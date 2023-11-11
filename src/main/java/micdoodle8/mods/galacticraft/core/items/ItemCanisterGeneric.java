@@ -1,244 +1,162 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.item.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.*;
+import java.util.*;
+import net.minecraft.nbt.*;
+import net.minecraftforge.fluids.*;
+import cpw.mods.fml.common.*;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
-
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.ItemFluidContainer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.CompatibilityManager;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.JavaUtil;
-
-public abstract class ItemCanisterGeneric extends ItemFluidContainer implements GCRarity
+public abstract class ItemCanisterGeneric extends ItemFluidContainer
 {
-
-    public final static int EMPTY = Fluid.BUCKET_VOLUME + 1;
-    private static boolean isTELoaded = CompatibilityManager.isTELoaded();
-
-    private String allowedFluid = null;
-
-    public ItemCanisterGeneric(String assetName)
-    {
-        super(Fluid.BUCKET_VOLUME);
-        this.setMaxDamage(ItemCanisterGeneric.EMPTY);
+    private String allowedFluid;
+    public static final int EMPTY = 1001;
+    private static boolean isTELoaded;
+    
+    public ItemCanisterGeneric(final String assetName) {
+        super(0, 1000);
+        this.allowedFluid = null;
+        this.setMaxDamage(1001);
         this.setMaxStackSize(1);
         this.setNoRepair();
-        this.setTranslationKey(assetName);
+        this.setUnlocalizedName(assetName);
         this.setContainerItem(GCItems.oilCanister);
-        this.setHasSubtypes(true);
     }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack)
-    {
-        return false;
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt)
-    {
-        return new ItemCanisterGenericHandler(stack);
-    }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            list.add(new ItemStack(this, 1, 1));
-        }
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        par3List.add(new ItemStack(par1, 1, 1));
     }
-
-    @Override
-    public ItemStack getContainerItem(ItemStack itemStack)
-    {
-        // Workaround for strange behaviour in TE Transposer
-        if (isTELoaded)
-        {
-            if (JavaUtil.instance.isCalledBy("thermalexpansion.block.machine.TileTransposer"))
-            {
-                return ItemStack.EMPTY;
+    
+    public ItemStack getContainerItem(final ItemStack itemStack) {
+        if (ItemCanisterGeneric.isTELoaded) {
+            final StackTraceElement[] st = Thread.currentThread().getStackTrace();
+            for (int imax = Math.max(st.length, 5), i = 1; i < imax; ++i) {
+                final String ste = st[i].getClassName();
+                if (ste.equals("thermalexpansion.block.machine.TileTransposer")) {
+                    return null;
+                }
             }
         }
-
-        return new ItemStack(this.getContainerItem(), 1, ItemCanisterGeneric.EMPTY);
+        return new ItemStack(this.getContainerItem(), 1, 1001);
     }
-
-    @Override
-    public void onUpdate(ItemStack par1ItemStack, World par2World, Entity par3Entity, int par4, boolean par5)
-    {
-        if (ItemCanisterGeneric.EMPTY == par1ItemStack.getItemDamage())
-        {
-            if (par1ItemStack.getItem() != GCItems.oilCanister)
-            {
+    
+    public void onUpdate(final ItemStack par1ItemStack, final World par2World, final Entity par3Entity, final int par4, final boolean par5) {
+        if (1001 == par1ItemStack.getItemDamage()) {
+            if (par1ItemStack.getItem() != GCItems.oilCanister) {
                 this.replaceEmptyCanisterItem(par1ItemStack, GCItems.oilCanister);
             }
-            par1ItemStack.setTagCompound(null);
-        } else if (par1ItemStack.getItemDamage() <= 0)
-        {
+            par1ItemStack.stackTagCompound = null;
+        }
+        else if (par1ItemStack.getItemDamage() <= 0) {
             par1ItemStack.setItemDamage(1);
         }
     }
-
-    public void setAllowedFluid(String name)
-    {
-        this.allowedFluid = name;
+    
+    public void setAllowedFluid(final String name) {
+        this.allowedFluid = new String(name);
     }
-
-    public String getAllowedFluid()
-    {
+    
+    public String getAllowedFluid() {
         return this.allowedFluid;
     }
-
-    public int fill(ItemStack container, FluidStack resource, boolean doFill)
-    {
-        if (resource == null || resource.getFluid() == null || resource.amount <= 0 || container == null || container.getItemDamage() <= 1 || !(container.getItem() instanceof ItemCanisterGeneric))
-        {
+    
+    public int fill(final ItemStack container, final FluidStack resource, final boolean doFill) {
+        if (resource == null || resource.getFluid() == null || resource.amount == 0 || container == null || container.getItemDamage() <= 1 || !(container.getItem() instanceof ItemCanisterGeneric)) {
             return 0;
         }
-        String fluidName = resource.getFluid().getName();
-
-        int capacityPlusOne = container.getItemDamage();
-        if (capacityPlusOne <= 1)
-        {
-            if (capacityPlusOne < 1)
-            {
-                // It shouldn't be possible, but just in case, set this to a
-                // proper filled item
-                container.setItemDamage(1);
-            }
-            return 0;
-        }
-        if (capacityPlusOne >= ItemCanisterGeneric.EMPTY)
-        {
-            // Empty canister - find a new canister to match the fluid
-            for (ItemCanisterGeneric i : GCItems.canisterTypes)
-            {
-                if (fluidName.equalsIgnoreCase(i.allowedFluid))
-                {
-                    if (!doFill)
-                    {
+        final String fluidName = resource.getFluid().getName();
+        if (container.getItemDamage() == 1001) {
+            for (final String key : GalacticraftCore.itemList.keySet()) {
+                if (key.contains("CanisterFull")) {
+                    final Item i = GalacticraftCore.itemList.get(key).getItem();
+                    if (!(i instanceof ItemCanisterGeneric) || !fluidName.equalsIgnoreCase(((ItemCanisterGeneric)i).allowedFluid)) {
+                        continue;
+                    }
+                    if (!doFill) {
                         return Math.min(resource.amount, this.capacity);
                     }
-
                     this.replaceEmptyCanisterItem(container, i);
                     break;
                 }
             }
-            if (capacityPlusOne > ItemCanisterGeneric.EMPTY)
-            {
-                // It shouldn't be possible, but just in case, set this to a
-                // proper empty item
-                capacityPlusOne = ItemCanisterGeneric.EMPTY;
-                container.setItemDamage(capacityPlusOne);
-            }
+            container.stackTagCompound = null;
         }
-
-        if (fluidName.equalsIgnoreCase(((ItemCanisterGeneric) container.getItem()).allowedFluid))
-        {
-            int added = Math.min(resource.amount, capacityPlusOne - 1);
-            if (doFill && added > 0)
-            {
+        else {
+            container.stackTagCompound = null;
+            super.fill(container, this.getFluid(container), true);
+        }
+        if (fluidName.equalsIgnoreCase(((ItemCanisterGeneric)container.getItem()).allowedFluid)) {
+            final int added = super.fill(container, resource, doFill);
+            if (doFill && added > 0) {
                 container.setItemDamage(Math.max(1, container.getItemDamage() - added));
             }
             return added;
         }
-
         return 0;
     }
-
-    public FluidStack drain(ItemStack container, int maxDrain, boolean doDrain)
-    {
-        if (this.allowedFluid == null || container.getItemDamage() >= ItemCanisterGeneric.EMPTY)
-        {
+    
+    public FluidStack drain(final ItemStack container, final int maxDrain, final boolean doDrain) {
+        if (this.allowedFluid == null || container.getItemDamage() >= 1001) {
             return null;
         }
-
-        FluidStack used = this.getFluid(container);
-        if (used != null && used.amount > maxDrain)
-            used.amount = maxDrain;
-        if (doDrain && used != null && used.amount > 0)
-        {
+        container.stackTagCompound = null;
+        super.fill(container, this.getFluid(container), true);
+        final FluidStack used = super.drain(container, maxDrain, doDrain);
+        if (doDrain && used != null && used.amount > 0) {
             this.setNewDamage(container, container.getItemDamage() + used.amount);
         }
         return used;
     }
-
-    protected void setNewDamage(ItemStack container, int newDamage)
-    {
-        newDamage = Math.min(newDamage, ItemCanisterGeneric.EMPTY);
-        container.setItemDamage(newDamage);
-        if (newDamage == ItemCanisterGeneric.EMPTY)
-        {
-            if (container.getItem() != GCItems.oilCanister)
-            {
+    
+    protected void setNewDamage(final ItemStack container, int newDamage) {
+        newDamage = Math.min(newDamage, 1001);
+        if (newDamage == 1001) {
+            container.stackTagCompound = null;
+            if (container.getItem() != GCItems.oilCanister) {
                 this.replaceEmptyCanisterItem(container, GCItems.oilCanister);
                 return;
             }
         }
+        container.setItemDamage(newDamage);
     }
-
-    private void replaceEmptyCanisterItem(ItemStack container, Item newItem)
-    {
-        try
-        {
-            Class itemStack = container.getClass();
-            Field itemId = itemStack.getDeclaredField(GCCoreUtil.isDeobfuscated() ? "item" : "field_151002_e");
-            itemId.setAccessible(true);
-            itemId.set(container, newItem);
-            Method forgeInit = itemStack.getDeclaredMethod("forgeInit");
-            forgeInit.setAccessible(true);
-            forgeInit.invoke(container);
-        } catch (Exception ignore)
-        {
-        }
+    
+    private void replaceEmptyCanisterItem(final ItemStack container, final Item newItem) {
+        final int stackSize = container.stackSize;
+        final NBTTagCompound tag = new NBTTagCompound();
+        tag.setShort("id", (short)Item.getIdFromItem(newItem));
+        tag.setByte("Count", (byte)stackSize);
+        tag.setShort("Damage", (short)1001);
+        container.readFromNBT(tag);
     }
-
-    public FluidStack getFluid(ItemStack container)
-    {
-        String fluidName = ((ItemCanisterGeneric) container.getItem()).allowedFluid;
-        if (fluidName == null || container.getItemDamage() >= ItemCanisterGeneric.EMPTY)
-        {
+    
+    public FluidStack getFluid(final ItemStack container) {
+        final String fluidName = ((ItemCanisterGeneric)container.getItem()).allowedFluid;
+        if (fluidName == null || 1001 == container.getItemDamage()) {
             return null;
         }
-
-        Fluid fluid = FluidRegistry.getFluid(fluidName);
-        if (fluid == null)
-        {
+        final Fluid fluid = FluidRegistry.getFluid(fluidName);
+        if (fluid == null) {
             return null;
         }
-
-        return new FluidStack(fluid, ItemCanisterGeneric.EMPTY - container.getItemDamage());
+        return new FluidStack(fluid, 1001 - container.getItemDamage());
+    }
+    
+    static {
+        ItemCanisterGeneric.isTELoaded = Loader.isModLoaded("ThermalExpansion");
     }
 }

@@ -1,45 +1,57 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.client.renderer.texture.*;
 
-public class ItemHeavyNoseCone extends Item implements ISortableItem, GCRarity
+public class ItemHeavyNoseCone extends Item
 {
-
-    public ItemHeavyNoseCone(String assetName)
-    {
-        super();
+    public IIcon[] icons;
+    
+    public ItemHeavyNoseCone(final String assetName) {
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
-        this.setTranslationKey(assetName);
+        this.setUnlocalizedName(assetName);
+        this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public boolean requiresMultipleRenderPasses() {
+        return true;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIconFromDamageForRenderPass(final int par1, final int par2) {
+        return (par2 == 0) ? this.icons[0] : this.icons[1];
+    }
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
-        return par1;
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.GENERAL;
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        (this.icons = new IIcon[2])[0] = iconRegister.registerIcon("galacticraftasteroids:heavyNoseCone");
+        this.icons[1] = iconRegister.registerIcon("galacticraftasteroids:heavyNoseCone.0");
+    }
+    
+    public IIcon getIconFromDamage(final int damage) {
+        if (this.icons.length > damage) {
+            return this.icons[damage];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
+    public int getMetadata(final int par1) {
+        return par1;
     }
 }

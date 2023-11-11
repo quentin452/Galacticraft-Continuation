@@ -1,119 +1,92 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.List;
-import java.util.Random;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import net.minecraft.block.BlockPlanks;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
-import net.minecraft.world.gen.structure.StructureComponent;
-import net.minecraft.world.gen.structure.template.TemplateManager;
+import net.minecraft.nbt.*;
+import net.minecraft.world.gen.structure.*;
+import java.util.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.init.*;
+import net.minecraft.block.*;
 
 public class StructureComponentVillageWell extends StructureComponentVillage
 {
-
-    private int averageGroundLevel = -1;
-
-    public StructureComponentVillageWell()
-    {
+    private int averageGroundLevel;
+    
+    public StructureComponentVillageWell() {
+        this.averageGroundLevel = -1;
     }
-
-    public StructureComponentVillageWell(StructureComponentVillageStartPiece par1ComponentVillageStartPiece, int par2, Random par3Random, int par4, int par5)
-    {
+    
+    public StructureComponentVillageWell(final StructureComponentVillageStartPiece par1ComponentVillageStartPiece, final int par2, final Random par3Random, final int par4, final int par5) {
         super(par1ComponentVillageStartPiece, par2);
-        this.setCoordBaseMode(EnumFacing.byIndex(par3Random.nextInt(4)));
-
-        switch (this.getCoordBaseMode().getHorizontalIndex())
-        {
+        this.averageGroundLevel = -1;
+        switch (this.coordBaseMode = par3Random.nextInt(4)) {
             case 0:
-            case 2:
+            case 2: {
                 this.boundingBox = new StructureBoundingBox(par4, 64, par5, par4 + 6 - 1, 78, par5 + 6 - 1);
                 break;
-            default:
+            }
+            default: {
                 this.boundingBox = new StructureBoundingBox(par4, 64, par5, par4 + 6 - 1, 78, par5 + 6 - 1);
+                break;
+            }
         }
     }
-
-    @Override
-    protected void writeStructureToNBT(NBTTagCompound nbt)
-    {
-        super.writeStructureToNBT(nbt);
-
+    
+    protected void func_143012_a(final NBTTagCompound nbt) {
+        super.func_143012_a(nbt);
         nbt.setInteger("AvgGroundLevel", this.averageGroundLevel);
     }
-
-    @Override
-    protected void readStructureFromNBT(NBTTagCompound nbt, TemplateManager manager)
-    {
-        super.readStructureFromNBT(nbt, manager);
-
+    
+    protected void func_143011_b(final NBTTagCompound nbt) {
+        super.func_143011_b(nbt);
         this.averageGroundLevel = nbt.getInteger("AvgGroundLevel");
     }
-
-    @Override
-    public void buildComponent(StructureComponent par1StructureComponent, List<StructureComponent> par2List, Random par3Random)
-    {
-        StructureVillagePiecesMoon.getNextStructureComponentVillagePath((StructureComponentVillageStartPiece) par1StructureComponent, par2List, par3Random, this.boundingBox.minX - 1,
-            this.boundingBox.maxY - 4, this.boundingBox.minZ + 1, EnumFacing.byHorizontalIndex(1), this.getComponentType());
-        StructureVillagePiecesMoon.getNextStructureComponentVillagePath((StructureComponentVillageStartPiece) par1StructureComponent, par2List, par3Random, this.boundingBox.maxX + 1,
-            this.boundingBox.maxY - 4, this.boundingBox.minZ + 1, EnumFacing.byHorizontalIndex(3), this.getComponentType());
-        StructureVillagePiecesMoon.getNextStructureComponentVillagePath((StructureComponentVillageStartPiece) par1StructureComponent, par2List, par3Random, this.boundingBox.minX + 1,
-            this.boundingBox.maxY - 4, this.boundingBox.minZ - 1, EnumFacing.byHorizontalIndex(2), this.getComponentType());
-        StructureVillagePiecesMoon.getNextStructureComponentVillagePath((StructureComponentVillageStartPiece) par1StructureComponent, par2List, par3Random, this.boundingBox.minX + 1,
-            this.boundingBox.maxY - 4, this.boundingBox.maxZ + 1, EnumFacing.byHorizontalIndex(0), this.getComponentType());
+    
+    public void buildComponent(final StructureComponent par1StructureComponent, final List par2List, final Random par3Random) {
+        StructureVillagePiecesMoon.getNextStructureComponentVillagePath((StructureComponentVillageStartPiece)par1StructureComponent, par2List, par3Random, this.boundingBox.minX - 1, this.boundingBox.maxY - 4, this.boundingBox.minZ + 1, 1, this.getComponentType());
+        StructureVillagePiecesMoon.getNextStructureComponentVillagePath((StructureComponentVillageStartPiece)par1StructureComponent, par2List, par3Random, this.boundingBox.maxX + 1, this.boundingBox.maxY - 4, this.boundingBox.minZ + 1, 3, this.getComponentType());
+        StructureVillagePiecesMoon.getNextStructureComponentVillagePath((StructureComponentVillageStartPiece)par1StructureComponent, par2List, par3Random, this.boundingBox.minX + 1, this.boundingBox.maxY - 4, this.boundingBox.minZ - 1, 2, this.getComponentType());
+        StructureVillagePiecesMoon.getNextStructureComponentVillagePath((StructureComponentVillageStartPiece)par1StructureComponent, par2List, par3Random, this.boundingBox.minX + 1, this.boundingBox.maxY - 4, this.boundingBox.maxZ + 1, 0, this.getComponentType());
     }
-
-    @Override
-    public boolean addComponentParts(World par1World, Random par2Random, StructureBoundingBox par3StructureBoundingBox)
-    {
-        if (this.averageGroundLevel < 0)
-        {
+    
+    public boolean addComponentParts(final World par1World, final Random par2Random, final StructureBoundingBox par3StructureBoundingBox) {
+        if (this.averageGroundLevel < 0) {
             this.averageGroundLevel = this.getAverageGroundLevel(par1World, par3StructureBoundingBox);
-
-            if (this.averageGroundLevel < 0)
-            {
+            if (this.averageGroundLevel < 0) {
                 return true;
             }
-
             this.boundingBox.offset(0, this.averageGroundLevel - this.boundingBox.maxY + 3, 0);
         }
-
-        this.fillWithBlocks(par1World, par3StructureBoundingBox, 1, 0, 1, 4, 12, 4, GCBlocks.basicBlock.getStateFromMeta(4), Blocks.FLOWING_WATER.getDefaultState(), false);
-        this.setBlockState(par1World, Blocks.AIR.getDefaultState(), 2, 12, 2, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.AIR.getDefaultState(), 3, 12, 2, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.AIR.getDefaultState(), 2, 12, 3, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.AIR.getDefaultState(), 3, 12, 3, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.DARK_OAK_FENCE.getDefaultState(), 1, 13, 1, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.DARK_OAK_FENCE.getDefaultState(), 1, 14, 1, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.DARK_OAK_FENCE.getDefaultState(), 4, 13, 1, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.DARK_OAK_FENCE.getDefaultState(), 4, 14, 1, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.DARK_OAK_FENCE.getDefaultState(), 1, 13, 4, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.DARK_OAK_FENCE.getDefaultState(), 1, 14, 4, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.DARK_OAK_FENCE.getDefaultState(), 4, 13, 4, par3StructureBoundingBox);
-        this.setBlockState(par1World, Blocks.DARK_OAK_FENCE.getDefaultState(), 4, 14, 4, par3StructureBoundingBox);
-        this.fillWithBlocks(par1World, par3StructureBoundingBox, 1, 15, 1, 4, 15, 4, GCBlocks.basicBlock.getStateFromMeta(4), GCBlocks.basicBlock.getStateFromMeta(4), false);
-
-        for (int var4 = 0; var4 <= 5; ++var4)
-        {
-            for (int var5 = 0; var5 <= 5; ++var5)
-            {
-                if (var5 == 0 || var5 == 5 || var4 == 0 || var4 == 5)
-                {
-                    this.setBlockState(par1World, Blocks.PLANKS.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.SPRUCE), var5, 11, var4, par3StructureBoundingBox);
+        this.fillWithMetadataBlocks(par1World, par3StructureBoundingBox, 1, 0, 1, 4, 12, 4, GCBlocks.basicBlock, 4, (Block)Blocks.flowing_water, 0, false);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.air, 0, 2, 12, 2, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.air, 0, 3, 12, 2, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.air, 0, 2, 12, 3, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.air, 0, 3, 12, 3, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.fence, 0, 1, 13, 1, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.fence, 0, 1, 14, 1, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.fence, 0, 4, 13, 1, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.fence, 0, 4, 14, 1, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.fence, 0, 1, 13, 4, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.fence, 0, 1, 14, 4, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.fence, 0, 4, 13, 4, par3StructureBoundingBox);
+        this.placeBlockAtCurrentPosition(par1World, Blocks.fence, 0, 4, 14, 4, par3StructureBoundingBox);
+        this.fillWithMetadataBlocks(par1World, par3StructureBoundingBox, 1, 15, 1, 4, 15, 4, GCBlocks.basicBlock, 4, GCBlocks.basicBlock, 4, false);
+        for (int var4 = 0; var4 <= 5; ++var4) {
+            for (int var5 = 0; var5 <= 5; ++var5) {
+                if (var5 == 0 || var5 == 5 || var4 == 0 || var4 == 5) {
+                    this.placeBlockAtCurrentPosition(par1World, Blocks.planks, 1, var5, 11, var4, par3StructureBoundingBox);
                     this.clearCurrentPositionBlocksUpwards(par1World, var5, 12, var4, par3StructureBoundingBox);
                 }
             }
         }
         return true;
+    }
+    
+    protected void fillWithBlocksAndMetadata(final World par1World, final StructureBoundingBox par2StructureBoundingBox, final int par3, final int par4, final int par5, final int par6, final int par7, final int par8, final Block par9, final Block par10, final boolean par11) {
+        final Block var12 = this.getBiomeSpecificBlock(par9, 0);
+        final int var13 = this.getBiomeSpecificBlockMetadata(par9, 0);
+        final Block var14 = this.getBiomeSpecificBlock(par10, 0);
+        final int var15 = this.getBiomeSpecificBlockMetadata(par10, 0);
+        super.fillWithMetadataBlocks(par1World, par2StructureBoundingBox, par3, par4, par5, par6, par7, par8, var12, var13, var14, var15, par11);
     }
 }

@@ -1,237 +1,164 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.tile.IMultiBlock;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityBuggyFueler;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityLandingPad;
+import micdoodle8.mods.galacticraft.api.block.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import java.util.*;
+import net.minecraft.tileentity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.client.renderer.texture.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.world.*;
+import net.minecraftforge.common.util.*;
+import net.minecraft.util.*;
+import net.minecraft.item.*;
 
 public class BlockLandingPadFull extends BlockAdvancedTile implements IPartialSealableBlock
 {
-
-    public static final PropertyEnum<EnumLandingPadFullType> PAD_TYPE = PropertyEnum.create("type", EnumLandingPadFullType.class);
-    private final AxisAlignedBB AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.1875D, 1.0D);
-
-    public enum EnumLandingPadFullType implements IStringSerializable
-    {
-
-        ROCKET_PAD(0, "rocket"), BUGGY_PAD(1, "buggy");
-
-        private final int meta;
-        private final String name;
-
-        EnumLandingPadFullType(int meta, String name)
-        {
-            this.meta = meta;
-            this.name = name;
-        }
-
-        public int getMeta()
-        {
-            return this.meta;
-        }
-
-        private final static EnumLandingPadFullType[] values = values();
-
-        public static EnumLandingPadFullType byMetadata(int meta)
-        {
-            return values[meta % values.length];
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
+    private IIcon[] icons;
+    
+    public BlockLandingPadFull(final String assetName) {
+        super(Material.rock);
+        this.icons = new IIcon[3];
+        this.setHardness(1.0f);
+        this.setResistance(10.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
+        this.maxY = 0.39;
     }
-
-    public BlockLandingPadFull(String assetName)
-    {
-        super(Material.ROCK);
-        this.setHardness(1.0F);
-        this.setResistance(10.0F);
-        this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(assetName);
-//        this.maxY = 0.25F;
+    
+    public int damageDropped(final int meta) {
+        return meta;
     }
-
-    @Override
-    public int damageDropped(IBlockState state)
-    {
-        return getMetaFromState(state);
-    }
-
-    @Override
-    public int quantityDropped(Random par1Random)
-    {
+    
+    public int quantityDropped(final Random par1Random) {
         return 9;
     }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        final TileEntity var9 = worldIn.getTileEntity(pos);
-
-        if (var9 instanceof IMultiBlock)
-        {
-            ((IMultiBlock) var9).onDestroy(var9);
+    
+    public void breakBlock(final World var1, final int var2, final int var3, final int var4, final Block var5, final int var6) {
+        final TileEntity var7 = var1.getTileEntity(var2, var3, var4);
+        if (var7 instanceof IMultiBlock) {
+            ((IMultiBlock)var7).onDestroy(var7);
         }
-
-        super.breakBlock(worldIn, pos, state);
+        super.breakBlock(var1, var2, var3, var4, var5, var6);
     }
-
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune)
-    {
+    
+    public Item getItemDropped(final int par1, final Random par2Random, final int par3) {
         return Item.getItemFromBlock(GCBlocks.landingPad);
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
-    {
-//        switch (getMetaFromState(blockState))
-//        {
-//        case 0:
-//            return new AxisAlignedBB(pos.getX() + this.minX, pos.getY() + this.minY, pos.getZ() + this.minZ,
-//                    pos.getX() + this.maxX, pos.getY() + this.maxY, pos.getZ() + this.maxZ); TODO
-//        case 2:
-//            return new AxisAlignedBB(pos.getX() + this.minX, pos.getY() + this.minY, pos.getZ() + this.minZ,
-//                    pos.getX() + this.maxX, pos.getY() + this.maxY, pos.getZ() + this.maxZ);
-//        default:
-//        }
-        return this.AABB;
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        switch (world.getBlockMetadata(x, y, z)) {
+            case 0: {
+                return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
+            }
+            case 2: {
+                return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
+            }
+            default: {
+                return AxisAlignedBB.getBoundingBox(x + 0.0, y + 0.0, z + 0.0, x + 1.0, y + 0.2, z + 1.0);
+            }
+        }
     }
-
-    @Override
-    public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
-    {
-        for (int x2 = -1; x2 < 2; ++x2)
-        {
-            for (int z2 = -1; z2 < 2; ++z2)
-            {
-                if (!super.canPlaceBlockAt(worldIn, new BlockPos(pos.getX() + x2, pos.getY(), pos.getZ() + z2)))
-                {
+    
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        switch (world.getBlockMetadata(x, y, z)) {
+            case 0: {
+                return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
+            }
+            case 2: {
+                return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
+            }
+            default: {
+                return AxisAlignedBB.getBoundingBox(x + 0.0, y + 0.0, z + 0.0, x + 1.0, y + 0.2, z + 1.0);
+            }
+        }
+    }
+    
+    public int getRenderType() {
+        return GalacticraftCore.proxy.getBlockRender((Block)this);
+    }
+    
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.icons[0] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "launch_pad");
+        this.icons[1] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "buggy_fueler");
+        this.icons[2] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "buggy_fueler_blank");
+        this.blockIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "launch_pad");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(final int par1, final int par2) {
+        switch (par2) {
+            case 0: {
+                return this.icons[0];
+            }
+            case 1: {
+                return this.icons[1];
+            }
+            case 2: {
+                return this.icons[2];
+            }
+            default: {
+                return this.blockIcon;
+            }
+        }
+    }
+    
+    public boolean canPlaceBlockAt(final World world, final int x, final int y, final int z) {
+        for (int x2 = -1; x2 < 2; ++x2) {
+            for (int z2 = -1; z2 < 2; ++z2) {
+                if (!super.canPlaceBlockAt(world, x + x2, y, z + z2)) {
                     return false;
                 }
             }
-
         }
-
         return true;
     }
-
-    @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
+    
+    public boolean hasTileEntity(final int metadata) {
         return true;
     }
-
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
-    {
-        switch (getMetaFromState(state))
-        {
-            case 0:
+    
+    public TileEntity createTileEntity(final World world, final int metadata) {
+        switch (metadata) {
+            case 0: {
                 return new TileEntityLandingPad();
-            case 1:
+            }
+            case 1: {
                 return new TileEntityBuggyFueler();
-            // case 2:
-            // return new GCCoreTileEntityCargoPad();
-            default:
+            }
+            default: {
                 return null;
+            }
         }
     }
-
-    @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
-    {
-        worldIn.notifyBlockUpdate(pos, state, state, 3);
+    
+    public void onNeighborBlockChange(final World par1World, final int par2, final int par3, final int par4, final Block par5) {
+        par1World.markBlockForUpdate(par2, par3, par4);
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
-    }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
-    {
+    public boolean shouldSideBeRendered(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4, final int par5) {
         return true;
     }
-
-    @Override
-    public boolean isSealed(World worldIn, BlockPos pos, EnumFacing direction)
-    {
-        return direction == EnumFacing.UP;
+    
+    public boolean isSealed(final World world, final int x, final int y, final int z, final ForgeDirection direction) {
+        return direction == ForgeDirection.UP;
     }
-
-    @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
-    {
-        int metadata = getMetaFromState(state);
+    
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        final int metadata = world.getBlockMetadata(x, y, z);
         return new ItemStack(Item.getItemFromBlock(GCBlocks.landingPad), 1, metadata);
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(PAD_TYPE, EnumLandingPadFullType.byMetadata(meta));
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return ((EnumLandingPadFullType) state.getValue(PAD_TYPE)).getMeta();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, PAD_TYPE);
     }
 }

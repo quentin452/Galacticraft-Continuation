@@ -1,175 +1,93 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.recipe;
 
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.items.ItemOxygenTank;
-import micdoodle8.mods.galacticraft.planets.asteroids.items.ItemCanisterLiquidOxygen;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
+import net.minecraft.item.crafting.*;
+import java.util.*;
+import net.minecraft.inventory.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.items.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.item.*;
 
 public class CanisterRecipes extends ShapelessRecipes
 {
-
-    public CanisterRecipes(ItemStack stack, NonNullList<Ingredient> list)
-    {
-        super("canisters", stack, list);
+    public CanisterRecipes(final ItemStack stack, final List list) {
+        super(stack, list);
     }
-
-    /**
-     * Used to check if a recipe matches current crafting inventory
-     */
-    @Override
-    public boolean matches(InventoryCrafting p_77569_1_, World p_77569_2_)
-    {
-        ItemStack itemCanister = ItemStack.EMPTY;
-        ItemStack itemTank = ItemStack.EMPTY;
-
-        for (int i = 0; i < p_77569_1_.getSizeInventory(); ++i)
-        {
-            ItemStack itemstack1 = p_77569_1_.getStackInSlot(i);
-
-            if (!itemstack1.isEmpty())
-            {
-                Item testItem = itemstack1.getItem();
-                if (testItem instanceof ItemCanisterLiquidOxygen || testItem == GCItems.oxygenCanisterInfinite)
-                {
-                    if (!itemCanister.isEmpty())
-                    {
-                        // Two canisters
+    
+    public boolean matches(final InventoryCrafting p_77569_1_, final World p_77569_2_) {
+        ItemStack itemCanister = null;
+        ItemStack itemTank = null;
+        for (int i = 0; i < p_77569_1_.getSizeInventory(); ++i) {
+            final ItemStack itemstack1 = p_77569_1_.getStackInSlot(i);
+            if (itemstack1 != null) {
+                final Item testItem = itemstack1.getItem();
+                if (testItem instanceof ItemCanisterLiquidOxygen || testItem == GCItems.oxygenCanisterInfinite) {
+                    if (itemCanister != null) {
                         return false;
                     }
-
                     itemCanister = itemstack1;
-                } else
-                {
-                    if (!(testItem instanceof ItemOxygenTank) || !itemTank.isEmpty())
-                    {
-                        // Something other than an oxygen tank
+                }
+                else {
+                    if (!(testItem instanceof ItemOxygenTank) || itemTank != null) {
                         return false;
                     }
-
                     itemTank = itemstack1;
                 }
             }
         }
-
-        // Need one canister + one tank
-        if (itemCanister.isEmpty() || itemTank.isEmpty())
-        {
-            return false;
-        }
-
-        // Empty canister
-        if (itemCanister.getItemDamage() >= itemCanister.getMaxDamage())
-        {
-            return false;
-        }
-
-        // Full tank
-        if (itemTank.getItemDamage() <= 0)
-        {
-            return false;
-        }
-
-        return true;
+        return itemCanister != null && itemTank != null && itemCanister.getItemDamage() < itemCanister.getMaxDamage() && itemTank.getItemDamage() > 0;
     }
-
-    /**
-     * Returns an Item that is the result of this recipe
-     */
-    @Override
-    public ItemStack getCraftingResult(InventoryCrafting inv)
-    {
-        ItemStack itemTank = null; // Intentionally null - internal use only
-        ItemStack itemCanister = null; // Intentionally null - internal use only
-
-        for (int i = 0; i < inv.getSizeInventory(); ++i)
-        {
-            ItemStack itemstack1 = inv.getStackInSlot(i);
-
-            if (!itemstack1.isEmpty())
-            {
-                Item testItem = itemstack1.getItem();
-                if (testItem instanceof ItemCanisterLiquidOxygen || testItem == GCItems.oxygenCanisterInfinite)
-                {
-                    // Intentional item null check
-                    if (itemCanister != null)
-                    {
-                        // Two canisters
-                        return ItemStack.EMPTY;
+    
+    public ItemStack getCraftingResult(final InventoryCrafting inv) {
+        ItemStack itemTank = null;
+        ItemStack itemCanister = null;
+        for (int i = 0; i < inv.getSizeInventory(); ++i) {
+            final ItemStack itemstack1 = inv.getStackInSlot(i);
+            if (itemstack1 != null) {
+                final Item testItem = itemstack1.getItem();
+                if (testItem instanceof ItemCanisterLiquidOxygen || testItem == GCItems.oxygenCanisterInfinite) {
+                    if (itemCanister != null) {
+                        return null;
                     }
-
                     itemCanister = itemstack1;
-                } else
-                {
-                    // Intentional item null check
-                    if (!(testItem instanceof ItemOxygenTank) || itemTank != null)
-                    {
-                        // Something other than an oxygen tank
-                        return ItemStack.EMPTY;
+                }
+                else {
+                    if (!(testItem instanceof ItemOxygenTank) || itemTank != null) {
+                        return null;
                     }
-
                     itemTank = itemstack1;
                 }
             }
         }
-
-        // Need one canister + one tank (intentional item null check)
-        if (itemCanister == null || itemTank == null)
-        {
-            return ItemStack.EMPTY;
+        if (itemCanister == null || itemTank == null) {
+            return null;
         }
-
-        // Empty canister
-        if (itemCanister.getItemDamage() >= itemCanister.getMaxDamage())
-        {
-            return ItemStack.EMPTY;
+        if (itemCanister.getItemDamage() >= itemCanister.getMaxDamage()) {
+            return null;
         }
-
-        // Full tank
-        if (itemTank.getItemDamage() <= 0)
-        {
-            return ItemStack.EMPTY;
+        if (itemTank.getItemDamage() <= 0) {
+            return null;
         }
-
-        int oxygenAvail = itemCanister.getMaxDamage() - itemCanister.getItemDamage();
-        int oxygenToFill = itemTank.getItemDamage() * 5 / 54;
-
-        if (oxygenAvail >= oxygenToFill)
-        {
-            ItemStack result = itemTank.copy();
+        final int oxygenAvail = itemCanister.getMaxDamage() - itemCanister.getItemDamage();
+        final int oxygenToFill = itemTank.getItemDamage() * 5 / 54;
+        if (oxygenAvail >= oxygenToFill) {
+            final ItemStack result = itemTank.copy();
             result.setItemDamage(0);
-            if (itemCanister.getItem() instanceof ItemCanisterLiquidOxygen)
-            {
+            if (itemCanister.getItem() instanceof ItemCanisterLiquidOxygen) {
                 ItemCanisterLiquidOxygen.saveDamage(itemCanister, itemCanister.getItemDamage() + oxygenToFill);
             }
             return result;
         }
-
-        int tankDamageNew = (oxygenToFill - oxygenAvail) * 54 / 5;
-        ItemStack result = itemTank.copy();
-        result.setItemDamage(tankDamageNew);
-        if (itemCanister.getItem() instanceof ItemCanisterLiquidOxygen)
-        {
+        final int tankDamageNew = (oxygenToFill - oxygenAvail) * 54 / 5;
+        final ItemStack result2 = itemTank.copy();
+        result2.setItemDamage(tankDamageNew);
+        if (itemCanister.getItem() instanceof ItemCanisterLiquidOxygen) {
             ItemCanisterLiquidOxygen.saveDamage(itemCanister, itemCanister.getMaxDamage());
         }
-        return result;
+        return result2;
     }
-
-    @Override
-    public boolean canFit(int width, int height)
-    {
-        return width * height >= 2;
+    
+    public int getRecipeSize() {
+        return 2;
     }
 }

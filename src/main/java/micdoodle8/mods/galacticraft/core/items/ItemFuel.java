@@ -1,23 +1,24 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.item.Item;
+import net.minecraft.client.renderer.texture.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-
-public class ItemFuel extends Item implements GCRarity
+public class ItemFuel extends Item
 {
-
-    public ItemFuel(String assetName)
-    {
-        super();
-        this.setTranslationKey(assetName);
+    public ItemFuel(final String assetName) {
+        this.setUnlocalizedName(assetName);
     }
-
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister par1IconRegister) {
+        this.itemIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "fuel_flow");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
 }

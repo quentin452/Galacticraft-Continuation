@@ -1,22 +1,13 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.model;
 
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
-import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.model.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import org.lwjgl.opengl.*;
+import net.minecraft.util.*;
 
 public class ModelEvolvedZombie extends ModelBiped
 {
-
     ModelRenderer leftOxygenTank;
     ModelRenderer rightOxygenTank;
     ModelRenderer tubeRight2;
@@ -37,153 +28,127 @@ public class ModelEvolvedZombie extends ModelBiped
     ModelRenderer oxygenMask;
     private float saveGravity;
     private boolean renderGear;
-
-    public ModelEvolvedZombie(boolean renderGear)
-    {
-        this(0.0F, false, renderGear);
+    
+    public ModelEvolvedZombie(final boolean renderGear) {
+        this(0.0f, false, renderGear);
     }
-
-    public ModelEvolvedZombie(float par1, boolean halfSizeTexture, boolean renderGear)
-    {
-        this.textureWidth = halfSizeTexture ? 64 : 128;
-        this.textureHeight = halfSizeTexture ? 32 : 64;
+    
+    public ModelEvolvedZombie(final float par1, final boolean halfSizeTexture, final boolean renderGear) {
+        this.textureWidth = (halfSizeTexture ? 64 : 128);
+        this.textureHeight = (halfSizeTexture ? 32 : 64);
         this.renderGear = renderGear;
         final int par2 = 0;
-        this.leftOxygenTank = new ModelRenderer(this, 56, 20);
-        this.leftOxygenTank.addBox(-1.5F, 0F, -1.5F, 3, 7, 3, par1);
-        this.leftOxygenTank.setRotationPoint(2F, 2F, 3.8F);
+        (this.leftOxygenTank = new ModelRenderer((ModelBase)this, 56, 20)).addBox(-1.5f, 0.0f, -1.5f, 3, 7, 3, par1);
+        this.leftOxygenTank.setRotationPoint(2.0f, 2.0f, 3.8f);
         this.leftOxygenTank.mirror = true;
-        this.setRotation(this.leftOxygenTank, 0F, 0F, 0F);
-        this.rightOxygenTank = new ModelRenderer(this, 56, 20);
-        this.rightOxygenTank.addBox(-1.5F, 0F, -1.5F, 3, 7, 3, par1);
-        this.rightOxygenTank.setRotationPoint(-2F, 2F, 3.8F);
+        this.setRotation(this.leftOxygenTank, 0.0f, 0.0f, 0.0f);
+        (this.rightOxygenTank = new ModelRenderer((ModelBase)this, 56, 20)).addBox(-1.5f, 0.0f, -1.5f, 3, 7, 3, par1);
+        this.rightOxygenTank.setRotationPoint(-2.0f, 2.0f, 3.8f);
         this.rightOxygenTank.mirror = true;
-        this.setRotation(this.rightOxygenTank, 0F, 0F, 0F);
-        this.tubeRight2 = new ModelRenderer(this, 56, 30);
-        this.tubeRight2.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeRight2.setRotationPoint(-2F, 2F, 6.8F);
+        this.setRotation(this.rightOxygenTank, 0.0f, 0.0f, 0.0f);
+        (this.tubeRight2 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeRight2.setRotationPoint(-2.0f, 2.0f, 6.8f);
         this.tubeRight2.mirror = true;
-        this.setRotation(this.tubeRight2, 0F, 0F, 0F);
-        this.tubeLeft1 = new ModelRenderer(this, 56, 30);
-        this.tubeLeft1.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeLeft1.setRotationPoint(2F, 3F, 5.8F);
+        this.setRotation(this.tubeRight2, 0.0f, 0.0f, 0.0f);
+        (this.tubeLeft1 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeLeft1.setRotationPoint(2.0f, 3.0f, 5.8f);
         this.tubeLeft1.mirror = true;
-        this.setRotation(this.tubeLeft1, 0F, 0F, 0F);
-        this.tubeRight3 = new ModelRenderer(this, 56, 30);
-        this.tubeRight3.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeRight3.setRotationPoint(-2F, 1F, 6.8F);
+        this.setRotation(this.tubeLeft1, 0.0f, 0.0f, 0.0f);
+        (this.tubeRight3 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeRight3.setRotationPoint(-2.0f, 1.0f, 6.8f);
         this.tubeRight3.mirror = true;
-        this.setRotation(this.tubeRight3, 0F, 0F, 0F);
-        this.tubeRight4 = new ModelRenderer(this, 56, 30);
-        this.tubeRight4.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeRight4.setRotationPoint(-2F, 0F, 6.8F);
+        this.setRotation(this.tubeRight3, 0.0f, 0.0f, 0.0f);
+        (this.tubeRight4 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeRight4.setRotationPoint(-2.0f, 0.0f, 6.8f);
         this.tubeRight4.mirror = true;
-        this.setRotation(this.tubeRight4, 0F, 0F, 0F);
-        this.tubeRight5 = new ModelRenderer(this, 56, 30);
-        this.tubeRight5.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeRight5.setRotationPoint(-2F, -1F, 6.8F);
+        this.setRotation(this.tubeRight4, 0.0f, 0.0f, 0.0f);
+        (this.tubeRight5 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeRight5.setRotationPoint(-2.0f, -1.0f, 6.8f);
         this.tubeRight5.mirror = true;
-        this.setRotation(this.tubeRight5, 0F, 0F, 0F);
-        this.tubeLeft6 = new ModelRenderer(this, 56, 30);
-        this.tubeLeft6.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeLeft6.setRotationPoint(2F, -2F, 5.8F);
+        this.setRotation(this.tubeRight5, 0.0f, 0.0f, 0.0f);
+        (this.tubeLeft6 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeLeft6.setRotationPoint(2.0f, -2.0f, 5.8f);
         this.tubeLeft6.mirror = true;
-        this.setRotation(this.tubeLeft6, 0F, 0F, 0F);
-        this.tubeRight7 = new ModelRenderer(this, 56, 30);
-        this.tubeRight7.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeRight7.setRotationPoint(-2F, -3F, 4.8F);
+        this.setRotation(this.tubeLeft6, 0.0f, 0.0f, 0.0f);
+        (this.tubeRight7 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeRight7.setRotationPoint(-2.0f, -3.0f, 4.8f);
         this.tubeRight7.mirror = true;
-        this.setRotation(this.tubeRight7, 0F, 0F, 0F);
-        this.tubeRight1 = new ModelRenderer(this, 56, 30);
-        this.tubeRight1.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeRight1.setRotationPoint(-2F, 3F, 5.8F);
+        this.setRotation(this.tubeRight7, 0.0f, 0.0f, 0.0f);
+        (this.tubeRight1 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeRight1.setRotationPoint(-2.0f, 3.0f, 5.8f);
         this.tubeRight1.mirror = true;
-        this.setRotation(this.tubeRight1, 0F, 0F, 0F);
-        this.tubeLeft2 = new ModelRenderer(this, 56, 30);
-        this.tubeLeft2.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeLeft2.setRotationPoint(2F, 2F, 6.8F);
+        this.setRotation(this.tubeRight1, 0.0f, 0.0f, 0.0f);
+        (this.tubeLeft2 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeLeft2.setRotationPoint(2.0f, 2.0f, 6.8f);
         this.tubeLeft2.mirror = true;
-        this.setRotation(this.tubeLeft2, 0F, 0F, 0F);
-        this.tubeLeft3 = new ModelRenderer(this, 56, 30);
-        this.tubeLeft3.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeLeft3.setRotationPoint(2F, 1F, 6.8F);
+        this.setRotation(this.tubeLeft2, 0.0f, 0.0f, 0.0f);
+        (this.tubeLeft3 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeLeft3.setRotationPoint(2.0f, 1.0f, 6.8f);
         this.tubeLeft3.mirror = true;
-        this.setRotation(this.tubeLeft3, 0F, 0F, 0F);
-        this.tubeLeft4 = new ModelRenderer(this, 56, 30);
-        this.tubeLeft4.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeLeft4.setRotationPoint(2F, 0F, 6.8F);
+        this.setRotation(this.tubeLeft3, 0.0f, 0.0f, 0.0f);
+        (this.tubeLeft4 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeLeft4.setRotationPoint(2.0f, 0.0f, 6.8f);
         this.tubeLeft4.mirror = true;
-        this.setRotation(this.tubeLeft4, 0F, 0F, 0F);
-        this.tubeLeft5 = new ModelRenderer(this, 56, 30);
-        this.tubeLeft5.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeLeft5.setRotationPoint(2F, -1F, 6.8F);
+        this.setRotation(this.tubeLeft4, 0.0f, 0.0f, 0.0f);
+        (this.tubeLeft5 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeLeft5.setRotationPoint(2.0f, -1.0f, 6.8f);
         this.tubeLeft5.mirror = true;
-        this.setRotation(this.tubeLeft5, 0F, 0F, 0F);
-        this.tubeLeft7 = new ModelRenderer(this, 56, 30);
-        this.tubeLeft7.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeLeft7.setRotationPoint(2F, -3F, 4.8F);
+        this.setRotation(this.tubeLeft5, 0.0f, 0.0f, 0.0f);
+        (this.tubeLeft7 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeLeft7.setRotationPoint(2.0f, -3.0f, 4.8f);
         this.tubeLeft7.mirror = true;
-        this.setRotation(this.tubeLeft7, 0F, 0F, 0F);
-        this.tubeRight6 = new ModelRenderer(this, 56, 30);
-        this.tubeRight6.addBox(-0.5F, -0.5F, -0.5F, 1, 1, 1, par1);
-        this.tubeRight6.setRotationPoint(-2F, -2F, 5.8F);
+        this.setRotation(this.tubeLeft7, 0.0f, 0.0f, 0.0f);
+        (this.tubeRight6 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(-0.5f, -0.5f, -0.5f, 1, 1, 1, par1);
+        this.tubeRight6.setRotationPoint(-2.0f, -2.0f, 5.8f);
         this.tubeRight6.mirror = true;
-        this.setRotation(this.tubeRight6, 0F, 0F, 0F);
-        this.tubeLeft8 = new ModelRenderer(this, 56, 30);
-        this.tubeLeft8.addBox(0F, 0F, 0F, 1, 1, 1, par1);
-        this.tubeLeft8.setRotationPoint(0F, -5F, 0F);
+        this.setRotation(this.tubeRight6, 0.0f, 0.0f, 0.0f);
+        (this.tubeLeft8 = new ModelRenderer((ModelBase)this, 56, 30)).addBox(0.0f, 0.0f, 0.0f, 1, 1, 1, par1);
+        this.tubeLeft8.setRotationPoint(0.0f, -5.0f, 0.0f);
         this.tubeLeft8.mirror = true;
-        this.setRotation(this.tubeLeft8, 0F, 0F, 0F);
-        this.oxygenMask = new ModelRenderer(this, 56, 0);
-        this.oxygenMask.addBox(-5F, -9F, -5F, 10, 10, 10, par1);
-        this.oxygenMask.setRotationPoint(0F, 0F, 0F);
+        this.setRotation(this.tubeLeft8, 0.0f, 0.0f, 0.0f);
+        (this.oxygenMask = new ModelRenderer((ModelBase)this, 56, 0)).addBox(-5.0f, -9.0f, -5.0f, 10, 10, 10, par1);
+        this.oxygenMask.setRotationPoint(0.0f, 0.0f, 0.0f);
         this.oxygenMask.mirror = true;
-        this.setRotation(this.oxygenMask, 0F, 0F, 0F);
-        this.bipedHead = new ModelRenderer(this, 0, 0);
-        this.bipedHead.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, par1);
-        this.bipedHead.setRotationPoint(0.0F, 0.0F + par2, 0.0F);
-        this.bipedBody = new ModelRenderer(this, 16, 16);
-        this.bipedBody.addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, par1);
-        this.bipedBody.setRotationPoint(0.0F, 0.0F + par2, 0.0F);
-        this.bipedRightArm = new ModelRenderer(this, 40, 16);
-        this.bipedRightArm.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, par1);
-        this.bipedRightArm.setRotationPoint(-5.0F, 2.0F + par2, 0.0F);
-        this.bipedLeftArm = new ModelRenderer(this, 40, 16);
+        this.setRotation(this.oxygenMask, 0.0f, 0.0f, 0.0f);
+        (this.bipedCloak = new ModelRenderer((ModelBase)this, 0, 0)).addBox(-5.0f, 0.0f, -1.0f, 10, 16, 1, par1);
+        (this.bipedEars = new ModelRenderer((ModelBase)this, 24, 0)).addBox(-3.0f, -6.0f, -1.0f, 6, 6, 1, par1);
+        (this.bipedHead = new ModelRenderer((ModelBase)this, 0, 0)).addBox(-4.0f, -8.0f, -4.0f, 8, 8, 8, par1);
+        this.bipedHead.setRotationPoint(0.0f, 0.0f, 0.0f);
+        (this.bipedHeadwear = new ModelRenderer((ModelBase)this, 32, 0)).addBox(-4.0f, -8.0f, -4.0f, 8, 8, 8, par1 + 0.5f);
+        this.bipedHeadwear.setRotationPoint(0.0f, 0.0f, 0.0f);
+        (this.bipedBody = new ModelRenderer((ModelBase)this, 16, 16)).addBox(-4.0f, 0.0f, -2.0f, 8, 12, 4, par1);
+        this.bipedBody.setRotationPoint(0.0f, 0.0f, 0.0f);
+        (this.bipedRightArm = new ModelRenderer((ModelBase)this, 40, 16)).addBox(-3.0f, -2.0f, -2.0f, 4, 12, 4, par1);
+        this.bipedRightArm.setRotationPoint(-5.0f, 2.0f, 0.0f);
+        this.bipedLeftArm = new ModelRenderer((ModelBase)this, 40, 16);
         this.bipedLeftArm.mirror = true;
-        this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, par1);
-        this.bipedLeftArm.setRotationPoint(5.0F, 2.0F + par2, 0.0F);
-        this.bipedRightLeg = new ModelRenderer(this, 0, 16);
-        this.bipedRightLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, par1);
-        this.bipedRightLeg.setRotationPoint(-2.0F, 12.0F + par2, 0.0F);
-        this.bipedLeftLeg = new ModelRenderer(this, 0, 16);
+        this.bipedLeftArm.addBox(-1.0f, -2.0f, -2.0f, 4, 12, 4, par1);
+        this.bipedLeftArm.setRotationPoint(5.0f, 2.0f, 0.0f);
+        (this.bipedRightLeg = new ModelRenderer((ModelBase)this, 0, 16)).addBox(-2.0f, 0.0f, -2.0f, 4, 12, 4, par1);
+        this.bipedRightLeg.setRotationPoint(-2.0f, 12.0f, 0.0f);
+        this.bipedLeftLeg = new ModelRenderer((ModelBase)this, 0, 16);
         this.bipedLeftLeg.mirror = true;
-        this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, par1);
-        this.bipedLeftLeg.setRotationPoint(2.0F, 12.0F + par2, 0.0F);
+        this.bipedLeftLeg.addBox(-2.0f, 0.0f, -2.0f, 4, 12, 4, par1);
+        this.bipedLeftLeg.setRotationPoint(2.0f, 12.0f, 0.0f);
     }
-
-    @Override
-    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5)
-    {
+    
+    public void render(final Entity entity, final float f, final float f1, final float f2, final float f3, final float f4, final float f5) {
         this.saveGravity = WorldUtil.getGravityFactor(entity);
-        this.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
-
-        if (this.isChild)
-        {
-            float f6 = 2.0F;
+        this.setRotationAngles(f, f1, f2, f3, f4, f5);
+        if (this.isChild) {
+            final float f6 = 2.0f;
             GL11.glPushMatrix();
-            GL11.glScalef(1.5F / f6, 1.5F / f6, 1.5F / f6);
-            GL11.glTranslatef(0.0F, 16.0F * f5, 0.0F);
+            GL11.glScalef(1.5f / f6, 1.5f / f6, 1.5f / f6);
+            GL11.glTranslatef(0.0f, 16.0f * f5, 0.0f);
             this.bipedHead.render(f5);
-            if (this.renderGear)
-            {
+            if (this.renderGear) {
                 this.oxygenMask.render(f5);
             }
             GL11.glPopMatrix();
             GL11.glPushMatrix();
-            GL11.glScalef(1.0F / f6, 1.0F / f6, 1.0F / f6);
-            GL11.glTranslatef(0.0F, 24.0F * f5, 0.0F);
-            if (this.renderGear)
-            {
+            GL11.glScalef(1.0f / f6, 1.0f / f6, 1.0f / f6);
+            GL11.glTranslatef(0.0f, 24.0f * f5, 0.0f);
+            if (this.renderGear) {
                 this.leftOxygenTank.render(f5);
                 this.rightOxygenTank.render(f5);
                 this.tubeRight2.render(f5);
@@ -207,11 +172,11 @@ public class ModelEvolvedZombie extends ModelBiped
             this.bipedLeftArm.render(f5);
             this.bipedRightLeg.render(f5);
             this.bipedLeftLeg.render(f5);
+            this.bipedHeadwear.render(f5);
             GL11.glPopMatrix();
-        } else
-        {
-            if (this.renderGear)
-            {
+        }
+        else {
+            if (this.renderGear) {
                 this.leftOxygenTank.render(f5);
                 this.rightOxygenTank.render(f5);
                 this.tubeRight2.render(f5);
@@ -237,35 +202,100 @@ public class ModelEvolvedZombie extends ModelBiped
             this.bipedLeftArm.render(f5);
             this.bipedRightLeg.render(f5);
             this.bipedLeftLeg.render(f5);
+            this.bipedHeadwear.render(f5);
         }
     }
-
-    private void setRotation(ModelRenderer model, float x, float y, float z)
-    {
+    
+    private void setRotation(final ModelRenderer model, final float x, final float y, final float z) {
         model.rotateAngleX = x;
         model.rotateAngleY = y;
         model.rotateAngleZ = z;
     }
-
-    @Override
-    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity entityIn)
-    {
-        super.setRotationAngles(p_78087_1_, p_78087_2_, p_78087_3_, p_78087_4_, p_78087_5_, p_78087_6_, entityIn);
-        float f = MathHelper.sin(this.swingProgress * (float) Math.PI);
-        float f1 = MathHelper.sin((1.0F - (1.0F - this.swingProgress) * (1.0F - this.swingProgress)) * (float) Math.PI);
-        this.bipedRightArm.rotateAngleZ = 0.0F;
-        this.bipedLeftArm.rotateAngleZ = 0.0F;
-        this.bipedRightArm.rotateAngleY = -(0.1F - f * 0.6F);
-        this.bipedLeftArm.rotateAngleY = 0.1F - f * 0.6F;
-        this.bipedRightArm.rotateAngleX = -((float) Math.PI / 2F);
-        this.bipedLeftArm.rotateAngleX = -((float) Math.PI / 2F);
-        this.bipedRightArm.rotateAngleX -= f * 1.2F - f1 * 0.4F;
-        this.bipedLeftArm.rotateAngleX -= f * 1.2F - f1 * 0.4F;
-        this.bipedRightArm.rotateAngleZ += MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
-        this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(p_78087_3_ * 0.09F) * 0.05F + 0.05F;
-        this.bipedRightArm.rotateAngleX += MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
-        this.bipedLeftArm.rotateAngleX -= MathHelper.sin(p_78087_3_ * 0.067F) * 0.05F;
-
-        copyModelAngles(this.bipedHead, this.oxygenMask);
+    
+    public void setRotationAngles(final float par1, final float par2, final float par3, final float par4, final float par5, final float par6) {
+        this.bipedHead.rotateAngleY = par4 / 57.295776f;
+        this.bipedHead.rotateAngleX = par5 / 57.295776f;
+        this.oxygenMask.rotateAngleY = par4 / 57.295776f;
+        this.oxygenMask.rotateAngleX = par5 / 57.295776f;
+        this.bipedHeadwear.rotateAngleY = this.bipedHead.rotateAngleY;
+        this.bipedHeadwear.rotateAngleX = this.bipedHead.rotateAngleX;
+        this.bipedRightArm.rotateAngleX = MathHelper.cos(par1 * 0.6662f + 3.1415927f) * 2.0f * par2 * 0.5f;
+        this.bipedLeftArm.rotateAngleX = MathHelper.cos(par1 * 0.6662f) * 2.0f * par2 * 0.5f;
+        this.bipedRightArm.rotateAngleZ = 0.0f;
+        this.bipedLeftArm.rotateAngleZ = 0.0f;
+        this.bipedRightLeg.rotateAngleX = MathHelper.cos(par1 * 0.6662f / this.saveGravity) * (1.5f - this.saveGravity) * par2;
+        this.bipedLeftLeg.rotateAngleX = MathHelper.cos(par1 * 0.6662f / this.saveGravity + 3.1415927f) * (1.5f - this.saveGravity) * par2;
+        this.bipedRightLeg.rotateAngleY = 0.0f;
+        this.bipedLeftLeg.rotateAngleY = 0.0f;
+        if (this.isRiding) {
+            final ModelRenderer bipedRightArm = this.bipedRightArm;
+            bipedRightArm.rotateAngleX -= 0.62831855f;
+            final ModelRenderer bipedLeftArm = this.bipedLeftArm;
+            bipedLeftArm.rotateAngleX -= 0.62831855f;
+            this.bipedRightLeg.rotateAngleX = -1.2566371f;
+            this.bipedLeftLeg.rotateAngleX = -1.2566371f;
+            this.bipedRightLeg.rotateAngleY = 0.31415927f;
+            this.bipedLeftLeg.rotateAngleY = -0.31415927f;
+        }
+        this.bipedRightArm.rotateAngleY = 0.0f;
+        this.bipedLeftArm.rotateAngleY = 0.0f;
+        if (this.onGround > -9990.0f) {
+            float var7 = this.onGround;
+            this.bipedBody.rotateAngleY = MathHelper.sin(MathHelper.sqrt_float(var7) * 3.1415927f * 2.0f) * 0.2f;
+            this.bipedRightArm.rotationPointZ = MathHelper.sin(this.bipedBody.rotateAngleY) * 5.0f;
+            this.bipedRightArm.rotationPointX = -MathHelper.cos(this.bipedBody.rotateAngleY) * 5.0f;
+            this.bipedLeftArm.rotationPointZ = -MathHelper.sin(this.bipedBody.rotateAngleY) * 5.0f;
+            this.bipedLeftArm.rotationPointX = MathHelper.cos(this.bipedBody.rotateAngleY) * 5.0f;
+            final ModelRenderer bipedRightArm2 = this.bipedRightArm;
+            bipedRightArm2.rotateAngleY += this.bipedBody.rotateAngleY;
+            final ModelRenderer bipedLeftArm2 = this.bipedLeftArm;
+            bipedLeftArm2.rotateAngleY += this.bipedBody.rotateAngleY;
+            final ModelRenderer bipedLeftArm3 = this.bipedLeftArm;
+            bipedLeftArm3.rotateAngleX += this.bipedBody.rotateAngleY;
+            var7 = 1.0f - this.onGround;
+            var7 *= var7;
+            var7 *= var7;
+            var7 = 1.0f - var7;
+            final float var8 = MathHelper.sin(var7 * 3.1415927f);
+            final float var9 = MathHelper.sin(this.onGround * 3.1415927f) * -(this.bipedHead.rotateAngleX - 0.7f) * 0.75f;
+            this.bipedRightArm.rotateAngleX -= (float)(var8 * 1.2 + var9);
+            final ModelRenderer bipedRightArm3 = this.bipedRightArm;
+            bipedRightArm3.rotateAngleY += this.bipedBody.rotateAngleY * 2.0f;
+            this.bipedRightArm.rotateAngleZ = MathHelper.sin(this.onGround * 3.1415927f) * -0.4f;
+        }
+        this.bipedBody.rotateAngleX = 0.0f;
+        this.bipedRightLeg.rotationPointZ = 0.0f;
+        this.bipedLeftLeg.rotationPointZ = 0.0f;
+        this.bipedRightLeg.rotationPointY = 12.0f;
+        this.bipedLeftLeg.rotationPointY = 12.0f;
+        this.bipedHead.rotationPointY = 0.0f;
+        final ModelRenderer bipedRightArm4 = this.bipedRightArm;
+        bipedRightArm4.rotateAngleZ += MathHelper.cos(par3 * 0.09f) * 0.05f + 0.05f;
+        final ModelRenderer bipedLeftArm4 = this.bipedLeftArm;
+        bipedLeftArm4.rotateAngleZ -= MathHelper.cos(par3 * 0.09f) * 0.05f + 0.05f;
+        final ModelRenderer bipedRightArm5 = this.bipedRightArm;
+        bipedRightArm5.rotateAngleX += MathHelper.sin(par3 * 0.067f) * 0.05f;
+        final ModelRenderer bipedLeftArm5 = this.bipedLeftArm;
+        bipedLeftArm5.rotateAngleX -= MathHelper.sin(par3 * 0.067f) * 0.05f;
+        final float var7a = MathHelper.sin(this.onGround * 3.1415927f);
+        final float var8a = MathHelper.sin((1.0f - (1.0f - this.onGround) * (1.0f - this.onGround)) * 3.1415927f);
+        this.bipedRightArm.rotateAngleZ = 0.0f;
+        this.bipedLeftArm.rotateAngleZ = 0.0f;
+        this.bipedRightArm.rotateAngleY = -(0.1f - var7a * 0.6f);
+        this.bipedLeftArm.rotateAngleY = 0.1f - var7a * 0.6f;
+        this.bipedRightArm.rotateAngleX = -1.5707964f;
+        this.bipedLeftArm.rotateAngleX = -1.5707964f;
+        final ModelRenderer bipedRightArm6 = this.bipedRightArm;
+        bipedRightArm6.rotateAngleX -= var7a * 1.2f - var8a * 0.4f;
+        final ModelRenderer bipedLeftArm6 = this.bipedLeftArm;
+        bipedLeftArm6.rotateAngleX -= var7a * 1.2f - var8a * 0.4f;
+        final ModelRenderer bipedRightArm7 = this.bipedRightArm;
+        bipedRightArm7.rotateAngleZ += MathHelper.cos(par3 * 0.09f) * 0.05f + 0.05f;
+        final ModelRenderer bipedLeftArm7 = this.bipedLeftArm;
+        bipedLeftArm7.rotateAngleZ -= MathHelper.cos(par3 * 0.09f) * 0.05f + 0.05f;
+        final ModelRenderer bipedRightArm8 = this.bipedRightArm;
+        bipedRightArm8.rotateAngleX += MathHelper.sin(par3 * 0.067f) * 0.05f;
+        final ModelRenderer bipedLeftArm8 = this.bipedLeftArm;
+        bipedLeftArm8.rotateAngleX -= MathHelper.sin(par3 * 0.067f) * 0.05f;
     }
 }

@@ -1,380 +1,241 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.tile;
 
-import java.util.LinkedList;
-import micdoodle8.mods.galacticraft.api.power.ILaserNode;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityAdvanced;
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.api.power.*;
+import micdoodle8.mods.miccore.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.tileentity.*;
+import java.util.*;
+import net.minecraft.world.chunk.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.nbt.*;
 
 public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements ILaserNode
 {
-
-    public LinkedList<ILaserNode> nodeList = new LinkedList<ILaserNode>();
-    @NetworkedField(targetSide = Side.CLIENT) public BlockPos targetVec = new BlockPos(-1, -1, -1);
+    public LinkedList<ILaserNode> nodeList;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public BlockVec3 targetVec;
     public float pitch;
     public float yaw;
-    private BlockPos preLoadTarget = null;
-    private BlockPos lastTargetVec = new BlockPos(-1, -1, -1);
-
-    public TileEntityBeamOutput(String tileName)
-    {
-        super(tileName);
+    private BlockVec3 preLoadTarget;
+    private BlockVec3 lastTargetVec;
+    
+    public TileEntityBeamOutput() {
+        this.nodeList = new LinkedList<ILaserNode>();
+        this.targetVec = BlockVec3.INVALID_VECTOR;
+        this.preLoadTarget = null;
+        this.lastTargetVec = BlockVec3.INVALID_VECTOR;
     }
-
-    @Override
-    public void update()
-    {
-        if (this.preLoadTarget != null)
-        {
-            TileEntity tileAtTarget = this.world.getTileEntity(this.preLoadTarget);
-
-            if (tileAtTarget != null && tileAtTarget instanceof ILaserNode)
-            {
-                this.setTarget((ILaserNode) tileAtTarget);
+    
+    public void updateEntity() {
+        if (this.preLoadTarget != null) {
+            final TileEntity tileAtTarget = this.worldObj.getTileEntity(this.preLoadTarget.x, this.preLoadTarget.y, this.preLoadTarget.z);
+            if (tileAtTarget != null && tileAtTarget instanceof ILaserNode) {
+                this.setTarget((ILaserNode)tileAtTarget);
                 this.preLoadTarget = null;
             }
         }
-
-        super.update();
-
-        if (!this.targetVec.equals(this.lastTargetVec))
-        {
+        super.updateEntity();
+        if (!this.targetVec.equals((Object)this.lastTargetVec)) {
             this.markDirty();
         }
-
         this.lastTargetVec = this.targetVec;
-
-        if (this.world.isRemote)
-        {
+        if (this.worldObj.isRemote) {
             this.updateOrientation();
-        } else if (this.targetVec.getX() == -1 && this.targetVec.getY() == -1 && this.targetVec.getZ() == -1)
-        {
+        }
+        else if (this.targetVec.equals((Object)BlockVec3.INVALID_VECTOR)) {
             this.initiateReflector();
         }
-
     }
-
-    @Override
-    public void invalidate()
-    {
+    
+    public void invalidate() {
         super.invalidate();
         this.invalidateReflector();
     }
-
-    @Override
-    protected boolean handleInventory()
-    {
-        return false;
+    
+    public void validate() {
+        super.validate();
     }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[0];
-    }
-
-    @Override
-    public void onLoad()
-    {
-    }
-
-    @Override
-    public void onChunkUnload()
-    {
+    
+    public void onChunkUnload() {
         this.invalidateReflector();
     }
-
-    public void invalidateReflector()
-    {
-        for (ILaserNode node : this.nodeList)
-        {
-            node.removeNode(this);
+    
+    public void invalidateReflector() {
+        for (final ILaserNode node : this.nodeList) {
+            node.removeNode((ILaserNode)this);
         }
-
         this.nodeList.clear();
     }
-
-    public void initiateReflector()
-    {
+    
+    public void initiateReflector() {
         this.nodeList.clear();
-
-        int chunkXMin = this.getPos().getX() - 15 >> 4;
-        int chunkZMin = this.getPos().getZ() - 15 >> 4;
-        int chunkXMax = this.getPos().getX() + 15 >> 4;
-        int chunkZMax = this.getPos().getZ() + 15 >> 4;
-
-        for (int cX = chunkXMin; cX <= chunkXMax; cX++)
-        {
-            for (int cZ = chunkZMin; cZ <= chunkZMax; cZ++)
-            {
-                if (this.world.getChunkProvider().getLoadedChunk(cX, cZ) != null)
-                {
-                    Chunk chunk = this.world.getChunk(cX, cZ);
-
-                    for (Object obj : chunk.getTileEntityMap().values())
-                    {
-                        if (obj != this && obj instanceof ILaserNode)
-                        {
-                            BlockVec3 deltaPos = new BlockVec3(this).subtract(new BlockVec3(((ILaserNode) obj).getTile()));
-
-                            if (deltaPos.x < 16 && deltaPos.y < 16 && deltaPos.z < 16)
-                            {
-                                ILaserNode laserNode = (ILaserNode) obj;
-
-                                if (this.canConnectTo(laserNode) && laserNode.canConnectTo(this))
-                                {
-                                    this.addNode(laserNode);
-                                    laserNode.addNode(this);
-                                }
+        final int chunkXMin = this.xCoord - 15 >> 4;
+        final int chunkZMin = this.zCoord - 15 >> 4;
+        final int chunkXMax = this.xCoord + 15 >> 4;
+        final int chunkZMax = this.zCoord + 15 >> 4;
+        for (int cX = chunkXMin; cX <= chunkXMax; ++cX) {
+            for (int cZ = chunkZMin; cZ <= chunkZMax; ++cZ) {
+                if (this.worldObj.getChunkProvider().chunkExists(cX, cZ)) {
+                    final Chunk chunk = this.worldObj.getChunkFromChunkCoords(cX, cZ);
+                    for (final Object obj : chunk.chunkTileEntityMap.values()) {
+                        if (obj != this && obj instanceof ILaserNode) {
+                            final BlockVec3 deltaPos = new BlockVec3((TileEntity)this).subtract(new BlockVec3(((ILaserNode)obj).getTile()));
+                            if (deltaPos.x >= 16 || deltaPos.y >= 16 || deltaPos.z >= 16) {
+                                continue;
                             }
+                            final ILaserNode laserNode = (ILaserNode)obj;
+                            if (!this.canConnectTo(laserNode) || !laserNode.canConnectTo((ILaserNode)this)) {
+                                continue;
+                            }
+                            this.addNode(laserNode);
+                            laserNode.addNode((ILaserNode)this);
                         }
                     }
                 }
             }
         }
-
         this.setTarget(this.nodeList.peekFirst());
     }
-
-    @Override
-    public void addNode(ILaserNode node)
-    {
+    
+    public void addNode(final ILaserNode node) {
         int index = -1;
-
-        for (int i = 0; i < this.nodeList.size(); i++)
-        {
-            if (new BlockVec3(this.nodeList.get(i).getTile()).equals(new BlockVec3(node.getTile())))
-            {
+        for (int i = 0; i < this.nodeList.size(); ++i) {
+            if (new BlockVec3(this.nodeList.get(i).getTile()).equals((Object)new BlockVec3(node.getTile()))) {
                 index = i;
                 break;
             }
         }
-
-        if (index != -1)
-        {
+        if (index != -1) {
             this.nodeList.set(index, node);
             return;
         }
-
-        if (this.nodeList.isEmpty())
-        {
+        if (this.nodeList.isEmpty()) {
             this.nodeList.add(node);
-        } else
-        {
-            int nodeCompare = this.nodeList.get(0).compareTo(node, new BlockVec3(this));
-
-            if (nodeCompare <= 0)
-            {
+        }
+        else {
+            int nodeCompare = this.nodeList.get(0).compareTo(node, new BlockVec3((TileEntity)this));
+            if (nodeCompare <= 0) {
                 this.nodeList.addFirst(node);
                 return;
             }
-
-            nodeCompare = this.nodeList.get(this.nodeList.size() - 1).compareTo(node, new BlockVec3(this));
-
-            if (nodeCompare >= 0)
-            {
+            nodeCompare = this.nodeList.get(this.nodeList.size() - 1).compareTo(node, new BlockVec3((TileEntity)this));
+            if (nodeCompare >= 0) {
                 this.nodeList.addLast(node);
                 return;
             }
-
-            index = 1;
-
-            while (index < this.nodeList.size())
-            {
-                index++;
-            }
-
+            for (index = 1; index < this.nodeList.size(); ++index) {}
             this.nodeList.add(index, node);
         }
     }
-
-    @Override
-    public void removeNode(ILaserNode node)
-    {
+    
+    public void removeNode(final ILaserNode node) {
         int index = -1;
-
-        for (int i = 0; i < this.nodeList.size(); i++)
-        {
-            if (new BlockVec3(this.nodeList.get(i).getTile()).equals(new BlockVec3(node.getTile())))
-            {
+        for (int i = 0; i < this.nodeList.size(); ++i) {
+            if (new BlockVec3(this.nodeList.get(i).getTile()).equals((Object)new BlockVec3(node.getTile()))) {
                 index = i;
                 break;
             }
         }
-
-        if (new BlockVec3(node.getTile()).equals(new BlockVec3(this.targetVec)))
-        {
-            if (index == 0)
-            {
-                if (this.nodeList.size() > 1)
-                {
+        if (new BlockVec3(node.getTile()).equals((Object)this.targetVec)) {
+            if (index == 0) {
+                if (this.nodeList.size() > 1) {
                     this.setTarget(this.nodeList.get(index + 1));
-                } else
-                {
+                }
+                else {
                     this.setTarget(null);
                 }
-            } else if (index > 0)
-            {
+            }
+            else {
                 this.setTarget(this.nodeList.get(index - 1));
-            } else
-            {
-                this.setTarget(null);
             }
         }
-
-        if (index != -1)
-        {
+        if (index != -1) {
             this.nodeList.remove(index);
         }
     }
-
-    public void updateOrientation()
-    {
-        if (this.getTarget() != null)
-        {
-            Vector3 direction = Vector3.subtract(this.getOutputPoint(false), this.getTarget().getInputPoint()).normalize();
-            this.pitch = (float) -Vector3.getAngle(new Vector3(-direction.x, -direction.y, -direction.z), new Vector3(0, 1, 0)) * Constants.RADIANS_TO_DEGREES + 90;
-            this.yaw = (float) -(Math.atan2(direction.z, direction.x) * Constants.RADIANS_TO_DEGREES) + 90;
+    
+    public void updateOrientation() {
+        if (this.getTarget() != null) {
+            final Vector3 direction = Vector3.subtract(this.getOutputPoint(false), this.getTarget().getInputPoint()).normalize();
+            this.pitch = (float)(-Vector3.getAngle(new Vector3(-direction.x, -direction.y, -direction.z), new Vector3(0.0, 1.0, 0.0))) * 57.29578f + 90.0f;
+            this.yaw = (float)(-(Math.atan2(direction.z, direction.x) * 57.295780181884766)) + 90.0f;
         }
     }
-
-    @Override
-    public TileEntity getTile()
-    {
-        return this;
+    
+    public TileEntity getTile() {
+        return (TileEntity)this;
     }
-
-    @Override
-    public int compareTo(ILaserNode otherNode, BlockVec3 origin)
-    {
-        int thisDistance = new BlockVec3(this).subtract(origin).getMagnitudeSquared();
-        int otherDistance = new BlockVec3(otherNode.getTile()).subtract(origin).getMagnitudeSquared();
-
-        if (thisDistance < otherDistance)
-        {
+    
+    public int compareTo(final ILaserNode otherNode, final BlockVec3 origin) {
+        final int thisDistance = new BlockVec3((TileEntity)this).subtract(origin).getMagnitudeSquared();
+        final int otherDistance = new BlockVec3(otherNode.getTile()).subtract(origin).getMagnitudeSquared();
+        if (thisDistance < otherDistance) {
             return 1;
-        } else if (thisDistance > otherDistance)
-        {
+        }
+        if (thisDistance > otherDistance) {
             return -1;
         }
-
         return 0;
     }
-
-    public boolean onMachineActivated(World world, BlockPos pos, IBlockState state, EntityPlayer entityPlayer, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        if (this.nodeList.size() > 1)
-        {
+    
+    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        if (this.nodeList.size() > 1) {
             int index = -1;
-
-            if (this.getTarget() != null)
-            {
-                for (int i = 0; i < this.nodeList.size(); i++)
-                {
-                    if (new BlockVec3(this.nodeList.get(i).getTile()).equals(new BlockVec3(this.getTarget().getTile())))
-                    {
+            if (this.getTarget() != null) {
+                for (int i = 0; i < this.nodeList.size(); ++i) {
+                    if (new BlockVec3(this.nodeList.get(i).getTile()).equals((Object)new BlockVec3(this.getTarget().getTile()))) {
                         index = i;
                         break;
                     }
                 }
             }
-
-            if (index == -1)
-            {
-                // This shouldn't happen, but just in case...
-                this.initiateReflector();
-            } else
-            {
-                index++;
-                index %= this.nodeList.size();
+            if (index != -1) {
+                index = ++index % this.nodeList.size();
                 this.setTarget(this.nodeList.get(index));
                 return true;
             }
+            this.initiateReflector();
         }
-
         return false;
     }
-
-    @Override
-    public ILaserNode getTarget()
-    {
-        if (this.targetVec.getX() != -1 || this.targetVec.getY() != -1 || this.targetVec.getZ() != -1)
-        {
-            TileEntity tileAtTarget = this.world.getTileEntity(this.targetVec);
-
-            if (tileAtTarget != null && tileAtTarget instanceof ILaserNode)
-            {
-                return (ILaserNode) tileAtTarget;
-            }
-
+    
+    public ILaserNode getTarget() {
+        if (this.targetVec.equals((Object)BlockVec3.INVALID_VECTOR)) {
             return null;
         }
-
+        final TileEntity tileAtTarget = this.worldObj.getTileEntity(this.targetVec.x, this.targetVec.y, this.targetVec.z);
+        if (tileAtTarget != null && tileAtTarget instanceof ILaserNode) {
+            return (ILaserNode)tileAtTarget;
+        }
         return null;
     }
-
-    public void setTarget(ILaserNode target)
-    {
-        if (target != null)
-        {
-            this.targetVec = target.getTile().getPos();
-        } else
-        {
-            this.targetVec = new BlockPos(-1, -1, -1);
+    
+    public void setTarget(final ILaserNode target) {
+        if (target != null) {
+            this.targetVec = new BlockVec3(target.getTile());
+        }
+        else {
+            this.targetVec = BlockVec3.INVALID_VECTOR;
         }
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readFromNBT(final NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-
-        if (nbt.getBoolean("HasTarget"))
-        {
-            this.preLoadTarget = new BlockPos(nbt.getInteger("TargetX"), nbt.getInteger("TargetY"), nbt.getInteger("TargetZ"));
+        if (nbt.getBoolean("HasTarget")) {
+            this.preLoadTarget = new BlockVec3(nbt.getInteger("TargetX"), nbt.getInteger("TargetY"), nbt.getInteger("TargetZ"));
         }
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    
+    public void writeToNBT(final NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-
         nbt.setBoolean("HasTarget", this.getTarget() != null);
-
-        if (this.getTarget() != null)
-        {
-            nbt.setInteger("TargetX", this.getTarget().getTile().getPos().getX());
-            nbt.setInteger("TargetY", this.getTarget().getTile().getPos().getY());
-            nbt.setInteger("TargetZ", this.getTarget().getTile().getPos().getZ());
+        if (this.getTarget() != null) {
+            nbt.setInteger("TargetX", this.getTarget().getTile().xCoord);
+            nbt.setInteger("TargetY", this.getTarget().getTile().yCoord);
+            nbt.setInteger("TargetZ", this.getTarget().getTile().zCoord);
         }
-
-        return nbt;
-    }
-
-    @Override
-    public NBTTagCompound getUpdateTag()
-    {
-        return this.writeToNBT(new NBTTagCompound());
     }
 }

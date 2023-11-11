@@ -1,72 +1,55 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemArmor;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.entity.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.client.renderer.texture.*;
 
-public class ItemArmorMars extends ItemArmor implements ISortableItem, GCRarity
+public class ItemArmorMars extends ItemArmor
 {
-
-    private final ArmorMaterial material;
-
-    public ItemArmorMars(ArmorMaterial par2EnumArmorMaterial, int par3, EntityEquipmentSlot par4)
-    {
+    private final ItemArmor.ArmorMaterial material;
+    
+    public ItemArmorMars(final ItemArmor.ArmorMaterial par2EnumArmorMaterial, final int par3, final int par4) {
         super(par2EnumArmorMaterial, par3, par4);
         this.material = par2EnumArmorMaterial;
     }
-
-    @Override
-    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type)
-    {
-        if (this.material == MarsItems.ARMORDESH)
-        {
-            if (stack.getItem() == MarsItems.deshHelmet)
-            {
-                return GalacticraftPlanets.TEXTURE_PREFIX + "textures/model/armor/desh_1.png";
-            } else if (stack.getItem() == MarsItems.deshChestplate || stack.getItem() == MarsItems.deshBoots)
-            {
-                return GalacticraftPlanets.TEXTURE_PREFIX + "textures/model/armor/desh_2.png";
-            } else if (stack.getItem() == MarsItems.deshLeggings)
-            {
-                return GalacticraftPlanets.TEXTURE_PREFIX + "textures/model/armor/desh_3.png";
+    
+    public Item setUnlocalizedName(final String par1Str) {
+        super.setTextureName(par1Str);
+        super.setUnlocalizedName(par1Str);
+        return (Item)this;
+    }
+    
+    public String getArmorTexture(final ItemStack stack, final Entity entity, final int slot, final String type) {
+        if (this.material == MarsItems.ARMORDESH) {
+            if (stack.getItem() == MarsItems.deshHelmet) {
+                return "galacticraftmars:textures/model/armor/desh_1.png";
+            }
+            if (stack.getItem() == MarsItems.deshChestplate || stack.getItem() == MarsItems.deshBoots) {
+                return "galacticraftmars:textures/model/armor/desh_2.png";
+            }
+            if (stack.getItem() == MarsItems.deshLeggings) {
+                return "galacticraftmars:textures/model/armor/desh_3.png";
             }
         }
-
         return null;
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.ARMOR;
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
-    {
-        return repair.getItem() == MarsItems.marsItemBasic && repair.getItemDamage() == 2;
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister par1IconRegister) {
+        this.itemIcon = par1IconRegister.registerIcon(this.getUnlocalizedName().replace("item.", "galacticraftmars:"));
     }
 }

@@ -1,42 +1,34 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemFood;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-
-public class ItemCheese extends ItemFood implements ISortableItem, GCRarity
+public class ItemCheese extends ItemFood
 {
-
-    public ItemCheese(int par1, float par2, boolean par3)
-    {
+    public ItemCheese(final int par1, final float par2, final boolean par3) {
         super(par1, par2, par3);
-        this.setTranslationKey("cheese_curd");
+        this.setUnlocalizedName("cheeseCurd");
     }
-
-    public ItemCheese(int par1, boolean par2)
-    {
-        this(par1, 0.6F, par2);
+    
+    public ItemCheese(final int par1, final boolean par2) {
+        this(par1, 0.6f, par2);
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        this.itemIcon = iconRegister.registerIcon("galacticraftmoon:cheese_curd");
+    }
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.GENERAL;
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
 }

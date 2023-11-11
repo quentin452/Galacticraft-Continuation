@@ -1,53 +1,32 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.*;
+import net.minecraft.item.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.blocks.BlockOxygenCompressor;
-
-public class ItemBlockOxygenCompressor extends ItemBlockDesc implements GCRarity
+public class ItemBlockOxygenCompressor extends ItemBlockDesc
 {
-
-    public ItemBlockOxygenCompressor(Block block)
-    {
+    public ItemBlockOxygenCompressor(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public int getMetadata(int damage)
-    {
+    
+    public int getMetadata(final int damage) {
         return damage;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemstack)
-    {
+    
+    public String getUnlocalizedName(final ItemStack itemstack) {
         int metadata = 0;
-
-        if (itemstack.getItemDamage() >= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA)
-        {
+        if (itemstack.getItemDamage() >= 4) {
             metadata = 1;
-        } else if (itemstack.getItemDamage() >= BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA)
-        {
+        }
+        else if (itemstack.getItemDamage() >= 0) {
             metadata = 0;
         }
-
-        return this.getBlock().getTranslationKey() + "." + metadata;
+        return this.field_150939_a.getUnlocalizedName() + "." + metadata;
     }
-
-    @Override
-    public String getTranslationKey()
-    {
-        return this.getBlock().getTranslationKey() + ".0";
+    
+    public String getUnlocalizedName() {
+        return this.field_150939_a.getUnlocalizedName() + ".0";
     }
 }

@@ -1,254 +1,154 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import java.util.Random;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
-import micdoodle8.mods.galacticraft.core.blocks.ISortableBlock;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.IMultiBlock;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.asteroids.dimension.ShortRangeTelepadHandler;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityShortRangeTelepad;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.util.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.dimension.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.planets.*;
 
-public class BlockShortRangeTelepad extends BlockTileGC implements IShiftDescription, ISortableBlock
+public class BlockShortRangeTelepad extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    protected static final AxisAlignedBB AABB_TELEPAD = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 0.45F, 1.0F);
-
-    protected BlockShortRangeTelepad(String assetName)
-    {
-        super(Material.IRON);
-        this.blockHardness = 3.0F;
-        this.setTranslationKey(assetName);
-        this.setSoundType(SoundType.METAL);
+    protected BlockShortRangeTelepad(final String assetName) {
+        super(Material.iron);
+        this.blockHardness = 3.0f;
+        this.setBlockName(assetName);
+        this.setBlockTextureName("stone");
+        this.setStepSound(Block.soundTypeMetal);
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.INVISIBLE;
+    
+    public int getRenderType() {
+        return -1;
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
+        return (TileEntity)new TileEntityShortRangeTelepad();
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
-        return new TileEntityShortRangeTelepad();
+    
+    public void setBlockBoundsBasedOnState(final IBlockAccess world, final int x, final int y, final int z) {
+        this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.45f, 1.0f);
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        return AABB_TELEPAD;
+    
+    public void addCollisionBoxesToList(final World world, final int x, final int y, final int z, final AxisAlignedBB axisalignedbb, final List list, final Entity entity) {
+        this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.45f, 1.0f);
+        super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
     }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
-    {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-
-        TileEntity tile = worldIn.getTileEntity(pos);
-
+    
+    public void onBlockPlacedBy(final World world, final int x0, final int y0, final int z0, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+        super.onBlockPlacedBy(world, x0, y0, z0, entityLiving, itemStack);
+        final TileEntity tile = world.getTileEntity(x0, y0, z0);
         boolean validSpot = true;
-
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int y = 0; y < 3; y += 2)
-            {
-                for (int z = -1; z <= 1; z++)
-                {
-                    if (!(x == 0 && y == 0 && z == 0))
-                    {
-                        IBlockState stateAt = worldIn.getBlockState(pos.add(x, y, z));
-
-                        if (!stateAt.getMaterial().isReplaceable())
-                        {
+        for (int x = -1; x <= 1; ++x) {
+            for (int y = 0; y < 3; y += 2) {
+                for (int z = -1; z <= 1; ++z) {
+                    if (x != 0 || y != 0 || z != 0) {
+                        final Block blockAt = world.getBlock(x0 + x, y0 + y, z0 + z);
+                        if (!blockAt.getMaterial().isReplaceable()) {
                             validSpot = false;
                         }
                     }
                 }
             }
         }
-
-        if (!validSpot)
-        {
-            worldIn.setBlockToAir(pos);
-
-            if (placer instanceof EntityPlayer)
-            {
-                if (!worldIn.isRemote)
-                {
-                    ((EntityPlayer) placer).sendMessage(new TextComponentString(EnumColor.RED + GCCoreUtil.translate("gui.warning.noroom")));
+        if (!validSpot) {
+            world.setBlockToAir(x0, y0, z0);
+            if (entityLiving instanceof EntityPlayer) {
+                if (!world.isRemote) {
+                    ((EntityPlayer)entityLiving).addChatMessage((IChatComponent)new ChatComponentText(EnumColor.RED + GCCoreUtil.translate("gui.warning.noroom")));
                 }
-                ((EntityPlayer) placer).inventory.addItemStackToInventory(new ItemStack(Item.getItemFromBlock(this), 1, 0));
+                ((EntityPlayer)entityLiving).inventory.addItemStackToInventory(new ItemStack(Item.getItemFromBlock((Block)this), 1, 0));
             }
-
             return;
         }
-
-        if (tile instanceof TileEntityShortRangeTelepad)
-        {
-            ((TileEntityShortRangeTelepad) tile).onCreate(worldIn, pos);
-            ((TileEntityShortRangeTelepad) tile).setOwner(PlayerUtil.getName(((EntityPlayer) placer)));
+        if (tile instanceof TileEntityShortRangeTelepad) {
+            ((TileEntityShortRangeTelepad)tile).onCreate(new BlockVec3(x0, y0, z0));
+            ((TileEntityShortRangeTelepad)tile).setOwner(((EntityPlayer)entityLiving).getGameProfile().getName());
         }
     }
-
-    @Override
-    public boolean onMachineActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        return ((IMultiBlock) worldIn.getTileEntity(pos)).onActivated(playerIn);
+    
+    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        return ((IMultiBlock)world.getTileEntity(x, y, z)).onActivated(par5EntityPlayer);
     }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        final TileEntity tileAt = worldIn.getTileEntity(pos);
-
+    
+    public void breakBlock(final World world, final int x0, final int y0, final int z0, final Block var5, final int var6) {
+        final TileEntity tileAt = world.getTileEntity(x0, y0, z0);
         int fakeBlockCount = 0;
-
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int y = 0; y < 3; y += 2)
-            {
-                for (int z = -1; z <= 1; z++)
-                {
-                    if (!(x == 0 && y == 0 && z == 0))
-                    {
-                        if (worldIn.getBlockState(pos.add(x, y, z)).getBlock() == AsteroidBlocks.fakeTelepad)
-                        {
-                            fakeBlockCount++;
-                        }
+        for (int x = -1; x <= 1; ++x) {
+            for (int y = 0; y < 3; y += 2) {
+                for (int z = -1; z <= 1; ++z) {
+                    if ((x != 0 || y != 0 || z != 0) && world.getBlock(x0 + x, y0 + y, z0 + z) == AsteroidBlocks.fakeTelepad) {
+                        ++fakeBlockCount;
                     }
                 }
             }
         }
-
-        if (tileAt instanceof TileEntityShortRangeTelepad)
-        {
-            if (fakeBlockCount > 0)
-            {
-                ((TileEntityShortRangeTelepad) tileAt).onDestroy(tileAt);
+        if (tileAt instanceof TileEntityShortRangeTelepad) {
+            if (fakeBlockCount > 0) {
+                ((TileEntityShortRangeTelepad)tileAt).onDestroy(tileAt);
             }
-            ShortRangeTelepadHandler.removeShortRangeTeleporter((TileEntityShortRangeTelepad) tileAt);
+            ShortRangeTelepadHandler.removeShortRangeTeleporter((TileEntityShortRangeTelepad)tileAt);
         }
-
-        super.breakBlock(worldIn, pos, state);
+        super.breakBlock(world, x0, y0, z0, var5, var6);
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand)
-    {
-        final TileEntity tileAt = worldIn.getTileEntity(pos);
-
-        if (tileAt instanceof TileEntityShortRangeTelepad)
-        {
-            TileEntityShortRangeTelepad telepad = (TileEntityShortRangeTelepad) tileAt;
-            float teleportTimeScaled = Math.min(1.0F, telepad.teleportTime / (float) TileEntityShortRangeTelepad.MAX_TELEPORT_TIME);
-            float f;
-            float r;
-            float g;
-            float b;
-
-            for (int i = 0; i < 6; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    f = rand.nextFloat() * 0.6F + 0.4F;
-                    r = f * 0.3F;
-                    g = f * (0.3F + (teleportTimeScaled * 0.7F));
-                    b = f * (1.0F - (teleportTimeScaled * 0.7F));
-                    GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(pos.getX() + 0.2 + rand.nextDouble() * 0.6, pos.getY() + 0.1, pos.getZ() + 0.2 + rand.nextDouble() * 0.6),
-                        new Vector3(0.0, 1.4, 0.0), telepad, false);
+    public void randomDisplayTick(final World world, final int x, final int y, final int z, final Random rand) {
+        final TileEntity tileAt = world.getTileEntity(x, y, z);
+        if (tileAt instanceof TileEntityShortRangeTelepad) {
+            final TileEntityShortRangeTelepad telepad = (TileEntityShortRangeTelepad)tileAt;
+            final float teleportTimeScaled = Math.min(1.0f, telepad.teleportTime / 150.0f);
+            for (int i = 0; i < 6; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    final float f = rand.nextFloat() * 0.6f + 0.4f;
+                    final float r = f * 0.3f;
+                    final float g = f * (0.3f + teleportTimeScaled * 0.7f);
+                    final float b = f * (1.0f - teleportTimeScaled * 0.7f);
+                    GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(x + 0.2 + rand.nextDouble() * 0.6, y + 0.1, z + 0.2 + rand.nextDouble() * 0.6), new Vector3(0.0, 1.4, 0.0), telepad, false);
                 }
-
-                f = rand.nextFloat() * 0.6F + 0.4F;
-                r = f * 0.3F;
-                g = f * (0.3F + (teleportTimeScaled * 0.7F));
-                b = f * (1.0F - (teleportTimeScaled * 0.7F));
-                GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(pos.getX() + 0.0 + rand.nextDouble() * 0.2, pos.getY() + 2.9, pos.getZ() + rand.nextDouble()), new Vector3(0.0, -2.95, 0.0),
-                    telepad, true);
-                GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(pos.getX() + 0.8 + rand.nextDouble() * 0.2, pos.getY() + 2.9, pos.getZ() + rand.nextDouble()), new Vector3(0.0, -2.95, 0.0),
-                    telepad, true);
-                GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(pos.getX() + rand.nextDouble(), pos.getY() + 2.9, pos.getZ() + 0.2 + rand.nextDouble() * 0.2), new Vector3(0.0, -2.95, 0.0),
-                    telepad, true);
-                GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(pos.getX() + rand.nextDouble(), pos.getY() + 2.9, pos.getZ() + 0.8 + rand.nextDouble() * 0.2), new Vector3(0.0, -2.95, 0.0),
-                    telepad, true);
+                final float f = rand.nextFloat() * 0.6f + 0.4f;
+                final float r = f * 0.3f;
+                final float g = f * (0.3f + teleportTimeScaled * 0.7f);
+                final float b = f * (1.0f - teleportTimeScaled * 0.7f);
+                GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(x + 0.0 + rand.nextDouble() * 0.2, y + 2.9, z + rand.nextDouble()), new Vector3(0.0, -2.95, 0.0), telepad, true);
+                GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(x + 0.8 + rand.nextDouble() * 0.2, y + 2.9, z + rand.nextDouble()), new Vector3(0.0, -2.95, 0.0), telepad, true);
+                GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(x + rand.nextDouble(), y + 2.9, z + 0.2 + rand.nextDouble() * 0.2), new Vector3(0.0, -2.95, 0.0), telepad, true);
+                GalacticraftPlanets.spawnParticle("portalBlue", new Vector3(x + rand.nextDouble(), y + 2.9, z + 0.8 + rand.nextDouble() * 0.2), new Vector3(0.0, -2.95, 0.0), telepad, true);
             }
         }
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.MACHINE;
     }
 }

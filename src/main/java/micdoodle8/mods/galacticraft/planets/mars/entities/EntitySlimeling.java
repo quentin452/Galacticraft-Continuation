@@ -1,262 +1,202 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.entities;
 
-import java.util.UUID;
-import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.client.sounds.GCSounds;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.util.ColorUtil;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModuleClient;
-import micdoodle8.mods.galacticraft.planets.mars.inventory.InventorySlimeling;
-import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
-import net.minecraft.entity.ai.EntityAIFollowOwner;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILeapAtTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAIMate;
-import net.minecraft.entity.ai.EntityAIOwnerHurtByTarget;
-import net.minecraft.entity.ai.EntityAIOwnerHurtTarget;
-import net.minecraft.entity.ai.EntityAISit;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAITargetNonTamed;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityGhast;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityTameable;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeHooks;
+import micdoodle8.mods.galacticraft.api.entity.*;
+import micdoodle8.mods.galacticraft.planets.mars.inventory.*;
+import net.minecraft.world.*;
+import net.minecraft.init.*;
+import net.minecraft.item.*;
+import net.minecraft.nbt.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.entity.projectile.*;
+import micdoodle8.mods.galacticraft.planets.mars.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import net.minecraft.pathfinding.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.entity.monster.*;
+import net.minecraft.entity.passive.*;
+import net.minecraft.entity.ai.*;
+import micdoodle8.mods.galacticraft.planets.mars.items.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.potion.*;
+import net.minecraft.util.*;
+import net.minecraftforge.common.*;
 
 public class EntitySlimeling extends EntityTameable implements IEntityBreathable
 {
-
-    public InventorySlimeling slimelingInventory = new InventorySlimeling(this);
-
-    private static final DataParameter<Float> HEALTH = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.FLOAT);
-    private static final DataParameter<Float> COLOR_RED = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.FLOAT);
-    private static final DataParameter<Float> COLOR_GREEN = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.FLOAT);
-    private static final DataParameter<Float> COLOR_BLUE = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.FLOAT);
-    private static final DataParameter<Integer> AGE = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.VARINT);
-    private static final DataParameter<String> NAME = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.STRING);
-    private static final DataParameter<Integer> FAV_FOOD_ID = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.VARINT);
-    private static final DataParameter<Float> ATTACK_DAMAGE = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.FLOAT);
-    private static final DataParameter<Integer> KILLS = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.VARINT);
-    private static final DataParameter<String> OWNER_USERNAME = EntityDataManager.createKey(EntitySlimeling.class, DataSerializers.STRING);
-
+    public InventorySlimeling slimelingInventory;
     public float colorRed;
     public float colorGreen;
     public float colorBlue;
     public long ticksAlive;
-    public int age = 0;
+    public int age;
     public final int MAX_AGE = 100000;
-    public String slimelingName = GCCoreUtil.translate("gui.message.unnamed.name");
-    public int favFoodID = 1;
-    public float attackDamage = 0.05F;
+    public String slimelingName;
+    public int favFoodID;
+    public float attackDamage;
     public int kills;
-
-    public EntitySlimeling(World par1World)
-    {
+    
+    public EntitySlimeling(final World par1World) {
         super(par1World);
-        this.setSize(0.45F, 0.7F);
-        this.tasks.addTask(1, new EntityAISwimming(this));
+        this.slimelingInventory = new InventorySlimeling(this);
+        this.age = 0;
+        this.slimelingName = GCCoreUtil.translate("gui.message.unnamed.name");
+        this.favFoodID = 1;
+        this.attackDamage = 0.05f;
+        this.setSize(0.45f, 0.7f);
+        this.getNavigator().setAvoidsWater(true);
+        this.tasks.addTask(1, (EntityAIBase)new EntityAISwimming((EntityLiving)this));
         this.aiSit = new EntityAISitGC(this);
-        this.tasks.addTask(2, this.aiSit);
-        this.tasks.addTask(3, new EntityAILeapAtTarget(this, 0.4F));
-        this.tasks.addTask(4, new EntityAIAttackMelee(this, 1.0D, true));
-        this.tasks.addTask(5, new EntityAIFollowOwner(this, 1.0D, 10.0F, 2.0F));
-        this.tasks.addTask(6, new EntityAIMate(this, 1.0D));
-        this.tasks.addTask(7, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(9, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
-        this.tasks.addTask(9, new EntityAILookIdle(this));
-        this.targetTasks.addTask(1, new EntityAIOwnerHurtByTarget(this));
-        this.targetTasks.addTask(2, new EntityAIOwnerHurtTarget(this));
-        this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true));
-        this.targetTasks.addTask(4, new EntityAITargetNonTamed(this, EntitySludgeling.class, false, p_apply_1_ -> p_apply_1_ instanceof EntitySludgeling));
+        this.tasks.addTask(2, (EntityAIBase)this.aiSit);
+        this.tasks.addTask(3, (EntityAIBase)new EntityAILeapAtTarget((EntityLiving)this, 0.4f));
+        this.tasks.addTask(4, (EntityAIBase)new EntityAIAttackOnCollide((EntityCreature)this, 1.0, true));
+        this.tasks.addTask(5, (EntityAIBase)new EntityAIFollowOwner((EntityTameable)this, 1.0, 10.0f, 2.0f));
+        this.tasks.addTask(6, (EntityAIBase)new EntityAIMate((EntityAnimal)this, 1.0));
+        this.tasks.addTask(7, (EntityAIBase)new EntityAIWander((EntityCreature)this, 1.0));
+        this.tasks.addTask(9, (EntityAIBase)new EntityAIWatchClosest((EntityLiving)this, (Class)EntityPlayer.class, 8.0f));
+        this.tasks.addTask(9, (EntityAIBase)new EntityAILookIdle((EntityLiving)this));
+        this.targetTasks.addTask(1, (EntityAIBase)new EntityAIOwnerHurtByTarget((EntityTameable)this));
+        this.targetTasks.addTask(2, (EntityAIBase)new EntityAIOwnerHurtTarget((EntityTameable)this));
+        this.targetTasks.addTask(3, (EntityAIBase)new EntityAIHurtByTarget((EntityCreature)this, true));
+        this.targetTasks.addTask(4, (EntityAIBase)new EntityAITargetNonTamed((EntityTameable)this, (Class)EntitySludgeling.class, 200, false));
         this.setTamed(false);
-
-        switch (this.rand.nextInt(3))
-        {
-            case 0:
-                this.colorRed = 1.0F;
+        switch (this.rand.nextInt(3)) {
+            case 0: {
+                this.colorRed = 1.0f;
                 break;
-            case 1:
-                this.colorBlue = 1.0F;
+            }
+            case 1: {
+                this.colorBlue = 1.0f;
                 break;
-            case 2:
-                this.colorRed = 1.0F;
-                this.colorGreen = 1.0F;
+            }
+            case 2: {
+                this.colorRed = 1.0f;
+                this.colorGreen = 1.0f;
                 break;
+            }
         }
-
         this.setRandomFavFood();
     }
-
-    @Override
-    public EntityLivingBase getOwner()
-    {
-        EntityLivingBase owner = super.getOwner();
-        if (owner == null)
-        {
-            String ownerName = getOwnerUsername();
-            if (ownerName != null)
-            {
-                return this.world.getPlayerEntityByName(ownerName);
+    
+    public EntityLivingBase getOwner() {
+        final EntityLivingBase owner = super.getOwner();
+        if (owner == null) {
+            final String ownerName = this.getOwnerUsername();
+            if (ownerName != null) {
+                return (EntityLivingBase)this.worldObj.getPlayerEntityByName(ownerName);
             }
         }
         return owner;
     }
-
-    @Override
-    public boolean isOwner(EntityLivingBase entityLivingBase)
-    {
+    
+    public boolean isOwner(final EntityLivingBase entityLivingBase) {
         return entityLivingBase == this.getOwner();
     }
-
-    @Override
-    public boolean canBreatheUnderwater()
-    {
+    
+    public boolean canBreatheUnderwater() {
         return true;
     }
-
-    public float getSlimelingSize()
-    {
-        return this.getScale() * 2.0F;
+    
+    public float getSlimelingSize() {
+        return this.getScale() * 2.0f;
     }
-
-    @Override
-    public void setScaleForAge(boolean par1)
-    {
+    
+    public void setScaleForAge(final boolean par1) {
         this.setScale(this.getSlimelingSize());
     }
-
-    @Override
-    public boolean isChild()
-    {
-        return this.getAge() / (float) this.MAX_AGE < 0.33F;
+    
+    public boolean isChild() {
+        final float n = (float)this.getAge();
+        this.getClass();
+        return n / 100000.0f < 0.33f;
     }
-
-    private void setRandomFavFood()
-    {
-        switch (this.rand.nextInt(10))
-        {
-            case 0:
-                this.favFoodID = Item.getIdFromItem(Items.GOLD_INGOT);
+    
+    private void setRandomFavFood() {
+        switch (this.rand.nextInt(10)) {
+            case 0: {
+                this.favFoodID = Item.getIdFromItem(Items.gold_ingot);
                 break;
-            case 1:
-                this.favFoodID = Item.getIdFromItem(Items.FLINT_AND_STEEL);
+            }
+            case 1: {
+                this.favFoodID = Item.getIdFromItem(Items.flint_and_steel);
                 break;
-            case 2:
-                this.favFoodID = Item.getIdFromItem(Items.BAKED_POTATO);
+            }
+            case 2: {
+                this.favFoodID = Item.getIdFromItem(Items.baked_potato);
                 break;
-            case 3:
-                this.favFoodID = Item.getIdFromItem(Items.STONE_SWORD);
+            }
+            case 3: {
+                this.favFoodID = Item.getIdFromItem(Items.stone_sword);
                 break;
-            case 4:
-                this.favFoodID = Item.getIdFromItem(Items.GUNPOWDER);
+            }
+            case 4: {
+                this.favFoodID = Item.getIdFromItem(Items.gunpowder);
                 break;
-            case 5:
-                this.favFoodID = Item.getIdFromItem(Items.WOODEN_HOE);
+            }
+            case 5: {
+                this.favFoodID = Item.getIdFromItem(Items.wooden_door);
                 break;
-            case 6:
-                this.favFoodID = Item.getIdFromItem(Items.EMERALD);
+            }
+            case 6: {
+                this.favFoodID = Item.getIdFromItem(Items.emerald);
                 break;
-            case 7:
-                this.favFoodID = Item.getIdFromItem(Items.FISH);
+            }
+            case 7: {
+                this.favFoodID = Item.getIdFromItem(Items.cooked_fished);
                 break;
-            case 8:
-                this.favFoodID = Item.getIdFromItem(Items.REPEATER);
+            }
+            case 8: {
+                this.favFoodID = Item.getIdFromItem(Items.repeater);
                 break;
-            case 9:
-                this.favFoodID = Item.getIdFromItem(Items.BOAT);
+            }
+            case 9: {
+                this.favFoodID = Item.getIdFromItem(Items.boat);
                 break;
+            }
         }
     }
-
-    public EntitySlimeling(World par1World, float red, float green, float blue)
-    {
+    
+    public EntitySlimeling(final World par1World, final float red, final float green, final float blue) {
         this(par1World);
         this.colorRed = red;
         this.colorGreen = green;
         this.colorBlue = blue;
     }
-
-    @Override
-    protected void applyEntityAttributes()
-    {
+    
+    protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.30000001192092896D);
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(this.getMaxHealthSlimeling());
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(this.getMaxHealthSlimeling());
     }
-
-//    @Override
-//    public boolean isAIEnabled()
-//    {
-//        return true;
-//    }
-
-    @Override
-    protected void updateAITasks()
-    {
-        this.dataManager.set(HEALTH, this.getHealth());
+    
+    public boolean isAIEnabled() {
+        return true;
     }
-
-    @Override
-    protected void entityInit()
-    {
+    
+    protected void updateAITick() {
+        this.dataWatcher.updateObject(18, (Object)this.getHealth());
+    }
+    
+    protected void entityInit() {
         super.entityInit();
-        this.dataManager.register(HEALTH, this.getHealth());
-        this.dataManager.register(COLOR_RED, this.colorRed);
-        this.dataManager.register(COLOR_GREEN, this.colorGreen);
-        this.dataManager.register(COLOR_BLUE, this.colorBlue);
-        this.dataManager.register(AGE, this.age);
-        this.dataManager.register(NAME, "");
-        this.dataManager.register(FAV_FOOD_ID, this.favFoodID);
-        this.dataManager.register(ATTACK_DAMAGE, this.attackDamage);
-        this.dataManager.register(KILLS, this.kills);
-        this.dataManager.register(OWNER_USERNAME, "");
+        this.dataWatcher.addObject(18, (Object)new Float(this.getHealth()));
+        this.dataWatcher.addObject(19, (Object)new Float(this.colorRed));
+        this.dataWatcher.addObject(20, (Object)new Float(this.colorGreen));
+        this.dataWatcher.addObject(21, (Object)new Float(this.colorBlue));
+        this.dataWatcher.addObject(22, (Object)new Integer(this.age));
+        this.dataWatcher.addObject(23, (Object)"");
+        this.dataWatcher.addObject(24, (Object)new Integer(this.favFoodID));
+        this.dataWatcher.addObject(25, (Object)new Float(this.attackDamage));
+        this.dataWatcher.addObject(26, (Object)new Integer(this.kills));
+        this.dataWatcher.addObject(27, (Object)new ItemStack(Blocks.stone));
+        this.dataWatcher.addObject(28, (Object)"");
         this.setName(GCCoreUtil.translate("gui.message.unnamed.name"));
     }
-
-    @Override
-    public void writeEntityToNBT(NBTTagCompound nbt)
-    {
+    
+    public void writeEntityToNBT(final NBTTagCompound nbt) {
         super.writeEntityToNBT(nbt);
-        nbt.setTag("SlimelingInventory", this.slimelingInventory.writeToNBT(new NBTTagList()));
+        nbt.setTag("SlimelingInventory", (NBTBase)this.slimelingInventory.writeToNBT(new NBTTagList()));
         nbt.setFloat("SlimeRed", this.colorRed);
         nbt.setFloat("SlimeGreen", this.colorGreen);
         nbt.setFloat("SlimeBlue", this.colorBlue);
@@ -267,10 +207,8 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
         nbt.setInteger("SlimelingKills", this.kills);
         nbt.setString("OwnerUsername", this.getOwnerUsername());
     }
-
-    @Override
-    public void readEntityFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readEntityFromNBT(final NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
         this.slimelingInventory.readFromNBT(nbt.getTagList("SlimelingInventory", 10));
         this.colorRed = nbt.getFloat("SlimeRed");
@@ -289,513 +227,397 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
         this.setName(this.slimelingName);
         this.setKillCount(this.kills);
     }
-
-    @Override
-    protected SoundEvent getHurtSound(DamageSource damageSourceIn)
-    {
-        this.playSound(SoundEvents.BLOCK_SLIME_STEP, this.getSoundVolume(), 1.1F);
+    
+    protected String getLivingSound() {
         return null;
     }
-
-    @Override
-    protected SoundEvent getDeathSound()
-    {
-        this.playSound(GCSounds.slimeDeath, this.getSoundVolume(), 0.8F);
+    
+    protected String getHurtSound() {
+        this.playSound("mob.slime.small", this.getSoundVolume(), 1.1f);
         return null;
     }
-
-    @Override
-    protected Item getDropItem()
-    {
-        return Items.SLIME_BALL;
+    
+    protected String getDeathSound() {
+        this.playSound(GalacticraftCore.TEXTURE_PREFIX + "entity.slime_death", this.getSoundVolume(), 0.8f);
+        return null;
     }
-
-    @Override
-    public void onLivingUpdate()
-    {
+    
+    protected Item getDropItem() {
+        return Items.slime_ball;
+    }
+    
+    public void onLivingUpdate() {
         super.onLivingUpdate();
-
-        if (!this.world.isRemote)
-        {
-            if (this.ticksAlive <= 0)
-            {
+        if (!this.worldObj.isRemote) {
+            if (this.ticksAlive <= 0L) {
                 this.setColorRed(this.colorRed);
                 this.setColorGreen(this.colorGreen);
                 this.setColorBlue(this.colorBlue);
             }
-
-            this.ticksAlive++;
-
-            if (this.ticksAlive % 2 == 0)
-            {
-                if (this.age < this.MAX_AGE)
-                {
-                    this.age++;
-                }
-
-                this.setAge(Math.min(this.age, this.MAX_AGE));
+            ++this.ticksAlive;
+            if (this.ticksAlive >= Long.MAX_VALUE) {
+                this.ticksAlive = 0L;
             }
-
+            if (this.ticksAlive % 2L == 0L) {
+                final int age = this.age;
+                this.getClass();
+                if (age < 100000) {
+                    ++this.age;
+                }
+                final int age2 = this.age;
+                this.getClass();
+                this.setAge(Math.min(age2, 100000));
+            }
             this.setFavoriteFood(this.favFoodID);
             this.setAttackDamage(this.attackDamage);
             this.setKillCount(this.kills);
-//            this.setCargoSlot(this.slimelingInventory.getStackInSlot(1));
+            this.setCargoSlot(this.slimelingInventory.getStackInSlot(1));
         }
-
-        if (!this.world.isRemote)
-        {
-            this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(this.getMaxHealthSlimeling());
-
-            if (this.getOwnerUsername().isEmpty())
-            {
-                Entity owner = this.getOwner();
-
-                if (owner != null)
-                {
-                    this.setOwnerUsername(owner.getName());
+        if (!this.worldObj.isRemote) {
+            this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(this.getMaxHealthSlimeling());
+            if (this.getOwnerUsername().isEmpty()) {
+                final EntityLivingBase owner = this.getOwner();
+                if (owner != null) {
+                    this.setOwnerUsername(owner.getCommandSenderName());
                 }
             }
         }
     }
-
-    private double getMaxHealthSlimeling()
-    {
-        if (this.isTamed())
-        {
-            return 20.001D + 30.0 * ((double) this.age / (double) this.MAX_AGE);
-        } else
-        {
-            return 8.0D;
+    
+    private double getMaxHealthSlimeling() {
+        if (this.isTamed()) {
+            final double n = 20.001;
+            final double n2 = 30.0;
+            final double n3 = this.age;
+            this.getClass();
+            return n + n2 * (n3 / 100000.0);
         }
+        return 8.0;
     }
-
-    @Override
-    public float getEyeHeight()
-    {
-        return this.height * 0.8F;
+    
+    public float getEyeHeight() {
+        return this.height * 0.8f;
     }
-
-    @Override
-    public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
-    {
-        if (this.isEntityInvulnerable(par1DamageSource))
-        {
+    
+    public boolean attackEntityFrom(final DamageSource par1DamageSource, float par2) {
+        if (this.isEntityInvulnerable()) {
             return false;
-        } else
-        {
-            Entity entity = par1DamageSource.getTrueSource();
-            this.setSittingAI(false);
-
-            if (entity != null && !(entity instanceof EntityPlayer))
-            {
-                par2 = (par2 + 1.0F) / 2.0F;
-            }
-
-            return super.attackEntityFrom(par1DamageSource, par2);
         }
+        final Entity entity = par1DamageSource.getEntity();
+        this.setSittingAI(false);
+        if (entity != null && !(entity instanceof EntityPlayer) && !(entity instanceof EntityArrow)) {
+            par2 = (par2 + 1.0f) / 2.0f;
+        }
+        return super.attackEntityFrom(par1DamageSource, par2);
     }
-
-    @Override
-    public boolean attackEntityAsMob(Entity par1Entity)
-    {
-        return par1Entity.attackEntityFrom(new EntityDamageSource("slimeling", this), this.getDamage());
+    
+    public boolean attackEntityAsMob(final Entity par1Entity) {
+        return par1Entity.attackEntityFrom((DamageSource)new EntityDamageSource("slimeling", (Entity)this), this.getDamage());
     }
-
-    public float getDamage()
-    {
-        int i = this.isTamed() ? 5 : 2;
+    
+    public float getDamage() {
+        final int i = this.isTamed() ? 5 : 2;
         return i * this.getAttackDamage();
     }
-
-    @Override
-    public void setTamed(boolean par1)
-    {
+    
+    public void setTamed(final boolean par1) {
         super.setTamed(par1);
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(this.getMaxHealthSlimeling());
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(this.getMaxHealthSlimeling());
     }
-
-    @Override
-    public boolean processInteract(EntityPlayer player, EnumHand hand)
-    {
-        ItemStack itemstack = player.inventory.getCurrentItem();
-
-        if (this.isTamed())
-        {
-            if (!itemstack.isEmpty())
-            {
-                if (itemstack.getItem() == this.getFavoriteFood())
-                {
-                    if (this.isOwner(player))
-                    {
-                        itemstack.shrink(1);
-
-                        if (itemstack.isEmpty())
-                        {
-                            player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.EMPTY);
+    
+    public boolean interact(final EntityPlayer par1EntityPlayer) {
+        final ItemStack itemstack = par1EntityPlayer.inventory.getCurrentItem();
+        if (this.isTamed()) {
+            if (itemstack != null) {
+                if (itemstack.getItem() == this.getFavoriteFood()) {
+                    if (this.isOwner((EntityLivingBase)par1EntityPlayer)) {
+                        final ItemStack itemStack = itemstack;
+                        --itemStack.stackSize;
+                        if (itemstack.stackSize <= 0) {
+                            par1EntityPlayer.inventory.setInventorySlotContents(par1EntityPlayer.inventory.currentItem, (ItemStack)null);
                         }
-
-                        if (this.world.isRemote)
-                        {
+                        if (this.worldObj.isRemote) {
                             MarsModuleClient.openSlimelingGui(this, 1);
                         }
-
-                        if (this.rand.nextInt(3) == 0)
-                        {
+                        if (this.rand.nextInt(3) == 0) {
                             this.setRandomFavFood();
                         }
-                    } else
-                    {
-                        if (player instanceof EntityPlayerMP)
-                        {
-                            GCPlayerStats stats = GCPlayerStats.get(player);
-                            if (stats.getChatCooldown() == 0)
-                            {
-                                player.sendMessage(new TextComponentString(GCCoreUtil.translate("gui.slimeling.chat.wrong_player")));
-                                stats.setChatCooldown(100);
-                            }
+                    }
+                    else if (par1EntityPlayer instanceof EntityPlayerMP) {
+                        final GCPlayerStats stats = GCPlayerStats.get((EntityPlayerMP)par1EntityPlayer);
+                        if (stats.chatCooldown == 0) {
+                            par1EntityPlayer.addChatMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.slimeling.chat.wrongPlayer")));
+                            stats.chatCooldown = 100;
                         }
                     }
-                } else
-                {
-                    if (this.world.isRemote)
-                    {
-                        MarsModuleClient.openSlimelingGui(this, 0);
-                    }
                 }
-            } else
-            {
-                if (this.world.isRemote)
-                {
+                else if (this.worldObj.isRemote) {
                     MarsModuleClient.openSlimelingGui(this, 0);
                 }
             }
-
+            else if (this.worldObj.isRemote) {
+                MarsModuleClient.openSlimelingGui(this, 0);
+            }
             return true;
-        } else if (!itemstack.isEmpty() && itemstack.getItem() == Items.SLIME_BALL)
-        {
-            if (!player.capabilities.isCreativeMode)
-            {
-                itemstack.shrink(1);
+        }
+        if (itemstack != null && itemstack.getItem() == Items.slime_ball) {
+            if (!par1EntityPlayer.capabilities.isCreativeMode) {
+                final ItemStack itemStack2 = itemstack;
+                --itemStack2.stackSize;
             }
-
-            if (itemstack.isEmpty())
-            {
-                player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.EMPTY);
+            if (itemstack.stackSize <= 0) {
+                par1EntityPlayer.inventory.setInventorySlotContents(par1EntityPlayer.inventory.currentItem, (ItemStack)null);
             }
-
-            if (!this.world.isRemote)
-            {
-                if (this.rand.nextInt(3) == 0)
-                {
+            if (!this.worldObj.isRemote) {
+                if (this.rand.nextInt(3) == 0) {
                     this.setTamed(true);
-                    this.getNavigator().clearPath();
-                    this.setAttackTarget(null);
+                    this.setPathToEntity((PathEntity)null);
+                    this.setAttackTarget((EntityLivingBase)null);
                     this.setSittingAI(true);
-                    this.setHealth(20.0F);
-                    this.setOwnerId(player.getUniqueID());
-                    this.setOwnerUsername(player.getName());
+                    this.setHealth(20.0f);
+                    VersionUtil.setSlimelingOwner(this, VersionUtil.mcVersion1_7_10 ? par1EntityPlayer.getUniqueID().toString() : (VersionUtil.mcVersion1_7_2 ? par1EntityPlayer.getCommandSenderName() : ""));
+                    this.setOwnerUsername(par1EntityPlayer.getCommandSenderName());
                     this.playTameEffect(true);
-                    this.world.setEntityState(this, (byte) 7);
-                } else
-                {
+                    this.worldObj.setEntityState((Entity)this, (byte)7);
+                }
+                else {
                     this.playTameEffect(false);
-                    this.world.setEntityState(this, (byte) 6);
+                    this.worldObj.setEntityState((Entity)this, (byte)6);
                 }
             }
-
             return true;
         }
-
-        return super.processInteract(player, hand);
+        return super.interact(par1EntityPlayer);
     }
-
-    public void setSittingAI(boolean sitting)
-    {
+    
+    public void setSittingAI(final boolean sitting) {
         this.aiSit.setSitting(sitting);
     }
-
-    public String getOwnerUsername()
-    {
-        String s = this.dataManager.get(OWNER_USERNAME);
-        return s == null || s.length() == 0 ? "" : s;
+    
+    public String getOwnerUsername() {
+        final String s = this.dataWatcher.getWatchableObjectString(28);
+        return (s == null || s.length() == 0) ? "" : s;
     }
-
-    public void setOwnerUsername(String username)
-    {
-        this.dataManager.set(OWNER_USERNAME, username);
+    
+    public void setOwnerUsername(final String username) {
+        this.dataWatcher.updateObject(28, (Object)username);
     }
-
-    @Override
-    public boolean isBreedingItem(ItemStack par1ItemStack)
-    {
+    
+    public boolean isBreedingItem(final ItemStack par1ItemStack) {
         return false;
     }
-
-    public EntitySlimeling spawnBabyAnimal(EntityAgeable par1EntityAgeable)
-    {
-        if (par1EntityAgeable instanceof EntitySlimeling)
-        {
-            EntitySlimeling otherSlimeling = (EntitySlimeling) par1EntityAgeable;
-
-            Vector3 colorParentA = new Vector3(this.getColorRed(), this.getColorGreen(), this.getColorBlue());
-            Vector3 colorParentB = new Vector3(otherSlimeling.getColorRed(), otherSlimeling.getColorGreen(), otherSlimeling.getColorBlue());
-            Vector3 newColor = ColorUtil.addColorsRealistically(colorParentA, colorParentB);
-            newColor.x = Math.max(Math.min(newColor.x, 1.0F), 0);
-            newColor.y = Math.max(Math.min(newColor.y, 1.0F), 0);
-            newColor.z = Math.max(Math.min(newColor.z, 1.0F), 0);
-            EntitySlimeling newSlimeling = new EntitySlimeling(this.world, (float) newColor.x, (float) newColor.y, (float) newColor.z);
-
-            UUID s = this.getOwnerId();
-
-            if (s != null)
-            {
-                newSlimeling.setOwnerId(s);
+    
+    public EntitySlimeling spawnBabyAnimal(final EntityAgeable par1EntityAgeable) {
+        if (par1EntityAgeable instanceof EntitySlimeling) {
+            final EntitySlimeling otherSlimeling = (EntitySlimeling)par1EntityAgeable;
+            final Vector3 colorParentA = new Vector3((double)this.getColorRed(), (double)this.getColorGreen(), (double)this.getColorBlue());
+            final Vector3 colorParentB = new Vector3((double)otherSlimeling.getColorRed(), (double)otherSlimeling.getColorGreen(), (double)otherSlimeling.getColorBlue());
+            final Vector3 newColor = ColorUtil.addColorsRealistically(colorParentA, colorParentB);
+            newColor.x = Math.max(Math.min(newColor.x, 1.0), 0.0);
+            newColor.y = Math.max(Math.min(newColor.y, 1.0), 0.0);
+            newColor.z = Math.max(Math.min(newColor.z, 1.0), 0.0);
+            final EntitySlimeling newSlimeling = new EntitySlimeling(this.worldObj, (float)newColor.x, (float)newColor.y, (float)newColor.z);
+            String s = VersionUtil.getSlimelingOwner(this);
+            if (s != null && s.trim().length() > 0) {
+                VersionUtil.setSlimelingOwner(newSlimeling, s);
+                newSlimeling.setOwnerUsername(this.getOwnerUsername());
                 newSlimeling.setTamed(true);
             }
-
+            else {
+                s = VersionUtil.getSlimelingOwner(otherSlimeling);
+                if (s != null && s.trim().length() > 0) {
+                    VersionUtil.setSlimelingOwner(newSlimeling, s);
+                    newSlimeling.setOwnerUsername(this.getOwnerUsername());
+                    newSlimeling.setTamed(true);
+                }
+            }
             return newSlimeling;
         }
-
         return null;
     }
-
-    @Override
-    public boolean canMateWith(EntityAnimal par1EntityAnimal)
-    {
-        if (par1EntityAnimal == this)
-        {
+    
+    public boolean canMateWith(final EntityAnimal par1EntityAnimal) {
+        if (par1EntityAnimal == this) {
             return false;
-        } else if (!this.isTamed())
-        {
-            return false;
-        } else if (!(par1EntityAnimal instanceof EntitySlimeling))
-        {
-            return false;
-        } else
-        {
-            EntitySlimeling slimeling = (EntitySlimeling) par1EntityAnimal;
-            return slimeling.isTamed() && !slimeling.isSitting() && this.isInLove() && slimeling.isInLove();
         }
+        if (!this.isTamed()) {
+            return false;
+        }
+        if (!(par1EntityAnimal instanceof EntitySlimeling)) {
+            return false;
+        }
+        final EntitySlimeling slimeling = (EntitySlimeling)par1EntityAnimal;
+        return slimeling.isTamed() && !slimeling.isSitting() && this.isInLove() && slimeling.isInLove();
     }
-
-    @Override
-    public boolean shouldAttackEntity(EntityLivingBase toAttack, EntityLivingBase owner)
-    {
-        if (!(toAttack instanceof EntityCreeper) && !(toAttack instanceof EntityGhast))
-        {
-            if (toAttack instanceof EntitySlimeling)
-            {
-                EntitySlimeling slimeling = (EntitySlimeling) toAttack;
-
-                if (slimeling.isTamed() && slimeling.getOwner() == owner)
-                {
+    
+    public boolean func_142018_a(final EntityLivingBase par1EntityLivingBase, final EntityLivingBase par2EntityLivingBase) {
+        if (!(par1EntityLivingBase instanceof EntityCreeper) && !(par1EntityLivingBase instanceof EntityGhast)) {
+            if (par1EntityLivingBase instanceof EntitySlimeling) {
+                final EntitySlimeling slimeling = (EntitySlimeling)par1EntityLivingBase;
+                if (slimeling.isTamed() && slimeling.getOwner() == par2EntityLivingBase) {
                     return false;
                 }
             }
-
-            return !(toAttack instanceof EntityPlayer && owner instanceof EntityPlayer && !((EntityPlayer) owner).canAttackPlayer((EntityPlayer) toAttack))
-                && (!(toAttack instanceof EntityHorse) || !((EntityHorse) toAttack).isTame());
-        } else
-        {
-            return false;
+            return (!(par1EntityLivingBase instanceof EntityPlayer) || !(par2EntityLivingBase instanceof EntityPlayer) || ((EntityPlayer)par2EntityLivingBase).canAttackPlayer((EntityPlayer)par1EntityLivingBase)) && (!(par1EntityLivingBase instanceof EntityHorse) || !((EntityHorse)par1EntityLivingBase).isTame());
         }
+        return false;
     }
-
-    @Override
-    public EntityAgeable createChild(EntityAgeable par1EntityAgeable)
-    {
-        return this.spawnBabyAnimal(par1EntityAgeable);
+    
+    public EntityAgeable createChild(final EntityAgeable par1EntityAgeable) {
+        return (EntityAgeable)this.spawnBabyAnimal(par1EntityAgeable);
     }
-
-    public float getColorRed()
-    {
-        return this.dataManager.get(COLOR_RED);
+    
+    public float getColorRed() {
+        return this.dataWatcher.getWatchableObjectFloat(19);
     }
-
-    public void setColorRed(float color)
-    {
-        this.dataManager.set(COLOR_RED, color);
+    
+    public void setColorRed(final float color) {
+        this.dataWatcher.updateObject(19, (Object)color);
     }
-
-    public float getColorGreen()
-    {
-        return this.dataManager.get(COLOR_GREEN);
+    
+    public float getColorGreen() {
+        return this.dataWatcher.getWatchableObjectFloat(20);
     }
-
-    public void setColorGreen(float color)
-    {
-        this.dataManager.set(COLOR_GREEN, color);
+    
+    public void setColorGreen(final float color) {
+        this.dataWatcher.updateObject(20, (Object)color);
     }
-
-    public float getColorBlue()
-    {
-        return this.dataManager.get(COLOR_BLUE);
+    
+    public float getColorBlue() {
+        return this.dataWatcher.getWatchableObjectFloat(21);
     }
-
-    public void setColorBlue(float color)
-    {
-        this.dataManager.set(COLOR_BLUE, color);
+    
+    public void setColorBlue(final float color) {
+        this.dataWatcher.updateObject(21, (Object)color);
     }
-
-    public int getAge()
-    {
-        return this.dataManager.get(AGE);
+    
+    public int getAge() {
+        return this.dataWatcher.getWatchableObjectInt(22);
     }
-
-    public void setAge(int age)
-    {
-        this.dataManager.set(AGE, age);
+    
+    public void setAge(final int age) {
+        this.dataWatcher.updateObject(22, (Object)age);
     }
-
-    @Override
-    public String getName()
-    {
-        return this.dataManager.get(NAME);
+    
+    public String getName() {
+        return this.dataWatcher.getWatchableObjectString(23);
     }
-
-    public void setName(String name)
-    {
-        this.dataManager.set(NAME, name);
+    
+    public void setName(final String name) {
+        this.dataWatcher.updateObject(23, (Object)name);
     }
-
-    public Item getFavoriteFood()
-    {
-        return Item.getItemById(this.dataManager.get(FAV_FOOD_ID));
+    
+    public Item getFavoriteFood() {
+        return Item.getItemById(this.dataWatcher.getWatchableObjectInt(24));
     }
-
-    public void setFavoriteFood(int foodID)
-    {
-        this.dataManager.set(FAV_FOOD_ID, foodID);
+    
+    public void setFavoriteFood(final int foodID) {
+        this.dataWatcher.updateObject(24, (Object)foodID);
     }
-
-    public float getAttackDamage()
-    {
-        return this.dataManager.get(ATTACK_DAMAGE);
+    
+    public float getAttackDamage() {
+        return this.dataWatcher.getWatchableObjectFloat(25);
     }
-
-    public void setAttackDamage(float damage)
-    {
-        this.dataManager.set(ATTACK_DAMAGE, damage);
+    
+    public void setAttackDamage(final float damage) {
+        this.dataWatcher.updateObject(25, (Object)damage);
     }
-
-    public int getKillCount()
-    {
-        return this.dataManager.get(KILLS);
+    
+    public int getKillCount() {
+        return this.dataWatcher.getWatchableObjectInt(26);
     }
-
-    public void setKillCount(int damage)
-    {
-        this.dataManager.set(KILLS, damage);
+    
+    public void setKillCount(final int damage) {
+        this.dataWatcher.updateObject(26, (Object)damage);
     }
-
-    @Override
-    public boolean canBreath()
-    {
+    
+    public boolean canBreath() {
         return true;
     }
-
-    public float getScale()
-    {
-        return this.getAge() / (float) this.MAX_AGE * 0.5F + 0.5F;
+    
+    public float getScale() {
+        final float n = (float)this.getAge();
+        this.getClass();
+        return n / 100000.0f * 0.5f + 0.5f;
     }
-
-    public EntityAISit getAiSit()
-    {
+    
+    public EntityAISit getAiSit() {
         return this.aiSit;
     }
-
-    @Override
-    public void onDeath(DamageSource p_70645_1_)
-    {
+    
+    public ItemStack getCargoSlot() {
+        return this.dataWatcher.getWatchableObjectItemStack(27);
+    }
+    
+    public void setCargoSlot(final ItemStack stack) {
+        final ItemStack stack2 = this.dataWatcher.getWatchableObjectItemStack(27);
+        if (stack != stack2) {
+            this.dataWatcher.updateObject(27, (Object)stack);
+            this.dataWatcher.setObjectWatched(27);
+        }
+    }
+    
+    public void onDeath(final DamageSource p_70645_1_) {
         super.onDeath(p_70645_1_);
-
-        if (!this.world.isRemote)
-        {
-            ItemStack bag = this.slimelingInventory.getStackInSlot(1);
-            if (bag != null && bag.getItem() == MarsItems.marsItemBasic && bag.getItemDamage() == 4)
-            {
+        if (!this.worldObj.isRemote) {
+            final ItemStack bag = this.getCargoSlot();
+            if (bag != null && bag.getItem() == MarsItems.marsItemBasic && bag.getItemDamage() == 4) {
                 this.slimelingInventory.decrStackSize(1, 64);
-                this.entityDropItem(bag, 0.5F);
+                this.entityDropItem(bag, 0.5f);
             }
         }
     }
-
+    
+    protected void jump() {
+        this.motionY = 0.48 / WorldUtil.getGravityFactor((Entity)this);
+        if (this.motionY < 0.28) {
+            this.motionY = 0.28;
+        }
+        if (this.isPotionActive(Potion.jump)) {
+            this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1f;
+        }
+        if (this.isSprinting()) {
+            final float f = this.rotationYaw * 0.017453292f;
+            this.motionX -= MathHelper.sin(f) * 0.2f;
+            this.motionZ += MathHelper.cos(f) * 0.2f;
+        }
+        this.isAirBorne = true;
+        ForgeHooks.onLivingJump((EntityLivingBase)this);
+    }
+    
     public static class EntityAISitGC extends EntityAISit
     {
-
         private EntityTameable theEntity;
         private boolean isSitting;
-
-        public EntityAISitGC(EntityTameable theEntity)
-        {
+        
+        public EntityAISitGC(final EntityTameable theEntity) {
             super(theEntity);
             this.theEntity = theEntity;
             this.setMutexBits(5);
         }
-
-        @Override
-        public boolean shouldExecute()
-        {
-            if (!this.theEntity.isTamed())
-            {
-                return false;
-            } else if (this.theEntity.isInWater())
-            {
-                return false;
-            } else
-            {
-                Entity e = this.theEntity.getOwner();
-                if (e instanceof EntityLivingBase)
-                {
-                    EntityLivingBase living = (EntityLivingBase) e;
-                    return living == null ? true : (this.theEntity.getDistanceSq(living) < 144.0D && living.getRevengeTarget() != null ? false : this.isSitting);
-                }
+        
+        public boolean shouldExecute() {
+            if (!this.theEntity.isTamed()) {
                 return false;
             }
+            if (this.theEntity.isInWater()) {
+                return false;
+            }
+            final EntityLivingBase entitylivingbase = this.theEntity.getOwner();
+            return entitylivingbase == null || ((this.theEntity.getDistanceSqToEntity((Entity)entitylivingbase) >= 144.0 || entitylivingbase.getAITarget() == null) && this.isSitting);
         }
-
-        @Override
-        public void startExecuting()
-        {
-            this.theEntity.getNavigator().clearPath();
+        
+        public void startExecuting() {
+            this.theEntity.getNavigator().clearPathEntity();
             this.theEntity.setSitting(true);
         }
-
-        @Override
-        public void resetTask()
-        {
+        
+        public void resetTask() {
             this.theEntity.setSitting(false);
         }
-
-        @Override
-        public void setSitting(boolean isSitting)
-        {
+        
+        public void setSitting(final boolean isSitting) {
             this.isSitting = isSitting;
         }
-    }
-
-    @Override
-    protected void jump()
-    {
-        this.motionY = 0.48D / WorldUtil.getGravityFactor(this);
-        if (this.motionY < 0.28D)
-        {
-            this.motionY = 0.28D;
-        }
-
-        if (this.isPotionActive(MobEffects.JUMP_BOOST))
-        {
-            this.motionY += (this.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1F;
-        }
-
-        if (this.isSprinting())
-        {
-            float f = this.rotationYaw / Constants.RADIANS_TO_DEGREES;
-            this.motionX -= MathHelper.sin(f) * 0.2F;
-            this.motionZ += MathHelper.cos(f) * 0.2F;
-        }
-
-        this.isAirBorne = true;
-        ForgeHooks.onLivingJump(this);
     }
 }

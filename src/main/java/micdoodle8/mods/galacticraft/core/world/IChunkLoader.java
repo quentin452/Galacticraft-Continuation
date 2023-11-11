@@ -1,29 +1,20 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.world;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
+import net.minecraftforge.common.*;
+import net.minecraft.world.*;
+import net.minecraft.util.*;
 
 public interface IChunkLoader
 {
-
-    void onTicketLoaded(Ticket ticket, boolean placed);
-
-    Ticket getTicket();
-
-    World getWorld();
-
-    BlockPos getCoords();
-
+    void onTicketLoaded(final ForgeChunkManager.Ticket p0, final boolean p1);
+    
+    ForgeChunkManager.Ticket getTicket();
+    
+    World getWorldObj();
+    
+    ChunkCoordinates getCoords();
+    
     String getOwnerName();
-
-    void setOwnerName(String ownerName);
+    
+    void setOwnerName(final String p0);
 }

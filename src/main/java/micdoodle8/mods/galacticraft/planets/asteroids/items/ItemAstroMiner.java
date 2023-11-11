@@ -1,172 +1,98 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import java.util.List;
-import javax.annotation.Nullable;
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.dimension.WorldProviderSpaceStation;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityMulti;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.asteroids.ConfigManagerAsteroids;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
-import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.item.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import micdoodle8.mods.galacticraft.core.dimension.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.block.*;
+import java.util.*;
 
-public class ItemAstroMiner extends Item implements IHoldableItem, ISortableItem, GCRarity
+public class ItemAstroMiner extends Item implements IHoldableItem
 {
-
-    public ItemAstroMiner(String assetName)
-    {
-        super();
+    public ItemAstroMiner(final String assetName) {
         this.setMaxDamage(0);
         this.setMaxStackSize(1);
-        this.setTranslationKey(assetName);
-        // this.setTextureName("arrow");
+        this.setUnlocalizedName(assetName);
+        this.setTextureName("arrow");
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
-    {
+    
+    public boolean onItemUse(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final World par3World, final int par4, final int par5, final int par6, final int par7, final float par8, final float par9, final float par10) {
         TileEntity tile = null;
-
-        if (playerIn == null)
-        {
-            return EnumActionResult.PASS;
-        } else
-        {
-            final Block id = worldIn.getBlockState(pos).getBlock();
-
-            if (id == GCBlocks.fakeBlock)
-            {
-                tile = worldIn.getTileEntity(pos);
-
-                if (tile instanceof TileEntityMulti)
-                {
-                    tile = ((TileEntityMulti) tile).getMainBlockTile();
-                }
-            }
-
-            if (id == AsteroidBlocks.minerBaseFull)
-            {
-                tile = worldIn.getTileEntity(pos);
-            }
-
-            if (tile instanceof TileEntityMinerBase)
-            {
-                // Don't open GUI on client
-                if (worldIn.isRemote)
-                {
-                    return EnumActionResult.FAIL;
-                }
-
-                if (worldIn.provider instanceof WorldProviderSpaceStation)
-                {
-                    playerIn.sendMessage(new TextComponentString(GCCoreUtil.translate("gui.message.astro_miner7.fail")));
-                    return EnumActionResult.FAIL;
-                }
-
-                if (((TileEntityMinerBase) tile).getLinkedMiner() != null)
-                {
-                    playerIn.sendMessage(new TextComponentString(GCCoreUtil.translate("gui.message.astro_miner.fail")));
-                    return EnumActionResult.FAIL;
-                }
-
-                // Gives a chance for any loaded Astro Miner to link itself
-                if (((TileEntityMinerBase) tile).ticks < 15)
-                {
-                    return EnumActionResult.FAIL;
-                }
-
-                EntityPlayerMP playerMP = (EntityPlayerMP) playerIn;
-                GCPlayerStats stats = GCPlayerStats.get(playerIn);
-
-                int astroCount = stats.getAstroMinerCount();
-                if (astroCount >= ConfigManagerAsteroids.astroMinerMax && (!playerIn.capabilities.isCreativeMode))
-                {
-                    playerIn.sendMessage(new TextComponentString(GCCoreUtil.translate("gui.message.astro_miner2.fail")));
-                    return EnumActionResult.FAIL;
-                }
-
-                if (!((TileEntityMinerBase) tile).spawnMiner(playerMP))
-                {
-                    playerIn.sendMessage(new TextComponentString(GCCoreUtil.translate("gui.message.astro_miner1.fail") + " " + GCCoreUtil.translate(EntityAstroMiner.blockingBlock.toString())));
-                    return EnumActionResult.FAIL;
-                }
-
-                if (!playerIn.capabilities.isCreativeMode)
-                {
-                    stats.setAstroMinerCount(stats.getAstroMinerCount() + 1);
-                    playerIn.getHeldItem(hand).shrink(1);
-                }
-                return EnumActionResult.SUCCESS;
-            }
+        if (par3World.isRemote || par2EntityPlayer == null) {
+            return false;
         }
-        return EnumActionResult.PASS;
+        final Block id = par3World.getBlock(par4, par5, par6);
+        if (id == AsteroidBlocks.minerBaseFull) {
+            tile = par3World.getTileEntity(par4, par5, par6);
+        }
+        if (!(tile instanceof TileEntityMinerBase)) {
+            return false;
+        }
+        if (par3World.provider instanceof WorldProviderSpaceStation) {
+            par2EntityPlayer.addChatMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner7.fail")));
+            return false;
+        }
+        if (((TileEntityMinerBase)tile).getLinkedMiner() != null) {
+            par2EntityPlayer.addChatMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner.fail")));
+            return false;
+        }
+        if (((TileEntityMinerBase)tile).ticks < 15) {
+            return false;
+        }
+        final EntityPlayerMP playerMP = (EntityPlayerMP)par2EntityPlayer;
+        final int astroCount = GCPlayerStats.get(playerMP).astroMinerCount;
+        if (astroCount >= ConfigManagerAsteroids.astroMinerMax && !par2EntityPlayer.capabilities.isCreativeMode) {
+            par2EntityPlayer.addChatMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner2.fail")));
+            return false;
+        }
+        if (!((TileEntityMinerBase)tile).spawnMiner(playerMP)) {
+            par2EntityPlayer.addChatMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner1.fail") + " " + GCCoreUtil.translate(EntityAstroMiner.blockingBlock.toString())));
+            return false;
+        }
+        if (!par2EntityPlayer.capabilities.isCreativeMode) {
+            final GCPlayerStats value = GCPlayerStats.get(playerMP);
+            ++value.astroMinerCount;
+            --par1ItemStack.stackSize;
+        }
+        return true;
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        // TODO
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer player, final List par2List, final boolean b) {
     }
-
-    @Override
-    public boolean shouldHoldLeftHandUp(EntityPlayer player)
-    {
+    
+    public boolean shouldHoldLeftHandUp(final EntityPlayer player) {
         return true;
     }
-
-    @Override
-    public boolean shouldHoldRightHandUp(EntityPlayer player)
-    {
+    
+    public boolean shouldHoldRightHandUp(final EntityPlayer player) {
         return true;
     }
-
-    @Override
-    public boolean shouldCrouch(EntityPlayer player)
-    {
+    
+    public boolean shouldCrouch(final EntityPlayer player) {
         return true;
-    }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.GENERAL;
     }
 }

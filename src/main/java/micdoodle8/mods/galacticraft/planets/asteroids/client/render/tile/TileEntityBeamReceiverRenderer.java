@@ -1,151 +1,101 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import micdoodle8.mods.galacticraft.core.client.model.OBJLoaderGC;
-import micdoodle8.mods.galacticraft.core.tile.ReceiverMode;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.core.util.ColorUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityBeamReceiver;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.obj.OBJModel;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.tileentity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import net.minecraftforge.client.model.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import cpw.mods.fml.client.*;
+import org.lwjgl.opengl.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.tileentity.*;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityBeamReceiverRenderer extends TileEntitySpecialRenderer<TileEntityBeamReceiver>
+public class TileEntityBeamReceiverRenderer extends TileEntitySpecialRenderer
 {
-
-    private static OBJModel.OBJBakedModel reflectorModelMain;
-    private static OBJModel.OBJBakedModel reflectorModelReceiver;
-    private static OBJModel.OBJBakedModel reflectorModelRing;
-
-    private void updateModels()
-    {
-        if (reflectorModelMain == null)
-        {
-            try
-            {
-                IModel model = OBJLoaderGC.instance.loadModel(new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "block/receiver.obj"));
-                Function<ResourceLocation, TextureAtlasSprite> spriteFunction = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
-
-                reflectorModelMain = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Main"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                reflectorModelReceiver = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Receiver"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                reflectorModelRing = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Ring"), false), DefaultVertexFormats.ITEM, spriteFunction);
-            } catch (Exception e)
-            {
-                throw new RuntimeException(e);
+    public static final ResourceLocation receiverTexture;
+    public static IModelCustom receiverModel;
+    
+    public TileEntityBeamReceiverRenderer() {
+        TileEntityBeamReceiverRenderer.receiverModel = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/receiver.obj"));
+    }
+    
+    public void renderModelAt(final TileEntityBeamReceiver tileEntity, final double d, final double d1, final double d2, final float f) {
+        FMLClientHandler.instance().getClient().renderEngine.bindTexture(TileEntityBeamReceiverRenderer.receiverTexture);
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)d + 0.5f, (float)d1, (float)d2 + 0.5f);
+        GL11.glScalef(0.85f, 0.85f, 0.85f);
+        switch (ForgeDirection.getOrientation(tileEntity.facing)) {
+            case DOWN: {
+                GL11.glTranslatef(0.7f, -0.15f, 0.0f);
+                GL11.glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+                break;
+            }
+            case UP: {
+                GL11.glTranslatef(-0.7f, 1.3f, 0.0f);
+                GL11.glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+                break;
+            }
+            case EAST: {
+                GL11.glTranslatef(0.7f, -0.15f, 0.0f);
+                GL11.glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+                break;
+            }
+            case SOUTH: {
+                GL11.glTranslatef(0.0f, -0.15f, 0.7f);
+                GL11.glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+                break;
+            }
+            case WEST: {
+                GL11.glTranslatef(-0.7f, -0.15f, 0.0f);
+                GL11.glRotatef(0.0f, 0.0f, 1.0f, 0.0f);
+                break;
+            }
+            case NORTH: {
+                GL11.glTranslatef(0.0f, -0.15f, -0.7f);
+                GL11.glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
+                break;
+            }
+            default: {
+                GL11.glPopMatrix();
+                return;
             }
         }
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        TileEntityBeamReceiverRenderer.receiverModel.renderPart("Main");
+        if (tileEntity.modeReceive == ReceiverMode.RECEIVE.ordinal()) {
+            GL11.glColor3f(0.0f, 0.8f, 0.0f);
+        }
+        else if (tileEntity.modeReceive == ReceiverMode.EXTRACT.ordinal()) {
+            GL11.glColor3f(0.6f, 0.0f, 0.0f);
+        }
+        else {
+            GL11.glColor3f(0.1f, 0.1f, 0.1f);
+        }
+        GL11.glDisable(3553);
+        GL11.glDisable(2884);
+        TileEntityBeamReceiverRenderer.receiverModel.renderPart("Receiver");
+        GL11.glEnable(3553);
+        GL11.glEnable(2884);
+        final float dX = 0.34772f;
+        final float dY = 0.75097f;
+        final float dZ = 0.0f;
+        GL11.glTranslatef(dX, dY, dZ);
+        if (tileEntity.modeReceive != ReceiverMode.UNDEFINED.ordinal()) {
+            GL11.glRotatef((float)(-tileEntity.ticks * 50), 1.0f, 0.0f, 0.0f);
+        }
+        GL11.glTranslatef(-dX, -dY, -dZ);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        TileEntityBeamReceiverRenderer.receiverModel.renderPart("Ring");
+        GL11.glPopMatrix();
     }
-
-    @Override
-    public void render(TileEntityBeamReceiver tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
-    {
-        if (tile.facing == null)
-        {
-            return;
-        }
-
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) x + 0.5F, (float) y, (float) z + 0.5F);
-        GlStateManager.scale(0.85F, 0.85F, 0.85F);
-
-        switch (tile.facing)
-        {
-            case DOWN:
-                GlStateManager.translate(0.7F, -0.15F, 0.0F);
-                GlStateManager.rotate(90, 0, 0, 1);
-                break;
-            case UP:
-                GlStateManager.translate(-0.7F, 1.3F, 0.0F);
-                GlStateManager.rotate(-90, 0, 0, 1);
-                break;
-            case EAST:
-                GlStateManager.translate(0.7F, -0.15F, 0.0F);
-                GlStateManager.rotate(180, 0, 1, 0);
-                break;
-            case SOUTH:
-                GlStateManager.translate(0.0F, -0.15F, 0.7F);
-                GlStateManager.rotate(90, 0, 1, 0);
-                break;
-            case WEST:
-                GlStateManager.translate(-0.7F, -0.15F, 0.0F);
-                GlStateManager.rotate(0, 0, 1, 0);
-                break;
-            case NORTH:
-                GlStateManager.translate(0.0F, -0.15F, -0.7F);
-                GlStateManager.rotate(270, 0, 1, 0);
-                break;
-            default:
-                GlStateManager.popMatrix();
-                return;
-        }
-
-        this.updateModels();
-        this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-        if (Minecraft.isAmbientOcclusionEnabled())
-        {
-            GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        } else
-        {
-            GlStateManager.shadeModel(GL11.GL_FLAT);
-        }
-
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        ClientUtil.drawBakedModel(reflectorModelMain);
-
-        int color;
-
-        if (tile.modeReceive == ReceiverMode.RECEIVE.ordinal())
-        {
-            color = ColorUtil.to32BitColor(255, 0, 204, 0);
-        } else if (tile.modeReceive == ReceiverMode.EXTRACT.ordinal())
-        {
-            color = ColorUtil.to32BitColor(255, 0, 0, 153);
-        } else
-        {
-            color = ColorUtil.to32BitColor(255, 25, 25, 25);
-        }
-
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableCull();
-        ClientUtil.drawBakedModelColored(reflectorModelReceiver, color);
-        GlStateManager.enableTexture2D();
-        GlStateManager.enableCull();
-        float dX = 0.34772F;
-        float dY = 0.75097F;
-        float dZ = 0.0F;
-        GlStateManager.translate(dX, dY, dZ);
-
-        if (tile.modeReceive != ReceiverMode.UNDEFINED.ordinal())
-        {
-            GlStateManager.rotate(-tile.ticks * 50, 1, 0, 0);
-        }
-
-        GlStateManager.translate(-dX, -dY, -dZ);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        ClientUtil.drawBakedModel(reflectorModelRing);
-        GlStateManager.popMatrix();
-        RenderHelper.enableStandardItemLighting();
+    
+    public void renderTileEntityAt(final TileEntity tileEntity, final double var2, final double var4, final double var6, final float var8) {
+        this.renderModelAt((TileEntityBeamReceiver)tileEntity, var2, var4, var6, var8);
+    }
+    
+    static {
+        receiverTexture = new ResourceLocation("galacticraftasteroids", "textures/model/beamReceiver.png");
     }
 }

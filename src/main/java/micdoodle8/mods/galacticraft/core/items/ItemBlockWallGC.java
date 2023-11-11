@@ -1,46 +1,38 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-
-public class ItemBlockWallGC extends ItemBlock implements GCRarity
+public class ItemBlockWallGC extends ItemBlock
 {
-
-    private static final String[] types = new String[]
-    {"tin", "tin", "moon", "moon_bricks", "mars", "mars_bricks"};
-
-    public ItemBlockWallGC(Block block)
-    {
+    private static final String[] types;
+    
+    public ItemBlockWallGC(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public int getMetadata(int meta)
-    {
+    
+    public int getMetadata(final int meta) {
         return meta;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemstack)
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public String getUnlocalizedName(final ItemStack itemstack) {
         int meta = itemstack.getItemDamage();
-
-        if (meta < 0 || meta >= types.length)
-        {
+        if (meta < 0 || meta >= ItemBlockWallGC.types.length) {
             meta = 0;
         }
-        return super.getTranslationKey() + "." + types[meta];
+        return super.getUnlocalizedName() + "." + ItemBlockWallGC.types[meta];
+    }
+    
+    static {
+        types = new String[] { "tin", "tin", "moon", "moonBricks", "mars", "marsBricks" };
     }
 }

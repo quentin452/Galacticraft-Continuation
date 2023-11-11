@@ -1,174 +1,127 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.concurrent.atomic.AtomicInteger;
-import javax.imageio.ImageIO;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import net.minecraft.client.renderer.IImageBuffer;
-import net.minecraft.client.renderer.texture.SimpleTexture;
-import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import cpw.mods.fml.relauncher.*;
+import java.util.concurrent.atomic.*;
+import net.minecraft.client.renderer.*;
+import java.awt.image.*;
+import net.minecraft.util.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.client.resources.*;
+import cpw.mods.fml.common.*;
+import javax.imageio.*;
+import java.io.*;
+import java.net.*;
+import org.apache.commons.io.*;
+import org.apache.logging.log4j.*;
 
 @SideOnly(Side.CLIENT)
 public class ThreadDownloadImageDataGC extends SimpleTexture
 {
-
-    private static final Logger logger = LogManager.getLogger();
-    private static final AtomicInteger threadDownloadCounter = new AtomicInteger(0);
+    private static final Logger logger;
+    private static final AtomicInteger threadDownloadCounter;
     private final File field_152434_e;
     private final String imageUrl;
     private final IImageBuffer imageBuffer;
     private BufferedImage bufferedImage;
     private Thread imageThread;
     private boolean textureUploaded;
-
-    public ThreadDownloadImageDataGC(File p_i1049_1_, String p_i1049_2_, ResourceLocation p_i1049_3_, IImageBuffer p_i1049_4_)
-    {
+    
+    public ThreadDownloadImageDataGC(final File p_i1049_1_, final String p_i1049_2_, final ResourceLocation p_i1049_3_, final IImageBuffer p_i1049_4_) {
         super(p_i1049_3_);
         this.field_152434_e = p_i1049_1_;
         this.imageUrl = p_i1049_2_;
         this.imageBuffer = p_i1049_4_;
     }
-
-    private void checkTextureUploaded()
-    {
-        if (!this.textureUploaded)
-        {
-            if (this.bufferedImage != null)
-            {
-                if (this.textureLocation != null)
-                {
-                    this.deleteGlTexture();
-                }
-
-                TextureUtil.uploadTextureImage(super.getGlTextureId(), this.bufferedImage);
-                this.textureUploaded = true;
+    
+    private void checkTextureUploaded() {
+        if (!this.textureUploaded && this.bufferedImage != null) {
+            if (this.textureLocation != null) {
+                this.deleteGlTexture();
             }
+            TextureUtil.uploadTextureImage(super.getGlTextureId(), this.bufferedImage);
+            this.textureUploaded = true;
         }
     }
-
-    @Override
-    public int getGlTextureId()
-    {
+    
+    public int getGlTextureId() {
         this.checkTextureUploaded();
         return super.getGlTextureId();
     }
-
-    public void setBufferedImage(BufferedImage p_147641_1_)
-    {
+    
+    public void setBufferedImage(final BufferedImage p_147641_1_) {
         this.bufferedImage = p_147641_1_;
     }
-
-    @Override
-    public void loadTexture(IResourceManager p_110551_1_)
-    {
-        try
-        {
-            if (this.bufferedImage == null && this.textureLocation != null)
-            {
+    
+    public void loadTexture(final IResourceManager p_110551_1_) {
+        try {
+            if (this.bufferedImage == null && this.textureLocation != null) {
                 super.loadTexture(p_110551_1_);
             }
-        } catch (Exception e)
-        {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
-
-        if (this.imageThread == null)
-        {
-            if (this.field_152434_e != null && this.field_152434_e.isFile())
-            {
-                GalacticraftCore.logger.debug("Loading http texture from local cache (%s)", this.field_152434_e);
-
-                try
-                {
+        if (this.imageThread == null) {
+            if (this.field_152434_e != null && this.field_152434_e.isFile()) {
+                FMLLog.fine("Loading http texture from local cache (%s)", new Object[] { this.field_152434_e });
+                try {
                     this.bufferedImage = ImageIO.read(this.field_152434_e);
-
-                    if (this.imageBuffer != null)
-                    {
+                    if (this.imageBuffer != null) {
                         this.setBufferedImage(this.imageBuffer.parseUserSkin(this.bufferedImage));
                     }
-                } catch (IOException ioexception)
-                {
-                    logger.error("Couldn\'t load skin " + this.field_152434_e, ioexception);
+                }
+                catch (IOException ioexception) {
+                    ThreadDownloadImageDataGC.logger.error("Couldn't load skin " + this.field_152434_e, (Throwable)ioexception);
                     this.func_152433_a();
                 }
-            } else
-            {
+            }
+            else {
                 this.func_152433_a();
             }
         }
     }
-
-    protected void func_152433_a()
-    {
-        this.imageThread = new Thread("Texture Downloader #" + threadDownloadCounter.incrementAndGet())
-        {
-
+    
+    protected void func_152433_a() {
+        (this.imageThread = new Thread("Texture Downloader #" + ThreadDownloadImageDataGC.threadDownloadCounter.incrementAndGet()) {
             @Override
-            public void run()
-            {
+            public void run() {
                 HttpURLConnection httpurlconnection = null;
-                GalacticraftCore.logger.debug("Downloading http texture from %s to %s", ThreadDownloadImageDataGC.this.imageUrl, ThreadDownloadImageDataGC.this.field_152434_e);
-
-                try
-                {
-                    httpurlconnection = (HttpURLConnection) (new URL(ThreadDownloadImageDataGC.this.imageUrl)).openConnection();
+                FMLLog.fine("Downloading http texture from %s to %s", new Object[] { ThreadDownloadImageDataGC.this.imageUrl, ThreadDownloadImageDataGC.this.field_152434_e });
+                try {
+                    httpurlconnection = (HttpURLConnection)new URL(ThreadDownloadImageDataGC.this.imageUrl).openConnection();
                     httpurlconnection.setDoInput(true);
                     httpurlconnection.setDoOutput(false);
                     httpurlconnection.connect();
-
-                    if (httpurlconnection.getResponseCode() / 100 == 2)
-                    {
+                    if (httpurlconnection.getResponseCode() / 100 == 2) {
                         BufferedImage bufferedimage;
-
-                        if (ThreadDownloadImageDataGC.this.field_152434_e != null)
-                        {
+                        if (ThreadDownloadImageDataGC.this.field_152434_e != null) {
                             FileUtils.copyInputStreamToFile(httpurlconnection.getInputStream(), ThreadDownloadImageDataGC.this.field_152434_e);
                             bufferedimage = ImageIO.read(ThreadDownloadImageDataGC.this.field_152434_e);
-                        } else
-                        {
+                        }
+                        else {
                             bufferedimage = ImageIO.read(httpurlconnection.getInputStream());
                         }
-
-                        if (ThreadDownloadImageDataGC.this.imageBuffer != null)
-                        {
+                        if (ThreadDownloadImageDataGC.this.imageBuffer != null) {
                             bufferedimage = ThreadDownloadImageDataGC.this.imageBuffer.parseUserSkin(bufferedimage);
                         }
-
                         ThreadDownloadImageDataGC.this.setBufferedImage(bufferedimage);
-                        return;
                     }
-                } catch (Exception exception)
-                {
-                    ThreadDownloadImageDataGC.logger.error("Couldn\'t download http texture", exception);
-                    return;
-                } finally
-                {
-                    if (httpurlconnection != null)
-                    {
+                }
+                catch (Exception exception) {
+                    ThreadDownloadImageDataGC.logger.error("Couldn't download http texture", (Throwable)exception);
+                }
+                finally {
+                    if (httpurlconnection != null) {
                         httpurlconnection.disconnect();
                     }
                 }
             }
-        };
-        this.imageThread.setDaemon(true);
+        }).setDaemon(true);
         this.imageThread.start();
+    }
+    
+    static {
+        logger = LogManager.getLogger();
+        threadDownloadCounter = new AtomicInteger(0);
     }
 }

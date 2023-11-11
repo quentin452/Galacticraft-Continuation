@@ -1,68 +1,35 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.transmission.grid;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkConnection;
-import micdoodle8.mods.galacticraft.api.transmission.tile.ITransmitter;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.api.transmission.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraftforge.common.util.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.api.transmission.tile.*;
+import java.util.*;
+import net.minecraft.tileentity.*;
 
-/**
- * Check if a conductor connects with another.
- *
- * @author Calclavia
- */
 public class PathfinderChecker extends Pathfinder
 {
-
-    public PathfinderChecker(final World world, final INetworkConnection targetConnector, final NetworkType networkType, final INetworkConnection... ignoreConnector)
-    {
-        super(new IPathCallBack()
-        {
-
-            @Override
-            public Set<BlockVec3> getConnectedNodes(Pathfinder finder, BlockVec3 currentNode)
-            {
-                Set<BlockVec3> neighbors = new HashSet<BlockVec3>();
-
-                for (int i = 0; i < 6; i++)
-                {
-                    EnumFacing direction = EnumFacing.byIndex(i);
-                    BlockVec3 position = currentNode.clone().modifyPositionFromSide(direction);
-                    TileEntity connectedBlock = position.getTileEntity(world);
-
-                    if (connectedBlock instanceof ITransmitter && !Arrays.asList(ignoreConnector).contains(connectedBlock))
-                    {
-                        if (((ITransmitter) connectedBlock).canConnect(direction.getOpposite(), networkType))
-                        {
-                            neighbors.add(position);
-                        }
+    public PathfinderChecker(final World world, final INetworkConnection targetConnector, final NetworkType networkType, final INetworkConnection... ignoreConnector) {
+        super((IPathCallBack)new IPathCallBack() {
+            public Set<BlockVec3> getConnectedNodes(final Pathfinder finder, final BlockVec3 currentNode) {
+                final Set<BlockVec3> neighbors = new HashSet<BlockVec3>();
+                for (int i = 0; i < 6; ++i) {
+                    final ForgeDirection direction = ForgeDirection.getOrientation(i);
+                    final BlockVec3 position = currentNode.clone().modifyPositionFromSide(direction);
+                    final TileEntity connectedBlock = position.getTileEntity((IBlockAccess)world);
+                    if (connectedBlock instanceof ITransmitter && !Arrays.asList(ignoreConnector).contains(connectedBlock) && ((ITransmitter)connectedBlock).canConnect(direction.getOpposite(), networkType)) {
+                        neighbors.add(position);
                     }
                 }
-
                 return neighbors;
             }
-
-            @Override
-            public boolean onSearch(Pathfinder finder, BlockVec3 node)
-            {
-                if (node.getTileEntity(world) == targetConnector)
-                {
+            
+            public boolean onSearch(final Pathfinder finder, final BlockVec3 node) {
+                if (node.getTileEntity((IBlockAccess)world) == targetConnector) {
                     finder.results.add(node);
                     return true;
                 }
-
                 return false;
             }
         });

@@ -1,53 +1,33 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
-import java.util.Set;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.client.IModGuiFactory;
-import net.minecraftforge.fml.client.config.GuiConfig;
+import cpw.mods.fml.client.*;
+import net.minecraft.client.*;
+import net.minecraft.client.gui.*;
+import cpw.mods.fml.client.config.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.*;
 
 public class ConfigGuiFactoryCore implements IModGuiFactory
 {
-
-    public static class CoreConfigGUI extends GuiConfig
-    {
-
-        public CoreConfigGUI(GuiScreen parent)
-        {
-            super(parent, ConfigManagerCore.getConfigElements(), Constants.MOD_ID_CORE, false, false, GCCoreUtil.translate("gc.configgui.title"));
-        }
+    public void initialize(final Minecraft minecraftInstance) {
     }
-
-    @Override
-    public void initialize(Minecraft minecraftInstance)
-    {
-
+    
+    public Class<? extends GuiScreen> mainConfigGuiClass() {
+        return (Class<? extends GuiScreen>)CoreConfigGUI.class;
     }
-
-    @Override
-    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories()
-    {
+    
+    public Set<IModGuiFactory.RuntimeOptionCategoryElement> runtimeGuiCategories() {
         return null;
     }
-
-    public GuiScreen createConfigGui(GuiScreen arg0)
-    {
-        // TODO Forge 2282 addition!
-        return new CoreConfigGUI(arg0);
+    
+    public IModGuiFactory.RuntimeOptionGuiHandler getHandlerFor(final IModGuiFactory.RuntimeOptionCategoryElement element) {
+        return null;
     }
-
-    public boolean hasConfigGui()
+    
+    public static class CoreConfigGUI extends GuiConfig
     {
-        return true;
+        public CoreConfigGUI(final GuiScreen parent) {
+            super(parent, (List)ConfigManagerCore.getConfigElements(), "GalacticraftCore", false, false, GCCoreUtil.translate("gc.configgui.title"));
+        }
     }
 }

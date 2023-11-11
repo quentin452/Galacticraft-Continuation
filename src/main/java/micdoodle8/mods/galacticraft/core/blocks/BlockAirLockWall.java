@@ -1,196 +1,99 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
+import micdoodle8.mods.galacticraft.api.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import net.minecraft.world.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import java.util.*;
+import net.minecraft.item.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockBreakable;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-
-public class BlockAirLockWall extends BlockBreakable implements IPartialSealableBlock, ISortableBlock
+public class BlockAirLockWall extends BlockBreakable implements IPartialSealableBlock
 {
-
-    public static final PropertyEnum<EnumAirLockSealConnection> CONNECTION_TYPE = PropertyEnum.create("connection", EnumAirLockSealConnection.class);
-    protected static final AxisAlignedBB AABB_X = new AxisAlignedBB(0.25, 0.0, 0.0, 0.75, 1.0, 1.0);
-    protected static final AxisAlignedBB AABB_Z = new AxisAlignedBB(0.0, 0.0, 0.25, 1.0, 1.0, 0.75);
-    protected static final AxisAlignedBB AABB_FLAT = new AxisAlignedBB(0.0, 0.25, 0.0, 1.0, 0.75, 1.0);
-
-    public enum EnumAirLockSealConnection implements IStringSerializable
-    {
-
-        X("x"), Z("z"), FLAT("flat");
-
-        private final String name;
-
-        EnumAirLockSealConnection(String name)
-        {
-            this.name = name;
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
-    }
-
-    public BlockAirLockWall(String assetName)
-    {
-        super(Material.IRON, false);
+    public BlockAirLockWall(final String assetName) {
+        super(GalacticraftCore.TEXTURE_PREFIX + "oxygentile_3", Material.iron, false);
         this.setTickRandomly(true);
-        this.setHardness(1000.0F);
-        this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(assetName);
+        this.setHardness(1000.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        switch (getConnection(source, pos))
-        {
-            case X:
-                return AABB_X;
-            case Z:
-                return AABB_Z;
-            default:
-            case FLAT:
-                return AABB_FLAT;
-        }
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
-    }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
-    {
-        return true;
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.blockIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "deco_aluminium_4");
     }
-
-    @Override
-    public int quantityDropped(Random par1Random)
-    {
-        return 0;
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        this.setBlockBoundsBasedOnState((IBlockAccess)world, x, y, z);
+        return super.getCollisionBoundingBoxFromPool(world, x, y, z);
     }
-
-    @Override
-    public boolean isSealed(World worldIn, BlockPos pos, EnumFacing direction)
-    {
-        return true;
+    
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        this.setBlockBoundsBasedOnState((IBlockAccess)world, x, y, z);
+        return super.getSelectedBoundingBoxFromPool(world, x, y, z);
     }
-
-//    @Override
-//    public Item getItem(World world, BlockPos pos)
-//    {
-//        return null;
-//    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.MACHINE;
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, CONNECTION_TYPE);
-    }
-
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        return state.withProperty(CONNECTION_TYPE, getConnection(worldIn, pos));
-    }
-
-    private EnumAirLockSealConnection getConnection(IBlockAccess worldIn, BlockPos pos)
-    {
-        EnumAirLockSealConnection connection;
-
-        Block frameID = GCBlocks.airLockFrame;
-        Block sealID = GCBlocks.airLockSeal;
-
-        Block idXMin = worldIn.getBlockState(pos.offset(EnumFacing.WEST)).getBlock();
-        Block idXMax = worldIn.getBlockState(pos.offset(EnumFacing.WEST)).getBlock();
-
-        if (idXMin != frameID && idXMax != frameID && idXMin != sealID && idXMax != sealID)
-        {
-            connection = EnumAirLockSealConnection.X;
-        } else
-        {
+    
+    public void setBlockBoundsBasedOnState(final IBlockAccess world, final int x, final int y, final int z) {
+        final Block frameID = GCBlocks.airLockFrame;
+        final Block sealID = GCBlocks.airLockSeal;
+        final Block idXMin = world.getBlock(x - 1, y, z);
+        final Block idXMax = world.getBlock(x + 1, y, z);
+        if (idXMin != frameID && idXMax != frameID && idXMin != sealID && idXMax != sealID) {
+            final float var5 = 0.25f;
+            final float var6 = 0.5f;
+            this.setBlockBounds(0.5f - var5, 0.0f, 0.5f - var6, 0.5f + var5, 1.0f, 0.5f + var6);
+        }
+        else {
             int adjacentCount = 0;
-
-            for (EnumFacing dir : EnumFacing.HORIZONTALS)
-            {
-                Block blockID = worldIn.getBlockState(pos.offset(dir)).getBlock();
-
-                if (blockID == GCBlocks.airLockFrame || blockID == GCBlocks.airLockSeal)
-                {
-                    adjacentCount++;
+            for (final ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+                if (dir != ForgeDirection.UP && dir != ForgeDirection.DOWN) {
+                    Vector3 thisVec = new Vector3((double)x, (double)y, (double)z);
+                    thisVec = thisVec.modifyPositionFromSide(dir);
+                    final Block blockID = thisVec.getBlock(world);
+                    if (blockID == GCBlocks.airLockFrame || blockID == GCBlocks.airLockSeal) {
+                        ++adjacentCount;
+                    }
                 }
             }
-
-            if (adjacentCount == 4)
-            {
-                connection = EnumAirLockSealConnection.FLAT;
-            } else
-            {
-                connection = EnumAirLockSealConnection.Z;
+            if (adjacentCount == 4) {
+                this.setBlockBounds(0.0f, 0.25f, 0.0f, 1.0f, 0.75f, 1.0f);
+            }
+            else {
+                final float var5 = 0.5f;
+                final float var6 = 0.25f;
+                this.setBlockBounds(0.5f - var5, 0.0f, 0.5f - var6, 0.5f + var5, 1.0f, 0.5f + var6);
             }
         }
-
-        return connection;
     }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
+        return false;
+    }
+    
+    public boolean renderAsNormalBlock() {
+        return false;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4, final int par5) {
+        return true;
+    }
+    
+    public int quantityDropped(final Random par1Random) {
         return 0;
     }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState();
+    
+    public boolean isSealed(final World world, final int x, final int y, final int z, final ForgeDirection direction) {
+        return true;
+    }
+    
+    public Item getItem(final World world, final int x, final int y, final int z) {
+        return null;
     }
 }

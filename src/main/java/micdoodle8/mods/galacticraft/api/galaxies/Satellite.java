@@ -1,51 +1,50 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.galaxies;
 
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.*;
 
 public class Satellite extends CelestialBody implements IChildBody
 {
-    protected Planet parentCelestialBody = null;
-    protected int dimensionIdStatic = 0;
-
-    public Satellite(String satelliteName)
-    {
-        super(CelestialType.SATELLITE, satelliteName);
+    protected Planet parentCelestialBody;
+    protected int dimensionIdStatic;
+    
+    public Satellite(final String satelliteName) {
+        super(satelliteName);
+        this.parentCelestialBody = null;
+        this.dimensionIdStatic = 0;
     }
-
-    @Override
-    public Planet getParentPlanet()
-    {
+    
+    public Planet getParentPlanet() {
         return this.parentCelestialBody;
     }
-
-    public Satellite setParentBody(Planet parentCelestialBody)
-    {
+    
+    public Satellite setParentBody(final Planet parentCelestialBody) {
         this.parentCelestialBody = parentCelestialBody;
         return this;
     }
-
-    public CelestialBody setDimensionInfo(int providerIdDynamic, int providerIdStatic, Class<? extends WorldProvider> providerClass)
-    {
-        this.dimensionIdStatic = providerIdStatic;
-        return super.setDimensionInfo(providerIdDynamic, providerClass, false);
-    }
-
-    public int getDimensionIdStatic()
-    {
-        return dimensionIdStatic;
-    }
-
-    @Override
+    
     @Deprecated
-    public CelestialBody setDimensionInfo(int providerId, Class<? extends WorldProvider> providerClass, boolean autoRegister)
-    {
+    public CelestialBody setDimensionInfo(final int providerId, final Class<? extends WorldProvider> providerClass, final boolean autoRegister) {
         throw new UnsupportedOperationException("Satellite registered using an outdated method (setDimensionInfo)! Tell Galacticraft addon authors to update to the latest API.");
+    }
+    
+    public CelestialBody setDimensionInfo(final int providerIdDynamic, final int providerIdStatic, final Class<? extends WorldProvider> providerClass) {
+        this.dimensionID = providerIdDynamic;
+        this.dimensionIdStatic = providerIdStatic;
+        this.providerClass = providerClass;
+        this.autoRegisterDimension = false;
+        this.isReachable = true;
+        return this;
+    }
+    
+    public int getID() {
+        return GalaxyRegistry.getSatelliteID(this.bodyName);
+    }
+    
+    public String getUnlocalizedNamePrefix() {
+        return "satellite";
+    }
+    
+    public int getDimensionIdStatic() {
+        return this.dimensionIdStatic;
     }
 }

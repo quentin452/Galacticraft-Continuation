@@ -1,220 +1,194 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.galacticraft.api.transmission.tile.*;
+import micdoodle8.mods.miccore.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.api.power.*;
+import net.minecraft.init.*;
+import net.minecraft.item.*;
+import net.minecraft.nbt.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.entity.player.*;
+import net.minecraftforge.common.util.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.api.transmission.*;
 
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-
-import net.minecraftforge.fml.relauncher.Side;
-
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachineBase;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectricalSource;
-import micdoodle8.mods.galacticraft.core.inventory.IInventoryDefaults;
-import micdoodle8.mods.galacticraft.core.util.ItemUtil;
-
-public class TileEntityCoalGenerator extends TileBaseUniversalElectricalSource implements IInventoryDefaults, ISidedInventory, IConnector
+public class TileEntityCoalGenerator extends TileBaseUniversalElectricalSource implements IInventory, ISidedInventory, IConnector
 {
-    private final int dustCoalCookTime  = 220;
-    private final int itemCoalCookTime  = 320;
-    private final int blockCoalCookTime = 3200;
-    //
-    private final int dustCharcoalCookTime  = 120;
-    private final int itemCharcoalCookTime  = 160;
-    private final int blockCharcoalCookTime = 1600;
-    // New energy rates:
-    //
-    // Tier 1 machine typically consumes 600 gJ/s = 30 gJ/t
-    // Coal generator on max heat can power up to 4 Tier 1 machines
-    // (fewer if one of them is an Electric Furnace)
-    // Basic solar gen in full sun can power 1 Tier 1 machine
-    // 1 lump of coal is equivalent to 38400 gJ
-    // because on max heat it produces 120 gJ/t over 320 ticks
-    // Below the min_generate, all heat is wasted
-    // At max generate, 100% efficient conversion coal energy -> electric makes
-    // 120 gJ/t
-    public static final int    MAX_GENERATE_GJ_PER_TICK = 150;
-    public static final int    MIN_GENERATE_GJ_PER_TICK = 30;
-    private static final float BASE_ACCELERATION        = 0.3f;
-    public float               prevGenerateWatts        = 0;
-    @NetworkedField(targetSide = Side.CLIENT)
-    public float               heatGJperTick            = 0;
-    @NetworkedField(targetSide = Side.CLIENT)
-    public int                 itemCookTime             = 0;
-
-    public TileEntityCoalGenerator()
-    {
-        super("tile.machine.0.name");
-        this.storage.setMaxExtract(TileEntityCoalGenerator.MAX_GENERATE_GJ_PER_TICK - TileEntityCoalGenerator.MIN_GENERATE_GJ_PER_TICK);
-        this.inventory = NonNullList.withSize(1, ItemStack.EMPTY);
+    public static final int MAX_GENERATE_GJ_PER_TICK = 150;
+    public static final int MIN_GENERATE_GJ_PER_TICK = 30;
+    private static final float BASE_ACCELERATION = 0.3f;
+    public float prevGenerateWatts;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public float heatGJperTick;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int itemCookTime;
+    private ItemStack[] containingItems;
+    
+    public TileEntityCoalGenerator() {
+        this.prevGenerateWatts = 0.0f;
+        this.heatGJperTick = 0.0f;
+        this.itemCookTime = 0;
+        this.containingItems = new ItemStack[1];
+        this.storage.setMaxExtract(120.0f);
     }
-
-    @Override
-    public void update()
-    {
-        if (!this.world.isRemote && this.heatGJperTick - TileEntityCoalGenerator.MIN_GENERATE_GJ_PER_TICK > 0)
-        {
-            this.receiveEnergyGC(null, (this.heatGJperTick - TileEntityCoalGenerator.MIN_GENERATE_GJ_PER_TICK), false);
+    
+    public void updateEntity() {
+        if (!this.worldObj.isRemote && this.heatGJperTick - 30.0f > 0.0f) {
+            this.receiveEnergyGC((EnergySource)null, this.heatGJperTick - 30.0f, false);
         }
-        super.update();
-        if (!this.world.isRemote)
-        {
-            if (this.itemCookTime > 0)
-            {
-                this.itemCookTime--;
-                this.heatGJperTick = Math.min(this.heatGJperTick + Math.max(this.heatGJperTick * 0.005F, TileEntityCoalGenerator.BASE_ACCELERATION), TileEntityCoalGenerator.MAX_GENERATE_GJ_PER_TICK);
+        super.updateEntity();
+        if (!this.worldObj.isRemote) {
+            if (this.itemCookTime > 0) {
+                --this.itemCookTime;
+                this.heatGJperTick = Math.min(this.heatGJperTick + Math.max(this.heatGJperTick * 0.005f, 0.3f), 150.0f);
             }
-            if (this.itemCookTime <= 0 && !this.getInventory().get(0).isEmpty())
-            {
-                ItemStack stack = this.getInventory().get(0);
-                if (stack.getCount() > 0)
-                {
-                    if (ItemUtil.hasOreDictSuffix(stack, "charcoal"))
-                    {
-                        if (ItemUtil.isBlock(stack))
-                        {
-                            this.handleFuel(blockCharcoalCookTime);
-                        } else if (ItemUtil.isDust(stack))
-                        {
-                            this.handleFuel(dustCharcoalCookTime);
-                        } else
-                        {
-                            this.handleFuel(itemCharcoalCookTime);
-                        }
-                    } else if (ItemUtil.hasOreDictSuffix(stack, "coal"))
-                    {
-                        if (ItemUtil.isBlock(stack))
-                        {
-                            this.handleFuel(blockCoalCookTime);
-                        } else if (ItemUtil.isDust(stack))
-                        {
-                            this.handleFuel(dustCoalCookTime);
-                        } else
-                        {
-                            this.handleFuel(itemCoalCookTime);
-                        }
-                    } else
-                    {
-                        if (stack.getItem() == Items.COAL)
-                        {
-                            this.itemCookTime = 320;
-                            this.decrStackSize(0, 1);
-                        } else if (stack.getItem() == Item.getItemFromBlock(Blocks.COAL_BLOCK) && stack.getCount() > 0)
-                        {
-                            this.itemCookTime = 320 * 10;
-                            this.decrStackSize(0, 1);
-                        }
-                    }
+            if (this.itemCookTime <= 0 && this.containingItems[0] != null) {
+                if (this.containingItems[0].getItem() == Items.coal && this.containingItems[0].stackSize > 0) {
+                    this.itemCookTime = 320;
+                    this.decrStackSize(0, 1);
+                }
+                else if (this.containingItems[0].getItem() == Item.getItemFromBlock(Blocks.coal_block) && this.containingItems[0].stackSize > 0) {
+                    this.itemCookTime = 3200;
+                    this.decrStackSize(0, 1);
                 }
             }
             this.produce();
-            if (this.itemCookTime <= 0)
-            {
-                this.heatGJperTick = Math.max(this.heatGJperTick - 0.3F, 0);
+            if (this.itemCookTime <= 0) {
+                this.heatGJperTick = Math.max(this.heatGJperTick - 0.3f, 0.0f);
             }
-            this.heatGJperTick = Math.min(Math.max(this.heatGJperTick, 0.0F), this.getMaxEnergyStoredGC());
+            this.heatGJperTick = Math.min(Math.max(this.heatGJperTick, 0.0f), this.getMaxEnergyStoredGC());
         }
     }
-
-    private void handleFuel(int cookTime)
-    {
-        this.itemCookTime = cookTime;
-        this.decrStackSize(0, 1);
+    
+    public void openInventory() {
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
-        super.readFromNBT(nbt);
-        this.itemCookTime = nbt.getInteger("itemCookTime");
-        this.heatGJperTick = nbt.getInteger("generateRateInt");
+    
+    public void closeInventory() {
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
-        super.writeToNBT(nbt);
-        nbt.setInteger("itemCookTime", this.itemCookTime);
-        nbt.setFloat("generateRate", this.heatGJperTick);
-        return nbt;
+    
+    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.readFromNBT(par1NBTTagCompound);
+        this.itemCookTime = par1NBTTagCompound.getInteger("itemCookTime");
+        this.heatGJperTick = (float)par1NBTTagCompound.getInteger("generateRateInt");
+        final NBTTagList var2 = par1NBTTagCompound.getTagList("Items", 10);
+        this.containingItems = new ItemStack[this.getSizeInventory()];
+        for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
+            final NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+            final int var5 = var4.getByte("Slot") & 0xFF;
+            if (var5 < this.containingItems.length) {
+                this.containingItems[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
+        }
     }
-
-    @Override
-    public boolean isItemValidForSlot(int slotID, ItemStack itemstack)
-    {
-        //        if (itemstack.getItem() != Items.COAL || itemstack.getItem() != Item.getItemFromBlock(Blocks.COAL_BLOCK))
-        //        {
-        //            return ItemUtil.hasOreDictSuffix(itemstack, "coal") || ItemUtil.hasOreDictSuffix(itemstack, "charcoal");
-        //        } else
-        //        {
-        //            return itemstack.getItem() == Item.getItemFromBlock(Blocks.COAL_BLOCK);
-        //        }
+    
+    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.writeToNBT(par1NBTTagCompound);
+        par1NBTTagCompound.setInteger("itemCookTime", this.itemCookTime);
+        par1NBTTagCompound.setFloat("generateRate", this.heatGJperTick);
+        final NBTTagList var2 = new NBTTagList();
+        for (int var3 = 0; var3 < this.containingItems.length; ++var3) {
+            if (this.containingItems[var3] != null) {
+                final NBTTagCompound var4 = new NBTTagCompound();
+                var4.setByte("Slot", (byte)var3);
+                this.containingItems[var3].writeToNBT(var4);
+                var2.appendTag((NBTBase)var4);
+            }
+        }
+        par1NBTTagCompound.setTag("Items", (NBTBase)var2);
+    }
+    
+    public int getSizeInventory() {
+        return this.containingItems.length;
+    }
+    
+    public ItemStack getStackInSlot(final int par1) {
+        return this.containingItems[par1];
+    }
+    
+    public ItemStack decrStackSize(final int par1, final int par2) {
+        if (this.containingItems[par1] == null) {
+            return null;
+        }
+        if (this.containingItems[par1].stackSize <= par2) {
+            final ItemStack var3 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var3;
+        }
+        final ItemStack var3 = this.containingItems[par1].splitStack(par2);
+        if (this.containingItems[par1].stackSize == 0) {
+            this.containingItems[par1] = null;
+        }
+        return var3;
+    }
+    
+    public ItemStack getStackInSlotOnClosing(final int par1) {
+        if (this.containingItems[par1] != null) {
+            final ItemStack var2 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var2;
+        }
+        return null;
+    }
+    
+    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+        this.containingItems[par1] = par2ItemStack;
+        if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit()) {
+            par2ItemStack.stackSize = this.getInventoryStackLimit();
+        }
+    }
+    
+    public String getInventoryName() {
+        return GCCoreUtil.translate("tile.machine.0.name");
+    }
+    
+    public int getInventoryStackLimit() {
+        return 64;
+    }
+    
+    public boolean isUseableByPlayer(final EntityPlayer par1EntityPlayer) {
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
+    }
+    
+    public boolean hasCustomInventoryName() {
         return true;
     }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[] {0};
+    
+    public boolean isItemValidForSlot(final int slotID, final ItemStack itemstack) {
+        return itemstack.getItem() == Items.coal || itemstack.getItem() == Item.getItemFromBlock(Blocks.coal_block);
     }
-
-    @Override
-    public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing direction)
-    {
+    
+    public int[] getAccessibleSlotsFromSide(final int var1) {
+        return new int[] { 0 };
+    }
+    
+    public boolean canInsertItem(final int slotID, final ItemStack itemstack, final int j) {
+        return this.isItemValidForSlot(slotID, itemstack);
+    }
+    
+    public boolean canExtractItem(final int slotID, final ItemStack itemstack, final int j) {
         return slotID == 0;
     }
-
-    @Override
-    public float receiveElectricity(EnumFacing from, float energy, int tier, boolean doReceive)
-    {
-        return 0;
+    
+    public float receiveElectricity(final ForgeDirection from, final float energy, final int tier, final boolean doReceive) {
+        return 0.0f;
     }
-
-    @Override
-    public EnumSet<EnumFacing> getElectricalInputDirections()
-    {
-        return EnumSet.noneOf(EnumFacing.class);
+    
+    public EnumSet<ForgeDirection> getElectricalInputDirections() {
+        return EnumSet.noneOf(ForgeDirection.class);
     }
-
-    @Override
-    public EnumSet<EnumFacing> getElectricalOutputDirections()
-    {
-        return EnumSet.of(this.getElectricOutputDirection());
+    
+    public EnumSet<ForgeDirection> getElectricalOutputDirections() {
+        return EnumSet.of(ForgeDirection.getOrientation(this.getBlockMetadata() + 2));
     }
-
-    public EnumFacing byIndex()
-    {
-        return BlockMachineBase.byIndex(this.world.getBlockState(getPos()));
+    
+    public ForgeDirection getElectricalOutputDirectionMain() {
+        return ForgeDirection.getOrientation(this.getBlockMetadata() + 2);
     }
-
-    @Override
-    public EnumFacing getElectricOutputDirection()
-    {
-        return byIndex().rotateY();
-    }
-
-    @Override
-    public boolean canConnect(EnumFacing direction, NetworkType type)
-    {
-        if (direction == null || type != NetworkType.POWER)
-        {
-            return false;
-        }
-        return direction == this.getElectricOutputDirection();
+    
+    public boolean canConnect(final ForgeDirection direction, final NetworkType type) {
+        return direction != null && !direction.equals((Object)ForgeDirection.UNKNOWN) && type == NetworkType.POWER && direction == this.getElectricalOutputDirectionMain();
     }
 }

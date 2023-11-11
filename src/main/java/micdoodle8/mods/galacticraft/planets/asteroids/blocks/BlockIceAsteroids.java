@@ -1,147 +1,101 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.ISortableBlock;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockBreakable;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
-import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.material.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.stats.*;
+import net.minecraft.block.*;
+import net.minecraft.enchantment.*;
+import net.minecraft.entity.*;
+import net.minecraft.item.*;
+import net.minecraftforge.event.*;
+import micdoodle8.mods.galacticraft.api.world.*;
+import net.minecraft.init.*;
+import java.util.*;
+import net.minecraft.world.*;
+import net.minecraft.client.renderer.texture.*;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-public class BlockIceAsteroids extends BlockBreakable implements ISortableBlock
+public class BlockIceAsteroids extends BlockBreakable
 {
-
-    public BlockIceAsteroids(String assetName)
-    {
-        super(Material.ICE, false);
-        this.slipperiness = 0.98F;
+    public BlockIceAsteroids(final String assetName) {
+        super(assetName, Material.ice, false);
+        this.slipperiness = 0.98f;
         this.setTickRandomly(true);
-        this.setHardness(0.5F);
-        this.setTranslationKey(assetName);
-        this.setSoundType(SoundType.GLASS);
+        this.setCreativeTab(CreativeTabs.tabBlock);
+        this.setBlockTextureName("galacticraftasteroids:" + assetName);
+        this.setHardness(0.5f);
+        this.setBlockName(assetName);
+        this.setStepSound(BlockIceAsteroids.soundTypeGlass);
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getRenderLayer()
-    {
-        return BlockRenderLayer.TRANSLUCENT;
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack tool)
-    {
-        player.addStat(StatList.getBlockStats(this));
-        player.addExhaustion(0.025F);
-
-        if (this.canSilkHarvest(worldIn, pos, state, player) && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0)
-        {
-            ArrayList<ItemStack> items = new ArrayList<ItemStack>();
-            items.add(this.getSilkTouchDrop(state));
-
-            ForgeEventFactory.fireBlockHarvesting(items, worldIn, pos, state, 0, 1.0f, true, player);
-            for (ItemStack is : items)
-            {
-                Block.spawnAsEntity(worldIn, pos, is);
+    
+    @SideOnly(Side.CLIENT)
+    public int getRenderBlockPass() {
+        return 1;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(final IBlockAccess world, final int x, final int y, final int z, final int side) {
+        return super.shouldSideBeRendered(world, x, y, z, 1 - side);
+    }
+    
+    public void harvestBlock(final World world, final EntityPlayer player, final int x, final int y, final int z, final int meta) {
+        player.addStat(StatList.mineBlockStatArray[Block.getIdFromBlock((Block)this)], 1);
+        player.addExhaustion(0.025f);
+        if (this.canSilkHarvest(world, player, x, y, z, meta) && EnchantmentHelper.getSilkTouchModifier((EntityLivingBase)player)) {
+            final ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+            final ItemStack itemstack = this.createStackedBlock(meta);
+            if (itemstack != null) {
+                items.add(itemstack);
             }
-        } else
-        {
-            if (worldIn.provider.getDimension() == -1 || worldIn.provider instanceof IGalacticraftWorldProvider)
-            {
-                worldIn.setBlockToAir(pos);
+            ForgeEventFactory.fireBlockHarvesting((ArrayList)items, world, (Block)this, x, y, z, meta, 0, 1.0f, true, player);
+            for (final ItemStack is : items) {
+                this.dropBlockAsItem(world, x, y, z, is);
+            }
+        }
+        else {
+            if (world.provider.isHellWorld || world.provider instanceof IGalacticraftWorldProvider) {
+                world.setBlockToAir(x, y, z);
                 return;
             }
-
-            int i1 = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, tool);
-            harvesters.set(player);
-            this.dropBlockAsItem(worldIn, pos, state, i1);
-            harvesters.set(null);
-            IBlockState state1 = worldIn.getBlockState(pos.down());
-            Material material = state1.getMaterial();
-
-            if (material.blocksMovement() || material.isLiquid())
-            {
-                worldIn.setBlockState(pos, Blocks.FLOWING_WATER.getDefaultState());
+            final int i1 = EnchantmentHelper.getFortuneModifier((EntityLivingBase)player);
+            this.harvesters.set(player);
+            this.dropBlockAsItem(world, x, y, z, meta, i1);
+            this.harvesters.set(null);
+            final Material material = world.getBlock(x, y - 1, z).getMaterial();
+            if (material.blocksMovement() || material.isLiquid()) {
+                world.setBlock(x, y, z, (Block)Blocks.flowing_water);
             }
         }
     }
-
-    @Override
-    public int quantityDropped(Random rand)
-    {
+    
+    public int quantityDropped(final Random rand) {
         return 0;
     }
-
-    @Override
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
-    {
-        if (worldIn.getLightFor(EnumSkyBlock.BLOCK, pos) > 13 - this.getLightOpacity(state))
-        {
-            if (GCCoreUtil.getDimensionID(worldIn) == -1 || worldIn.provider instanceof IGalacticraftWorldProvider)
-            {
-                worldIn.setBlockToAir(pos);
+    
+    public void updateTick(final World world, final int x, final int y, final int z, final Random rand) {
+        if (world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) > 13) {
+            if (world.provider.isHellWorld || world.provider instanceof IGalacticraftWorldProvider) {
+                world.setBlockToAir(x, y, z);
                 return;
             }
-
-            this.dropBlockAsItem(worldIn, pos, state, 0);
-            worldIn.setBlockState(pos, Blocks.WATER.getDefaultState());
+            this.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
+            world.setBlock(x, y, z, Blocks.water);
         }
     }
-
-    @Override
-    public EnumPushReaction getPushReaction(IBlockState state)
-    {
-        return EnumPushReaction.NORMAL;
+    
+    public int getMobilityFlag() {
+        return 0;
     }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.GENERAL;
-    }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
+    
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister iconRegister) {
+        this.blockIcon = iconRegister.registerIcon(this.getTextureName());
     }
 }

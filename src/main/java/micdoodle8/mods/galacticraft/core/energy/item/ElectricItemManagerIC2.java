@@ -1,139 +1,74 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.energy.item;
 
-import ic2.api.item.IElectricItem;
-import ic2.api.item.IElectricItemManager;
-import micdoodle8.mods.galacticraft.api.item.IItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.api.item.*;
+import micdoodle8.mods.galacticraft.core.energy.*;
+import micdoodle8.mods.miccore.*;
+import net.minecraft.entity.*;
 
-/*
- * Interface between Galacticraft electric items (batteries) and IC2.
- *
- * Galactricraft items implemented as Tier 1 items when recharging
- * and for discharging purposes (so can power anything)
- */
-public class ElectricItemManagerIC2 implements IElectricItemManager
+public class ElectricItemManagerIC2
 {
-
-    @Override
-    public double charge(ItemStack itemStack, double amount, int tier, boolean ignoreTransferLimit, boolean simulate)
-    {
-        if (itemStack.getItem() instanceof IItemElectricBase)
-        {
-            IItemElectricBase item = (IItemElectricBase) itemStack.getItem();
-            if (amount > ((IElectricItem) item).getMaxCharge(itemStack))
-            {
-                amount = ((IElectricItem) item).getMaxCharge(itemStack);
-            }
-            float energy = (float) amount * EnergyConfigHandler.IC2_RATIO;
-            float rejectedElectricity = Math.max(item.getElectricityStored(itemStack) + energy - item.getMaxElectricityStored(itemStack), 0);
+    @Annotations.RuntimeInterface(clazz = "ic2.api.item.IElectricItemManager", modID = "IC2")
+    public int charge(final ItemStack itemStack, final int amount, final int tier, final boolean ignoreTransferLimit, final boolean simulate) {
+        if (itemStack.getItem() instanceof IItemElectricBase) {
+            final IItemElectricBase item = (IItemElectricBase)itemStack.getItem();
+            final float energy = amount * EnergyConfigHandler.IC2_RATIO;
+            float rejectedElectricity = Math.max(item.getElectricityStored(itemStack) + energy - item.getMaxElectricityStored(itemStack), 0.0f);
             float energyToReceive = energy - rejectedElectricity;
-            if (!ignoreTransferLimit && energyToReceive > item.getMaxTransferGC(itemStack))
-            {
+            if (!ignoreTransferLimit && energyToReceive > item.getMaxTransferGC(itemStack)) {
+                rejectedElectricity += energyToReceive - item.getMaxTransferGC(itemStack);
                 energyToReceive = item.getMaxTransferGC(itemStack);
             }
-
-            if (!simulate)
-            {
+            if (!simulate) {
                 item.setElectricity(itemStack, item.getElectricityStored(itemStack) + energyToReceive);
             }
-
-            return energyToReceive / EnergyConfigHandler.IC2_RATIO;
+            return (int)(energyToReceive / EnergyConfigHandler.IC2_RATIO);
         }
-        return 0D;
+        return 0;
     }
-
-    @Override
-    public double discharge(ItemStack itemStack, double amount, int tier, boolean ignoreTransferLimit, boolean externally, boolean simulate)
-    {
-        if (itemStack.getItem() instanceof IItemElectricBase)
-        {
-            IItemElectricBase item = (IItemElectricBase) itemStack.getItem();
-            float energy = (float) amount / EnergyConfigHandler.TO_IC2_RATIO;
+    
+    @Annotations.RuntimeInterface(clazz = "ic2.api.item.IElectricItemManager", modID = "IC2")
+    public int discharge(final ItemStack itemStack, final int amount, final int tier, final boolean ignoreTransferLimit, final boolean simulate) {
+        if (itemStack.getItem() instanceof IItemElectricBase) {
+            final IItemElectricBase item = (IItemElectricBase)itemStack.getItem();
+            final float energy = amount / EnergyConfigHandler.TO_IC2_RATIO;
             float energyToTransfer = Math.min(item.getElectricityStored(itemStack), energy);
-            if (!ignoreTransferLimit)
-            {
+            if (!ignoreTransferLimit) {
                 energyToTransfer = Math.min(energyToTransfer, item.getMaxTransferGC(itemStack));
             }
-
-            if (!simulate)
-            {
+            if (!simulate) {
                 item.setElectricity(itemStack, item.getElectricityStored(itemStack) - energyToTransfer);
             }
-
-            return energyToTransfer * EnergyConfigHandler.TO_IC2_RATIO;
+            return (int)(energyToTransfer * EnergyConfigHandler.TO_IC2_RATIO);
         }
-        return 0D;
+        return 0;
     }
-
-    @Override
-    public double getCharge(ItemStack itemStack)
-    {
-        if (itemStack.getItem() instanceof IItemElectricBase)
-        {
-            IItemElectricBase item = (IItemElectricBase) itemStack.getItem();
-            return item.getElectricityStored(itemStack) * EnergyConfigHandler.TO_IC2_RATIO;
+    
+    @Annotations.RuntimeInterface(clazz = "ic2.api.item.IElectricItemManager", modID = "IC2")
+    public int getCharge(final ItemStack itemStack) {
+        if (itemStack.getItem() instanceof IItemElectricBase) {
+            final IItemElectricBase item = (IItemElectricBase)itemStack.getItem();
+            return (int)(item.getElectricityStored(itemStack) * EnergyConfigHandler.TO_IC2_RATIO);
         }
-        return 0D;
+        return 0;
     }
-
-    @Override
-    public boolean canUse(ItemStack itemStack, double amount)
-    {
-        if (itemStack.getItem() instanceof IItemElectricBase)
-        {
-            return this.getCharge(itemStack) >= amount;
-        }
-        return false;
+    
+    @Annotations.RuntimeInterface(clazz = "ic2.api.item.IElectricItemManager", modID = "IC2")
+    public boolean canUse(final ItemStack itemStack, final int amount) {
+        return itemStack.getItem() instanceof IItemElectricBase && this.getCharge(itemStack) >= amount;
     }
-
-    @Override
-    public boolean use(ItemStack itemStack, double amount, EntityLivingBase entity)
-    {
-        if (itemStack.getItem() instanceof IItemElectricBase)
-        {
-            return this.discharge(itemStack, amount, 1, true, false, false) >= amount - 1;
-        }
-        return false;
+    
+    @Annotations.RuntimeInterface(clazz = "ic2.api.item.IElectricItemManager", modID = "IC2")
+    public boolean use(final ItemStack itemStack, final int amount, final EntityLivingBase entity) {
+        return itemStack.getItem() instanceof IItemElectricBase && this.discharge(itemStack, amount, 1, true, false) >= amount - 1;
     }
-
-    @Override
-    public void chargeFromArmor(ItemStack itemStack, EntityLivingBase entity)
-    {
+    
+    @Annotations.RuntimeInterface(clazz = "ic2.api.item.IElectricItemManager", modID = "IC2")
+    public void chargeFromArmor(final ItemStack itemStack, final EntityLivingBase entity) {
     }
-
-    @Override
-    public String getToolTip(ItemStack itemStack)
-    {
+    
+    @Annotations.RuntimeInterface(clazz = "ic2.api.item.IElectricItemManager", modID = "IC2")
+    public String getToolTip(final ItemStack itemStack) {
         return null;
-    }
-
-    @Override
-    public double getMaxCharge(ItemStack stack)
-    {
-        if (stack.getItem() instanceof IItemElectricBase)
-        {
-            return ((IElectricItem) stack.getItem()).getMaxCharge(stack);
-        }
-        return 1;
-    }
-
-    @Override
-    public int getTier(ItemStack stack)
-    {
-        if (stack.getItem() instanceof IItemElectricBase)
-        {
-            return ((IElectricItem) stack.getItem()).getTier(stack);
-        }
-
-        return 1;
     }
 }

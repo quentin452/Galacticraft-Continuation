@@ -1,77 +1,58 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.client.model.ModelLander;
-import micdoodle8.mods.galacticraft.core.entities.EntityLander;
-import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.client.model.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import net.minecraft.entity.*;
+import org.lwjgl.opengl.*;
+import micdoodle8.mods.galacticraft.core.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderLander extends Render<EntityLander>
+public class RenderLander extends Render
 {
-
-    private static final ResourceLocation landerTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/model/lander.png");
-
+    private static final ResourceLocation landerTexture;
     protected ModelLander landerModel;
-
-    public RenderLander(RenderManager manager)
-    {
-        super(manager);
-        this.shadowSize = 2F;
+    
+    public RenderLander() {
+        this.shadowSize = 2.0f;
         this.landerModel = new ModelLander();
     }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityLander par1Entity)
-    {
+    
+    protected ResourceLocation func_110779_a(final EntityLander par1EntityArrow) {
         return RenderLander.landerTexture;
     }
-
-    @Override
-    public void doRender(EntityLander lander, double par2, double par4, double par6, float par8, float par9)
-    {
+    
+    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+        return this.func_110779_a((EntityLander)par1Entity);
+    }
+    
+    public void renderLander(final EntityLander entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
         GL11.glPushMatrix();
-        final float var24 = lander.prevRotationPitch + (lander.rotationPitch - lander.prevRotationPitch) * par9;
-        GL11.glTranslatef((float) par2, (float) par4 + 1.55F, (float) par6);
-        GL11.glRotatef(180.0F - par8, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(-var24, 0.0F, 0.0F, 1.0F);
-
-        float f6 = lander.timeSinceHit - par9;
-        float f7 = lander.currentDamage - par9;
-
-        if (f7 < 0.0F)
-        {
-            f7 = 0.0F;
+        final float var24 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * par9;
+        GL11.glTranslatef((float)par2, (float)par4 + 1.55f, (float)par6);
+        GL11.glRotatef(180.0f - par8, 0.0f, 1.0f, 0.0f);
+        GL11.glRotatef(-var24, 0.0f, 0.0f, 1.0f);
+        final float f6 = entity.timeSinceHit - par9;
+        float f7 = entity.currentDamage - par9;
+        if (f7 < 0.0f) {
+            f7 = 0.0f;
         }
-
-        if (f6 > 0.0F)
-        {
-            GL11.glRotatef((float) Math.sin(f6) * 0.2F * f6 * f7 / 25.0F, 1.0F, 0.0F, 0.0F);
+        if (f6 > 0.0f) {
+            GL11.glRotatef((float)Math.sin(f6) * 0.2f * f6 * f7 / 25.0f, 1.0f, 0.0f, 0.0f);
         }
-
-        this.bindEntityTexture(lander);
-        GL11.glScalef(-1.0F, -1.0F, 1.0F);
-        this.landerModel.render(lander, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+        this.bindEntityTexture((Entity)entity);
+        GL11.glScalef(-1.0f, -1.0f, 1.0f);
+        this.landerModel.render((Entity)entity, 0.0f, 0.0f, -0.1f, 0.0f, 0.0f, 0.0625f);
         GL11.glPopMatrix();
     }
-
-    @Override
-    public boolean shouldRender(EntityLander lander, ICamera camera, double camX, double camY, double camZ)
-    {
-        AxisAlignedBB axisalignedbb = lander.getEntityBoundingBox().grow(2D, 1D, 2D);
-        return lander.isInRangeToRender3d(camX, camY, camZ) && camera.isBoundingBoxInFrustum(axisalignedbb);
+    
+    public void doRender(final Entity par1Entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        this.renderLander((EntityLander)par1Entity, par2, par4, par6, par8, par9);
+    }
+    
+    static {
+        landerTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/lander.png");
     }
 }

@@ -1,399 +1,268 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.galaxies;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-
-import micdoodle8.mods.galacticraft.annotations.ReplaceWith;
-import micdoodle8.mods.galacticraft.api.event.celestial.RegisterEvent;
-import micdoodle8.mods.galacticraft.api.util.stream.CelestialCollector;
-import micdoodle8.mods.galacticraft.core.util.list.CelestialList;
-import micdoodle8.mods.galacticraft.core.util.list.ImmutableCelestialList;
+import net.minecraftforge.common.*;
+import cpw.mods.fml.common.eventhandler.*;
+import java.util.*;
+import com.google.common.collect.*;
 
 public class GalaxyRegistry
 {
+    static int maxSolarSystemID;
+    static int maxPlanetID;
+    static int maxMoonID;
+    static int maxSatelliteID;
+    static HashMap<String, SolarSystem> solarSystems;
+    static BiMap<String, Integer> solarSystemIDs;
+    static TreeMap<String, Planet> planets;
+    static BiMap<String, Integer> planetIDs;
+    static TreeMap<String, Moon> moons;
+    static BiMap<String, Integer> moonIDs;
+    static HashMap<String, Satellite> satellites;
+    static BiMap<String, Integer> satelliteIDs;
+    static HashMap<Planet, List<Moon>> moonList;
+    static HashMap<CelestialBody, List<Satellite>> satelliteList;
+    static HashMap<SolarSystem, List<Planet>> solarSystemList;
 
-    static CelestialList<SolarSystem>                   solarSystems    = CelestialList.create();
-    static CelestialList<Planet>                        planets         = CelestialList.create();
-    static CelestialList<Moon>                          moons           = CelestialList.create();
-    static CelestialList<Satellite>                     satellites      = CelestialList.create();
-    static CelestialList<CelestialObject>               objects         = CelestialList.create();
-    static Map<Planet, CelestialList<Moon>>             moonList        = new HashMap<>();
-    static Map<CelestialBody, CelestialList<Satellite>> satelliteList   = new HashMap<>();
-    static Map<SolarSystem, CelestialList<Planet>>      solarSystemList = new HashMap<>();
-
-    public static void refreshGalaxies()
-    {
-        moonList.clear();
-        satelliteList.clear();
-        solarSystemList.clear();
-        for (Moon moon : getMoons())
-        {
-            Planet planet = moon.getParentPlanet();
-            CelestialList<Moon> list = moonList.get(planet);
-            if (list == null)
-            {
-                list = CelestialList.create();
-            }
-            list.add(moon);
-            moonList.put(planet, list);
-        }
-        for (Satellite satellite : getSatellites())
-        {
-            CelestialBody celestialBody = satellite.getParentPlanet();
-            CelestialList<Satellite> list = satelliteList.get(celestialBody);
-            if (list == null)
-            {
-                list = CelestialList.create();
-            }
-            list.add(satellite);
-            satelliteList.put(celestialBody, list);
-        }
-        for (Planet planet : getPlanets())
-        {
-            SolarSystem solarSystem = planet.getParentSolarSystem();
-            CelestialList<Planet> list = solarSystemList.get(solarSystem);
-            if (list == null)
-            {
-                list = CelestialList.create();
-            }
-            list.add(planet);
-            solarSystemList.put(solarSystem, list);
-        }
-    }
-
-    /**
-     * Returns the CelestialObject that matches the given TranslationKey. Iterates through EVERY registerd object
-     *
-     * @param  translationkey
-     *
-     * @return                CelestialObject
-     */
-    public static CelestialObject getCelestialObjectFromTranslationKey(String translationkey)
-    {
-        for (CelestialObject celestialObject : objects)
-        {
-            if (celestialObject.getTranslationKey().equals(translationkey))
-            {
-                return celestialObject;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the CelestialBody of the given DimensionID. Iterates through, Planets, Moons & Satellites only
-     *
-     * @param  dimensionID the DIM Id of the CelestialBody
-     *
-     * @return             CelestialBody with the DimensionID provided
-     */
-    public static CelestialBody getCelestialBodyFromDimensionID(int dimensionID)
-    {
-        for (Planet planet : planets)
-        {
-            if (planet.getDimensionID() == dimensionID)
-            {
+    public static CelestialBody getCelestialBodyFromDimensionID(final int dimensionID) {
+        for (final Planet planet : GalaxyRegistry.planets.values()) {
+            if (planet.getDimensionID() == dimensionID) {
                 return planet;
             }
         }
-        for (Moon moon : moons)
-        {
-            if (moon.getDimensionID() == dimensionID)
-            {
+        for (final Moon moon : GalaxyRegistry.moons.values()) {
+            if (moon.getDimensionID() == dimensionID) {
                 return moon;
             }
         }
-        for (Satellite satellite : satellites)
-        {
-            if (satellite.getDimensionID() == dimensionID)
-            {
+        for (final Satellite satellite : GalaxyRegistry.satellites.values()) {
+            if (satellite.getDimensionID() == dimensionID) {
                 return satellite;
             }
         }
         return null;
     }
 
-    public static List<Planet> getPlanetsForSolarSystem(SolarSystem solarSystem)
-    {
-        if (solarSystemList.get(solarSystem) == null)
-        {
-            return new ArrayList<>();
+    public static void refreshGalaxies() {
+        GalaxyRegistry.moonList.clear();
+        GalaxyRegistry.satelliteList.clear();
+        GalaxyRegistry.solarSystemList.clear();
+        for (final Moon moon : getRegisteredMoons().values()) {
+            final Planet planet = moon.getParentPlanet();
+            List<Moon> listOfMoons = GalaxyRegistry.moonList.get(planet);
+            if (listOfMoons == null) {
+                listOfMoons = new ArrayList<Moon>();
+            }
+            listOfMoons.add(moon);
+            GalaxyRegistry.moonList.put(planet, listOfMoons);
         }
-        return solarSystemList.get(solarSystem);
+        for (final Satellite satellite : getRegisteredSatellites().values()) {
+            final CelestialBody celestialBody = satellite.getParentPlanet();
+            List<Satellite> satelliteList1 = GalaxyRegistry.satelliteList.get(celestialBody);
+            if (satelliteList1 == null) {
+                satelliteList1 = new ArrayList<Satellite>();
+            }
+            satelliteList1.add(satellite);
+            GalaxyRegistry.satelliteList.put(celestialBody, satelliteList1);
+        }
+        for (final Planet planet2 : getRegisteredPlanets().values()) {
+            final SolarSystem solarSystem = planet2.getParentSolarSystem();
+            List<Planet> planetList = GalaxyRegistry.solarSystemList.get(solarSystem);
+            if (planetList == null) {
+                planetList = new ArrayList<Planet>();
+            }
+            planetList.add(planet2);
+            GalaxyRegistry.solarSystemList.put(solarSystem, planetList);
+        }
     }
 
-    public static List<Moon> getMoonsForPlanet(Planet planet)
-    {
-        if (moonList.get(planet) == null)
-        {
-            return new ArrayList<>();
+    public static List<Planet> getPlanetsForSolarSystem(final SolarSystem solarSystem) {
+        final List<Planet> solarSystemListLocal = GalaxyRegistry.solarSystemList.get(solarSystem);
+        if (solarSystemListLocal == null) {
+            return new ArrayList<Planet>();
         }
-        return moonList.get(planet);
+        return (List<Planet>)ImmutableList.copyOf((Collection<Planet>)solarSystemListLocal);
     }
 
-    public static List<Satellite> getSatellitesForCelestialBody(CelestialBody celestialBody)
-    {
-        if (satelliteList.get(celestialBody) == null)
-        {
-            return new ArrayList<>();
+    public static List<Moon> getMoonsForPlanet(final Planet planet) {
+        final List<Moon> moonListLocal = GalaxyRegistry.moonList.get(planet);
+        if (moonListLocal == null) {
+            return new ArrayList<Moon>();
         }
-        return satelliteList.get(celestialBody);
+        return (List<Moon>)ImmutableList.copyOf((Collection<Moon>)moonListLocal);
     }
 
-    public static CelestialBody getPlanetOrMoonFromTranslationkey(String translationKey)
-    {
-        for (Planet planet : planets)
-        {
-            if (planet.getTranslationKey().equals(translationKey))
-            {
+    public static List<Satellite> getSatellitesForCelestialBody(final CelestialBody celestialBody) {
+        final List<Satellite> satelliteList1 = GalaxyRegistry.satelliteList.get(celestialBody);
+        if (satelliteList1 == null) {
+            return new ArrayList<Satellite>();
+        }
+        return (List<Satellite>)ImmutableList.copyOf((Collection<Satellite>)satelliteList1);
+    }
+
+    public static CelestialBody getCelestialBodyFromUnlocalizedName(final String unlocalizedName) {
+        for (final Planet planet : GalaxyRegistry.planets.values()) {
+            if (planet.getUnlocalizedName().equals(unlocalizedName)) {
                 return planet;
             }
         }
-        for (Moon moon : moons)
-        {
-            if (moon.getTranslationKey().equals(translationKey))
-            {
+        for (final Moon moon : GalaxyRegistry.moons.values()) {
+            if (moon.getUnlocalizedName().equals(unlocalizedName)) {
                 return moon;
             }
         }
         return null;
     }
 
-    public static void register(Object object)
-    {
-        if (object instanceof SolarSystem)
-        {
-            SolarSystem solarSystem = (SolarSystem) object;
-            RegisterEvent registerEvent = new RegisterEvent(solarSystem, Loader.instance().activeModContainer());
-            solarSystems.add(solarSystem);
-            objects.add(solarSystem);
-            MinecraftForge.EVENT_BUS.post(registerEvent);
+    public static boolean registerSolarSystem(final SolarSystem solarSystem) {
+        if (GalaxyRegistry.solarSystemIDs.containsKey((Object)solarSystem.getName())) {
+            return false;
         }
-        if (object instanceof Planet)
-        {
-            Planet planet = (Planet) object;
-            RegisterEvent registerEvent = new RegisterEvent(planet, Loader.instance().activeModContainer());
-            planets.add(planet);
-            objects.add(planet);
-            MinecraftForge.EVENT_BUS.post(registerEvent);
+        GalaxyRegistry.solarSystems.put(solarSystem.getName(), solarSystem);
+        GalaxyRegistry.solarSystemIDs.put(solarSystem.getName(), ++GalaxyRegistry.maxSolarSystemID);
+        MinecraftForge.EVENT_BUS.post((Event)new SolarSystemRegisterEvent(solarSystem.getName(), GalaxyRegistry.maxSolarSystemID));
+        return true;
+    }
+
+    public static boolean registerPlanet(final Planet planet) {
+        if (GalaxyRegistry.planetIDs.containsKey(planet.getName())) {
+            return false;
         }
-        if (object instanceof Moon)
-        {
-            Moon moon = (Moon) object;
-            RegisterEvent registerEvent = new RegisterEvent(moon, Loader.instance().activeModContainer());
-            moons.add(moon);
-            objects.add(moon);
-            MinecraftForge.EVENT_BUS.post(registerEvent);
+        GalaxyRegistry.planets.put(planet.getName(), planet);
+        GalaxyRegistry.planetIDs.put(planet.getName(), ++GalaxyRegistry.maxPlanetID);
+        MinecraftForge.EVENT_BUS.post(new PlanetRegisterEvent(planet.getName(), GalaxyRegistry.maxPlanetID));
+        return true;
+    }
+
+    public static boolean registerMoon(final Moon moon) {
+        if (GalaxyRegistry.moonIDs.containsKey(moon.getName())) {
+            return false;
         }
-        if (object instanceof Satellite)
-        {
-            Satellite satellite = (Satellite) object;
-            RegisterEvent registerEvent = new RegisterEvent(satellite, Loader.instance().activeModContainer());
-            satellites.add(satellite);
-            objects.add(satellite);
-            MinecraftForge.EVENT_BUS.post(registerEvent);
+        GalaxyRegistry.moons.put(moon.getName(), moon);
+        GalaxyRegistry.moonIDs.put(moon.getName(), ++GalaxyRegistry.maxMoonID);
+        MinecraftForge.EVENT_BUS.post(new MoonRegisterEvent(moon.getName(), GalaxyRegistry.maxMoonID));
+        return true;
+    }
+
+    public static boolean registerSatellite(final Satellite satellite) {
+        if (GalaxyRegistry.satelliteIDs.containsKey(satellite.getName())) {
+            return false;
         }
-        if (object instanceof CelestialBody)
-        {
-            CelestialBody celestialType = (CelestialBody) object;
-            String unlocalizedPrefix = ((CelestialBody) object).getUnlocalizedNamePrefix();
-            if (!unlocalizedPrefix.equals("unset"))
-            {
-                ((CelestialBody) object).setType(CelestialType.create(unlocalizedPrefix));
-            }
-            RegisterEvent registerEvent = new RegisterEvent(celestialType, Loader.instance().activeModContainer());
-            objects.add(celestialType);
-            MinecraftForge.EVENT_BUS.post(registerEvent);
+        if (satellite.getParentPlanet() == null) {
+            throw new RuntimeException("Registering satellite without a parent!!!");
+        }
+        GalaxyRegistry.satellites.put(satellite.getName(), satellite);
+        GalaxyRegistry.satelliteIDs.put(satellite.getName(), ++GalaxyRegistry.maxSatelliteID);
+        MinecraftForge.EVENT_BUS.post(new SatelliteRegisterEvent(satellite.getName(), GalaxyRegistry.maxSatelliteID));
+        return true;
+    }
+
+    public static Map<String, SolarSystem> getRegisteredSolarSystems() {
+        return ImmutableMap.copyOf(GalaxyRegistry.solarSystems);
+    }
+
+    public static Map<String, Integer> getRegisteredSolarSystemIDs() {
+        return ImmutableMap.copyOf(GalaxyRegistry.solarSystemIDs);
+    }
+
+    public static Map<String, Planet> getRegisteredPlanets() {
+        return (Map<String, Planet>)GalaxyRegistry.planets.clone();
+    }
+
+    public static Map<String, Integer> getRegisteredPlanetIDs() {
+        return ImmutableMap.copyOf(GalaxyRegistry.planetIDs);
+    }
+
+    public static Map<String, Moon> getRegisteredMoons() {
+        return (Map<String, Moon>)GalaxyRegistry.moons.clone();
+    }
+
+    public static Map<String, Integer> getRegisteredMoonIDs() {
+        return ImmutableMap.copyOf(GalaxyRegistry.moonIDs);
+    }
+
+    public static Map<String, Satellite> getRegisteredSatellites() {
+        return ImmutableMap.copyOf(GalaxyRegistry.satellites);
+    }
+
+    public static Map<String, Integer> getRegisteredSatelliteIDs() {
+        return ImmutableMap.copyOf(GalaxyRegistry.satelliteIDs);
+    }
+
+    public static int getSolarSystemID(final String solarSystemName) {
+        return GalaxyRegistry.solarSystemIDs.get(solarSystemName);
+    }
+
+    public static int getPlanetID(final String planetName) {
+        return GalaxyRegistry.planetIDs.get(planetName);
+    }
+
+    public static int getMoonID(final String moonName) {
+        return GalaxyRegistry.moonIDs.get(moonName);
+    }
+
+    public static int getSatelliteID(final String satelliteName) {
+        return GalaxyRegistry.satelliteIDs.get(satelliteName);
+    }
+
+    static {
+        GalaxyRegistry.maxSolarSystemID = 0;
+        GalaxyRegistry.maxPlanetID = 0;
+        GalaxyRegistry.maxMoonID = 0;
+        GalaxyRegistry.maxSatelliteID = 0;
+        GalaxyRegistry.solarSystems = Maps.newHashMap();
+        GalaxyRegistry.solarSystemIDs = HashBiMap.create();
+        GalaxyRegistry.planets = Maps.newTreeMap();
+        GalaxyRegistry.planetIDs = HashBiMap.create();
+        GalaxyRegistry.moons = Maps.newTreeMap();
+        GalaxyRegistry.moonIDs = HashBiMap.create();
+        GalaxyRegistry.satellites = Maps.newHashMap();
+        GalaxyRegistry.satelliteIDs = HashBiMap.create();
+        GalaxyRegistry.moonList = Maps.newHashMap();
+        GalaxyRegistry.satelliteList = Maps.newHashMap();
+        GalaxyRegistry.solarSystemList = Maps.newHashMap();
+    }
+
+    public static class SolarSystemRegisterEvent extends Event
+    {
+        public final String solarSystemName;
+        public final int solarSystemID;
+
+        public SolarSystemRegisterEvent(final String solarSystemName, final int solarSystemID) {
+            this.solarSystemName = solarSystemName;
+            this.solarSystemID = solarSystemID;
         }
     }
 
-    /**
-     * Returns a read-only list containing all registered CelestialObjects
-     */
-    public static ImmutableCelestialList<CelestialObject> getAllRegisteredObjects()
+    public static class PlanetRegisterEvent extends Event
     {
-        return ImmutableCelestialList.of(objects);
+        public final String planetName;
+        public final int planetID;
+
+        public PlanetRegisterEvent(final String planetName, final int planetID) {
+            this.planetName = planetName;
+            this.planetID = planetID;
+        }
     }
 
-    /**
-     * Returns a read-only list containing all registered Solar Systems
-     */
-    public static ImmutableCelestialList<SolarSystem> getSolarSystems()
+    public static class MoonRegisterEvent extends Event
     {
-        return ImmutableCelestialList.of(solarSystems);
+        public final String moonName;
+        public final int moonID;
+
+        public MoonRegisterEvent(final String moonName, final int moonID) {
+            this.moonName = moonName;
+            this.moonID = moonID;
+        }
     }
 
-    /**
-     * Returns a read-only list containing all registered Planets
-     */
-    public static ImmutableCelestialList<Planet> getPlanets()
+    public static class SatelliteRegisterEvent extends Event
     {
-        return ImmutableCelestialList.of(planets);
-    }
+        public final String satelliteName;
+        public final int satelliteID;
 
-    /**
-     * Returns a read-only list containing all registered Moons
-     */
-    public static ImmutableCelestialList<Moon> getMoons()
-    {
-        return ImmutableCelestialList.of(moons);
-    }
-
-    /**
-     * Returns a read-only list containing all registered Satellites
-     */
-    public static ImmutableCelestialList<Satellite> getSatellites()
-    {
-        return ImmutableCelestialList.of(satellites);
-    }
-
-    /**
-     * Returns a read-only list containing all CelestialObjects that are reachable
-     */
-    public static ImmutableCelestialList<CelestialBody> getAllReachableBodies()
-    {//@noformat
-        return ImmutableCelestialList.from(
-            planets.stream().filter(CelestialBody.filterReachable()).collect(CelestialCollector.toList()),
-            moons.stream().filter(CelestialBody.filterReachable()).collect(CelestialCollector.toList())
-        );
-    }
-
-    /**
-     * Returns a read-only list containing all CelestialObjects registered by the provided ModContainer
-     */
-    public static ImmutableCelestialList<CelestialObject> getCelestialObjectsFromMod(ModContainer modContainer)
-    {
-        return getCelestialObjectsFromMod(modContainer.getModId());
-    }
-
-    /**
-     * Returns a read-only list containing all CelestialObjects registered by the provided modId
-     */
-    public static ImmutableCelestialList<CelestialObject> getCelestialObjectsFromMod(String modId)
-    {
-        return objects.stream().filter(CelestialObject.filter(modId)).collect(CelestialCollector.toList()).toUnmodifiableList();
-    }
-
-    public static String[] getAllTransltionKeys()
-    {
-        return objects.stream().map(key -> key.getTranslationKey()).collect(Collectors.toList()).toArray(new String[objects.size()]);
-    }
-
-    // -- DEPRECIATED METHODS -- //
-
-    /**
-     * @ReplaceWith {@link GalaxyRegistry#getPlanetOrMoonFromTranslationkey(String translationKey)}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.getPlanetOrMoonFromTranslationkey(String translationKey)")
-    public static CelestialBody getCelestialBodyFromUnlocalizedName(String unlocalizedName)
-    {
-        return getPlanetOrMoonFromTranslationkey(unlocalizedName);
-    }
-
-    /**
-     * @ReplaceWith {@link GalaxyRegistry#register(T object)}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.register(T object)")
-    public static boolean registerSolarSystem(SolarSystem solarSystem)
-    {
-        GalaxyRegistry.register(solarSystem);
-        return solarSystems.contains(solarSystem);
-    }
-
-    /**
-     * @ReplaceWith {@link GalaxyRegistry#register(T object)}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.register(T object)")
-    public static boolean registerPlanet(Planet planet)
-    {
-        GalaxyRegistry.register(planet);
-        return planets.contains(planet);
-    }
-
-    /**
-     * @ReplaceWith {@link GalaxyRegistry#register(T object)}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.register(T object)")
-    public static boolean registerMoon(Moon moon)
-    {
-        GalaxyRegistry.register(moon);
-        return moons.contains(moon);
-    }
-
-    /**
-     * @ReplaceWith {@link GalaxyRegistry#register(T object)}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.register(T object)")
-    public static boolean registerSatellite(Satellite satellite)
-    {
-        GalaxyRegistry.register(satellite);
-        return satellites.contains(satellite);
-    }
-
-    /**
-     * Returns a read-only map containing Solar System Names and their associated Solar Systems.
-     *
-     * @ReplaceWith {@link GalaxyRegistry#getSolarSystems()}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.getSolarSystems()")
-    public static Map<String, SolarSystem> getRegisteredSolarSystems()
-    {
-        return solarSystems.getRegistered();
-    }
-
-    /**
-     * Returns a read-only map containing Planet Names and their associated Planets.
-     *
-     * @ReplaceWith {@link GalaxyRegistry#getPlanets()}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.getPlanets()")
-    public static Map<String, Planet> getRegisteredPlanets()
-    {
-        return planets.getRegistered();
-    }
-
-    /**
-     * Returns a read-only map containing Moon Names and their associated Moons.
-     *
-     * @ReplaceWith {@link GalaxyRegistry#getMoons()}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.getMoons()")
-    public static Map<String, Moon> getRegisteredMoons()
-    {
-        return moons.getRegistered();
-    }
-
-    /**
-     * Returns a read-only map containing Satellite Names and their associated Satellite.
-     *
-     * @ReplaceWith {@link GalaxyRegistry#getSatellites()}
-     */
-    @Deprecated
-    @ReplaceWith("GalaxyRegistry.getSatellites()")
-    public static Map<String, Satellite> getRegisteredSatellites()
-    {
-        return satellites.getRegistered();
+        public SatelliteRegisterEvent(final String satelliteName, final int satelliteID) {
+            this.satelliteName = satelliteName;
+            this.satelliteID = satelliteID;
+        }
     }
 }

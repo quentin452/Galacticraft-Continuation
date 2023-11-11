@@ -1,100 +1,79 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
 
-public class ItemBlockMars extends ItemBlock implements GCRarity
+public class ItemBlockMars extends ItemBlock
 {
-
-    public ItemBlockMars(Block block)
-    {
+    public ItemBlockMars(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public int getMetadata(int meta)
-    {
+    
+    public int getMetadata(final int meta) {
         return meta;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemstack)
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public String getUnlocalizedName(final ItemStack itemstack) {
         String name = "";
-
-        switch (itemstack.getItemDamage())
-        {
-            case 0:
-            {
+        switch (itemstack.getItemDamage()) {
+            case 0: {
                 name = "coppermars";
                 break;
             }
-            case 1:
-            {
+            case 1: {
                 name = "tinmars";
                 break;
             }
-            case 3:
-            {
+            case 3: {
                 name = "ironmars";
                 break;
             }
-            case 2:
-            {
+            case 2: {
                 name = "deshmars";
                 break;
             }
-            case 4:
-            {
+            case 4: {
                 name = "marscobblestone";
                 break;
             }
-            case 5:
-            {
+            case 5: {
                 name = "marsgrass";
                 break;
             }
-            case 6:
-            {
+            case 6: {
                 name = "marsdirt";
                 break;
             }
-            case 7:
-            {
+            case 7: {
                 name = "marsdungeon";
                 break;
             }
-            case 8:
-            {
+            case 8: {
                 name = "marsdeco";
                 break;
             }
-            case 9:
-            {
+            case 9: {
                 name = "marsstone";
                 break;
             }
-            default:
+            default: {
                 name = "null";
+                break;
+            }
         }
-
-        return this.getBlock().getTranslationKey() + "." + name;
+        return this.field_150939_a.getUnlocalizedName() + "." + name;
     }
-
-    @Override
-    public String getTranslationKey()
-    {
-        return this.getBlock().getTranslationKey() + ".0";
+    
+    public String getUnlocalizedName() {
+        return this.field_150939_a.getUnlocalizedName() + ".0";
     }
 }

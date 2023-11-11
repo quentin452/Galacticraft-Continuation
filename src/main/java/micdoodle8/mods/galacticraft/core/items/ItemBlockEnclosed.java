@@ -1,127 +1,149 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.lang.reflect.Method;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.init.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.*;
+import appeng.api.*;
+import appeng.api.util.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.blocks.BlockEnclosed;
-import micdoodle8.mods.galacticraft.core.blocks.BlockEnclosed.EnumEnclosedBlockType;
-import micdoodle8.mods.galacticraft.core.util.CompatibilityManager;
-
-import appeng.api.AEApi;
-import appeng.api.util.AEColor;
-
-public class ItemBlockEnclosed extends ItemBlockDesc implements GCRarity
+public class ItemBlockEnclosed extends ItemBlockDesc
 {
-
-    public ItemBlockEnclosed(Block block)
-    {
+    public ItemBlockEnclosed(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public String getTranslationKey(ItemStack par1ItemStack)
-    {
-        String name;
-
-        try
-        {
-            name = BlockEnclosed.EnumEnclosedBlockType.byMetadata(par1ItemStack.getItemDamage()).getName();
-            name = name.substring(9, name.length()); // Remove "enclosed_"
-        } catch (Exception e)
-        {
-            name = "null";
-        }
-
-        return this.getBlock().getTranslationKey() + "." + name;
-    }
-
-    @Override
-    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        ItemStack itemstack = playerIn.getHeldItem(hand);
-        int metadata = this.getMetadata(itemstack.getItemDamage());
-        if (metadata == EnumEnclosedBlockType.ME_CABLE.getMeta() && CompatibilityManager.isAppEngLoaded())
-        {
-            IBlockState iblockstate = worldIn.getBlockState(pos);
-            Block block = iblockstate.getBlock();
-            BlockPos origPos = pos;
-
-            if (!block.isReplaceable(worldIn, pos))
-            {
-                pos = pos.offset(side);
+    
+    public String getUnlocalizedName(final ItemStack par1ItemStack) {
+        String name = null;
+        switch (par1ItemStack.getItemDamage()) {
+            case 0: {
+                name = "null";
+                break;
             }
-
-            if (itemstack.getCount() == 0)
-            {
-                return EnumActionResult.FAIL;
-            } else if (!playerIn.canPlayerEdit(pos, side, itemstack))
-            {
-                return EnumActionResult.FAIL;
-            } else if (worldIn.mayPlace(this.block, pos, false, side, null))
-            {
-                int i = this.getMetadata(itemstack.getMetadata());
-                IBlockState iblockstate1 = this.block.getStateForPlacement(worldIn, pos, side, hitX, hitY, hitZ, i, playerIn);
-
-                if (placeBlockAt(itemstack, playerIn, worldIn, pos, side, hitX, hitY, hitZ, iblockstate1))
-                {
-                    SoundType soundType = this.getBlock().getSoundType(iblockstate, worldIn, pos, playerIn);
-                    worldIn.playSound(playerIn, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, soundType.getPlaceSound(), SoundCategory.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F,
-                        soundType.getPitch() * 0.8F);
-                    itemstack.shrink(1);
-
-                    ItemStack itemME = AEApi.instance().definitions().parts().cableGlass().stack(AEColor.TRANSPARENT, 1);
-                    itemME.setCount(2); // Fool AppEng into not destroying
-                                        // anything in the player inventory
-                    AEApi.instance().partHelper().placeBus(itemME, origPos, side, playerIn, hand, worldIn);
-                    // Emulate appeng.parts.PartPlacement.place( is, pos, side,
-                    // player, w, PartPlacement.PlaceType.INTERACT_SECOND_PASS,
-                    // 0 );
-                    try
-                    {
-                        Class clazzpp = Class.forName("appeng.parts.PartPlacement");
-                        Class enumPlaceType = Class.forName("appeng.parts.PartPlacement$PlaceType");
-                        Method methPl = clazzpp.getMethod("place", ItemStack.class, BlockPos.class, EnumFacing.class, EntityPlayer.class, EnumHand.class, World.class, enumPlaceType, int.class);
-                        methPl.invoke(null, itemME, origPos, side, playerIn, hand, worldIn, enumPlaceType.getEnumConstants()[2], 0);
-                    } catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+            case 1: {
+                name = "oxygenPipe";
+                break;
+            }
+            case 2: {
+                name = "copperCable";
+                break;
+            }
+            case 3: {
+                name = "goldCable";
+                break;
+            }
+            case 4: {
+                name = "hvCable";
+                break;
+            }
+            case 5: {
+                name = "glassFibreCable";
+                break;
+            }
+            case 6: {
+                name = "lvCable";
+                break;
+            }
+            case 13: {
+                name = "meCable";
+                break;
+            }
+            case 14: {
+                name = "aluminumWire";
+                break;
+            }
+            case 15: {
+                name = "aluminumWireHeavy";
+                break;
+            }
+            default: {
+                try {
+                    name = BlockEnclosed.getTypeFromMeta(par1ItemStack.getItemDamage()).getPipeType();
                 }
-                return EnumActionResult.SUCCESS;
-            } else
-            {
-                return EnumActionResult.FAIL;
+                catch (Exception e) {
+                    name = "null";
+                }
+                break;
             }
-        } else
-        {
-            return super.onItemUse(playerIn, worldIn, pos, hand, side, hitX, hitY, hitZ);
         }
+        return this.field_150939_a.getUnlocalizedName() + "." + name;
     }
-
-    @Override
-    public int getMetadata(int damage)
-    {
+    
+    public boolean onItemUse(final ItemStack itemstack, final EntityPlayer entityplayer, final World world, int i, int j, int k, int side, final float par8, final float par9, final float par10) {
+        final int metadata = this.getMetadata(itemstack.getItemDamage());
+        if (metadata != BlockEnclosed.EnumEnclosedBlock.ME_CABLE.getMetadata() || !CompatibilityManager.isAppEngLoaded()) {
+            return super.onItemUse(itemstack, entityplayer, world, i, j, k, side, par8, par9, par10);
+        }
+        final int x = i;
+        final int y = j;
+        final int z = k;
+        final Block block = world.getBlock(i, j, k);
+        if (block == Blocks.snow_layer && (world.getBlockMetadata(i, j, k) & 0x7) < 1) {
+            side = 1;
+        }
+        else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush && !block.isReplaceable((IBlockAccess)world, i, j, k)) {
+            if (side == 0) {
+                --j;
+            }
+            if (side == 1) {
+                ++j;
+            }
+            if (side == 2) {
+                --k;
+            }
+            if (side == 3) {
+                ++k;
+            }
+            if (side == 4) {
+                --i;
+            }
+            if (side == 5) {
+                ++i;
+            }
+        }
+        if (itemstack.stackSize == 0) {
+            return false;
+        }
+        if (!entityplayer.canPlayerEdit(i, j, k, side, itemstack)) {
+            return false;
+        }
+        if (j == 255 && this.field_150939_a.getMaterial().isSolid()) {
+            return false;
+        }
+        if (!world.canPlaceEntityOnSide(block, i, j, k, false, side, (Entity)entityplayer, itemstack)) {
+            return false;
+        }
+        final int j2 = this.field_150939_a.onBlockPlaced(world, i, j, k, side, par8, par9, par10, metadata);
+        if (this.placeBlockAt(itemstack, entityplayer, world, i, j, k, side, par8, par9, par10, j2)) {
+            world.playSoundEffect((double)(i + 0.5f), (double)(j + 0.5f), (double)(k + 0.5f), this.field_150939_a.stepSound.func_150496_b(), (this.field_150939_a.stepSound.getVolume() + 1.0f) / 2.0f, this.field_150939_a.stepSound.getPitch() * 0.8f);
+            --itemstack.stackSize;
+            final ItemStack itemME = AEApi.instance().definitions().parts().cableGlass().stack(AEColor.Transparent, 1);
+            itemME.stackSize = 2;
+            return AEApi.instance().partHelper().placeBus(itemME, x, y, z, side, entityplayer, world);
+        }
+        return true;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public int getMetadata(final int damage) {
+        if (damage == 4) {
+            return 0;
+        }
+        if (damage == 0) {
+            return 4;
+        }
         return damage;
     }
 }

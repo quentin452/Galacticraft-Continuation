@@ -1,63 +1,30 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.blocks.BlockOxygenDetector;
-import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
-
-public class TileEntityOxygenDetector extends TileEntity implements ITickable
+public class TileEntityOxygenDetector extends TileEntityAdvanced
 {
-
-    private int ticks = 49;
-    private AxisAlignedBB oxygenSearch;
-
-    @Override
-    public void update()
-    {
-        if (!this.world.isRemote && ++this.ticks == 50)
-        {
-            this.ticks = 0;
-            if (this.getBlockType() instanceof BlockOxygenDetector)
-            {
-                boolean oxygenFound = false;
-                if (this.world.provider instanceof IGalacticraftWorldProvider && !((IGalacticraftWorldProvider) this.world.provider).hasBreathableAtmosphere())
-                {
-                    oxygenFound = OxygenUtil.isAABBInBreathableAirBlock(this.world, this.oxygenSearch, false);
-                } else
-                {
-                    for (EnumFacing side : EnumFacing.VALUES)
-                    {
-                        BlockPos offset = this.pos.offset(side, 1);
-                        IBlockState bs = this.world.getBlockState(offset);
-                        if (!bs.getBlock().isSideSolid(bs, world, offset, side.getOpposite()))
-                        {
-                            oxygenFound = true;
-                            break;
-                        }
-                    }
-                }
-                ((BlockOxygenDetector) this.blockType).updateOxygenState(this.world, this.getPos(), oxygenFound);
+    public void updateEntity() {
+        super.updateEntity();
+        if (this.worldObj != null && !this.worldObj.isRemote && this.ticks % 50 == 0) {
+            this.blockType = this.getBlockType();
+            if (this.blockType != null && this.blockType instanceof BlockOxygenDetector) {
+                ((BlockOxygenDetector)this.blockType).updateOxygenState(this.worldObj, this.xCoord, this.yCoord, this.zCoord, OxygenUtil.isAABBInBreathableAirBlock(this.worldObj, AxisAlignedBB.getBoundingBox((double)(this.xCoord - 1), (double)(this.yCoord - 1), (double)(this.zCoord - 1), (double)(this.xCoord + 2), (double)(this.yCoord + 2), (double)(this.zCoord + 2))));
             }
         }
     }
-
-    @Override
-    public void onLoad()
-    {
-        this.oxygenSearch =
-            new AxisAlignedBB(this.getPos().getX() - 0.6, this.getPos().getY() - 0.6, this.getPos().getZ() - 0.6, this.getPos().getX() + 1.6, this.getPos().getY() + 1.6, this.getPos().getZ() + 1.6);
+    
+    public double getPacketRange() {
+        return 0.0;
+    }
+    
+    public int getPacketCooldown() {
+        return 0;
+    }
+    
+    public boolean isNetworkedTile() {
+        return false;
     }
 }

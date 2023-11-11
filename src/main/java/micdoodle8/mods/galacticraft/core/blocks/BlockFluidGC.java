@@ -1,244 +1,114 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
-import javax.annotation.Nullable;
-
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.fluids.BlockFluidBase;
-import net.minecraftforge.fluids.BlockFluidClassic;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.IFluidBlock;
-
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GCFluids;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import net.minecraftforge.fluids.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.block.material.*;
+import net.minecraft.creativetab.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.client.entity.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import java.util.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.block.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.*;
 
 public class BlockFluidGC extends BlockFluidClassic
 {
-
+    private IIcon stillIcon;
+    private IIcon flowingIcon;
     private final String fluidName;
     private final Fluid fluid;
-
-    public BlockFluidGC(Fluid fluid, String assetName)
-    {
-        super(fluid, (assetName.startsWith("oil") || assetName.startsWith("fuel")) ? GCFluids.materialOil : Material.WATER);
+    
+    public BlockFluidGC(final Fluid fluid, final String assetName) {
+        super(fluid, (assetName.startsWith("oil") || assetName.startsWith("fuel")) ? GalacticraftCore.materialOil : Material.water);
+        this.setRenderPass(1);
         this.fluidName = assetName;
         this.fluid = fluid;
-
-        if (assetName.startsWith("oil"))
-        {
+        if (assetName.startsWith("oil")) {
             this.needsRandomTick = true;
         }
-
-        this.setTranslationKey(assetName);
     }
-
-    @Override
-    @Nullable
-    public Boolean isEntityInsideMaterial(IBlockAccess world, BlockPos pos, IBlockState state, Entity entity, double yToTest, Material material, boolean testingHead)
-    {
-        return true;
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
+        return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        if (worldIn.isRemote && this.fluidName.startsWith("oil") && playerIn instanceof EntityPlayerSP)
-        {
-            ClientProxyCore.playerClientHandler.onBuild(7, (EntityPlayerSP) playerIn);
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(final int par1, final int par2) {
+        return (par1 != 0 && par1 != 1) ? this.flowingIcon : this.stillIcon;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.stillIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + this.fluidName + "_still");
+        this.flowingIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + this.fluidName + "_flow");
+        this.fluid.setStillIcon(this.stillIcon);
+        this.fluid.setFlowingIcon(this.flowingIcon);
+    }
+    
+    public boolean onBlockActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        if (world.isRemote && this.fluidName.startsWith("oil") && entityPlayer instanceof EntityPlayerSP) {
+            ClientProxyCore.playerClientHandler.onBuild(7, (EntityPlayerSP)entityPlayer);
         }
-
-        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, side, hitX, hitY, hitZ);
+        return super.onBlockActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
     }
-
-    @Override
-    public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand)
-    {
-        super.randomDisplayTick(stateIn, worldIn, pos, rand);
-
-        if (this.fluidName.startsWith("oil") && rand.nextInt(1200) == 0)
-        {
-            worldIn.playSound(null, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, SoundEvents.BLOCK_LAVA_AMBIENT, SoundCategory.BLOCKS, rand.nextFloat() * 0.25F + 0.75F,
-                0.00001F + rand.nextFloat() * 0.5F);
+    
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(final World world, final int x, final int y, final int z, final Random rand) {
+        super.randomDisplayTick(world, x, y, z, rand);
+        if (this.fluidName.startsWith("oil") && rand.nextInt(1200) == 0) {
+            world.playSound((double)(x + 0.5f), (double)(y + 0.5f), (double)(z + 0.5f), "liquid.lava", rand.nextFloat() * 0.25f + 0.75f, 1.0E-5f + rand.nextFloat() * 0.5f, false);
         }
-        if (this.fluidName.equals("oil") && rand.nextInt(10) == 0)
-        {
-            BlockPos below = pos.down();
-            IBlockState state = worldIn.getBlockState(below);
-            if (state.getBlock().isSideSolid(state, worldIn, below, EnumFacing.UP) && !worldIn.getBlockState(pos.down(2)).getMaterial().blocksMovement())
-            {
-                GalacticraftCore.proxy.spawnParticle("oilDrip", new Vector3(pos.getX() + rand.nextFloat(), pos.getY() - 1.05D, pos.getZ() + rand.nextFloat()), new Vector3(0, 0, 0), new Object[]
-                {});
-            }
+        if (this.fluidName.equals("oil") && rand.nextInt(10) == 0 && World.doesBlockHaveSolidTopSurface((IBlockAccess)world, x, y - 1, z) && !world.getBlock(x, y - 2, z).getMaterial().blocksMovement()) {
+            GalacticraftCore.proxy.spawnParticle("oilDrip", new Vector3((double)(x + rand.nextFloat()), y - 1.05, (double)(z + rand.nextFloat())), new Vector3(0.0, 0.0, 0.0), new Object[0]);
         }
     }
-
-    @Override
-    public boolean canDisplace(IBlockAccess world, BlockPos pos)
-    {
-        if (world.getBlockState(pos).getMaterial().isLiquid())
-        {
+    
+    public boolean canDisplace(final IBlockAccess world, final int x, final int y, final int z) {
+        if (world.getBlock(x, y, z) instanceof BlockLiquid) {
+            final int meta = world.getBlockMetadata(x, y, z);
+            return meta > 1 || meta == -1;
+        }
+        return super.canDisplace(world, x, y, z);
+    }
+    
+    public boolean displaceIfPossible(final World world, final int x, final int y, final int z) {
+        if (world.getBlock(x, y, z) instanceof BlockLiquid) {
+            final int meta = world.getBlockMetadata(x, y, z);
+            return (meta > 1 || meta == -1) && super.displaceIfPossible(world, x, y, z);
+        }
+        return super.displaceIfPossible(world, x, y, z);
+    }
+    
+    public IIcon getStillIcon() {
+        return this.stillIcon;
+    }
+    
+    public IIcon getFlowingIcon() {
+        return this.flowingIcon;
+    }
+    
+    public boolean isFlammable(final IBlockAccess world, final int x, final int y, final int z, final ForgeDirection face) {
+        if (!(world instanceof World)) {
             return false;
         }
-
-        return super.canDisplace(world, pos);
-    }
-
-    @Override
-    public boolean displaceIfPossible(World world, BlockPos pos)
-    {
-        if (world.getBlockState(pos).getMaterial().isLiquid())
-        {
+        if (OxygenUtil.noAtmosphericCombustion(((World)world).provider) && !OxygenUtil.isAABBInBreathableAirBlock((World)world, AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)(x + 1), (double)(y + 2), (double)(z + 1)))) {
             return false;
         }
-
-        return super.displaceIfPossible(world, pos);
-    }
-
-    @Override
-    public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face)
-    {
-        if (this.fluidName.startsWith("fuel"))
-        {
-            ((World) world).createExplosion(null, pos.getX(), pos.getY(), pos.getZ(), 6.0F, true);
+        if (this.fluidName.startsWith("fuel")) {
+            ((World)world).createExplosion((Entity)null, (double)x, (double)y, (double)z, 6.0f, true);
             return true;
         }
-        return (this.fluidName.startsWith("oil"));
+        return this.fluidName.startsWith("oil");
     }
-
-    @Override
-    public IBlockState getExtendedState(IBlockState oldState, IBlockAccess world, BlockPos pos)
-    {
-        IExtendedBlockState state = (IExtendedBlockState) oldState;
-        state = state.withProperty(FLOW_DIRECTION, (float) getFlowDirection(state, world, pos));
-        IBlockState[][] upBlockState = new IBlockState[3][3];
-        float[][] height = new float[3][3];
-        float[][] corner = new float[2][2];
-        upBlockState[1][1] = world.getBlockState(pos.down(this.densityDir));
-        height[1][1] = this.getFluidHeightForRender(world, pos, upBlockState[1][1]);
-
-        if (height[1][1] == 1)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                for (int j = 0; j < 2; j++)
-                {
-                    corner[i][j] = 1;
-                }
-            }
-        } else
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    if (i != 1 || j != 1)
-                    {
-                        upBlockState[i][j] = world.getBlockState(pos.add(i - 1, 0, j - 1).down(this.densityDir));
-                        height[i][j] = this.getFluidHeightForRender(world, pos.add(i - 1, 0, j - 1), upBlockState[i][j]);
-                    }
-                }
-            }
-            for (int i = 0; i < 2; i++)
-            {
-                for (int j = 0; j < 2; j++)
-                {
-                    corner[i][j] = this.getFluidHeightAverage(height[i][j], height[i][j + 1], height[i + 1][j], height[i + 1][j + 1]);
-                }
-            }
-            // check for downflow above corners
-            boolean n = this.isFluid(upBlockState[0][1]);
-            boolean s = this.isFluid(upBlockState[2][1]);
-            boolean w = this.isFluid(upBlockState[1][0]);
-            boolean e = this.isFluid(upBlockState[1][2]);
-            boolean nw = this.isFluid(upBlockState[0][0]);
-            boolean ne = this.isFluid(upBlockState[0][2]);
-            boolean sw = this.isFluid(upBlockState[2][0]);
-            boolean se = this.isFluid(upBlockState[2][2]);
-
-            if (nw || n || w)
-            {
-                corner[0][0] = 0.999F;
-            }
-            if (ne || n || e)
-            {
-                corner[0][1] = 0.999F;
-            }
-            if (sw || s || w)
-            {
-                corner[1][0] = 0.999F;
-            }
-            if (se || s || e)
-            {
-                corner[1][1] = 0.999F;
-            }
-        }
-        state = state.withProperty(LEVEL_CORNERS[0], corner[0][0]);
-        state = state.withProperty(LEVEL_CORNERS[1], corner[0][1]);
-        state = state.withProperty(LEVEL_CORNERS[2], corner[1][1]);
-        state = state.withProperty(LEVEL_CORNERS[3], corner[1][0]);
-        return state;
-    }
-
-    public static double getFlowDirection(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
-        if (!state.getMaterial().isLiquid())
-        {
-            return -1000.0;
-        }
-        Vec3d vec = ((BlockFluidBase) state.getBlock()).getFlowVector(world, pos);
-        return vec.x == 0.0D && vec.z == 0.0D ? -1000.0D : Math.atan2(vec.z, vec.x) - Math.PI / 2D;
-    }
-
-    private boolean isFluid(IBlockState state)
-    {
-        return state.getMaterial().isLiquid() || state.getBlock() instanceof IFluidBlock;
-    }
-
-    @Override
-    public float getFluidHeightForRender(IBlockAccess world, BlockPos pos, IBlockState up)
-    {
-        IBlockState here = world.getBlockState(pos);
-
-        if (here.getBlock() == this)
-        {
-            if (up.getMaterial().isLiquid() || up.getBlock() instanceof IFluidBlock)
-            {
-                return 1;
-            }
-            if (this.getMetaFromState(here) == this.getMaxRenderHeightMeta())
-            {
-                return 0.875F;
-            }
-        }
-        if (here.getBlock() instanceof BlockLiquid)
-        {
-            return Math.min(1 - BlockLiquid.getLiquidHeightPercent(here.getValue(BlockLiquid.LEVEL)), 14f / 16);
-        }
-        return !here.getMaterial().isSolid() && up.getBlock() == this ? 1 : this.getQuantaPercentage(world, pos) * 0.875F;
+    
+    public boolean shouldSideBeRendered(final IBlockAccess world, final int x, final int y, final int z, final int side) {
+        return super.shouldSideBeRendered(world, x, y, z, side);
     }
 }

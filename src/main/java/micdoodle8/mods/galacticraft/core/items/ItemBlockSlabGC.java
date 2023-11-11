@@ -1,38 +1,28 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemSlab;
-import net.minecraft.item.ItemStack;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.block.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.blocks.BlockDoubleSlabGC;
-import micdoodle8.mods.galacticraft.core.blocks.BlockSlabGC;
-
-public class ItemBlockSlabGC extends ItemSlab implements GCRarity
+public class ItemBlockSlabGC extends ItemSlab
 {
-
-    public ItemBlockSlabGC(Block block, BlockSlabGC singleSlab, BlockDoubleSlabGC doubleSlab)
-    {
-        super(block, singleSlab, doubleSlab);
+    public ItemBlockSlabGC(final Block block, final BlockSlabGC singleSlab, final BlockSlabGC doubleSlab) {
+        super(block, (BlockSlab)singleSlab, (BlockSlab)doubleSlab, block == doubleSlab);
     }
-
-    @Override
-    public int getMetadata(int meta)
-    {
-        return meta & 7;
+    
+    public int getMetadata(final int meta) {
+        return meta & 0x7;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemStack)
-    {
-        BlockSlabGC slab = (BlockSlabGC) Block.getBlockFromItem(itemStack.getItem());
-        return super.getTranslationKey() + "." + slab.getTranslationKey(itemStack.getItemDamage());
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public String getUnlocalizedName(final ItemStack itemStack) {
+        final BlockSlabGC slab = (BlockSlabGC)Block.getBlockFromItem(itemStack.getItem());
+        return super.getUnlocalizedName() + "." + new StringBuilder().append(slab.func_150002_b(itemStack.getItemDamage())).toString();
     }
 }

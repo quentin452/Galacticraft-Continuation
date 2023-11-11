@@ -1,84 +1,38 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.transmission.grid;
 
-import java.util.HashSet;
-import java.util.Set;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import java.util.*;
 
-/**
- * A class that allows flexible ai for different positions. Compared to AStar
- * ai, this version is faster but does not calculated the most optimal path.
- *
- * @author Calclavia
- */
 public class Pathfinder
 {
-
-    /**
-     * A ai call back interface used to call back on paths.
-     */
     public IPathCallBack callBackCheck;
-
-    /**
-     * A list of nodes that the pathfinder already went through.
-     */
     public Set<BlockVec3> closedSet;
-
-    /**
-     * The resulted path found by the pathfinder. Could be null if no path was
-     * found.
-     */
     public Set<BlockVec3> results;
-
-    public Pathfinder(IPathCallBack callBack)
-    {
+    
+    public Pathfinder(final IPathCallBack callBack) {
         this.callBackCheck = callBack;
         this.reset();
     }
-
-    /**
-     * @return True on success finding, false on failure.
-     */
-    public boolean findNodes(BlockVec3 currentNode)
-    {
+    
+    public boolean findNodes(final BlockVec3 currentNode) {
         this.closedSet.add(currentNode);
-
-        if (this.callBackCheck.onSearch(this, currentNode))
-        {
+        if (this.callBackCheck.onSearch(this, currentNode)) {
             return false;
         }
-
-        for (BlockVec3 node : this.callBackCheck.getConnectedNodes(this, currentNode))
-        {
-            if (!this.closedSet.contains(node))
-            {
-                if (this.findNodes(node))
-                {
-                    return true;
-                }
+        for (final BlockVec3 node : this.callBackCheck.getConnectedNodes(this, currentNode)) {
+            if (!this.closedSet.contains(node) && this.findNodes(node)) {
+                return true;
             }
         }
-
         return false;
     }
-
-    /**
-     * Called to execute the ai operation.
-     */
-    public Pathfinder init(BlockVec3 startNode)
-    {
+    
+    public Pathfinder init(final BlockVec3 startNode) {
         this.findNodes(startNode);
         return this;
     }
-
-    public Pathfinder reset()
-    {
+    
+    public Pathfinder reset() {
         this.closedSet = new HashSet<BlockVec3>();
         this.results = new HashSet<BlockVec3>();
         return this;

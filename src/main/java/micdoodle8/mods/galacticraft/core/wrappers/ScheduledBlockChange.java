@@ -1,62 +1,55 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.wrappers;
 
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.BlockPos;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.block.*;
 
 public class ScheduledBlockChange
 {
-
-    private BlockPos changePosition;
-    private IBlockState change;
+    private BlockVec3 changePosition;
+    private Block change;
+    private int changeMeta;
     private int changeUpdateFlag;
-
-    public ScheduledBlockChange(BlockVec3 changePosition, IBlockState change)
-    {
-        this(changePosition.toBlockPos(), change, 3);
+    
+    public ScheduledBlockChange(final BlockVec3 changePosition, final Block change, final int changeMeta) {
+        this(changePosition, change, changeMeta, 3);
     }
-
-    public ScheduledBlockChange(BlockPos pos, IBlockState change, int changeUpdateFlag)
-    {
-        this.changePosition = pos;
+    
+    public ScheduledBlockChange(final BlockVec3 changePosition, final Block change, final int changeMeta, final int changeUpdateFlag) {
+        this.changePosition = changePosition;
         this.change = change;
+        this.changeMeta = changeMeta;
         this.changeUpdateFlag = changeUpdateFlag;
     }
-
-    public BlockPos getChangePosition()
-    {
+    
+    public BlockVec3 getChangePosition() {
         return this.changePosition;
     }
-
-    public void setChangePosition(BlockPos changePosition)
-    {
+    
+    public void setChangePosition(final BlockVec3 changePosition) {
         this.changePosition = changePosition;
     }
-
-    public IBlockState getChangeState()
-    {
+    
+    public Block getChangeID() {
         return this.change;
     }
-
-    public void setChangeState(IBlockState change)
-    {
+    
+    public void setChangeID(final Block change) {
         this.change = change;
     }
-
-    public int getChangeUpdateFlag()
-    {
-        return changeUpdateFlag;
+    
+    public int getChangeMeta() {
+        return this.changeMeta;
     }
-
-    public void setChangeUpdateFlag(int changeUpdateFlag)
-    {
+    
+    public void setChangeMeta(final int changeMeta) {
+        this.changeMeta = changeMeta;
+    }
+    
+    public int getChangeUpdateFlag() {
+        return this.changeUpdateFlag;
+    }
+    
+    public void setChangeUpdateFlag(final int changeUpdateFlag) {
         this.changeUpdateFlag = changeUpdateFlag;
     }
 }

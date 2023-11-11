@@ -1,58 +1,33 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import java.util.Random;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.api.world.ITeleportType;
+import micdoodle8.mods.galacticraft.api.world.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.entity.*;
+import java.util.*;
+import net.minecraft.world.*;
 
 public class TeleportTypeOrbit implements ITeleportType
 {
-
-    @Override
-    public boolean useParachute()
-    {
+    public boolean useParachute() {
         return false;
     }
-
-    @Override
-    public Vector3 getPlayerSpawnLocation(WorldServer world, EntityPlayerMP player)
-    {
+    
+    public Vector3 getPlayerSpawnLocation(final WorldServer world, final EntityPlayerMP player) {
         return new Vector3(0.5, 65.0, 0.5);
     }
-
-    @Override
-    public Vector3 getEntitySpawnLocation(WorldServer world, Entity player)
-    {
+    
+    public Vector3 getEntitySpawnLocation(final WorldServer world, final Entity player) {
         return new Vector3(0.5, 65.0, 0.5);
     }
-
-    @Override
-    public Vector3 getParaChestSpawnLocation(WorldServer world, EntityPlayerMP player, Random rand)
-    {
-        return new Vector3(-8.5D, 90.0, -1.5D);
+    
+    public Vector3 getParaChestSpawnLocation(final WorldServer world, final EntityPlayerMP player, final Random rand) {
+        return new Vector3(-8.5, 90.0, -1.5);
     }
-
-    @Override
-    public void onSpaceDimensionChanged(World newWorld, EntityPlayerMP player, boolean ridingAutoRocket)
-    {
+    
+    public void onSpaceDimensionChanged(final World newWorld, final EntityPlayerMP player, final boolean ridingAutoRocket) {
     }
-
-    @Override
-    public void setupAdventureSpawn(EntityPlayerMP player)
-    {
-        // TODO Auto-generated method stub
-
+    
+    public void setupAdventureSpawn(final EntityPlayerMP player) {
     }
 }

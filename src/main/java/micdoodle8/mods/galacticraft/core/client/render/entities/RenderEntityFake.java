@@ -1,43 +1,22 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import micdoodle8.mods.galacticraft.core.entities.EntityCelestialFake;
-import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderEntityFake extends Render<EntityCelestialFake>
+public class RenderEntityFake extends Render
 {
-
-    public RenderEntityFake(RenderManager manager)
-    {
-        super(manager);
-    }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityCelestialFake par1Entity)
-    {
+    protected ResourceLocation func_110779_a(final EntityMeteor entity) {
         return null;
     }
-
-    @Override
-    public void doRender(EntityCelestialFake par1Entity, double par2, double par4, double par6, float par8, float par9)
-    {
+    
+    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+        return null;
     }
-
-    @Override
-    public boolean shouldRender(EntityCelestialFake lander, ICamera camera, double camX, double camY, double camZ)
-    {
-        return false;
+    
+    public void doRender(final Entity par1Entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
     }
 }

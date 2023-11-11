@@ -1,87 +1,51 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.dimension.SpaceRaceManager;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import micdoodle8.mods.galacticraft.core.dimension.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.core.network.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.command.*;
+import net.minecraft.entity.player.*;
 
 public class CommandJoinSpaceRace extends CommandBase
 {
-
-    @Override
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 0;
     }
 
-    @Override
-    public String getUsage(ICommandSender var1)
-    {
-        return "/" + this.getName();
+    public String getCommandUsage(final ICommandSender var1) {
+        return "/" + this.getCommandName();
     }
 
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
-    {
+    public boolean canCommandSenderUseCommand(final ICommandSender sender) {
         return true;
     }
 
-    @Override
-    public String getName()
-    {
+    public String getCommandName() {
         return "joinrace";
     }
 
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-    {
-        EntityPlayerMP playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(server, sender.getName(), true);
-
-        if (args.length == 0)
-        {
-            try
-            {
-                if (playerBase != null)
-                {
-                    GCPlayerStats stats = GCPlayerStats.get(playerBase);
-
-                    if (stats.getSpaceRaceInviteTeamID() > 0)
-                    {
-                        SpaceRaceManager.sendSpaceRaceData(server, playerBase, SpaceRaceManager.getSpaceRaceFromID(stats.getSpaceRaceInviteTeamID()));
-                        GalacticraftCore.packetPipeline.sendTo(new PacketSimple(EnumSimplePacket.C_OPEN_JOIN_RACE_GUI, GCCoreUtil.getDimensionID(playerBase.world), new Object[]
-                        {stats.getSpaceRaceInviteTeamID()}), playerBase);
-                    } else
-                    {
-                        throw new Exception("You haven't been invited to a space race team!");
-                    }
-                } else
-                {
-                    throw new Exception("Could not find player with name: " + args[0]);
+    public void processCommand(final ICommandSender icommandsender, final String[] astring) {
+        final EntityPlayerMP playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
+        if (astring.length == 0) {
+            try {
+                if (playerBase == null) {
+                    throw new Exception("Could not find player with name: " + astring[0]);
                 }
-            } catch (final Exception var6)
-            {
-                throw new CommandException(var6.getMessage(), new Object[0]);
+                final GCPlayerStats stats = GCPlayerStats.get(playerBase);
+                if (stats.spaceRaceInviteTeamID > 0) {
+                    SpaceRaceManager.sendSpaceRaceData(playerBase, SpaceRaceManager.getSpaceRaceFromID(stats.spaceRaceInviteTeamID));
+                    GalacticraftCore.packetPipeline.sendTo(new PacketSimple(PacketSimple.EnumSimplePacket.C_OPEN_JOIN_RACE_GUI, new Object[] { stats.spaceRaceInviteTeamID }), playerBase);
+                    return;
+                }
+                throw new Exception("You haven't been invited to a space race team!");
             }
-        } else
-        {
-            throw new WrongUsageException(GCCoreUtil.translateWithFormat("commands.joinrace.no_team", this.getUsage(sender)), new Object[0]);
+            catch (Exception var6) {
+                throw new CommandException(var6.getMessage());
+            }
+            //throw new WrongUsageException(GCCoreUtil.translateWithFormat("commands.joinrace.noTeam", this.getCommandUsage(icommandsender)), new Object[0]);
         }
+        throw new WrongUsageException(GCCoreUtil.translateWithFormat("commands.joinrace.noTeam", this.getCommandUsage(icommandsender)));
     }
 }

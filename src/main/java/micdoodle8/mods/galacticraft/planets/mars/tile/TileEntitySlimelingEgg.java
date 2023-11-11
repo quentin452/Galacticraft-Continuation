@@ -1,118 +1,77 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.tile;
 
-import java.util.UUID;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.management.PreYggdrasilConverter;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.planets.mars.entities.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.pathfinding.*;
+import net.minecraft.entity.*;
+import net.minecraft.nbt.*;
 
-public class TileEntitySlimelingEgg extends TileEntity implements ITickable
+public class TileEntitySlimelingEgg extends TileEntity
 {
-
-    public int timeToHatch = -1;
-    public String lastTouchedPlayerUUID = "";
-    public String lastTouchedPlayerName = "";
-
-    @Override
-    public void update()
-    {
-        if (!this.world.isRemote)
-        {
-            if (this.timeToHatch > 0)
-            {
-                this.timeToHatch--;
-            } else if (this.timeToHatch == 0 && lastTouchedPlayerUUID != null && lastTouchedPlayerUUID.length() > 0)
-            {
-                IBlockState state = this.world.getBlockState(this.getPos());
-                int metadata = state.getBlock().getMetaFromState(state) % 3;
-
-                float colorRed = 0.0F;
-                float colorGreen = 0.0F;
-                float colorBlue = 0.0F;
-
-                switch (metadata)
-                {
-                    case 0:
-                        colorRed = 1.0F;
+    public int timeToHatch;
+    public String lastTouchedPlayerUUID;
+    public String lastTouchedPlayerName;
+    
+    public TileEntitySlimelingEgg() {
+        this.timeToHatch = -1;
+        this.lastTouchedPlayerUUID = "";
+        this.lastTouchedPlayerName = "";
+    }
+    
+    public void updateEntity() {
+        super.updateEntity();
+        if (!this.worldObj.isRemote) {
+            if (this.timeToHatch > 0) {
+                --this.timeToHatch;
+            }
+            else if (this.timeToHatch == 0 && this.lastTouchedPlayerUUID != null && this.lastTouchedPlayerUUID.length() > 0) {
+                final int metadata = this.worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord) % 3;
+                float colorRed = 0.0f;
+                float colorGreen = 0.0f;
+                float colorBlue = 0.0f;
+                switch (metadata) {
+                    case 0: {
+                        colorRed = 1.0f;
                         break;
-                    case 1:
-                        colorBlue = 1.0F;
+                    }
+                    case 1: {
+                        colorBlue = 1.0f;
                         break;
-                    case 2:
-                        colorRed = 1.0F;
-                        colorGreen = 1.0F;
+                    }
+                    case 2: {
+                        colorRed = 1.0f;
+                        colorGreen = 1.0f;
                         break;
+                    }
                 }
-
-                EntitySlimeling slimeling = new EntitySlimeling(this.world, colorRed, colorGreen, colorBlue);
-
-                slimeling.setPosition(this.getPos().getX() + 0.5, this.getPos().getY() + 1.0, this.getPos().getZ() + 0.5);
-                slimeling.setOwnerId(UUID.fromString(this.lastTouchedPlayerUUID));
+                final EntitySlimeling slimeling = new EntitySlimeling(this.worldObj, colorRed, colorGreen, colorBlue);
+                slimeling.setPosition(this.xCoord + 0.5, this.yCoord + 1.0, this.zCoord + 0.5);
+                VersionUtil.setSlimelingOwner(slimeling, this.lastTouchedPlayerUUID);
                 slimeling.setOwnerUsername(this.lastTouchedPlayerName);
-
-                if (!this.world.isRemote)
-                {
-                    this.world.spawnEntity(slimeling);
+                if (!this.worldObj.isRemote) {
+                    this.worldObj.spawnEntityInWorld((Entity)slimeling);
                 }
-
                 slimeling.setTamed(true);
-                slimeling.getNavigator().clearPath();
-                slimeling.setAttackTarget((EntityLivingBase) null);
-                slimeling.setHealth(20.0F);
-
-                this.world.setBlockToAir(this.getPos());
+                slimeling.setPathToEntity((PathEntity)null);
+                slimeling.setAttackTarget((EntityLivingBase)null);
+                slimeling.setHealth(20.0f);
+                this.worldObj.setBlockToAir(this.xCoord, this.yCoord, this.zCoord);
             }
         }
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readFromNBT(final NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         this.timeToHatch = nbt.getInteger("TimeToHatch");
-
-        String uuid;
-        if (nbt.hasKey("OwnerUUID", 8))
-        {
-            uuid = nbt.getString("OwnerUUID");
-        } else
-        {
-            uuid = PreYggdrasilConverter.convertMobOwnerIfNeeded(this.world.getMinecraftServer(), nbt.getString("Owner"));
-        }
-
-        if (uuid.length() > 0)
-        {
-            lastTouchedPlayerUUID = uuid;
-        }
-
+        VersionUtil.readSlimelingEggFromNBT(this, nbt);
         this.lastTouchedPlayerName = nbt.getString("OwnerUsername");
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    
+    public void writeToNBT(final NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setInteger("TimeToHatch", this.timeToHatch);
         nbt.setString("OwnerUUID", this.lastTouchedPlayerUUID);
         nbt.setString("OwnerUsername", this.lastTouchedPlayerName);
-        return nbt;
-    }
-
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
-    {
-        return oldState.getBlock() != newSate.getBlock();
     }
 }

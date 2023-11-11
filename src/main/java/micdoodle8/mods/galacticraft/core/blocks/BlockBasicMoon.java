@@ -1,400 +1,344 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import micdoodle8.mods.galacticraft.api.block.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.block.material.*;
+import net.minecraft.client.renderer.texture.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.init.*;
+import net.minecraft.item.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraftforge.common.util.*;
+import net.minecraftforge.common.*;
+import net.minecraft.block.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.wrappers.*;
+import micdoodle8.mods.galacticraft.core.tick.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import java.util.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockFlower;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
-import micdoodle8.mods.galacticraft.api.block.IPlantableBlock;
-import micdoodle8.mods.galacticraft.api.block.ITerraformableBlock;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3Dim;
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
-
-import com.google.common.base.Predicate;
-
-public class BlockBasicMoon extends Block implements IDetectableResource, IPlantableBlock, ITerraformableBlock, ISortableBlock
+public class BlockBasicMoon extends BlockAdvancedTile implements IDetectableResource, IPlantableBlock, ITerraformableBlock
 {
-
-    public static final PropertyEnum<EnumBlockBasicMoon> BASIC_TYPE_MOON = PropertyEnum.create("basictypemoon", EnumBlockBasicMoon.class);
-
-    public enum EnumBlockBasicMoon implements IStringSerializable
-    {
-
-        ORE_COPPER_MOON(0, "ore_copper_moon"),
-        ORE_TIN_MOON(1, "ore_tin_moon"),
-        ORE_CHEESE_MOON(2, "ore_cheese_moon"),
-        MOON_DIRT(3, "moon_dirt_moon"),
-        MOON_STONE(4, "moon_stone"),
-        MOON_TURF(5, "moon_turf"),
-        ORE_SAPPHIRE(6, "ore_sapphire_moon"),
-        MOON_DUNGEON_BRICK(14, "moon_dungeon_brick");
-
-        private final int meta;
-        private final String name;
-
-        EnumBlockBasicMoon(int meta, String name)
-        {
-            this.meta = meta;
-            this.name = name;
-        }
-
-        public int getMeta()
-        {
-            return this.meta;
-        }
-
-        private final static EnumBlockBasicMoon[] values = values();
-
-        public static EnumBlockBasicMoon byMetadata(int meta)
-        {
-            if (meta < 7)
-            {
-                return values[meta];
-            }
-
-            return MOON_DUNGEON_BRICK;
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
-    }
-
-    public BlockBasicMoon(String assetName)
-    {
-        super(Material.ROCK);
-        this.blockHardness = 1.5F;
-        this.blockResistance = 2.5F;
-        this.setDefaultState(this.blockState.getBaseState().withProperty(BASIC_TYPE_MOON, EnumBlockBasicMoon.ORE_COPPER_MOON));
-        this.setTranslationKey(assetName);
-    }
-
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    private IIcon[] moonBlockIcons;
+    
+    public BlockBasicMoon() {
+        super(Material.rock);
+        this.blockHardness = 1.5f;
+        this.blockResistance = 2.5f;
+        this.setBlockName("moonBlock");
+    }
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        if (world.getBlockMetadata(x, y, z) == 15) {
+            return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x, (double)y, (double)z);
+        }
+        return super.getCollisionBoundingBoxFromPool(world, x, y, z);
+    }
+    
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        if (world.getBlockMetadata(x, y, z) == 15) {
+            return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x, (double)y, (double)z);
+        }
+        return super.getSelectedBoundingBoxFromPool(world, x, y, z);
+    }
+    
+    public boolean isNormalCube(final IBlockAccess world, final int x, final int y, final int z) {
+        return world.getBlockMetadata(x, y, z) != 15 && super.isNormalCube(world, x, y, z);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        (this.moonBlockIcons = new IIcon[17])[0] = par1IconRegister.registerIcon("galacticraftmoon:top");
+        this.moonBlockIcons[1] = par1IconRegister.registerIcon("galacticraftmoon:brick");
+        this.moonBlockIcons[2] = par1IconRegister.registerIcon("galacticraftmoon:middle");
+        this.moonBlockIcons[3] = par1IconRegister.registerIcon("galacticraftmoon:top_side");
+        this.moonBlockIcons[4] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_1");
+        this.moonBlockIcons[5] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_2");
+        this.moonBlockIcons[6] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_3");
+        this.moonBlockIcons[7] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_4");
+        this.moonBlockIcons[8] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_5");
+        this.moonBlockIcons[9] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_6");
+        this.moonBlockIcons[10] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_7");
+        this.moonBlockIcons[11] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_8");
+        this.moonBlockIcons[12] = par1IconRegister.registerIcon("galacticraftmoon:moonore_copper");
+        this.moonBlockIcons[13] = par1IconRegister.registerIcon("galacticraftmoon:moonore_tin");
+        this.moonBlockIcons[14] = par1IconRegister.registerIcon("galacticraftmoon:moonore_cheese");
+        this.moonBlockIcons[15] = par1IconRegister.registerIcon("galacticraftmoon:bottom");
+        this.moonBlockIcons[16] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "blank");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion)
-    {
-        EnumBlockBasicMoon type = world.getBlockState(pos).getValue(BASIC_TYPE_MOON);
-
-        if (type == EnumBlockBasicMoon.MOON_DUNGEON_BRICK)
-        {
-            return 40.0F;
-        } else if (type == EnumBlockBasicMoon.MOON_STONE)
-        {
-            return 6.0F;
-        } else if (type == EnumBlockBasicMoon.ORE_COPPER_MOON || type == EnumBlockBasicMoon.ORE_TIN_MOON || type == EnumBlockBasicMoon.ORE_SAPPHIRE || type == EnumBlockBasicMoon.ORE_CHEESE_MOON)
-        {
-            return 3.0F;
+    
+    public float getExplosionResistance(final Entity par1Entity, final World world, final int x, final int y, final int z, final double explosionX, final double explosionY, final double explosionZ) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        if (metadata == 15) {
+            return 10000.0f;
         }
-
-        return this.blockResistance / 5.0F;
+        if (metadata == 14) {
+            return 40.0f;
+        }
+        if (metadata == 4) {
+            return 6.0f;
+        }
+        if (metadata < 3) {
+            return 3.0f;
+        }
+        return this.blockResistance / 5.0f;
     }
-
-    @Override
-    public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos)
-    {
-        EnumBlockBasicMoon type = blockState.getValue(BASIC_TYPE_MOON);
-
-        if (type == EnumBlockBasicMoon.MOON_DIRT || type == EnumBlockBasicMoon.MOON_TURF)
-        {
-            return 0.5F;
+    
+    public float getBlockHardness(final World par1World, final int par2, final int par3, final int par4) {
+        final int meta = par1World.getBlockMetadata(par2, par3, par4);
+        if (meta == 3 || (meta >= 5 && meta <= 13)) {
+            return 0.5f;
         }
-
-        if (type == EnumBlockBasicMoon.MOON_DUNGEON_BRICK)
-        {
-            return 4.0F;
+        if (meta == 14) {
+            return 4.0f;
         }
-
-        if (type == EnumBlockBasicMoon.ORE_COPPER_MOON || type == EnumBlockBasicMoon.ORE_TIN_MOON || type == EnumBlockBasicMoon.ORE_SAPPHIRE)
-        {
-            return 5.0F;
+        if (meta > 13) {
+            return -1.0f;
         }
-
-        if (type == EnumBlockBasicMoon.ORE_CHEESE_MOON)
-        {
-            return 3.0F;
+        if (meta < 2) {
+            return 5.0f;
         }
-
+        if (meta == 2) {
+            return 3.0f;
+        }
         return this.blockHardness;
     }
-
-    @Override
-    public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player)
-    {
-        IBlockState bs = world.getBlockState(pos);
-        if (bs.getBlock() != this)
-            return false;
-        EnumBlockBasicMoon type = bs.getValue(BASIC_TYPE_MOON);
-        if (type == EnumBlockBasicMoon.MOON_DIRT || type == EnumBlockBasicMoon.MOON_TURF)
-        {
-            return true;
-        }
-
-        return super.canHarvestBlock(world, pos, player);
+    
+    public boolean canHarvestBlock(final EntityPlayer player, final int meta) {
+        return meta == 3 || (meta >= 5 && meta <= 13) || super.canHarvestBlock(player, meta);
     }
-
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune)
-    {
-        EnumBlockBasicMoon type = ((EnumBlockBasicMoon) state.getValue(BASIC_TYPE_MOON));
-        switch (type)
-        {
-            case ORE_CHEESE_MOON:
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(final int side, final int meta) {
+        if (meta >= 5 && meta <= 13) {
+            if (side == 1) {
+                switch (meta - 5) {
+                    case 0: {
+                        return this.moonBlockIcons[0];
+                    }
+                    case 1: {
+                        return this.moonBlockIcons[4];
+                    }
+                    case 2: {
+                        return this.moonBlockIcons[5];
+                    }
+                    case 3: {
+                        return this.moonBlockIcons[6];
+                    }
+                    case 4: {
+                        return this.moonBlockIcons[7];
+                    }
+                    case 5: {
+                        return this.moonBlockIcons[8];
+                    }
+                    case 6: {
+                        return this.moonBlockIcons[9];
+                    }
+                    case 7: {
+                        return this.moonBlockIcons[10];
+                    }
+                    case 8: {
+                        return this.moonBlockIcons[11];
+                    }
+                    default: {
+                        return null;
+                    }
+                }
+            }
+            else {
+                if (side == 0) {
+                    return this.moonBlockIcons[2];
+                }
+                return this.moonBlockIcons[3];
+            }
+        }
+        else {
+            switch (meta) {
+                case 0: {
+                    return this.moonBlockIcons[12];
+                }
+                case 1: {
+                    return this.moonBlockIcons[13];
+                }
+                case 2: {
+                    return this.moonBlockIcons[14];
+                }
+                case 3: {
+                    return this.moonBlockIcons[2];
+                }
+                case 4: {
+                    return this.moonBlockIcons[15];
+                }
+                case 14: {
+                    return this.moonBlockIcons[1];
+                }
+                case 15: {
+                    return this.moonBlockIcons[16];
+                }
+                default: {
+                    return this.moonBlockIcons[16];
+                }
+            }
+        }
+    }
+    
+    public Item getItemDropped(final int meta, final Random random, final int par3) {
+        switch (meta) {
+            case 2: {
                 return GCItems.cheeseCurd;
-            case ORE_SAPPHIRE:
-                return GCItems.itemBasicMoon;
-            default:
-                return Item.getItemFromBlock(this);
+            }
+            case 15: {
+                return Item.getItemFromBlock(Blocks.air);
+            }
+            default: {
+                return Item.getItemFromBlock((Block)this);
+            }
         }
     }
-
-    @Override
-    public int damageDropped(IBlockState state)
-    {
-        EnumBlockBasicMoon type = ((EnumBlockBasicMoon) state.getValue(BASIC_TYPE_MOON));
-        if (type == EnumBlockBasicMoon.ORE_CHEESE_MOON)
-        {
+    
+    public int damageDropped(final int meta) {
+        if (meta >= 5 && meta <= 13) {
+            return 5;
+        }
+        if (meta == 2) {
             return 0;
-        } else if (type == EnumBlockBasicMoon.ORE_SAPPHIRE)
-        {
-            return 2;
-        } else
-        {
-            return getMetaFromState(state);
         }
+        return meta;
     }
-
-    @Override
-    public int quantityDropped(IBlockState state, int fortune, Random random)
-    {
-        EnumBlockBasicMoon type = ((EnumBlockBasicMoon) state.getValue(BASIC_TYPE_MOON));
-        switch (type)
-        {
-            case ORE_CHEESE_MOON:
-                if (fortune >= 1)
-                {
-                    return (random.nextFloat() < fortune * 0.29F - 0.25F) ? 2 : 1;
+    
+    public int getDamageValue(final World p_149643_1_, final int p_149643_2_, final int p_149643_3_, final int p_149643_4_) {
+        return p_149643_1_.getBlockMetadata(p_149643_2_, p_149643_3_, p_149643_4_);
+    }
+    
+    public int quantityDropped(final int meta, final int fortune, final Random random) {
+        switch (meta) {
+            case 2: {
+                if (fortune >= 1) {
+                    return (random.nextFloat() < fortune * 0.29f - 0.25f) ? 2 : 1;
                 }
                 return 1;
-            default:
+            }
+            case 15: {
+                return 0;
+            }
+            default: {
                 return 1;
+            }
         }
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        for (EnumBlockBasicMoon type : EnumBlockBasicMoon.values())
-        {
-            list.add(new ItemStack(this, 1, type.getMeta()));
+    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int var4 = 0; var4 < 6; ++var4) {
+            par3List.add(new ItemStack(par1, 1, var4));
+        }
+        for (int var4 = 14; var4 < 15; ++var4) {
+            par3List.add(new ItemStack(par1, 1, var4));
         }
     }
-
-    @Override
-    public boolean isValueable(IBlockState state)
-    {
-        EnumBlockBasicMoon type = ((EnumBlockBasicMoon) state.getValue(BASIC_TYPE_MOON));
-        switch (type)
-        {
-            case ORE_CHEESE_MOON:
-            case ORE_COPPER_MOON:
-            case ORE_SAPPHIRE:
-            case ORE_TIN_MOON:
+    
+    public TileEntity createTileEntity(final World world, final int metadata) {
+        if (metadata == 15) {
+            return new TileEntityDungeonSpawner();
+        }
+        return null;
+    }
+    
+    public boolean hasTileEntity(final int metadata) {
+        return metadata == 15;
+    }
+    
+    public boolean isValueable(final int metadata) {
+        switch (metadata) {
+            case 0: {
                 return true;
-            default:
+            }
+            case 1: {
+                return true;
+            }
+            case 2: {
+                return true;
+            }
+            default: {
                 return false;
+            }
         }
     }
-
-    @Override
-    public boolean canSustainPlant(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing direction, IPlantable plantable)
-    {
-        EnumBlockBasicMoon type = state.getValue(BASIC_TYPE_MOON);
-
-        if (type != EnumBlockBasicMoon.MOON_TURF)
-        {
+    
+    public boolean canSustainPlant(final IBlockAccess world, final int x, final int y, final int z, final ForgeDirection direction, final IPlantable plantable) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        if (metadata < 5 && metadata > 13) {
             return false;
         }
-
-        plantable.getPlant(world, pos.offset(EnumFacing.UP));
-
+        plantable.getPlant(world, x, y + 1, z);
         return plantable instanceof BlockFlower;
     }
-
-    @Override
-    public int requiredLiquidBlocksNearby()
-    {
+    
+    public int requiredLiquidBlocksNearby() {
         return 4;
     }
-
-    @Override
-    public boolean isPlantable(IBlockState state)
-    {
-        return state.getValue(BASIC_TYPE_MOON) == EnumBlockBasicMoon.MOON_TURF;
-
+    
+    public boolean isPlantable(final int metadata) {
+        return metadata >= 5 && metadata <= 13;
     }
-
-    @Override
-    public boolean isTerraformable(World world, BlockPos pos)
-    {
-        EnumBlockBasicMoon type = world.getBlockState(pos).getValue(BASIC_TYPE_MOON);
-
-        if (type == EnumBlockBasicMoon.MOON_TURF)
-        {
-            BlockPos above = pos.offset(EnumFacing.UP);
-            IBlockState stateAbove = world.getBlockState(above);
-            return stateAbove.getBlock().isAir(stateAbove, world, above);
+    
+    public boolean isTerraformable(final World world, final int x, final int y, final int z) {
+        final int meta = world.getBlockMetadata(x, y, z);
+        return meta >= 5 && meta <= 13 && !world.getBlock(x, y + 1, z).isOpaqueCube();
+    }
+    
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        if (metadata == 2) {
+            return new ItemStack(Item.getItemFromBlock((Block)this), 1, metadata);
         }
-
-        return false;
+        if (metadata == 15) {
+            return null;
+        }
+        return super.getPickBlock(target, world, x, y, z);
     }
-
-    @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
-    {
-        return new ItemStack(Item.getItemFromBlock(this), 1, this.getMetaFromState(state));
-    }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        super.breakBlock(worldIn, pos, state);
-        EnumBlockBasicMoon type = ((EnumBlockBasicMoon) state.getValue(BASIC_TYPE_MOON));
-
-        if (!worldIn.isRemote && type == EnumBlockBasicMoon.MOON_TURF)
-        {
-            Map<Long, List<Footprint>> footprintChunkMap = TickHandlerServer.serverFootprintMap.get(GCCoreUtil.getDimensionID(worldIn));
-
-            if (footprintChunkMap != null)
-            {
-                long chunkKey = ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
-                List<Footprint> footprintList = footprintChunkMap.get(chunkKey);
-
-                if (footprintList != null && !footprintList.isEmpty())
-                {
-                    List<Footprint> toRemove = new ArrayList<Footprint>();
-
-                    for (Footprint footprint : footprintList)
-                    {
-                        if (footprint.position.x > pos.getX() && footprint.position.x < pos.getX() + 1 && footprint.position.z > pos.getZ() && footprint.position.z < pos.getZ() + 1)
-                        {
+    
+    public void breakBlock(final World world, final int x, final int y, final int z, final Block block, final int par6) {
+        super.breakBlock(world, x, y, z, block, par6);
+        if (!world.isRemote && block == this && par6 == 5) {
+            final Map<Long, List<Footprint>> footprintChunkMap = TickHandlerServer.serverFootprintMap.get(world.provider.dimensionId);
+            if (footprintChunkMap != null) {
+                final long chunkKey = ChunkCoordIntPair.chunkXZ2Int(x >> 4, z >> 4);
+                final List<Footprint> footprintList = footprintChunkMap.get(chunkKey);
+                if (footprintList != null && !footprintList.isEmpty()) {
+                    final List<Footprint> toRemove = new ArrayList<Footprint>();
+                    for (final Footprint footprint : footprintList) {
+                        if (footprint.position.x > x && footprint.position.x < x + 1 && footprint.position.z > z && footprint.position.z < z + 1) {
                             toRemove.add(footprint);
                         }
                     }
-
-                    if (!toRemove.isEmpty())
-                    {
+                    if (!toRemove.isEmpty()) {
                         footprintList.removeAll(toRemove);
+                        footprintChunkMap.put(chunkKey, footprintList);
                     }
                 }
             }
-
-            TickHandlerServer.footprintBlockChanges.add(new BlockVec3Dim(pos, GCCoreUtil.getDimensionID(worldIn)));
+            TickHandlerServer.footprintBlockChanges.add(new BlockVec3Dim(x, y, z, world.provider.dimensionId));
         }
     }
-
-    @Override
-    public boolean isReplaceableOreGen(IBlockState state, IBlockAccess world, BlockPos pos, Predicate<IBlockState> target)
-    {
-        EnumBlockBasicMoon type = state.getValue(BASIC_TYPE_MOON);
-        return type == EnumBlockBasicMoon.MOON_STONE || type == EnumBlockBasicMoon.MOON_DIRT;
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(BASIC_TYPE_MOON, EnumBlockBasicMoon.byMetadata(meta));
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return ((EnumBlockBasicMoon) state.getValue(BASIC_TYPE_MOON)).getMeta();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, BASIC_TYPE_MOON);
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        EnumBlockBasicMoon type = ((EnumBlockBasicMoon) getStateFromMeta(meta).getValue(BASIC_TYPE_MOON));
-        switch (type)
-        {
-            case ORE_CHEESE_MOON:
-            case ORE_COPPER_MOON:
-            case ORE_SAPPHIRE:
-            case ORE_TIN_MOON:
-                return EnumSortCategoryBlock.ORE;
-            case MOON_DUNGEON_BRICK:
-                return EnumSortCategoryBlock.BRICKS;
-            default:
-                return EnumSortCategoryBlock.GENERAL;
+    
+    public boolean isReplaceableOreGen(final World world, final int x, final int y, final int z, final Block target) {
+        if (target != Blocks.stone) {
+            return false;
         }
-    }
-
-    @Override
-    public int getExpDrop(IBlockState state, IBlockAccess world, BlockPos pos, int fortune)
-    {
-        if (state.getBlock() != this)
-            return 0;
-
-        EnumBlockBasicMoon type = state.getValue(BASIC_TYPE_MOON);
-        if (type == EnumBlockBasicMoon.ORE_CHEESE_MOON || type == EnumBlockBasicMoon.ORE_SAPPHIRE)
-        {
-            Random rand = world instanceof World ? ((World) world).rand : new Random();
-            return MathHelper.getInt(rand, 2, 5) + (type == EnumBlockBasicMoon.ORE_SAPPHIRE ? 1 : 0);
-        }
-        return 0;
+        final int meta = world.getBlockMetadata(x, y, z);
+        return meta == 3 || meta == 4;
     }
 }

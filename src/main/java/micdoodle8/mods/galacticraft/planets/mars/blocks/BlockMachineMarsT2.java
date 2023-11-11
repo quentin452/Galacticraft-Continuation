@@ -1,198 +1,243 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import java.util.Random;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachineBase;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.GuiIdsPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityElectrolyzer;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityGasLiquefier;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityMethaneSynthesizer;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.items.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.block.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.planets.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.planets.mars.tile.*;
+import net.minecraft.item.*;
+import net.minecraft.util.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-public class BlockMachineMarsT2 extends BlockMachineBase
+public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    public static final PropertyEnum<EnumMachineType> TYPE = PropertyEnum.create("type", EnumMachineType.class);
-
-    public enum EnumMachineType implements EnumMachineBase, IStringSerializable
-    {
-
-        GAS_LIQUEFIER(0, "gas_liquefier", TileEntityGasLiquefier::new, "tile.gas_liquefier.description", "tile.mars_machine.4"),
-        METHANE_SYNTHESIZER(4, "methane_synthesizer", TileEntityMethaneSynthesizer::new, "tile.methane_synthesizer.description", "tile.mars_machine.5"),
-        ELECTROLYZER(8, "electrolyzer", TileEntityElectrolyzer::new, "tile.electrolyzer.description", "tile.mars_machine.6");
-
-        private final int meta;
-        private final String name;
-        private final TileConstructor tile;
-        private final String shiftDescriptionKey;
-        private final String blockName;
-
-        EnumMachineType(int meta, String name, TileConstructor tile, String key, String blockName)
-        {
-            this.meta = meta;
-            this.name = name;
-            this.tile = tile;
-            this.shiftDescriptionKey = key;
-            this.blockName = blockName;
-        }
-
-        @Override
-        public int getMetadata()
-        {
-            return this.meta;
-        }
-
-        private final static EnumMachineType[] values = values();
-
-        @Override
-        public EnumMachineType fromMetadata(int meta)
-        {
-            return values[(meta / 4) % values.length];
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
-
-        @Override
-        public TileEntity tileConstructor()
-        {
-            return this.tile.create();
-        }
-
-        @FunctionalInterface
-        private static interface TileConstructor
-        {
-
-            TileEntity create();
-        }
-
-        @Override
-        public String getShiftDescriptionKey()
-        {
-            return this.shiftDescriptionKey;
-        }
-
-        @Override
-        public String getTranslationKey()
-        {
-            return this.blockName;
-        }
+    public static final int GAS_LIQUEFIER = 0;
+    public static final int METHANE_SYNTHESIZER = 4;
+    public static final int ELECTROLYZER = 8;
+    private IIcon iconMachineSide;
+    private IIcon iconInput;
+    private IIcon iconGasInput;
+    private IIcon iconGasOutput;
+    private IIcon iconWaterInput;
+    private IIcon iconGasLiquefier;
+    private IIcon iconMethaneSynthesizer;
+    private IIcon iconElectrolyzer;
+    
+    public BlockMachineMarsT2() {
+        super(GCBlocks.machine);
+        this.setStepSound(Block.soundTypeMetal);
     }
-
-    public BlockMachineMarsT2(String assetName)
-    {
-        super(assetName);
+    
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.blockIcon = par1IconRegister.registerIcon("galacticraftasteroids:machine");
+        this.iconInput = par1IconRegister.registerIcon("galacticraftasteroids:machine_input");
+        this.iconMachineSide = par1IconRegister.registerIcon("galacticraftasteroids:machine_side_warning");
+        this.iconGasInput = par1IconRegister.registerIcon("galacticraftasteroids:machine_oxygen_input_warning");
+        this.iconGasOutput = par1IconRegister.registerIcon("galacticraftasteroids:machine_oxygen_output_warning");
+        this.iconWaterInput = par1IconRegister.registerIcon("galacticraftasteroids:machine_water_input_warning");
+        this.iconGasLiquefier = par1IconRegister.registerIcon("galacticraftasteroids:gasLiquefier");
+        this.iconMethaneSynthesizer = par1IconRegister.registerIcon("galacticraftasteroids:methaneSynthesizer");
+        this.iconElectrolyzer = par1IconRegister.registerIcon("galacticraftasteroids:electrolyzer");
     }
-
-    @Override
-    protected void initialiseTypes()
-    {
-        this.types = EnumMachineType.values;
-        this.typeBase = EnumMachineType.values[0];
+    
+    @SideOnly(Side.CLIENT)
+    public CreativeTabs getCreativeTabToDisplayOn() {
+        return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    /**
-     * Called when the block is right clicked by the player
-     */
-    @Override
-    public boolean onMachineActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        playerIn.openGui(GalacticraftPlanets.instance, GuiIdsPlanets.MACHINE_MARS, worldIn, pos.getX(), pos.getY(), pos.getZ());
+    
+    public int getRenderType() {
+        return GalacticraftPlanets.getBlockRenderID((Block)this);
+    }
+    
+    public IIcon getIcon(final int side, int metadata) {
+        if (side == 0) {
+            return this.iconInput;
+        }
+        if (side == 1) {
+            return this.blockIcon;
+        }
+        final int metaside = (metadata & 0x3) + 2;
+        metadata &= 0xC;
+        if (metadata == 0) {
+            if (side == metaside) {
+                return this.iconGasInput;
+            }
+            if (7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) == side) {
+                return this.iconGasLiquefier;
+            }
+        }
+        else if (metadata == 4) {
+            if (side == metaside) {
+                return this.iconGasInput;
+            }
+            if (side == (metaside ^ 0x1)) {
+                return this.iconGasOutput;
+            }
+            if (7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) == side) {
+                return this.iconMethaneSynthesizer;
+            }
+        }
+        else if (metadata == 8) {
+            if (side == (metaside ^ 0x1)) {
+                return this.iconGasOutput;
+            }
+            if (7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) == side) {
+                return this.iconElectrolyzer;
+            }
+            if (side == metaside) {
+                return this.iconWaterInput;
+            }
+            return this.iconGasOutput;
+        }
+        return this.iconMachineSide;
+    }
+    
+    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
+        int change = 0;
+        switch (angle) {
+            case 0: {
+                change = 3;
+                break;
+            }
+            case 1: {
+                change = 1;
+                break;
+            }
+            case 2: {
+                change = 2;
+                break;
+            }
+            case 3: {
+                change = 0;
+                break;
+            }
+        }
+        world.setBlockMetadataWithNotify(x, y, z, (metadata & 0xC) + change, 3);
+    }
+    
+    public boolean onUseWrench(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        final int metadata = par1World.getBlockMetadata(x, y, z);
+        final int original = metadata & 0x3;
+        int change = 0;
+        switch (original) {
+            case 0: {
+                change = 3;
+                break;
+            }
+            case 3: {
+                change = 1;
+                break;
+            }
+            case 1: {
+                change = 2;
+                break;
+            }
+            case 2: {
+                change = 0;
+                break;
+            }
+        }
+        final TileEntity te = par1World.getTileEntity(x, y, z);
+        if (te instanceof TileBaseUniversalElectrical) {
+            ((TileBaseUniversalElectrical)te).updateFacing();
+        }
+        par1World.setBlockMetadataWithNotify(x, y, z, (metadata & 0xC) + change, 3);
         return true;
     }
-
-    @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
-    {
-        int metadata = this.getMetaFromState(state) & BlockMachineBase.METADATA_MASK;
-        return new ItemStack(this, 1, metadata);
+    
+    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        par5EntityPlayer.openGui((Object)GalacticraftPlanets.instance, 2, world, x, y, z);
+        return true;
     }
-
-    @Override
+    
+    public TileEntity createTileEntity(final World world, int metadata) {
+        metadata &= 0xC;
+        if (metadata == 0) {
+            return (TileEntity)new TileEntityGasLiquefier();
+        }
+        if (metadata == 4) {
+            return (TileEntity)new TileEntityMethaneSynthesizer();
+        }
+        if (metadata == 8) {
+            return (TileEntity)new TileEntityElectrolyzer();
+        }
+        return null;
+    }
+    
+    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        par3List.add(new ItemStack((Block)this, 1, 0));
+        par3List.add(new ItemStack((Block)this, 1, 4));
+        par3List.add(new ItemStack((Block)this, 1, 8));
+    }
+    
+    public int damageDropped(final int metadata) {
+        return metadata & 0xC;
+    }
+    
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        final int metadata = this.getDamageValue(world, x, y, z);
+        return new ItemStack((Block)this, 1, metadata);
+    }
+    
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand)
-    {
-        final TileEntity te = worldIn.getTileEntity(pos);
-
-        if (te instanceof TileEntityGasLiquefier)
-        {
-            final TileEntityGasLiquefier tileEntity = (TileEntityGasLiquefier) te;
-
-            if (tileEntity.processTicks > 0)
-            {
-                final float x = pos.getX() + 0.5F;
-                final float y = pos.getY() + 0.8F + 0.05F * rand.nextInt(3);
-                final float z = pos.getZ() + 0.5F;
-
-                for (float i = -0.41F + 0.16F * rand.nextFloat(); i < 0.5F; i += 0.167F)
-                {
-                    if (rand.nextInt(3) == 0)
-                    {
-                        GalacticraftCore.proxy.spawnParticle("whiteSmokeTiny", new Vector3(x + i, y, z - 0.41F), new Vector3(0.0D, -0.015D, -0.0015D), new Object[]
-                        {});
+    public void randomDisplayTick(final World par1World, final int par2, final int par3, final int par4, final Random rand) {
+        final TileEntity te = par1World.getTileEntity(par2, par3, par4);
+        if (te instanceof TileEntityGasLiquefier) {
+            final TileEntityGasLiquefier tileEntity = (TileEntityGasLiquefier)te;
+            if (tileEntity.processTicks > 0) {
+                final float x = par2 + 0.5f;
+                final float y = par3 + 0.8f + 0.05f * rand.nextInt(3);
+                final float z = par4 + 0.5f;
+                for (float i = -0.41f + 0.16f * rand.nextFloat(); i < 0.5f; i += 0.167f) {
+                    if (rand.nextInt(3) == 0) {
+                        GalacticraftCore.proxy.spawnParticle("whiteSmokeTiny", new Vector3((double)(x + i), (double)y, (double)(z - 0.41f)), new Vector3(0.0, -0.015, -0.0015), new Object[0]);
                     }
-                    if (rand.nextInt(3) == 0)
-                    {
-                        GalacticraftCore.proxy.spawnParticle("whiteSmokeTiny", new Vector3(x + i, y, z + 0.537F), new Vector3(0.0D, -0.015D, 0.0015D), new Object[]
-                        {});
+                    if (rand.nextInt(3) == 0) {
+                        GalacticraftCore.proxy.spawnParticle("whiteSmokeTiny", new Vector3((double)(x + i), (double)y, (double)(z + 0.537f)), new Vector3(0.0, -0.015, 0.0015), new Object[0]);
                     }
-                    if (rand.nextInt(3) == 0)
-                    {
-                        GalacticraftCore.proxy.spawnParticle("whiteSmokeTiny", new Vector3(x - 0.41F, y, z + i), new Vector3(-0.0015D, -0.015D, 0.0D), new Object[]
-                        {});
+                    if (rand.nextInt(3) == 0) {
+                        GalacticraftCore.proxy.spawnParticle("whiteSmokeTiny", new Vector3((double)(x - 0.41f), (double)y, (double)(z + i)), new Vector3(-0.0015, -0.015, 0.0), new Object[0]);
                     }
-                    if (rand.nextInt(3) == 0)
-                    {
-                        GalacticraftCore.proxy.spawnParticle("whiteSmokeTiny", new Vector3(x + 0.537F, y, z + i), new Vector3(0.0015D, -0.015D, 0.0D), new Object[]
-                        {});
+                    if (rand.nextInt(3) == 0) {
+                        GalacticraftCore.proxy.spawnParticle("whiteSmokeTiny", new Vector3((double)(x + 0.537f), (double)y, (double)(z + i)), new Vector3(0.0015, -0.015, 0.0), new Object[0]);
                     }
                 }
             }
         }
     }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        EnumFacing enumfacing = EnumFacing.byHorizontalIndex(meta % 4);
-        EnumMachineType type = (EnumMachineType) typeBase.fromMetadata(meta);
-        return this.getDefaultState().withProperty(FACING, enumfacing).withProperty(TYPE, type);
+    
+    public String getShiftDescription(final int meta) {
+        switch (meta) {
+            case 8: {
+                return GCCoreUtil.translate("tile.electrolyzer.description");
+            }
+            case 0: {
+                return GCCoreUtil.translate("tile.gasLiquefier.description");
+            }
+            case 4: {
+                return GCCoreUtil.translate("tile.methaneSynthesizer.description");
+            }
+            default: {
+                return "";
+            }
+        }
     }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return (state.getValue(FACING)).getHorizontalIndex() + ((EnumMachineType) state.getValue(TYPE)).getMetadata();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, FACING, TYPE);
+    
+    public boolean showDescription(final int meta) {
+        return true;
     }
 }

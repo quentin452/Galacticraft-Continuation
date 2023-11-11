@@ -1,137 +1,93 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.entities;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.world.World;
+import net.minecraft.entity.*;
+import net.minecraft.world.*;
+import net.minecraft.nbt.*;
 
 public class EntitySmallAsteroid extends Entity
 {
-
-    private static final DataParameter<Float> SPIN_PITCH = EntityDataManager.createKey(EntitySmallAsteroid.class, DataSerializers.FLOAT);
-    private static final DataParameter<Float> SPIN_YAW = EntityDataManager.createKey(EntitySmallAsteroid.class, DataSerializers.FLOAT);
-    private static final DataParameter<Integer> ASTEROID_TYPE = EntityDataManager.createKey(EntitySmallAsteroid.class, DataSerializers.VARINT);
     public float spinPitch;
     public float spinYaw;
     public int type;
-    private boolean firstUpdate = true;
-
-    public EntitySmallAsteroid(World world)
-    {
+    private boolean firstUpdate;
+    
+    public EntitySmallAsteroid(final World world) {
         super(world);
-        this.setSize(1.0F, 1.0F);
+        this.firstUpdate = true;
+        this.setSize(1.0f, 1.0f);
         this.isImmuneToFire = true;
     }
-
-    @Override
-    public void onEntityUpdate()
-    {
-        if (!this.firstUpdate)
-        {
-            // Kill non-moving entities
-            if (Math.abs(this.posX - this.prevPosX) + Math.abs(this.posZ - this.prevPosZ) <= 0)
-            {
+    
+    public void onEntityUpdate() {
+        if (!this.firstUpdate) {
+            if (Math.abs(this.posX - this.prevPosX) + Math.abs(this.posZ - this.prevPosZ) <= 0.0) {
                 this.setDead();
             }
-
-            // Remove entities far outside the build range, or too old (to stop
-            // accumulations)
-            else if (this.posY > 288D || this.posY < -32D || this.ticksExisted > 3000)
-            {
+            else if (this.posY > 288.0 || this.posY < -32.0 || this.ticksExisted > 3000) {
                 this.setDead();
             }
         }
-
         super.onEntityUpdate();
-
-        if (!this.world.isRemote)
-        {
+        if (!this.worldObj.isRemote) {
             this.setSpinPitch(this.spinPitch);
             this.setSpinYaw(this.spinYaw);
             this.setAsteroidType(this.type);
             this.rotationPitch += this.spinPitch;
             this.rotationYaw += this.spinYaw;
-        } else
-        {
+        }
+        else {
             this.rotationPitch += this.getSpinPitch();
             this.rotationYaw += this.getSpinYaw();
         }
-
-        double sqrdMotion = this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ;
-
-        if (sqrdMotion < 0.05)
-        {
-            // If the motion is too low (for some odd reason), speed it back up
-            // slowly.
-            this.motionX *= 1.001D;
-            this.motionY *= 1.001D;
-            this.motionZ *= 1.001D;
+        final double sqrdMotion = this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ;
+        if (sqrdMotion < 0.05) {
+            this.motionX *= 1.001;
+            this.motionY *= 1.001;
+            this.motionZ *= 1.001;
         }
-
-        this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+        this.moveEntity(this.motionX, this.motionY, this.motionZ);
         this.firstUpdate = false;
     }
-
-    @Override
-    protected void entityInit()
-    {
-        this.dataManager.register(SPIN_PITCH, 0.0F);
-        this.dataManager.register(SPIN_YAW, 0.0F);
-        this.dataManager.register(ASTEROID_TYPE, 0);
+    
+    protected void entityInit() {
+        this.dataWatcher.addObject(10, (Object)0.0f);
+        this.dataWatcher.addObject(11, (Object)0.0f);
+        this.dataWatcher.addObject(12, (Object)0);
     }
-
-    @Override
-    protected void readEntityFromNBT(NBTTagCompound nbt)
-    {
+    
+    protected void readEntityFromNBT(final NBTTagCompound nbt) {
+        this.spinPitch = nbt.getFloat("spinPitch");
+        this.spinYaw = nbt.getFloat("spinYaw");
+        this.ticksExisted = nbt.getInteger("ageTicks");
     }
-
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
-    {
-        return compound;
+    
+    protected void writeEntityToNBT(final NBTTagCompound nbt) {
+        nbt.setFloat("spinPitch", this.spinPitch);
+        nbt.setFloat("spinYaw", this.spinYaw);
+        nbt.setInteger("ageTicks", this.ticksExisted);
     }
-
-    @Override
-    protected void writeEntityToNBT(NBTTagCompound nbt)
-    {
+    
+    public float getSpinPitch() {
+        return this.dataWatcher.getWatchableObjectFloat(10);
     }
-
-    public float getSpinPitch()
-    {
-        return this.dataManager.get(SPIN_PITCH);
+    
+    public float getSpinYaw() {
+        return this.dataWatcher.getWatchableObjectFloat(11);
     }
-
-    public float getSpinYaw()
-    {
-        return this.dataManager.get(SPIN_YAW);
+    
+    public void setSpinPitch(final float pitch) {
+        this.dataWatcher.updateObject(10, (Object)pitch);
     }
-
-    public void setSpinPitch(float pitch)
-    {
-        this.dataManager.set(SPIN_PITCH, pitch);
+    
+    public void setSpinYaw(final float yaw) {
+        this.dataWatcher.updateObject(11, (Object)yaw);
     }
-
-    public void setSpinYaw(float yaw)
-    {
-        this.dataManager.set(SPIN_YAW, yaw);
+    
+    public int getAsteroidType() {
+        return this.dataWatcher.getWatchableObjectInt(12);
     }
-
-    public int getAsteroidType()
-    {
-        return this.dataManager.get(ASTEROID_TYPE);
-    }
-
-    public void setAsteroidType(int type)
-    {
-        this.dataManager.set(ASTEROID_TYPE, type);
+    
+    public void setAsteroidType(final int type) {
+        this.dataWatcher.updateObject(12, (Object)type);
     }
 }

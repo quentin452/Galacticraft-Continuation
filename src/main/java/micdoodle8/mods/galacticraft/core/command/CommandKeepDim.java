@@ -1,94 +1,56 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
-
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.util.*;
+import net.minecraft.command.*;
+import net.minecraft.entity.player.*;
 
 public class CommandKeepDim extends CommandBase
 {
-
-    @Override
-    public String getUsage(ICommandSender var1)
-    {
-        return "/" + this.getName() + " <dimension id>";
+    public String getCommandUsage(final ICommandSender var1) {
+        return "/" + this.getCommandName() + " <dimension id>";
     }
-
-    @Override
-    public int getRequiredPermissionLevel()
-    {
+    
+    public int getRequiredPermissionLevel() {
         return 4;
     }
-
-    @Override
-    public String getName()
-    {
+    
+    public String getCommandName() {
         return "gckeeploaded";
     }
-
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-    {
-        EntityPlayerMP playerBase;
-
-        if (args.length > 1)
-        {
-            throw new WrongUsageException("Too many command arguments! Usage: " + this.getUsage(sender), new Object[0]);
-        } else
-        {
-            try
-            {
-                playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(sender.getName(), true);
-
-                if (playerBase != null)
-                {
-                    int dimID;
-
-                    if (args.length == 0)
-                    {
-                        dimID = playerBase.dimension;
-                    } else
-                    {
-                        try
-                        {
-                            dimID = CommandBase.parseInt(args[0]);
-                        } catch (Exception e)
-                        {
-                            throw new WrongUsageException("Needs a dimension number! Usage: " + this.getUsage(sender), new Object[0]);
-                        }
+    
+    public void processCommand(final ICommandSender icommandsender, final String[] astring) {
+        if (astring.length > 1) {
+            throw new WrongUsageException("Too many command arguments! Usage: " + this.getCommandUsage(icommandsender), new Object[0]);
+        }
+        try {
+            final EntityPlayerMP playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
+            if (playerBase != null) {
+                int dimID;
+                if (astring.length == 0) {
+                    dimID = playerBase.dimension;
+                }
+                else {
+                    try {
+                        dimID = CommandBase.parseInt(icommandsender, astring[0]);
                     }
-
-                    if (ConfigManagerCore.setLoaded(dimID))
-                    {
-                        playerBase.sendMessage(new TextComponentString("[GCKeepLoaded] Successfully set dimension " + dimID + " to load staticly"));
-                    } else
-                    {
-                        if (ConfigManagerCore.setUnloaded(dimID))
-                        {
-                            playerBase.sendMessage(new TextComponentString("[GCKeepLoaded] Successfully set dimension " + dimID + " to not load staticly"));
-                        } else
-                        {
-                            playerBase.sendMessage(new TextComponentString("[GCKeepLoaded] Failed to set dimension as not static"));
-                        }
+                    catch (Exception e) {
+                        throw new WrongUsageException("Needs a dimension number! Usage: " + this.getCommandUsage(icommandsender), new Object[0]);
                     }
                 }
-            } catch (final Exception var6)
-            {
-                throw new CommandException(var6.getMessage(), new Object[0]);
+                if (ConfigManagerCore.setLoaded(dimID)) {
+                    playerBase.addChatMessage((IChatComponent)new ChatComponentText("[GCKeepLoaded] Successfully set dimension " + dimID + " to load staticly"));
+                }
+                else if (ConfigManagerCore.setUnloaded(dimID)) {
+                    playerBase.addChatMessage((IChatComponent)new ChatComponentText("[GCKeepLoaded] Successfully set dimension " + dimID + " to not load staticly"));
+                }
+                else {
+                    playerBase.addChatMessage((IChatComponent)new ChatComponentText("[GCKeepLoaded] Failed to set dimension as not static"));
+                }
             }
+        }
+        catch (Exception var6) {
+            throw new CommandException(var6.getMessage(), new Object[0]);
         }
     }
 }

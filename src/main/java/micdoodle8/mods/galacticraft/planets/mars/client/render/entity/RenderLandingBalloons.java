@@ -1,106 +1,61 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.client.render.entity;
 
-import com.google.common.collect.ImmutableList;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.client.model.ModelBalloonParachute;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntityLandingBalloons;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.planets.mars.client.model.*;
+import net.minecraftforge.client.model.*;
+import micdoodle8.mods.galacticraft.planets.mars.entities.*;
+import net.minecraft.entity.*;
+import org.lwjgl.opengl.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderLandingBalloons extends Render<EntityLandingBalloons>
+public class RenderLandingBalloons extends Render
 {
-
-    private IBakedModel balloonModel;
-    protected ModelBalloonParachute parachuteModel = new ModelBalloonParachute();
-
-    public RenderLandingBalloons(RenderManager manager)
-    {
-        super(manager);
-        this.shadowSize = 1.2F;
+    private static final ResourceLocation landerTexture;
+    protected IModelCustom landerModel;
+    protected ModelBalloonParachute parachuteModel;
+    
+    public RenderLandingBalloons() {
+        this.parachuteModel = new ModelBalloonParachute();
+        this.shadowSize = 1.2f;
+        this.landerModel = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftmars", "models/landingBalloon.obj"));
     }
-
-    private void updateModels()
-    {
-        if (this.balloonModel == null)
-        {
-            try
-            {
-                this.balloonModel = ClientUtil.modelFromOBJ(new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "landing_balloon.obj"), ImmutableList.of("Sphere"));
-            } catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
+    
+    protected ResourceLocation func_110779_a(final EntityLandingBalloons par1EntityArrow) {
+        return RenderLandingBalloons.landerTexture;
     }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityLandingBalloons entity)
-    {
-        return TextureMap.LOCATION_BLOCKS_TEXTURE;
+    
+    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+        return this.func_110779_a((EntityLandingBalloons)par1Entity);
     }
-
-    @Override
-    public void doRender(EntityLandingBalloons entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
-        float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) x, (float) y + 0.8F, (float) z);
-        GlStateManager.rotate(entityYaw, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(pitch, 0.0F, 0.0F, 1.0F);
-
-        this.updateModels();
-        this.bindEntityTexture(entity);
-
-        if (Minecraft.isAmbientOcclusionEnabled())
-        {
-            GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        } else
-        {
-            GlStateManager.shadeModel(GL11.GL_FLAT);
-        }
-
-        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-        GlStateManager.scale(0.5F, 0.5F, 0.5F);
-        ClientUtil.drawBakedModel(this.balloonModel);
-        GlStateManager.popMatrix();
-
-        if (entity.posY >= 500.0F)
-        {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate((float) x - 1.25F, (float) y - 0.93F, (float) z - 0.3F);
-            GlStateManager.scale(2.5F, 3.0F, 2.5F);
+    
+    public void renderLander(final EntityLandingBalloons entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        GL11.glPushMatrix();
+        final float var24 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * par9;
+        GL11.glTranslatef((float)par2, (float)par4 + 0.8f, (float)par6);
+        GL11.glRotatef(par8, 0.0f, 1.0f, 0.0f);
+        GL11.glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef(var24, 0.0f, 0.0f, 1.0f);
+        this.bindEntityTexture((Entity)entity);
+        GL11.glScalef(-1.0f, -1.0f, 1.0f);
+        GL11.glScalef(0.5f, 0.5f, 0.5f);
+        this.landerModel.renderAll();
+        GL11.glPopMatrix();
+        if (entity.posY >= 500.0) {
+            GL11.glPushMatrix();
+            GL11.glTranslatef((float)par2 - 1.25f, (float)par4 - 0.93f, (float)par6 - 0.3f);
+            GL11.glScalef(2.5f, 3.0f, 2.5f);
             this.parachuteModel.renderAll();
-            GlStateManager.popMatrix();
+            GL11.glPopMatrix();
         }
-        RenderHelper.enableStandardItemLighting();
     }
-
-    @Override
-    public boolean shouldRender(EntityLandingBalloons lander, ICamera camera, double camX, double camY, double camZ)
-    {
-        AxisAlignedBB axisalignedbb = lander.getEntityBoundingBox().grow(2D, 1D, 2D);
-        return lander.isInRangeToRender3d(camX, camY, camZ) && camera.isBoundingBoxInFrustum(axisalignedbb);
+    
+    public void doRender(final Entity par1Entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        this.renderLander((EntityLandingBalloons)par1Entity, par2, par4, par6, par8, par9);
+    }
+    
+    static {
+        landerTexture = new ResourceLocation("galacticraftmars", "textures/model/landingBalloon.png");
     }
 }

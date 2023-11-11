@@ -1,64 +1,52 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import net.minecraft.block.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.client.entity.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.item.*;
+import cpw.mods.fml.relauncher.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-
-public class ItemBlockLandingPad extends ItemBlockDesc implements GCRarity
+public class ItemBlockLandingPad extends ItemBlockDesc
 {
-
-    public ItemBlockLandingPad(Block block)
-    {
+    public ItemBlockLandingPad(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public String getTranslationKey(ItemStack par1ItemStack)
-    {
+    
+    public String getUnlocalizedName(final ItemStack par1ItemStack) {
         String name = "";
-
-        switch (par1ItemStack.getItemDamage())
-        {
-            case 0:
-                name = "landing_pad";
+        switch (par1ItemStack.getItemDamage()) {
+            case 0: {
+                name = "landingPad";
                 break;
-            case 1:
-                name = "buggy_fueler";
+            }
+            case 1: {
+                name = "buggyFueler";
                 break;
-            case 2:
-                name = "cargo_pad";
+            }
+            case 2: {
+                name = "cargoPad";
                 break;
+            }
         }
-
-        return this.getBlock().getTranslationKey() + "." + name;
+        return this.field_150939_a.getUnlocalizedName() + "." + name;
     }
-
-    @Override
-    public void onCreated(ItemStack stack, World world, EntityPlayer player)
-    {
-        if (world.isRemote && stack.getItemDamage() == 0 && player instanceof EntityPlayerSP)
-        {
-            ClientProxyCore.playerClientHandler.onBuild(5, (EntityPlayerSP) player);
+    
+    public void onCreated(final ItemStack stack, final World world, final EntityPlayer player) {
+        if (world.isRemote && stack.getItemDamage() == 0 && player instanceof EntityPlayerSP) {
+            ClientProxyCore.playerClientHandler.onBuild(5, (EntityPlayerSP)player);
         }
     }
-
-    @Override
-    public int getMetadata(int damage)
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public int getMetadata(final int damage) {
         return damage;
     }
 }

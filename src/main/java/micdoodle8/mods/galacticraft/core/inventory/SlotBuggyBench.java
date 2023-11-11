@@ -1,75 +1,112 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import java.util.List;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-
-import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
-import micdoodle8.mods.galacticraft.api.recipe.INasaWorkbenchRecipe;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.core.network.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.items.*;
 
 public class SlotBuggyBench extends Slot
 {
-
     private final int index;
-    private final BlockPos pos;
+    private final int x;
+    private final int y;
+    private final int z;
     private final EntityPlayer player;
 
-    public SlotBuggyBench(IInventory par2IInventory, int par3, int par4, int par5, BlockPos pos, EntityPlayer player)
-    {
+    public SlotBuggyBench(final IInventory par2IInventory, final int par3, final int par4, final int par5, final int x, final int y, final int z, final EntityPlayer player) {
         super(par2IInventory, par3, par4, par5);
         this.index = par3;
-        this.pos = pos;
+        this.x = x;
+        this.y = y;
+        this.z = z;
         this.player = player;
     }
 
-    @Override
-    public void onSlotChanged()
-    {
-        if (this.player instanceof EntityPlayerMP)
-        {
-            int dimID = GCCoreUtil.getDimensionID(this.player.world);
-            GCCoreUtil.sendToAllAround(new PacketSimple(EnumSimplePacket.C_SPAWN_SPARK_PARTICLES, dimID, new Object[]
-            {this.pos}), this.player.world, dimID, this.pos, 20);
+    public void onSlotChanged() {
+        if (this.player instanceof EntityPlayerMP) {
+            final Object[] toSend = { this.x, this.y, this.z };
+            for (int var12 = 0; var12 < this.player.worldObj.playerEntities.size(); ++var12) {
+                final EntityPlayerMP var13 = (EntityPlayerMP) this.player.worldObj.playerEntities.get(var12);
+                if (var13.dimension == this.player.worldObj.provider.dimensionId) {
+                    final double var14 = this.x - var13.posX;
+                    final double var15 = this.y - var13.posY;
+                    final double var16 = this.z - var13.posZ;
+                    if (var14 * var14 + var15 * var15 + var16 * var16 < 400.0) {
+                        GalacticraftCore.packetPipeline.sendTo(new PacketSimple(PacketSimple.EnumSimplePacket.C_SPAWN_SPARK_PARTICLES, new Object[] { this.x, this.y, this.z }), var13);
+                    }
+                }
+            }
         }
     }
 
-    @Override
-    public boolean isItemValid(ItemStack par1ItemStack)
-    {
-        if (par1ItemStack == null)
-            return false;
-
-        List<INasaWorkbenchRecipe> recipes = GalacticraftRegistry.getBuggyBenchRecipes();
-        for (INasaWorkbenchRecipe recipe : recipes)
-        {
-            if (ItemStack.areItemsEqual(par1ItemStack, recipe.getRecipeInput().get(this.index)))
-                return true;
+    public boolean isItemValid(final ItemStack par1ItemStack) {
+        switch (this.index) {
+            case 1: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 2: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 3: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 4: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 5: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 6: {
+                return par1ItemStack.getItem() == GCItems.partBuggy && par1ItemStack.getItemDamage() == 1;
+            }
+            case 7: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 8: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 9: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 10: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 11: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 12: {
+                return par1ItemStack.getItem() == GCItems.heavyPlatingTier1;
+            }
+            case 13: {
+                return par1ItemStack.getItem() == GCItems.partBuggy && par1ItemStack.getItemDamage() == 0;
+            }
+            case 14: {
+                return par1ItemStack.getItem() == GCItems.partBuggy && par1ItemStack.getItemDamage() == 0;
+            }
+            case 15: {
+                return par1ItemStack.getItem() == GCItems.partBuggy && par1ItemStack.getItemDamage() == 0;
+            }
+            case 16: {
+                return par1ItemStack.getItem() == GCItems.partBuggy && par1ItemStack.getItemDamage() == 0;
+            }
+            case 17: {
+                return par1ItemStack.getItem() == GCItems.partBuggy && par1ItemStack.getItemDamage() == 2;
+            }
+            case 18: {
+                return par1ItemStack.getItem() == GCItems.partBuggy && par1ItemStack.getItemDamage() == 2;
+            }
+            case 19: {
+                return par1ItemStack.getItem() == GCItems.partBuggy && par1ItemStack.getItemDamage() == 2;
+            }
+            default: {
+                return false;
+            }
         }
-        return false;
     }
 
-    /**
-     * Returns the maximum stack size for a given slot (usually the same as
-     * getInventoryStackLimit(), but 1 in the case of armor slots)
-     */
-    @Override
-    public int getSlotStackLimit()
-    {
+    public int getSlotStackLimit() {
         return 1;
     }
 }

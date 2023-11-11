@@ -1,34 +1,20 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import java.util.List;
-import javax.annotation.Nullable;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.*;
+import net.minecraft.item.*;
+import net.minecraft.entity.player.*;
+import java.util.*;
+import cpw.mods.fml.relauncher.*;
 
 public class ItemBlockShortRangeTelepad extends ItemBlockDesc
 {
-
-    public ItemBlockShortRangeTelepad(Block block)
-    {
+    public ItemBlockShortRangeTelepad(final Block block) {
         super(block);
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        super.addInformation(par1ItemStack, worldIn, tooltip, flagIn);
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
+        super.addInformation(par1ItemStack, par2EntityPlayer, par3List, par4);
     }
 }

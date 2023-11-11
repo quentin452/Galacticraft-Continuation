@@ -1,108 +1,184 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
-import java.nio.FloatBuffer;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityScreen;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.tileentity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import net.minecraft.client.renderer.texture.*;
+import java.nio.*;
+import cpw.mods.fml.client.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import org.lwjgl.opengl.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraftforge.client.model.*;
+import net.minecraft.client.renderer.*;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityScreenRenderer extends TileEntitySpecialRenderer<TileEntityScreen>
+public class TileEntityScreenRenderer extends TileEntitySpecialRenderer
 {
-
-    public static final ResourceLocation blockTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/blocks/screen_side.png");
-    private TextureManager renderEngine = FMLClientHandler.instance().getClient().renderEngine;
-    private static FloatBuffer colorBuffer = GLAllocation.createDirectFloatBuffer(16);
-
-    private float yPlane = 0.91F;
-    float frame = 0.098F;
-
-    @Override
-    public void render(TileEntityScreen screen, double par2, double par4, double par6, float partialTickTime, int par9, float alpha)
-    {
+    public static final ResourceLocation blockTexture;
+    public static final IModelCustom screenModel0;
+    public static final IModelCustom screenModel1;
+    public static final IModelCustom screenModel2;
+    public static final IModelCustom screenModel3;
+    public static final IModelCustom screenModel4;
+    private TextureManager renderEngine;
+    private static FloatBuffer colorBuffer;
+    private float yPlane;
+    float frame;
+    
+    public TileEntityScreenRenderer() {
+        this.renderEngine = FMLClientHandler.instance().getClient().renderEngine;
+        this.yPlane = 0.91f;
+        this.frame = 0.098f;
+    }
+    
+    public void renderModelAt(final TileEntityScreen tileEntity, final double d, final double d1, final double d2, final float f) {
         GL11.glPushMatrix();
-        // Texture file
         this.renderEngine.bindTexture(TileEntityScreenRenderer.blockTexture);
-        GL11.glTranslatef((float) par2, (float) par4, (float) par6);
-
-        int meta = screen.getBlockMetadata();
-        boolean screenData = (meta >= 8);
-        meta &= 7;
-
-        switch (meta)
-        {
-            case 0:
-                GL11.glRotatef(180, 1, 0, 0);
-                GL11.glTranslatef(0, -1.0F, -1.0F);
+        GL11.glTranslatef((float)d, (float)d1, (float)d2);
+        int meta = tileEntity.getBlockMetadata();
+        final boolean screenData = meta >= 8;
+        meta &= 0x7;
+        switch (meta) {
+            case 0: {
+                GL11.glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+                GL11.glTranslatef(0.0f, -1.0f, -1.0f);
+            }
+            case 2: {
+                GL11.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+                GL11.glTranslatef(0.0f, 0.0f, -1.0f);
                 break;
-            case 1:
+            }
+            case 3: {
+                GL11.glRotatef(90.0f, -1.0f, 0.0f, 0.0f);
+                GL11.glTranslatef(1.0f, -1.0f, 1.0f);
+                GL11.glRotatef(180.0f, 0.0f, -1.0f, 0.0f);
                 break;
-            case 2:
-                GL11.glTranslatef(0.0F, 0.0F, -0.87F);
-                GL11.glRotatef(90, 1.0F, 0, 0);
-                GL11.glTranslatef(0.0F, 0.0F, -1.0F);
+            }
+            case 4: {
+                GL11.glRotatef(90.0f, 0.0f, 0.0f, -1.0f);
+                GL11.glTranslatef(-1.0f, 0.0f, 1.0f);
+                GL11.glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
                 break;
-            case 3:
-                GL11.glTranslatef(0.0F, 0.0F, 0.87F);
-                GL11.glRotatef(90, -1.0F, 0, 0);
-                GL11.glTranslatef(1.0F, -1.0F, 1.0F);
-                GL11.glRotatef(180, 0, -1.0F, 0);
+            }
+            case 5: {
+                GL11.glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+                GL11.glTranslatef(1.0f, -1.0f, 0.0f);
+                GL11.glRotatef(90.0f, 0.0f, -1.0f, 0.0f);
                 break;
-            case 4:
-                GL11.glTranslatef(-0.87F, 0.0F, 0.0F);
-                GL11.glRotatef(90, 0, 0, -1.0F);
-                GL11.glTranslatef(-1.0F, 0.0F, 1.0F);
-                GL11.glRotatef(90, 0, 1.0F, 0);
-                break;
-            case 5:
-                GL11.glTranslatef(0.87F, 0.0F, 0.0F);
-                GL11.glRotatef(90, 0, 0, 1.0F);
-                GL11.glTranslatef(1.0F, -1.0F, 0.0F);
-                GL11.glRotatef(90, 0, -1.0F, 0);
-                break;
-            default:
-                break;
-        }
-
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-        GL11.glTranslatef(-screen.screenOffsetx, this.yPlane, -screen.screenOffsetz);
-        GL11.glRotatef(90, 1F, 0F, 0F);
-        boolean cornerblock = false;
-        if (screen.connectionsLeft == 0 || screen.connectionsRight == 0)
-        {
-            cornerblock = (screen.connectionsUp == 0 || screen.connectionsDown == 0);
-        }
-        int totalLR = screen.connectionsLeft + screen.connectionsRight;
-        int totalUD = screen.connectionsUp + screen.connectionsDown;
-        if (totalLR > 1 && totalUD > 1 && !cornerblock)
-        {
-            // centre block
-            if (screen.connectionsLeft == screen.connectionsRight - (totalLR | 1))
-            {
-                if (screen.connectionsUp == screen.connectionsDown - (totalUD | 1))
-                {
-                    cornerblock = true;
-                }
             }
         }
-        GL11.glRotatef(180, 0, 1, 0);
-        GL11.glTranslatef(-screen.screen.getScaleX(), 0.0F, 0.0F);
-        screen.screen.drawScreen(screen.imageType, partialTickTime + screen.getWorld().getWorldTime(), cornerblock);
-
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glPushMatrix();
+        int count = 0;
+        if (tileEntity.connectedDown) {
+            ++count;
+        }
+        if (tileEntity.connectedUp) {
+            ++count;
+        }
+        if (tileEntity.connectedLeft) {
+            ++count;
+        }
+        if (tileEntity.connectedRight) {
+            ++count;
+        }
+        switch (count) {
+            case 0: {
+                GL11.glTranslatef(-0.001f, -0.001f, -0.001f);
+                GL11.glScalef(1.002f, 1.002f, 1.002f);
+                TileEntityScreenRenderer.screenModel0.renderAll();
+                break;
+            }
+            case 1: {
+                if (tileEntity.connectedUp) {
+                    GL11.glRotatef(90.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(0.0f, 0.0f, -1.0f);
+                }
+                else if (tileEntity.connectedRight) {
+                    GL11.glRotatef(180.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(-1.0f, 0.0f, -1.0f);
+                }
+                else if (tileEntity.connectedDown) {
+                    GL11.glRotatef(270.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(-1.0f, 0.0f, 0.0f);
+                }
+                GL11.glTranslatef(-0.001f, -0.001f, -0.001f);
+                GL11.glScalef(1.002f, 1.002f, 1.002f);
+                TileEntityScreenRenderer.screenModel1.renderAll();
+                break;
+            }
+            case 2: {
+                if (!tileEntity.connectedRight && !tileEntity.connectedDown) {
+                    GL11.glRotatef(90.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(0.0f, 0.0f, -1.0f);
+                }
+                else if (!tileEntity.connectedDown && !tileEntity.connectedLeft) {
+                    GL11.glRotatef(180.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(-1.0f, 0.0f, -1.0f);
+                }
+                else if (!tileEntity.connectedUp && !tileEntity.connectedLeft) {
+                    GL11.glRotatef(270.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(-1.0f, 0.0f, 0.0f);
+                }
+                GL11.glTranslatef(-0.001f, -0.001f, -0.001f);
+                GL11.glScalef(1.002f, 1.002f, 1.002f);
+                TileEntityScreenRenderer.screenModel2.renderAll();
+                break;
+            }
+            case 3: {
+                if (!tileEntity.connectedRight) {
+                    GL11.glRotatef(90.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(0.0f, 0.0f, -1.0f);
+                }
+                else if (!tileEntity.connectedDown) {
+                    GL11.glRotatef(180.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(-1.0f, 0.0f, -1.0f);
+                }
+                else if (!tileEntity.connectedLeft) {
+                    GL11.glRotatef(270.0f, 0.0f, -1.0f, 0.0f);
+                    GL11.glTranslatef(-1.0f, 0.0f, 0.0f);
+                }
+                GL11.glTranslatef(-0.001f, -0.001f, -0.001f);
+                GL11.glScalef(1.002f, 1.002f, 1.002f);
+                TileEntityScreenRenderer.screenModel3.renderAll();
+                break;
+            }
+            case 4: {
+                GL11.glTranslatef(-0.001f, -0.001f, -0.001f);
+                GL11.glScalef(1.002f, 1.002f, 1.002f);
+                TileEntityScreenRenderer.screenModel4.renderAll();
+                break;
+            }
+        }
         GL11.glPopMatrix();
+        GL11.glTranslatef((float)(-tileEntity.screenOffsetx), this.yPlane, (float)(-tileEntity.screenOffsetz));
+        GL11.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+        boolean cornerblock = false;
+        if (tileEntity.connectionsLeft == 0 || tileEntity.connectionsRight == 0) {
+            cornerblock = (tileEntity.connectionsUp == 0 || tileEntity.connectionsDown == 0);
+        }
+        final int totalLR = tileEntity.connectionsLeft + tileEntity.connectionsRight;
+        final int totalUD = tileEntity.connectionsUp + tileEntity.connectionsDown;
+        if (totalLR > 1 && totalUD > 1 && !cornerblock && tileEntity.connectionsLeft == tileEntity.connectionsRight - (totalLR | 0x1) && tileEntity.connectionsUp == tileEntity.connectionsDown - (totalUD | 0x1)) {
+            cornerblock = true;
+        }
+        tileEntity.screen.drawScreen(tileEntity.imageType, f + tileEntity.getWorldObj().getWorldTime(), cornerblock);
+        GL11.glPopMatrix();
+    }
+    
+    public void renderTileEntityAt(final TileEntity tileEntity, final double var2, final double var4, final double var6, final float var8) {
+        this.renderModelAt((TileEntityScreen)tileEntity, var2, var4, var6, var8);
+    }
+    
+    static {
+        blockTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/blocks/screenSide.png");
+        screenModel0 = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/screenWhole.obj"));
+        screenModel1 = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/screen3Quarters.obj"));
+        screenModel2 = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/screen2Quarters.obj"));
+        screenModel3 = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/screen1Quarters.obj"));
+        screenModel4 = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/screen0Quarters.obj"));
+        TileEntityScreenRenderer.colorBuffer = GLAllocation.createDirectFloatBuffer(16);
     }
 }

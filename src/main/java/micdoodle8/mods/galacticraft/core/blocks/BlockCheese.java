@@ -1,212 +1,129 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.material.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.world.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.entity.player.*;
+import java.util.*;
+import net.minecraft.item.*;
+import net.minecraft.init.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class BlockCheese extends Block implements IShiftDescription, ISortableBlock
+public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    public static final PropertyInteger BITES = PropertyInteger.create("bites", 0, 6);
-    protected static final AxisAlignedBB[] CHEESE_AABB = new AxisAlignedBB[]
-    {new AxisAlignedBB(0.0625, 0.0, 0.0625, 0.9375, 0.5, 0.9375), new AxisAlignedBB(0.1875, 0.0, 0.0625, 0.9375, 0.5, 0.9375), new AxisAlignedBB(0.3125, 0.0, 0.0625, 0.9375, 0.5, 0.9375),
-            new AxisAlignedBB(0.4375, 0.0, 0.0625, 0.9375, 0.5, 0.9375), new AxisAlignedBB(0.5625, 0.0, 0.0625, 0.9375, 0.5, 0.9375), new AxisAlignedBB(0.6875, 0.0, 0.0625, 0.9375, 0.5, 0.9375),
-            new AxisAlignedBB(0.8125, 0.0, 0.0625, 0.9375, 0.5, 0.9375)};
-
-    public BlockCheese(String assetName)
-    {
-        super(Material.CAKE);
+    IIcon[] cheeseIcons;
+    
+    public BlockCheese() {
+        super(Material.cake);
         this.setTickRandomly(true);
         this.disableStats();
-        this.setHardness(0.5F);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(BITES, Integer.valueOf(0)));
-        this.setSoundType(SoundType.CLOTH);
-        this.setTranslationKey(assetName);
+        this.setHardness(0.5f);
+        this.setStepSound(Block.soundTypeCloth);
+        this.setBlockName("cheeseBlock");
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        int bites = 0;
-        if (state.getBlock() instanceof BlockCheese)
-        {
-            bites = ((Integer) state.getValue(BITES)).intValue();
-        }
-        return CHEESE_AABB[bites];
+    
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        (this.cheeseIcons = new IIcon[3])[0] = par1IconRegister.registerIcon("galacticraftmoon:cheese_1");
+        this.cheeseIcons[1] = par1IconRegister.registerIcon("galacticraftmoon:cheese_2");
+        this.cheeseIcons[2] = par1IconRegister.registerIcon("galacticraftmoon:cheese_3");
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public void setBlockBoundsBasedOnState(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4) {
+        final int var5 = par1IBlockAccess.getBlockMetadata(par2, par3, par4);
+        final float var6 = 0.0625f;
+        final float var7 = (1 + var5 * 2) / 16.0f;
+        final float var8 = 0.5f;
+        this.setBlockBounds(var7, 0.0f, 0.0625f, 0.9375f, 0.5f, 0.9375f);
+    }
+    
+    public void setBlockBoundsForItemRender() {
+        final float var1 = 0.0625f;
+        final float var2 = 0.5f;
+        this.setBlockBounds(0.0625f, 0.0f, 0.0625f, 0.9375f, 0.5f, 0.9375f);
+    }
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World par1World, final int par2, final int par3, final int par4) {
+        final int var5 = par1World.getBlockMetadata(par2, par3, par4);
+        final float var6 = 0.0625f;
+        final float var7 = (1 + var5 * 2) / 16.0f;
+        final float var8 = 0.5f;
+        return AxisAlignedBB.getBoundingBox((double)(par2 + var7), (double)par3, (double)(par4 + 0.0625f), (double)(par2 + 1 - 0.0625f), (double)(par3 + 0.5f - 0.0625f), (double)(par4 + 1 - 0.0625f));
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World par1World, final int par2, final int par3, final int par4) {
+        final int var5 = par1World.getBlockMetadata(par2, par3, par4);
+        final float var6 = 0.0625f;
+        final float var7 = (1 + var5 * 2) / 16.0f;
+        final float var8 = 0.5f;
+        return AxisAlignedBB.getBoundingBox((double)(par2 + var7), (double)par3, (double)(par4 + 0.0625f), (double)(par2 + 1 - 0.0625f), (double)(par3 + 0.5f), (double)(par4 + 1 - 0.0625f));
+    }
+    
+    public IIcon getIcon(final int par1, final int par2) {
+        return (par1 == 1) ? this.cheeseIcons[0] : ((par1 == 0) ? this.cheeseIcons[0] : ((par2 > 0 && par1 == 4) ? this.cheeseIcons[2] : this.cheeseIcons[1]));
+    }
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
-    }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        this.eatCheeseSlice(worldIn, pos, state, playerIn);
+    
+    public boolean onBlockActivated(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer, final int par6, final float par7, final float par8, final float par9) {
+        this.eatCakeSlice(par1World, par2, par3, par4, par5EntityPlayer);
         return true;
     }
-
-    @Override
-    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn)
-    {
-        this.eatCheeseSlice(worldIn, pos, worldIn.getBlockState(pos), playerIn);
+    
+    public void onBlockClicked(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer) {
+        this.eatCakeSlice(par1World, par2, par3, par4, par5EntityPlayer);
     }
-
-    private void eatCheeseSlice(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn)
-    {
-        if (playerIn.canEat(false))
-        {
-            playerIn.getFoodStats().addStats(2, 0.1F);
-            int i = ((Integer) state.getValue(BITES)).intValue();
-
-            if (i < 6)
-            {
-                worldIn.setBlockState(pos, state.withProperty(BITES, Integer.valueOf(i + 1)), 3);
-            } else
-            {
-                worldIn.setBlockToAir(pos);
+    
+    private void eatCakeSlice(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer) {
+        if (par5EntityPlayer.canEat(false)) {
+            par5EntityPlayer.getFoodStats().addStats(2, 0.1f);
+            final int l = par1World.getBlockMetadata(par2, par3, par4) + 1;
+            if (l >= 6) {
+                par1World.setBlockToAir(par2, par3, par4);
+            }
+            else {
+                par1World.setBlockMetadataWithNotify(par2, par3, par4, l, 2);
             }
         }
     }
-
-    @Override
-    public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
-    {
-        return super.canPlaceBlockAt(worldIn, pos) && this.canBlockStay(worldIn, pos);
+    
+    public boolean canPlaceBlockAt(final World par1World, final int par2, final int par3, final int par4) {
+        return super.canPlaceBlockAt(par1World, par2, par3, par4) && this.canBlockStay(par1World, par2, par3, par4);
     }
-
-    @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
-    {
-        if (!this.canBlockStay(worldIn, pos))
-        {
-            worldIn.setBlockToAir(pos);
+    
+    public void onNeighborBlockChange(final World par1World, final int par2, final int par3, final int par4, final Block par5) {
+        if (!this.canBlockStay(par1World, par2, par3, par4)) {
+            par1World.setBlockToAir(par2, par3, par4);
         }
     }
-
-    private boolean canBlockStay(World worldIn, BlockPos pos)
-    {
-        return worldIn.getBlockState(pos.down()).getMaterial().isSolid();
+    
+    public boolean canBlockStay(final World par1World, final int par2, final int par3, final int par4) {
+        return par1World.getBlock(par2, par3 - 1, par4).getMaterial().isSolid();
     }
-
-    @Override
-    public int quantityDropped(Random par1Random)
-    {
+    
+    public int quantityDropped(final Random par1Random) {
         return 0;
     }
-
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune)
-    {
-        return Item.getItemFromBlock(Blocks.AIR);
+    
+    public Item getItemDropped(final int par1, final Random par2Random, final int par3) {
+        return Item.getItemFromBlock(Blocks.air);
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(BITES, Integer.valueOf(meta));
-    }
-
-    @Override
-    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
-    {
-        return new ItemStack(Items.CAKE, 1, 0);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getRenderLayer()
-    {
-        return BlockRenderLayer.CUTOUT;
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return ((Integer) state.getValue(BITES)).intValue();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, new IProperty[]
-        {BITES});
-    }
-
-    @Override
-    public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos)
-    {
-        return (7 - ((Integer) worldIn.getBlockState(pos).getValue(BITES)).intValue()) * 2;
-    }
-
-    @Override
-    public boolean hasComparatorInputOverride(IBlockState state)
-    {
-        return true;
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.GENERAL;
     }
 }

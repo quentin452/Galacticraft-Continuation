@@ -1,98 +1,57 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.core.GCBlocks;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.blocks.BlockMulti;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMulti.EnumBlockMultiType;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 
-public class TileEntitySpaceStationBase extends TileEntityMulti implements IMultiBlock
-{
+public class TileEntitySpaceStationBase extends TileEntityMulti implements IMultiBlock {
+    public String ownerUsername = "bobby";
 
-    public TileEntitySpaceStationBase()
-    {
-        super(null);
+    public TileEntitySpaceStationBase() {
     }
 
-    private boolean initialised;
-
-    @Override
-    public void update()
-    {
-        if (!this.initialised)
-        {
-            this.initialised = this.initialiseMultiTiles(this.getPos(), this.world);
-        }
+    public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
+        super.readFromNBT(par1NBTTagCompound);
+        this.ownerUsername = par1NBTTagCompound.getString("ownerUsername");
     }
 
-    @Override
-    public boolean onActivated(EntityPlayer entityPlayer)
-    {
+    public void writeToNBT(NBTTagCompound par1NBTTagCompound) {
+        super.writeToNBT(par1NBTTagCompound);
+        par1NBTTagCompound.setString("ownerUsername", this.ownerUsername);
+    }
+
+    public void setOwner(String username) {
+        this.ownerUsername = username;
+    }
+
+    public String getOwner() {
+        return this.ownerUsername;
+    }
+
+    public boolean onActivated(EntityPlayer entityPlayer) {
         return false;
     }
 
-    @Override
-    public void onCreate(World world, BlockPos placedPosition)
-    {
+    public void onCreate(BlockVec3 placedPosition) {
         this.mainBlockPosition = placedPosition;
         this.markDirty();
 
-        List<BlockPos> positions = new LinkedList<>();
-        this.getPositions(placedPosition, positions);
-        ((BlockMulti) GCBlocks.fakeBlock).makeFakeBlock(world, positions, placedPosition, this.getMultiType());
-    }
-
-    @Override
-    public BlockMulti.EnumBlockMultiType getMultiType()
-    {
-        return EnumBlockMultiType.SPACE_STATION_BASE;
-    }
-
-    @Override
-    public void getPositions(BlockPos placedPosition, List<BlockPos> positions)
-    {
-        int buildHeight = this.world.getHeight() - 1;
-
-        for (int y = 1; y < 3; y++)
-        {
-            if (placedPosition.getY() + y > buildHeight)
-            {
-                return;
-            }
-            positions.add(new BlockPos(placedPosition.getX(), placedPosition.getY() + y, placedPosition.getZ()));
-        }
-    }
-
-    @Override
-    public void onDestroy(TileEntity callingBlock)
-    {
-        final BlockPos thisBlock = getPos();
-        List<BlockPos> positions = new LinkedList<>();
-        this.getPositions(thisBlock, positions);
-
-        for (BlockPos pos : positions)
-        {
-            IBlockState stateAt = this.world.getBlockState(pos);
-
-            if (stateAt.getBlock() == GCBlocks.fakeBlock && (EnumBlockMultiType) stateAt.getValue(BlockMulti.MULTI_TYPE) == EnumBlockMultiType.SPACE_STATION_BASE)
-            {
-                this.world.setBlockToAir(pos);
+        for(int y = 1; y < 3; ++y) {
+            BlockVec3 vecToAdd = new BlockVec3(placedPosition.x, placedPosition.y + y, placedPosition.z);
+            if (!vecToAdd.equals(placedPosition)) {
+                ((BlockMulti)GCBlocks.fakeBlock).makeFakeBlock(this.worldObj, vecToAdd, placedPosition, 1);
             }
         }
-        this.world.destroyBlock(this.getPos(), false);
+
+    }
+
+    public void onDestroy(TileEntity callingBlock) {
+        for(int y = 0; y < 3; ++y) {
+            this.worldObj.setBlockToAir(this.xCoord, this.yCoord + y, this.zCoord);
+        }
+
     }
 }

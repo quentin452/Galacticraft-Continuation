@@ -1,45 +1,112 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.client.model.ModelEvolvedSkeletonBoss;
-import micdoodle8.mods.galacticraft.core.client.render.entities.layer.LayerHeldItemEvolvedSkeletonBoss;
-import micdoodle8.mods.galacticraft.core.entities.EntitySkeletonBoss;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.client.model.*;
+import net.minecraft.client.model.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import org.lwjgl.opengl.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.boss.*;
+import net.minecraft.init.*;
+import net.minecraft.item.*;
+import cpw.mods.fml.client.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.client.*;
+import net.minecraft.client.entity.*;
+import micdoodle8.mods.galacticraft.core.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderEvolvedSkeletonBoss extends RenderLiving<EntitySkeletonBoss>
+public class RenderEvolvedSkeletonBoss extends RenderLiving
 {
-
-    private static final ResourceLocation skeletonBossTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/model/skeletonboss.png");
-
-    public RenderEvolvedSkeletonBoss(RenderManager manager)
-    {
-        super(manager, new ModelEvolvedSkeletonBoss(), 0.9F);
-        this.addLayer(new LayerHeldItemEvolvedSkeletonBoss(this));
+    private static final ResourceLocation skeletonBossTexture;
+    private static final ResourceLocation powerTexture;
+    private final ModelEvolvedSkeletonBoss model;
+    
+    public RenderEvolvedSkeletonBoss() {
+        super((ModelBase)new ModelEvolvedSkeletonBoss(), 1.0f);
+        this.model = new ModelEvolvedSkeletonBoss();
     }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntitySkeletonBoss entity)
-    {
+    
+    protected ResourceLocation func_110779_a(final EntitySkeletonBoss par1EntityArrow) {
         return RenderEvolvedSkeletonBoss.skeletonBossTexture;
     }
-
-    @Override
-    protected void preRenderCallback(EntitySkeletonBoss entity, float partialTicks)
-    {
-        GlStateManager.scale(1.2F, 1.2F, 1.2F);
-        GlStateManager.rotate((float) (Math.pow(entity.deathTicks, 2) / 5.0F + (Math.pow(entity.deathTicks, 2) / 5.0F - Math.pow(entity.deathTicks - 1, 2) / 5.0F) * partialTicks), 0.0F, 1.0F, 0.0F);
+    
+    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+        return this.func_110779_a((EntitySkeletonBoss)par1Entity);
+    }
+    
+    protected void preRenderCallback(final EntityLivingBase par1EntityLiving, final float par2) {
+        GL11.glScalef(1.2f, 1.2f, 1.2f);
+    }
+    
+    public void doRender(final EntityLiving par1EntityLiving, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        BossStatus.setBossStatus((IBossDisplayData)par1EntityLiving, false);
+        super.doRender(par1EntityLiving, par2, par4, par6, par8, par9);
+    }
+    
+    protected void renderEquippedItems(final EntityLivingBase par1EntityLiving, final float par2) {
+        if (((EntitySkeletonBoss)par1EntityLiving).throwTimer + ((EntitySkeletonBoss)par1EntityLiving).postThrowDelay == 0) {
+            GL11.glPushMatrix();
+            GL11.glTranslatef(-0.3f, -1.6f, -1.2f);
+            GL11.glTranslatef(0.1f, 0.0f, 0.0f);
+            GL11.glRotatef(41.0f, 0.0f, 1.0f, 0.0f);
+            GL11.glRotatef(-20.0f, 1.0f, 0.0f, 0.0f);
+            GL11.glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+            GL11.glScalef(0.7f, 0.7f, 0.7f);
+            this.renderManager.itemRenderer.renderItem(par1EntityLiving, new ItemStack((Item)Items.bow), 0);
+            GL11.glPopMatrix();
+            GL11.glPushMatrix();
+            GL11.glTranslatef(0.11f, -1.6f, -1.2f);
+            GL11.glTranslatef(0.1f, 0.0f, 0.0f);
+            GL11.glRotatef(46.0f, 0.0f, 1.0f, 0.0f);
+            GL11.glRotatef(-20.0f, 1.0f, 0.0f, 0.0f);
+            GL11.glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+            GL11.glScalef(0.7f, 0.7f, 0.7f);
+            this.renderManager.itemRenderer.renderItem(par1EntityLiving, new ItemStack((Item)Items.bow), 0);
+            GL11.glPopMatrix();
+        }
+    }
+    
+    protected int shouldRenderPass(final EntityLivingBase par1EntityLiving, final int par2, final float par3) {
+        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final EntityPlayerSP player = (EntityPlayerSP)minecraft.thePlayer;
+        ItemStack helmetSlot = null;
+        if (player != null && player.inventory.armorItemInSlot(3) != null) {
+            helmetSlot = player.inventory.armorItemInSlot(3);
+        }
+        if (helmetSlot != null && helmetSlot.getItem() instanceof ItemSensorGlasses && minecraft.currentScreen == null) {
+            if (par2 == 1) {
+                final float var4 = par1EntityLiving.ticksExisted * 2 + par3;
+                this.bindTexture(RenderEvolvedSkeletonBoss.powerTexture);
+                GL11.glMatrixMode(5890);
+                GL11.glLoadIdentity();
+                final float var5 = var4 * 0.01f;
+                final float var6 = var4 * 0.01f;
+                GL11.glTranslatef(var5, var6, 0.0f);
+                this.setRenderPassModel((ModelBase)this.model);
+                GL11.glMatrixMode(5888);
+                GL11.glEnable(3042);
+                final float var7 = 0.5f;
+                GL11.glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+                GL11.glDisable(2896);
+                GL11.glBlendFunc(1, 1);
+                return 1;
+            }
+            if (par2 == 2) {
+                GL11.glMatrixMode(5890);
+                GL11.glLoadIdentity();
+                GL11.glMatrixMode(5888);
+                GL11.glEnable(2896);
+                GL11.glDisable(3042);
+            }
+        }
+        return -1;
+    }
+    
+    static {
+        skeletonBossTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/skeletonboss.png");
+        powerTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/power.png");
     }
 }

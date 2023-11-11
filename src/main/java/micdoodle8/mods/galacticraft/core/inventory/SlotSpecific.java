@@ -1,133 +1,112 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import net.minecraft.item.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.galacticraft.api.item.*;
+import micdoodle8.mods.galacticraft.core.energy.*;
+import java.util.*;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-
-import micdoodle8.mods.galacticraft.api.item.IItemElectric;
-import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
-
-/**
- * Creates a slot with a specific amount of items that matches the slot's
- * requirements. Allows easy shift right clicking management and slot blocking
- * in classes. In your container you can use this.getSlot(i).isItemValid to
- * justify the player's shift clicking actions to match the slot.
- *
- * @author Calclavia
- */
 public class SlotSpecific extends Slot
 {
-
-    public ItemStack[] validItemStacks = new ItemStack[0];
-    public Class<?>[] validClasses = new Class[0];
-
-    public boolean isInverted = false;
-    public boolean isMetadataSensitive = false;
-
-    public SlotSpecific(IInventory inventory, int par3, int par4, int par5, ItemStack... itemStacks)
-    {
-        super(inventory, par3, par4, par5);
+    public ItemStack[] validItemStacks;
+    public Class[] validClasses;
+    public boolean isInverted;
+    public boolean isMetadataSensitive;
+    
+    public SlotSpecific(final IInventory par2IInventory, final int par3, final int par4, final int par5, final ItemStack... itemStacks) {
+        super(par2IInventory, par3, par4, par5);
+        this.validItemStacks = new ItemStack[0];
+        this.validClasses = new Class[0];
+        this.isInverted = false;
+        this.isMetadataSensitive = false;
         this.setItemStacks(itemStacks);
     }
-
-    @SafeVarargs
-    public SlotSpecific(IInventory inventory, int par3, int par4, int par5, Class<?>... validClasses)
-    {
-        super(inventory, par3, par4, par5);
-        if (validClasses != null && Arrays.asList(validClasses).contains(IItemElectric.class))
-        {
-            try
-            {
-                if (EnergyConfigHandler.isRFAPILoaded())
-                {
-                    ArrayList<Class<?>> existing = new ArrayList<>(Arrays.asList(validClasses));
-                    existing.add(cofh.redstoneflux.api.IEnergyContainerItem.class);
+    
+    public SlotSpecific(final IInventory par2IInventory, final int par3, final int par4, final int par5, Class... validClasses) {
+        super(par2IInventory, par3, par4, par5);
+        this.validItemStacks = new ItemStack[0];
+        this.validClasses = new Class[0];
+        this.isInverted = false;
+        this.isMetadataSensitive = false;
+        if (validClasses != null && Arrays.asList((Class[])validClasses).contains(IItemElectric.class)) {
+            if (EnergyConfigHandler.isRFAPILoaded()) {
+                try {
+                    final Class<?> itemElectricRF = Class.forName("cofh.api.energy.IEnergyContainerItem");
+                    final ArrayList<Class> existing = new ArrayList<Class>(Arrays.asList((Class[])validClasses));
+                    existing.add(itemElectricRF);
                     validClasses = existing.toArray(new Class[existing.size()]);
                 }
-                if (EnergyConfigHandler.isIndustrialCraft2Loaded())
-                {
-                    ArrayList<Class<?>> existing = new ArrayList<>(Arrays.asList(validClasses));
-                    existing.add(ic2.api.item.IElectricItem.class);
-                    existing.add(ic2.api.item.ISpecialElectricItem.class);
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (EnergyConfigHandler.isIndustrialCraft2Loaded()) {
+                try {
+                    final Class<?> itemElectricIC2a = Class.forName("ic2.api.item.IElectricItem");
+                    final Class<?> itemElectricIC2b = Class.forName("ic2.api.item.ISpecialElectricItem");
+                    final ArrayList<Class> existing2 = new ArrayList<Class>(Arrays.asList((Class[])validClasses));
+                    existing2.add(itemElectricIC2a);
+                    existing2.add(itemElectricIC2b);
+                    validClasses = existing2.toArray(new Class[existing2.size()]);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (EnergyConfigHandler.isMekanismLoaded()) {
+                try {
+                    final Class<?> itemElectricMek = Class.forName("mekanism.api.energy.IEnergizedItem");
+                    final ArrayList<Class> existing = new ArrayList<Class>(Arrays.asList((Class[])validClasses));
+                    existing.add(itemElectricMek);
                     validClasses = existing.toArray(new Class[existing.size()]);
                 }
-                if (EnergyConfigHandler.isMekanismLoaded())
-                {
-                    ArrayList<Class<?>> existing = new ArrayList<>(Arrays.asList(validClasses));
-                    existing.add(mekanism.api.energy.IEnergizedItem.class);
-                    validClasses = existing.toArray(new Class[existing.size()]);
+                catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e)
-            {
-                e.printStackTrace();
             }
         }
-        this.validClasses = validClasses;
+        this.setClasses(validClasses);
     }
-
-    public SlotSpecific setMetadataSensitive()
-    {
+    
+    public SlotSpecific setMetadataSensitive() {
         this.isMetadataSensitive = true;
         return this;
     }
-
-    public SlotSpecific setItemStacks(ItemStack... validItemStacks)
-    {
+    
+    public SlotSpecific setItemStacks(final ItemStack... validItemStacks) {
         this.validItemStacks = validItemStacks;
         return this;
     }
-
-    public SlotSpecific toggleInverted()
-    {
+    
+    public SlotSpecific setClasses(final Class... validClasses) {
+        this.validClasses = validClasses;
+        return this;
+    }
+    
+    public SlotSpecific toggleInverted() {
         this.isInverted = !this.isInverted;
         return this;
     }
-
-    /**
-     * Check if the stack is a valid item for this slot. Always true beside for
-     * the armor slots.
-     */
-    @Override
-    public boolean isItemValid(ItemStack compareStack)
-    {
+    
+    public boolean isItemValid(final ItemStack compareStack) {
         boolean returnValue = false;
-
-        for (ItemStack itemStack : this.validItemStacks)
-        {
-            if (compareStack.isItemEqual(itemStack) || !this.isMetadataSensitive && compareStack.getItem() == itemStack.getItem())
-            {
+        for (final ItemStack itemStack : this.validItemStacks) {
+            if (compareStack.isItemEqual(itemStack) || (!this.isMetadataSensitive && compareStack == itemStack)) {
                 returnValue = true;
                 break;
             }
         }
-
-        if (!returnValue)
-        {
-            for (Class<?> clazz : this.validClasses)
-            {
-                if (clazz.isInstance(compareStack.getItem()))
-                {
+        if (!returnValue) {
+            for (final Class clazz : this.validClasses) {
+                if (clazz.isInstance(compareStack.getItem())) {
                     returnValue = true;
                     break;
                 }
             }
         }
-
-        if (this.isInverted)
-        {
+        if (this.isInverted) {
             return !returnValue;
         }
-
         return returnValue;
     }
 }

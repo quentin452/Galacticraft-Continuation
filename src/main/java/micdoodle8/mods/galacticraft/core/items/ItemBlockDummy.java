@@ -1,68 +1,66 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-
-public class ItemBlockDummy extends ItemBlock implements GCRarity
+public class ItemBlockDummy extends ItemBlock
 {
-
-    public ItemBlockDummy(Block block)
-    {
+    public ItemBlockDummy(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public int getMetadata(int damage)
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIconFromDamage(final int par1) {
+        return this.field_150939_a.getIcon(0, par1);
+    }
+    
+    public int getMetadata(final int damage) {
         return damage;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemstack)
-    {
-        int metadata = itemstack.getItemDamage();
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public String getUnlocalizedName(final ItemStack itemstack) {
+        final int metadata = itemstack.getItemDamage();
         String blockName = "";
-
-        switch (metadata)
-        {
-            case 1:
+        switch (metadata) {
+            case 1: {
                 blockName = "spaceStationBase";
                 break;
-            case 2:
+            }
+            case 2: {
                 blockName = "launchPad";
                 break;
-            case 3:
+            }
+            case 3: {
                 blockName = "nasaWorkbench";
                 break;
-            case 4:
+            }
+            case 4: {
                 blockName = "solar";
                 break;
-            case 5:
+            }
+            case 5: {
                 blockName = "cryogenicChamber";
                 break;
-            default:
+            }
+            default: {
                 blockName = null;
                 break;
+            }
         }
-
-        return this.getBlock().getTranslationKey() + "." + blockName;
+        return this.field_150939_a.getUnlocalizedName() + "." + blockName;
     }
-
-    @Override
-    public String getTranslationKey()
-    {
-        return this.getBlock().getTranslationKey() + ".0";
+    
+    public String getUnlocalizedName() {
+        return this.field_150939_a.getUnlocalizedName() + ".0";
     }
 }

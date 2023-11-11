@@ -1,31 +1,22 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.MoverType;
+import net.minecraft.client.entity.*;
 
 public interface IPlayerClient
 {
-
-    void move(EntityPlayerSP player, MoverType type, double x, double y, double z);
-
-    void onUpdate(EntityPlayerSP player);
-
-    void onLivingUpdatePre(EntityPlayerSP player);
-
-    void onLivingUpdatePost(EntityPlayerSP player);
-
-    float getBedOrientationInDegrees(EntityPlayerSP player, float vanillaDegrees);
-
-    boolean isEntityInsideOpaqueBlock(EntityPlayerSP player, boolean vanillaInside);
-
-    boolean wakeUpPlayer(EntityPlayerSP player, boolean immediately, boolean updateWorldFlag, boolean setSpawn);
-
-    void onBuild(int i, EntityPlayerSP player);
+    void moveEntity(final EntityPlayerSP p0, final double p1, final double p2, final double p3);
+    
+    void onUpdate(final EntityPlayerSP p0);
+    
+    void onLivingUpdatePre(final EntityPlayerSP p0);
+    
+    void onLivingUpdatePost(final EntityPlayerSP p0);
+    
+    float getBedOrientationInDegrees(final EntityPlayerSP p0, final float p1);
+    
+    boolean isEntityInsideOpaqueBlock(final EntityPlayerSP p0, final boolean p1);
+    
+    boolean wakeUpPlayer(final EntityPlayerSP p0, final boolean p1, final boolean p2, final boolean p3);
+    
+    void onBuild(final int p0, final EntityPlayerSP p1);
 }

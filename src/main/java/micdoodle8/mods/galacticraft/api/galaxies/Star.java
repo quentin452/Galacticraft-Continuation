@@ -1,29 +1,27 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.galaxies;
 
 public class Star extends CelestialBody
-
 {
-    protected SolarSystem parentSolarSystem = null;
-
-    public Star(String planetName)
-    {
-        super(CelestialType.STAR, planetName);
+    protected SolarSystem parentSolarSystem;
+    
+    public Star(final String planetName) {
+        super(planetName);
+        this.parentSolarSystem = null;
     }
-
-    public SolarSystem getParentSolarSystem()
-    {
+    
+    public SolarSystem getParentSolarSystem() {
         return this.parentSolarSystem;
     }
-
-    public Star setParentSolarSystem(SolarSystem galaxy)
-    {
+    
+    public int getID() {
+        return this.parentSolarSystem.getID();
+    }
+    
+    public String getUnlocalizedNamePrefix() {
+        return "star";
+    }
+    
+    public Star setParentSolarSystem(final SolarSystem galaxy) {
         this.parentSolarSystem = galaxy;
         return this;
     }

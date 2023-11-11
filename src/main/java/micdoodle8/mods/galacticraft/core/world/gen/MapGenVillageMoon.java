@@ -1,112 +1,70 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.BiomeAdaptive;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.structure.MapGenStructure;
-import net.minecraft.world.gen.structure.MapGenStructureIO;
-import net.minecraft.world.gen.structure.StructureStart;
+import net.minecraft.world.biome.*;
+import net.minecraft.world.gen.structure.*;
+import cpw.mods.fml.common.*;
+import java.util.*;
 
 public class MapGenVillageMoon extends MapGenStructure
 {
-
-    public static List<Biome> villageSpawnBiomes = Arrays.asList(new Biome[]
-    {BiomeAdaptive.biomeDefault});
+    public static List<BiomeGenBase> villageSpawnBiomes;
     private final int terrainType;
     private static boolean initialized;
-
-    static
-    {
-        try
-        {
-            MapGenVillageMoon.initiateStructures();
-        } catch (Throwable e)
-        {
-
+    
+    public static void initiateStructures() throws Throwable {
+        if (!MapGenVillageMoon.initialized) {
+            MapGenStructureIO.registerStructure((Class)StructureVillageStartMoon.class, "MoonVillage");
+            MapGenStructureIO.func_143031_a((Class)StructureComponentVillageField.class, "MoonField1");
+            MapGenStructureIO.func_143031_a((Class)StructureComponentVillageField2.class, "MoonField2");
+            MapGenStructureIO.func_143031_a((Class)StructureComponentVillageHouse.class, "MoonHouse");
+            MapGenStructureIO.func_143031_a((Class)StructureComponentVillageRoadPiece.class, "MoonRoadPiece");
+            MapGenStructureIO.func_143031_a((Class)StructureComponentVillagePathGen.class, "MoonPath");
+            MapGenStructureIO.func_143031_a((Class)StructureComponentVillageTorch.class, "MoonTorch");
+            MapGenStructureIO.func_143031_a((Class)StructureComponentVillageStartPiece.class, "MoonWell");
+            MapGenStructureIO.func_143031_a((Class)StructureComponentVillageWoodHut.class, "MoonWoodHut");
         }
-    }
-
-    public static void initiateStructures() throws Throwable
-    {
-        if (!MapGenVillageMoon.initialized)
-        {
-            MapGenStructureIO.registerStructure(StructureVillageStartMoon.class, "MoonVillage");
-            MapGenStructureIO.registerStructureComponent(StructureComponentVillageField.class, "MoonField1");
-            MapGenStructureIO.registerStructureComponent(StructureComponentVillageField2.class, "MoonField2");
-            MapGenStructureIO.registerStructureComponent(StructureComponentVillageHouse.class, "MoonHouse");
-            MapGenStructureIO.registerStructureComponent(StructureComponentVillageRoadPiece.class, "MoonRoadPiece");
-            MapGenStructureIO.registerStructureComponent(StructureComponentVillagePathGen.class, "MoonPath");
-            MapGenStructureIO.registerStructureComponent(StructureComponentVillageTorch.class, "MoonTorch");
-            MapGenStructureIO.registerStructureComponent(StructureComponentVillageStartPiece.class, "MoonWell");
-            MapGenStructureIO.registerStructureComponent(StructureComponentVillageWoodHut.class, "MoonWoodHut");
-        }
-
         MapGenVillageMoon.initialized = true;
     }
-
-    public MapGenVillageMoon()
-    {
+    
+    public MapGenVillageMoon() {
         this.terrainType = 0;
     }
-
-    @Override
-    protected boolean canSpawnStructureAtCoords(int i, int j)
-    {
+    
+    protected boolean canSpawnStructureAtCoords(int i, int j) {
         final byte numChunks = 32;
         final byte offsetChunks = 8;
         final int oldi = i;
         final int oldj = j;
-
-        if (i < 0)
-        {
-            i -= numChunks - 1;
+        if (i < 0) {
+            i -= 31;
         }
-
-        if (j < 0)
-        {
-            j -= numChunks - 1;
+        if (j < 0) {
+            j -= 31;
         }
-
-        int randX = i / numChunks;
-        int randZ = j / numChunks;
-        final Random var7 = this.world.setRandomSeed(i, j, 10387312);
-        randX *= numChunks;
-        randZ *= numChunks;
-        randX += var7.nextInt(numChunks - offsetChunks);
-        randZ += var7.nextInt(numChunks - offsetChunks);
-
+        int randX = i / 32;
+        int randZ = j / 32;
+        final Random var7 = this.worldObj.setRandomSeed(i, j, 10387312);
+        randX *= 32;
+        randZ *= 32;
+        randX += var7.nextInt(24);
+        randZ += var7.nextInt(24);
         return oldi == randX && oldj == randZ;
     }
-
-    @Override
-    public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
-    {
-        this.world = worldIn;
-        return findNearestStructurePosBySpacing(worldIn, this, pos, 32, 8, 10387312, false, 100, p_180706_3_);
+    
+    protected StructureStart getStructureStart(final int par1, final int par2) {
+        FMLLog.info("Generating Moon Village at x" + par1 * 16 + " z" + par2 * 16, new Object[0]);
+        return new StructureVillageStartMoon(this.worldObj, this.rand, par1, par2, this.terrainType);
     }
-
-    @Override
-    protected StructureStart getStructureStart(int par1, int par2)
-    {
-        GalacticraftCore.logger.debug("Generating Moon Village at x" + par1 * 16 + " z" + par2 * 16);
-        return new StructureVillageStartMoon(this.world, this.rand, par1, par2, this.terrainType);
-    }
-
-    @Override
-    public String getStructureName()
-    {
+    
+    public String func_143025_a() {
         return "MoonVillage";
+    }
+    
+    static {
+        MapGenVillageMoon.villageSpawnBiomes = Arrays.asList(BiomeGenBaseMoon.moonFlat);
+        try {
+            initiateStructures();
+        }
+        catch (Throwable t) {}
     }
 }

@@ -1,378 +1,273 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.network;
 
-import io.netty.buffer.ByteBuf;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.event.EventWakePlayer;
-import micdoodle8.mods.galacticraft.core.network.NetworkUtil;
-import micdoodle8.mods.galacticraft.core.network.PacketBase;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.GuiIdsPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiCargoRocket;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiLaunchControllerAdvanced;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiSlimelingInventory;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntityCargoRocket;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityCryogenicChamber;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityLaunchController;
-import micdoodle8.mods.galacticraft.planets.mars.util.MarsUtil;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import io.netty.channel.*;
+import io.netty.buffer.*;
+import micdoodle8.mods.galacticraft.core.network.*;
+import java.util.*;
+import java.io.*;
+import net.minecraft.client.entity.*;
+import cpw.mods.fml.client.*;
+import net.minecraft.client.gui.*;
+import micdoodle8.mods.galacticraft.planets.mars.entities.*;
+import micdoodle8.mods.galacticraft.planets.mars.client.gui.*;
+import net.minecraft.inventory.*;
+import net.minecraft.tileentity.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import net.minecraft.pathfinding.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.planets.mars.util.*;
+import micdoodle8.mods.galacticraft.core.event.*;
+import net.minecraftforge.common.*;
+import cpw.mods.fml.common.eventhandler.*;
+import micdoodle8.mods.galacticraft.planets.mars.tile.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.util.*;
 
-public class PacketSimpleMars extends PacketBase
+public class PacketSimpleMars implements IPacket
 {
-
-    public static enum EnumSimplePacketMars
-    {
-
-        // SERVER
-        S_UPDATE_SLIMELING_DATA(Side.SERVER, Integer.class, Integer.class, String.class),
-        S_WAKE_PLAYER(Side.SERVER),
-        S_UPDATE_ADVANCED_GUI(Side.SERVER, Integer.class, BlockPos.class, Integer.class),
-        S_UPDATE_CARGO_ROCKET_STATUS(Side.SERVER, Integer.class, Integer.class),
-        S_SWITCH_LAUNCH_CONTROLLER_GUI(Side.SERVER, BlockPos.class, Integer.class),
-        // CLIENT
-        C_OPEN_CUSTOM_GUI(Side.CLIENT, Integer.class, Integer.class, Integer.class),
-        C_OPEN_CUSTOM_GUI_TILE(Side.CLIENT, Integer.class, Integer.class, BlockPos.class),
-        C_BEGIN_CRYOGENIC_SLEEP(Side.CLIENT, BlockPos.class);
-
-        private Side targetSide;
-        private Class<?>[] decodeAs;
-
-        private EnumSimplePacketMars(Side targetSide, Class<?>... decodeAs)
-        {
-            this.targetSide = targetSide;
-            this.decodeAs = decodeAs;
-        }
-
-        public Side getTargetSide()
-        {
-            return this.targetSide;
-        }
-
-        public Class<?>[] getDecodeClasses()
-        {
-            return this.decodeAs;
-        }
-    }
-
     private EnumSimplePacketMars type;
     private List<Object> data;
 
-    public PacketSimpleMars()
-    {
-        super();
+    public PacketSimpleMars() {
     }
 
-    public PacketSimpleMars(EnumSimplePacketMars packetType, int dimID, Object[] data)
-    {
-        this(packetType, dimID, Arrays.asList(data));
+    public PacketSimpleMars(final EnumSimplePacketMars packetType, final Object[] data) {
+        this(packetType, Arrays.asList(data));
     }
 
-    public PacketSimpleMars(EnumSimplePacketMars packetType, int dimID, List<Object> data)
-    {
-        super(dimID);
-
-        if (packetType.getDecodeClasses().length != data.size())
-        {
-            GalacticraftPlanets.logger.info("Mars Simple Packet found data length different than packet type: " + packetType.name());
+    public PacketSimpleMars(final EnumSimplePacketMars packetType, final List<Object> data) {
+        if (packetType.getDecodeClasses().length != data.size()) {
+            GCLog.info("Simple Packet found data length different than packet type");
         }
-
         this.type = packetType;
         this.data = data;
     }
 
-    @Override
-    public void encodeInto(ByteBuf buffer)
-    {
-        super.encodeInto(buffer);
+    public void encodeInto(final ChannelHandlerContext context, final ByteBuf buffer) {
         buffer.writeInt(this.type.ordinal());
-
-        try
-        {
-            NetworkUtil.encodeData(buffer, this.data);
-        } catch (IOException e)
-        {
+        try {
+            NetworkUtil.encodeData(buffer, (Collection)this.data);
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
-    public void decodeInto(ByteBuf buffer)
-    {
-        super.decodeInto(buffer);
+    public void decodeInto(final ChannelHandlerContext context, final ByteBuf buffer) {
         this.type = EnumSimplePacketMars.values()[buffer.readInt()];
-
-        if (this.type.getDecodeClasses().length > 0)
-        {
-            this.data = NetworkUtil.decodeData(this.type.getDecodeClasses(), buffer);
+        if (this.type.getDecodeClasses().length > 0) {
+            this.data = (List<Object>)NetworkUtil.decodeData(this.type.getDecodeClasses(), buffer);
         }
     }
 
     @SideOnly(Side.CLIENT)
-    @Override
-    public void handleClientSide(EntityPlayer player)
-    {
-        EntityPlayerSP playerBaseClient = null;
-
-        if (player instanceof EntityPlayerSP)
-        {
-            playerBaseClient = (EntityPlayerSP) player;
+    public void handleClientSide(final EntityPlayer player) {
+        EntityClientPlayerMP playerBaseClient = null;
+        if (player instanceof EntityClientPlayerMP) {
+            playerBaseClient = (EntityClientPlayerMP)player;
         }
-
-        switch (this.type)
-        {
-            case C_OPEN_CUSTOM_GUI:
-                int entityID = 0;
-                Entity entity = null;
-
-                switch ((Integer) this.data.get(1))
-                {
-                    case 0:
-                        entityID = (Integer) this.data.get(2);
-                        entity = player.world.getEntityByID(entityID);
-
-                        if (entity != null && entity instanceof EntitySlimeling)
-                        {
-                            FMLClientHandler.instance().getClient().displayGuiScreen(new GuiSlimelingInventory(player, (EntitySlimeling) entity));
+        Label_0276: {
+            switch (this.type) {
+                case C_OPEN_CUSTOM_GUI: {
+                    int entityID = 0;
+                    Entity entity = null;
+                    if ((int)this.data.get(1) == 0) {
+                        entityID = (int) this.data.get(2);
+                        entity = player.worldObj.getEntityByID(entityID);
+                        if (entity != null && entity instanceof EntitySlimeling) {
+                            FMLClientHandler.instance().getClient().displayGuiScreen((GuiScreen) new GuiSlimelingInventory(player, (EntitySlimeling) entity));
                         }
-
-                        player.openContainer.windowId = (Integer) this.data.get(0);
-                        break;
-                    case 1:
-                        entityID = (Integer) this.data.get(2);
-                        entity = player.world.getEntityByID(entityID);
-
-                        if (entity != null && entity instanceof EntityCargoRocket)
-                        {
-                            FMLClientHandler.instance().getClient().displayGuiScreen(new GuiCargoRocket(player.inventory, (EntityCargoRocket) entity));
+                        player.openContainer.windowId = (int) this.data.get(0);
+                        break Label_0276;
+                    } else if ((int)this.data.get(1) == 1) {
+                        entityID = (int) this.data.get(2);
+                        entity = player.worldObj.getEntityByID(entityID);
+                        if (entity != null && entity instanceof EntityCargoRocket) {
+                            FMLClientHandler.instance().getClient().displayGuiScreen((GuiScreen) new GuiCargoRocket((IInventory) player.inventory, (EntityCargoRocket) entity));
                         }
-
-                        player.openContainer.windowId = (Integer) this.data.get(0);
+                        player.openContainer.windowId = (int) this.data.get(0);
+                        break Label_0276;
+                    }
+                    break;
+                }
+                case C_BEGIN_CRYOGENIC_SLEEP: {
+                    final TileEntity tile = player.worldObj.getTileEntity((int)this.data.get(0), (int)this.data.get(1), (int)this.data.get(2));
+                    if (tile instanceof TileEntityCryogenicChamber) {
+                        ((TileEntityCryogenicChamber)tile).sleepInBedAt(player, (Integer) this.data.get(0), (Integer) this.data.get(1), (Integer) this.data.get(2));
                         break;
+                    }
+                    break;
                 }
-
-                GalacticraftCore.packetPipeline.sendToServer(new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_CONTAINER_SLOT_REFRESH, GCCoreUtil.getDimensionID(player.world), new Object[]
-                {player.openContainer.windowId}));
-                break;
-            case C_OPEN_CUSTOM_GUI_TILE:
-                BlockPos pos;
-                TileEntity tile;
-
-                switch ((Integer) this.data.get(1))
-                {
-                    case 0:
-                        pos = (BlockPos) this.data.get(2);
-                        tile = player.world.getTileEntity(pos);
-
-                        if (tile != null && tile instanceof TileEntityLaunchController)
-                        {
-                            FMLClientHandler.instance().getClient().displayGuiScreen(new GuiLaunchControllerAdvanced(player.inventory, (TileEntityLaunchController) tile));
-                        }
-
-                        player.openContainer.windowId = (Integer) this.data.get(0);
-                        break;
-                }
-                GalacticraftCore.packetPipeline.sendToServer(new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_CONTAINER_SLOT_REFRESH, GCCoreUtil.getDimensionID(player.world), new Object[]
-                {player.openContainer.windowId}));
-                break;
-            case C_BEGIN_CRYOGENIC_SLEEP:
-                pos = (BlockPos) this.data.get(0);
-                tile = player.world.getTileEntity(pos);
-
-                if (tile instanceof TileEntityCryogenicChamber)
-                {
-                    ((TileEntityCryogenicChamber) tile).sleepInBedAt(player, pos.getX(), pos.getY(), pos.getZ());
-                }
-            default:
-                break;
+            }
         }
     }
 
-    @Override
-    public void handleServerSide(EntityPlayer player)
-    {
-        EntityPlayerMP playerBase = PlayerUtil.getPlayerBaseServerFromPlayer(player, false);
-
-        switch (this.type)
-        {
-            case S_UPDATE_SLIMELING_DATA:
-                Entity entity = player.world.getEntityByID((Integer) this.data.get(0));
-
-                if (entity instanceof EntitySlimeling)
-                {
-                    EntitySlimeling slimeling = (EntitySlimeling) entity;
-
-                    int subType = (Integer) this.data.get(1);
-
-                    switch (subType)
-                    {
-                        case 0:
-                            if (player == slimeling.getOwner() && !slimeling.world.isRemote)
-                            {
-                                slimeling.setSittingAI(!slimeling.isSitting());
-                                slimeling.setJumping(false);
-                                slimeling.getNavigator().clearPath();
-                                slimeling.setAttackTarget(null);
+    public void handleServerSide(final EntityPlayer player) {
+        final EntityPlayerMP playerBase = PlayerUtil.getPlayerBaseServerFromPlayer(player, false);
+        final GCPlayerStats stats = GCPlayerStats.get(playerBase);
+        Label_0949: {
+            switch (this.type) {
+                case S_UPDATE_SLIMELING_DATA: {
+                    final Entity entity = player.worldObj.getEntityByID((int)this.data.get(0));
+                    if (entity instanceof EntitySlimeling) {
+                        final EntitySlimeling slimeling = (EntitySlimeling)entity;
+                        final int subType = (int) this.data.get(1);
+                        switch (subType) {
+                            case 0: {
+                                if (player == slimeling.getOwner() && !slimeling.worldObj.isRemote) {
+                                    slimeling.setSittingAI(!slimeling.isSitting());
+                                    slimeling.setJumping(false);
+                                    slimeling.setPathToEntity((PathEntity)null);
+                                    slimeling.setTarget((Entity)null);
+                                    slimeling.setAttackTarget((EntityLivingBase)null);
+                                    break;
+                                }
+                                break;
                             }
-                            break;
-                        case 1:
-                            if (player == slimeling.getOwner() && !slimeling.world.isRemote)
-                            {
-                                slimeling.slimelingName = (String) this.data.get(2);
-                                slimeling.setName(slimeling.slimelingName);
+                            case 1: {
+                                if (player == slimeling.getOwner() && !slimeling.worldObj.isRemote) {
+                                    slimeling.setName(slimeling.slimelingName = (String) this.data.get(2));
+                                    break;
+                                }
+                                break;
                             }
-                            break;
-                        case 2:
-                            if (player == slimeling.getOwner() && !slimeling.world.isRemote)
-                            {
-                                slimeling.age += 5000;
+                            case 2: {
+                                if (player == slimeling.getOwner() && !slimeling.worldObj.isRemote) {
+                                    final EntitySlimeling entitySlimeling = slimeling;
+                                    entitySlimeling.age += 5000;
+                                    break;
+                                }
+                                break;
                             }
-                            break;
-                        case 3:
-                            if (!slimeling.isInLove() && player == slimeling.getOwner() && !slimeling.world.isRemote)
-                            {
-                                slimeling.setInLove(playerBase);
+                            case 3: {
+                                if (!slimeling.isInLove() && player == slimeling.getOwner() && !slimeling.worldObj.isRemote) {
+                                    slimeling.func_146082_f((EntityPlayer)playerBase);
+                                    break;
+                                }
+                                break;
                             }
-                            break;
-                        case 4:
-                            if (player == slimeling.getOwner() && !slimeling.world.isRemote)
-                            {
-                                slimeling.attackDamage = Math.min(slimeling.attackDamage + 0.1F, 1.0F);
+                            case 4: {
+                                if (player == slimeling.getOwner() && !slimeling.worldObj.isRemote) {
+                                    slimeling.attackDamage = Math.min(slimeling.attackDamage + 0.1f, 1.0f);
+                                    break;
+                                }
+                                break;
                             }
-                            break;
-                        case 5:
-                            if (player == slimeling.getOwner() && !slimeling.world.isRemote)
-                            {
-                                slimeling.setHealth(slimeling.getHealth() + 5.0F);
+                            case 5: {
+                                if (player == slimeling.getOwner() && !slimeling.worldObj.isRemote) {
+                                    slimeling.setHealth(slimeling.getHealth() + 5.0f);
+                                    break;
+                                }
+                                break;
                             }
-                            break;
-                        case 6:
-                            if (player == slimeling.getOwner() && !slimeling.world.isRemote)
-                            {
-                                MarsUtil.openSlimelingInventory(playerBase, slimeling);
+                            case 6: {
+                                if (player == slimeling.getOwner() && !slimeling.worldObj.isRemote) {
+                                    MarsUtil.openSlimelingInventory(playerBase, slimeling);
+                                    break;
+                                }
+                                break;
                             }
-                            break;
+                        }
+                        break;
                     }
+                    break;
                 }
-                break;
-            case S_WAKE_PLAYER:
-                BlockPos c = playerBase.bedLocation;
-
-                if (c != null)
-                {
-                    EventWakePlayer event = new EventWakePlayer(playerBase, c, true, true, false, true);
-                    MinecraftForge.EVENT_BUS.post(event);
-                    playerBase.wakeUpPlayer(true, true, false);
+                case S_WAKE_PLAYER: {
+                    final ChunkCoordinates c = playerBase.playerLocation;
+                    if (c != null) {
+                        final EventWakePlayer event = new EventWakePlayer((EntityPlayer)playerBase, c.posX, c.posY, c.posZ, true, true, false, true);
+                        MinecraftForge.EVENT_BUS.post((Event)event);
+                        playerBase.wakeUpPlayer(true, true, false);
+                        break;
+                    }
+                    break;
                 }
-                break;
-            case S_UPDATE_ADVANCED_GUI:
-                TileEntity tile = player.world.getTileEntity((BlockPos) this.data.get(1));
-
-                switch ((Integer) this.data.get(0))
-                {
-                    case 0:
-                        if (tile instanceof TileEntityLaunchController)
-                        {
-                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
-                            launchController.setFrequency((Integer) this.data.get(2));
+                case S_UPDATE_ADVANCED_GUI: {
+                    final TileEntity tile = player.worldObj.getTileEntity((int)this.data.get(1), (int)this.data.get(2), (int)this.data.get(3));
+                    if (Objects.requireNonNull(this.data.get(0)) instanceof Integer && (Integer) this.data.get(0) == 0) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            final TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
+                            launchController.setFrequency((Integer) this.data.get(4));
+                            break Label_0949;
                         }
-                        break;
-                    case 1:
-                        if (tile instanceof TileEntityLaunchController)
-                        {
-                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
-                            launchController.setLaunchDropdownSelection((Integer) this.data.get(2));
+                        break Label_0949;
+                    } else if (this.data.get(0) instanceof Integer && (Integer) this.data.get(0) == 1) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            final TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
+                            launchController.setLaunchDropdownSelection((Integer) this.data.get(4));
+                            break Label_0949;
                         }
-                        break;
-                    case 2:
-                        if (tile instanceof TileEntityLaunchController)
-                        {
-                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
-                            launchController.setDestinationFrequency((Integer) this.data.get(2));
+                        break Label_0949;
+                    } else if (this.data.get(0) instanceof Integer && (Integer) this.data.get(0) == 2) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            final TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
+                            launchController.setDestinationFrequency((Integer) this.data.get(4));
+                            break Label_0949;
                         }
-                        break;
-                    case 3:
-                        if (tile instanceof TileEntityLaunchController)
-                        {
-                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
-                            launchController.launchPadRemovalDisabled = (Integer) this.data.get(2) == 1;
+                        break Label_0949;
+                    } else if (this.data.get(0) instanceof Integer && (Integer) this.data.get(0) == 3) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            final TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
+                            launchController.launchPadRemovalDisabled = ((Integer) this.data.get(4)) == 1;
+                            break Label_0949;
                         }
-                        break;
-                    case 4:
-                        if (tile instanceof TileEntityLaunchController)
-                        {
-                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
-                            launchController.setLaunchSchedulingEnabled((Integer) this.data.get(2) == 1);
+                        break Label_0949;
+                    } else if (this.data.get(0) instanceof Integer && (Integer) this.data.get(0) == 4) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            final TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
+                            launchController.setLaunchSchedulingEnabled(((Integer) this.data.get(4)) == 1);
+                            break Label_0949;
                         }
-                        break;
-                    case 5:
-                        if (tile instanceof TileEntityLaunchController)
-                        {
-                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
+                        break Label_0949;
+                    } else if (this.data.get(0) instanceof Integer && (Integer) this.data.get(0) == 5) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            final TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
                             launchController.requiresClientUpdate = true;
+                            break Label_0949;
                         }
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case S_UPDATE_CARGO_ROCKET_STATUS:
-                Entity entity2 = player.world.getEntityByID((Integer) this.data.get(0));
-
-                if (entity2 instanceof EntityCargoRocket)
-                {
-                    EntityCargoRocket rocket = (EntityCargoRocket) entity2;
-
-                    int subType = (Integer) this.data.get(1);
-
-                    switch (subType)
-                    {
-                        default:
-                            rocket.statusValid = rocket.checkLaunchValidity();
-                            break;
+                        break Label_0949;
                     }
+                    break Label_0949;
                 }
-                break;
-            case S_SWITCH_LAUNCH_CONTROLLER_GUI:
-                BlockPos pos = (BlockPos) this.data.get(0);
-                TileEntity tile1 = player.world.getTileEntity(pos);
-                if (tile1 instanceof TileEntityLaunchController)
-                {
-                    TileEntityLaunchController launchController = (TileEntityLaunchController) tile1;
-                    switch ((Integer) this.data.get(1))
-                    {
-                        case 0:
-                            MarsUtil.openAdvancedLaunchController(playerBase, launchController);
-                            break;
-                        case 1:
-                            player.openGui(GalacticraftPlanets.instance, GuiIdsPlanets.MACHINE_MARS, player.world, pos.getX(), pos.getY(), pos.getZ());
-                            break;
+                case S_UPDATE_CARGO_ROCKET_STATUS: {
+                    final Entity entity2 = player.worldObj.getEntityByID((int)this.data.get(0));
+                    if (entity2 instanceof EntityCargoRocket) {
+                        final EntityCargoRocket rocket = (EntityCargoRocket)entity2;
+                        final int subType2 = (int) this.data.get(1);
+                        rocket.statusValid = rocket.checkLaunchValidity();
+                        break;
                     }
+                    break;
                 }
-                break;
-            default:
-                break;
+            }
+        }
+    }
+
+    public enum EnumSimplePacketMars
+    {
+        S_UPDATE_SLIMELING_DATA(Side.SERVER, (Class<?>[])new Class[] { Integer.class, Integer.class, String.class }),
+        S_WAKE_PLAYER(Side.SERVER, (Class<?>[])new Class[0]),
+        S_UPDATE_ADVANCED_GUI(Side.SERVER, (Class<?>[])new Class[] { Integer.class, Integer.class, Integer.class, Integer.class, Integer.class }),
+        S_UPDATE_CARGO_ROCKET_STATUS(Side.SERVER, (Class<?>[])new Class[] { Integer.class, Integer.class }),
+        C_OPEN_CUSTOM_GUI(Side.CLIENT, (Class<?>[])new Class[] { Integer.class, Integer.class, Integer.class }),
+        C_BEGIN_CRYOGENIC_SLEEP(Side.CLIENT, (Class<?>[])new Class[] { Integer.class, Integer.class, Integer.class });
+
+        private Side targetSide;
+        private Class<?>[] decodeAs;
+
+        private EnumSimplePacketMars(final Side targetSide, final Class<?>[] decodeAs) {
+            this.targetSide = targetSide;
+            this.decodeAs = decodeAs;
+        }
+
+        public Side getTargetSide() {
+            return this.targetSide;
+        }
+
+        public Class<?>[] getDecodeClasses() {
+            return this.decodeAs;
         }
     }
 }

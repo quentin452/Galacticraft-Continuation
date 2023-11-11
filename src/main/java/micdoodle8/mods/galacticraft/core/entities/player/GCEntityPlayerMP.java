@@ -1,89 +1,67 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import com.mojang.authlib.GameProfile;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerInteractionManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.WorldServer;
+import net.minecraft.server.*;
+import net.minecraft.world.*;
+import com.mojang.authlib.*;
+import net.minecraft.server.management.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.entity.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.api.world.*;
 
-/**
- * This class provides various hooks which are missing from Forge or don't quite
- * do what we need. </p> Do not reference this or test 'instance of' this in
- * your code: if PlayerAPI is installed, GCEntityPlayerMP will not be used.
- */
 public class GCEntityPlayerMP extends EntityPlayerMP
 {
-
-    public GCEntityPlayerMP(MinecraftServer server, WorldServer world, GameProfile profile, PlayerInteractionManager interactionManager)
-    {
-        super(server, world, profile, interactionManager);
-//        if (this.world != world)
-//        {
-//            GCPlayerStats.get(this).setStartDimension(WorldUtil.getDimensionName(this.world.provider));
-//        }
+    public GCEntityPlayerMP(final MinecraftServer server, final WorldServer world, final GameProfile profile, final ItemInWorldManager itemInWorldManager) {
+        super(server, WorldUtil.getStartWorld(world), profile, itemInWorldManager);
+        if (this.worldObj != world) {
+            GCPlayerStats.get(this).startAdventure(WorldUtil.getDimensionName(this.worldObj.provider));
+        }
     }
-
-    @Override
-    public void updateRidden()
-    {
+    
+    public void clonePlayer(final EntityPlayer oldPlayer, final boolean keepInv) {
+        super.clonePlayer(oldPlayer, keepInv);
+        GalacticraftCore.proxy.player.clonePlayer(this, oldPlayer, keepInv);
+        TileEntityTelemetry.updateLinkedPlayer((EntityPlayerMP)oldPlayer, this);
+    }
+    
+    public void updateRidden() {
         GalacticraftCore.proxy.player.updateRiddenPre(this);
         super.updateRidden();
         GalacticraftCore.proxy.player.updateRiddenPost(this);
     }
-
-    @Override
-    public void dismountRidingEntity()
-    {
-        if (!GalacticraftCore.proxy.player.dismountEntity(this, this.getRidingEntity()))
-        {
-            super.dismountRidingEntity();
+    
+    public void mountEntity(final Entity par1Entity) {
+        if (!GalacticraftCore.proxy.player.mountEntity(this, par1Entity)) {
+            super.mountEntity(par1Entity);
         }
     }
-
-    @Override
-    public void move(MoverType type, double x, double y, double z)
-    {
-        super.move(type, x, y, z);
-        GalacticraftCore.proxy.player.move(this, type, x, y, z);
+    
+    public void moveEntity(final double par1, final double par3, final double par5) {
+        super.moveEntity(par1, par3, par5);
+        GalacticraftCore.proxy.player.moveEntity(this, par1, par3, par5);
     }
-
-    @Override
-    public void wakeUpPlayer(boolean immediately, boolean updateWorldFlag, boolean setSpawn)
-    {
-        if (GalacticraftCore.proxy.player.wakeUpPlayer(this, immediately, updateWorldFlag, setSpawn))
-        {
-            return;
+    
+    public void wakeUpPlayer(final boolean par1, final boolean par2, final boolean par3) {
+        if (!GalacticraftCore.proxy.player.wakeUpPlayer(this, par1, par2, par3)) {
+            super.wakeUpPlayer(par1, par2, par3);
         }
-        super.wakeUpPlayer(immediately, updateWorldFlag, setSpawn);
     }
-
-    @Override
-    public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
-    {
+    
+    public boolean attackEntityFrom(final DamageSource par1DamageSource, float par2) {
         par2 = GalacticraftCore.proxy.player.attackEntityFrom(this, par1DamageSource, par2);
-        return par2 != -1F && super.attackEntityFrom(par1DamageSource, par2);
+        return par2 != -1.0f && super.attackEntityFrom(par1DamageSource, par2);
     }
-
-    @Override
-    public void knockBack(Entity p_70653_1_, float p_70653_2_, double impulseX, double impulseZ)
-    {
+    
+    public void knockBack(final Entity p_70653_1_, final float p_70653_2_, final double impulseX, final double impulseZ) {
         GalacticraftCore.proxy.player.knockBack(this, p_70653_1_, p_70653_2_, impulseX, impulseZ);
     }
-
-    @Override
-    public boolean isSpectator()
-    {
-        return GalacticraftCore.proxy.player.isSpectator(this) || super.isSpectator();
+    
+    public void setInPortal() {
+        if (!(this.worldObj.provider instanceof IGalacticraftWorldProvider)) {
+            super.setInPortal();
+        }
     }
 }

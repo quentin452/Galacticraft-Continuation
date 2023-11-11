@@ -1,65 +1,34 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
-import net.minecraft.item.ItemStack;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.entity.player.*;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.*;
+import net.minecraft.util.*;
+import net.minecraft.item.*;
+import cpw.mods.fml.relauncher.*;
 
 public class SlotArmorGC extends Slot
 {
-
-    private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[]
-    {EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
     final int armorType;
     final EntityPlayer thePlayer;
-
-    public SlotArmorGC(EntityPlayer thePlayer, IInventory par2IInventory, int par3, int par4, int par5, int par6)
-    {
+    
+    public SlotArmorGC(final EntityPlayer thePlayer, final IInventory par2IInventory, final int par3, final int par4, final int par5, final int par6) {
         super(par2IInventory, par3, par4, par5);
         this.thePlayer = thePlayer;
         this.armorType = par6;
     }
-
-    @Override
-    public int getSlotStackLimit()
-    {
+    
+    public int getSlotStackLimit() {
         return 1;
     }
-	
-    @Override
-    public boolean canTakeStack(EntityPlayer playerIn) {
-    	ItemStack item = this.inventory.getStackInSlot(getSlotIndex());
-    	if(EnchantmentHelper.hasBindingCurse(item)) {
-    		return false;
-        }
-    	return super.canTakeStack(playerIn);
+    
+    public boolean isItemValid(final ItemStack par1ItemStack) {
+        final Item item = (par1ItemStack == null) ? null : par1ItemStack.getItem();
+        return item != null && item.isValidArmor(par1ItemStack, this.armorType, (Entity)this.thePlayer);
     }
-
-    @Override
-    public boolean isItemValid(ItemStack par1ItemStack)
-    {
-        final Item item = par1ItemStack.isEmpty() ? null : par1ItemStack.getItem();
-        return item != null && item.isValidArmor(par1ItemStack, VALID_EQUIPMENT_SLOTS[this.armorType], this.thePlayer);
-    }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public String getSlotTexture()
-    {
-        return ItemArmor.EMPTY_SLOT_NAMES[VALID_EQUIPMENT_SLOTS[this.armorType].getIndex()];
+    public IIcon getBackgroundIconIndex() {
+        return ItemArmor.func_94602_b(this.armorType);
     }
 }

@@ -1,134 +1,75 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-
-import micdoodle8.mods.galacticraft.api.item.IItemElectric;
-import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlock;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityFuelLoader;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.api.item.*;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
 public class ContainerFuelLoader extends Container
 {
-
     private TileBaseElectricBlock tileEntity;
 
-    public ContainerFuelLoader(InventoryPlayer par1InventoryPlayer, TileEntityFuelLoader fuelLoader)
-    {
-        this.tileEntity = fuelLoader;
-        this.addSlotToContainer(new SlotSpecific(fuelLoader, 0, 51, 55, IItemElectric.class));
-        this.addSlotToContainer(new Slot(fuelLoader, 1, 7, 12));
-
-        int var6;
-        int var7;
-
-        // Player inv:
-
-        for (var6 = 0; var6 < 3; ++var6)
-        {
-            for (var7 = 0; var7 < 9; ++var7)
-            {
-                this.addSlotToContainer(new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 31 + 58 + var6 * 18));
+    public ContainerFuelLoader(final InventoryPlayer par1InventoryPlayer, final TileEntityFuelLoader fuelLoader) {
+        this.tileEntity = (TileBaseElectricBlock)fuelLoader;
+        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)fuelLoader, 0, 51, 55, new Class[] { IItemElectric.class }));
+        this.addSlotToContainer(new Slot((IInventory)fuelLoader, 1, 7, 12));
+        for (int var6 = 0; var6 < 3; ++var6) {
+            for (int var7 = 0; var7 < 9; ++var7) {
+                this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 89 + var6 * 18));
             }
         }
-
-        for (var6 = 0; var6 < 9; ++var6)
-        {
-            this.addSlotToContainer(new Slot(par1InventoryPlayer, var6, 8 + var6 * 18, 31 + 116));
+        for (int var6 = 0; var6 < 9; ++var6) {
+            this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var6, 8 + var6 * 18, 147));
         }
     }
 
-    @Override
-    public boolean canInteractWith(EntityPlayer var1)
-    {
-        return this.tileEntity.isUsableByPlayer(var1);
+    public boolean canInteractWith(final EntityPlayer var1) {
+        return this.tileEntity.isUseableByPlayer(var1);
     }
 
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer entityPlayer, int par2)
-    {
-        ItemStack var3 = ItemStack.EMPTY;
-        final Slot slot = this.inventorySlots.get(par2);
-
-        if (slot != null && slot.getHasStack())
-        {
-            final ItemStack var5 = slot.getStack();
-            var3 = var5.copy();
-            boolean movedToMachineSlot = false;
-
-            if (par2 < 2)
-            {
-                if (!this.mergeItemStack(var5, 2, 38, true))
-                {
-                    return ItemStack.EMPTY;
-                }
-            } else
-            {
-                if (EnergyUtil.isElectricItem(var5.getItem()))
-                {
-                    if (!this.mergeItemStack(var5, 0, 1, false))
-                    {
-                        return ItemStack.EMPTY;
-                    }
-                    movedToMachineSlot = true;
-                } else
-                {
-                    if (FluidUtil.isFuelContainerAny(var5))
-                    {
-                        if (!this.mergeItemStack(var5, 1, 2, false))
-                        {
-                            return ItemStack.EMPTY;
-                        }
-                        movedToMachineSlot = true;
-                    } else if (par2 < 29)
-                    {
-                        if (!this.mergeItemStack(var5, 29, 38, false))
-                        {
-                            return ItemStack.EMPTY;
-                        }
-                    } else if (!this.mergeItemStack(var5, 2, 29, false))
-                    {
-                        return ItemStack.EMPTY;
-                    }
+    public ItemStack transferStackInSlot(final EntityPlayer par1EntityPlayer, final int par2) {
+        ItemStack var3 = null;
+        final Slot slot = (Slot) this.inventorySlots.get(par2);
+        if (slot != null && slot.getHasStack()) {
+            final ItemStack var4 = slot.getStack();
+            var3 = var4.copy();
+            if (par2 < 2) {
+                if (!this.mergeItemStack(var4, 2, 38, true)) {
+                    return null;
                 }
             }
-
-            if (var5.getCount() == 0)
-            {
-                // Needed where tile has inventoryStackLimit of 1
-                if (movedToMachineSlot && var3.getCount() > 1)
-                {
-                    ItemStack remainder = var3.copy();
-                    remainder.shrink(1);
-                    slot.putStack(remainder);
-                } else
-                {
-                    slot.putStack(ItemStack.EMPTY);
+            else if (var4.getItem() instanceof IItemElectric) {
+                if (!this.mergeItemStack(var4, 0, 1, false)) {
+                    return null;
                 }
-            } else
-            {
+            }
+            else if (FluidUtil.isFuelContainerAny(var4)) {
+                if (!this.mergeItemStack(var4, 1, 2, false)) {
+                    return null;
+                }
+            }
+            else if (par2 < 29) {
+                if (!this.mergeItemStack(var4, 29, 38, false)) {
+                    return null;
+                }
+            }
+            else if (!this.mergeItemStack(var4, 2, 29, false)) {
+                return null;
+            }
+            if (var4.stackSize == 0) {
+                slot.putStack((ItemStack)null);
+            }
+            else {
                 slot.onSlotChanged();
             }
-
-            if (var5.getCount() == var3.getCount())
-            {
-                return ItemStack.EMPTY;
+            if (var4.stackSize == var3.stackSize) {
+                return null;
             }
-
-            slot.onTake(entityPlayer, var5);
+            slot.onPickupFromSlot(par1EntityPlayer, var4);
         }
-
         return var3;
     }
 }

@@ -1,26 +1,16 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.network;
 
-import net.minecraft.entity.player.EntityPlayer;
-
-import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
+import io.netty.buffer.*;
+import net.minecraft.entity.player.*;
 
 public interface IPacket
 {
-
-    void encodeInto(ByteBuf buffer);
-
-    void decodeInto(ByteBuf buffer);
-
-    void handleClientSide(EntityPlayer player);
-
-    void handleServerSide(EntityPlayer player);
-
-    int getDimensionID();
+    void encodeInto(final ChannelHandlerContext p0, final ByteBuf p1);
+    
+    void decodeInto(final ChannelHandlerContext p0, final ByteBuf p1);
+    
+    void handleClientSide(final EntityPlayer p0);
+    
+    void handleServerSide(final EntityPlayer p0);
 }

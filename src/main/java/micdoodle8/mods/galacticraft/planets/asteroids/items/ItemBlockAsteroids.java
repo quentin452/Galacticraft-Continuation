@@ -1,45 +1,63 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.BlockBasicAsteroids;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
 
-public class ItemBlockAsteroids extends ItemBlock implements GCRarity
+public class ItemBlockAsteroids extends ItemBlock
 {
-
-    public ItemBlockAsteroids(Block block)
-    {
+    public ItemBlockAsteroids(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public int getMetadata(int meta)
-    {
+    
+    public int getMetadata(final int meta) {
         return meta;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemstack)
-    {
-        String name = BlockBasicAsteroids.EnumBlockBasic.values()[itemstack.getItemDamage()].getName();
-
-        return this.getBlock().getTranslationKey() + "." + name;
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public String getTranslationKey()
-    {
-        return this.getBlock().getTranslationKey() + ".0";
+    
+    public String getUnlocalizedName(final ItemStack itemstack) {
+        String name = "";
+        switch (itemstack.getItemDamage()) {
+            case 0: {
+                name = "asteroid0";
+                break;
+            }
+            case 1: {
+                name = "asteroid1";
+                break;
+            }
+            case 2: {
+                name = "asteroid2";
+                break;
+            }
+            case 3: {
+                name = "oreAluminum";
+                break;
+            }
+            case 4: {
+                name = "oreIlmenite";
+                break;
+            }
+            case 5: {
+                name = "oreIron";
+                break;
+            }
+            default: {
+                name = "null";
+                break;
+            }
+        }
+        return this.field_150939_a.getUnlocalizedName() + "." + name;
+    }
+    
+    public String getUnlocalizedName() {
+        return this.field_150939_a.getUnlocalizedName() + ".0";
     }
 }

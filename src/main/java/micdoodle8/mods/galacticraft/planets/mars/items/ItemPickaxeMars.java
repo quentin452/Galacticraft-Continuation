@@ -1,56 +1,39 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemPickaxe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.texture.*;
+import java.util.*;
 
-public class ItemPickaxeMars extends ItemPickaxe implements ISortableItem, GCRarity
+public class ItemPickaxeMars extends ItemPickaxe
 {
-
-    public ItemPickaxeMars(ToolMaterial par2EnumToolMaterial)
-    {
+    public ItemPickaxeMars(final Item.ToolMaterial par2EnumToolMaterial) {
         super(par2EnumToolMaterial);
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            list.add(new ItemStack(this, 1, 0));
-        }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister par1IconRegister) {
+        this.itemIcon = par1IconRegister.registerIcon(this.getUnlocalizedName().replace("item.", "galacticraftmars:"));
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        par3List.add(new ItemStack(par1, 1, 0));
+    }
+    
+    public int getMetadata(final int par1) {
         return par1;
-    }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.TOOLS;
     }
 }

@@ -1,164 +1,112 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import api.player.client.ClientPlayerAPI;
-import api.player.client.ClientPlayerBase;
-import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
-import micdoodle8.mods.galacticraft.core.TransformerHooks;
-import micdoodle8.mods.galacticraft.core.client.EventHandlerClient;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.CompatibilityManager;
-import net.minecraft.entity.MoverType;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import api.player.client.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import micdoodle8.mods.galacticraft.api.world.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.common.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.entity.*;
+import net.minecraft.client.entity.*;
+import net.minecraft.entity.player.*;
 
 public class GCPlayerBaseSP extends ClientPlayerBase
 {
-
     boolean lastIsFlying;
     int lastLandingTicks;
-
-    public GCPlayerBaseSP(ClientPlayerAPI playerAPI)
-    {
+    
+    public GCPlayerBaseSP(final ClientPlayerAPI playerAPI) {
         super(playerAPI);
     }
-
-    private IPlayerClient getClientHandler()
-    {
+    
+    private IPlayerClient getClientHandler() {
         return ClientProxyCore.playerClientHandler;
     }
-
-//    @Override
-//    public void wakeUpPlayer(boolean par1, boolean par2, boolean par3)
-//    {
-//        if (!this.getClientHandler().wakeUpPlayer(this, par1, par2, par3))
-//        {
-//            super.wakeUpPlayer(par1, par2, par3);
-//        }
-//    }
-
-    @Override
-    public boolean isEntityInsideOpaqueBlock()
-    {
+    
+    public boolean isEntityInsideOpaqueBlock() {
         return this.getClientHandler().isEntityInsideOpaqueBlock(this.player, super.isEntityInsideOpaqueBlock());
     }
-
-    @Override
-    public void onLivingUpdate()
-    {
+    
+    public void onLivingUpdate() {
         this.getClientHandler().onLivingUpdatePre(this.player);
         super.onLivingUpdate();
         this.getClientHandler().onLivingUpdatePost(this.player);
     }
-
-    @Override
-    public void beforeUpdateEntityActionState()
-    {
-        if (this.player.world.provider instanceof IZeroGDimension)
-        {
-            GCPlayerStatsClient stats = GCPlayerStatsClient.get(this.player);
-            if (stats.getLandingTicks() > 0)
-            {
-                this.player.movementInput.moveStrafe *= 0.5F;
-                this.player.movementInput.moveForward *= 0.5F;
+    
+    public void beforeUpdateEntityActionState() {
+        if (this.player.worldObj.provider instanceof IZeroGDimension) {
+            final GCPlayerStatsClient stats = GCPlayerStatsClient.get(this.player);
+            if (stats.landingTicks > 0) {
+                this.player.ySize = stats.landingYOffset[stats.landingTicks];
+                final MovementInput movementInput = this.player.movementInput;
+                movementInput.moveStrafe *= 0.5f;
+                final MovementInput movementInput2 = this.player.movementInput;
+                movementInput2.moveForward *= 0.5f;
+                if (this.player.movementInput.sneak && this.player.ySize < 0.2f) {
+                    this.player.ySize = 0.2f;
+                }
             }
-
-            // TODO: equivalent to getEyeHeight() in GCEntityClientPlayerMP
-
-            // TODO: set this.player.flyToggleTimer = 0;
+            else if (stats.pjumpticks > 0) {
+                this.player.ySize = 0.01f * stats.pjumpticks;
+            }
+            else if (!this.player.onGround || stats.inFreefall) {
+                this.player.ySize = 0.0f;
+            }
         }
     }
-
-    @Override
-    public void afterUpdateEntityActionState()
-    {
-        if (this.player.world.provider instanceof IZeroGDimension)
-        {
+    
+    public void afterUpdateEntityActionState() {
+        if (this.player.worldObj.provider instanceof IZeroGDimension) {
             this.player.setJumping(false);
-            AxisAlignedBB aABB = this.player.getEntityBoundingBox();
-            if ((aABB.minY % 1D) == 0.5D)
-                this.player.setEntityBoundingBox(aABB.offset(0D, 0.00001D, 0D));
+            if (this.player.boundingBox.minY % 1.0 == 0.5) {
+                final AxisAlignedBB boundingBox = this.player.boundingBox;
+                boundingBox.minY += 9.999999747378752E-6;
+            }
         }
     }
-
-    @Override
-    public void moveEntity(MoverType moverType, double x, double y, double z)
-    {
-        super.moveEntity(moverType, x, y, z);
-        this.getClientHandler().move(this.player, moverType, x, y, z);
+    
+    public void moveEntity(final double par1, final double par3, final double par5) {
+        super.moveEntity(par1, par3, par5);
+        this.getClientHandler().moveEntity(this.player, par1, par3, par5);
     }
-
-    @Override
-    public void afterMoveEntityWithHeading(float paramFloat1, float paramFloat2, float paramFloat3)
-    {
-        super.afterMoveEntityWithHeading(paramFloat1, paramFloat2, paramFloat3);
-
-        if (CompatibilityManager.isSmartMovingLoaded && !this.player.capabilities.isFlying)
-        {
-            this.player.motionY += 0.080000000000000002D;
-            this.player.motionY -= TransformerHooks.getGravityForEntity(this.player);
+    
+    public void afterMoveEntityWithHeading(final float paramFloat1, final float paramFloat2) {
+        super.afterMoveEntityWithHeading(paramFloat1, paramFloat2);
+        if (Loader.isModLoaded("SmartMoving") && !this.player.capabilities.isFlying) {
+            final EntityPlayerSP player = this.player;
+            player.motionY += 0.08;
+            final EntityPlayerSP player2 = this.player;
+            player2.motionY -= WorldUtil.getGravityForEntity((Entity)this.player);
         }
     }
-
-    @Override
-    public void onUpdate()
-    {
+    
+    public void onUpdate() {
         this.getClientHandler().onUpdate(this.player);
         super.onUpdate();
     }
-
-    @Override
-    public boolean isSneaking()
-    {
-        if (this.player.world.provider instanceof IZeroGDimension)
-        {
-            GCPlayerStatsClient stats = GCPlayerStatsClient.get(this.player);
-            if (stats.getLandingTicks() > 0)
-            {
-                if (this.lastLandingTicks == 0)
-                    this.lastLandingTicks = stats.getLandingTicks();
-
-                return stats.getLandingTicks() < this.lastLandingTicks;
-            } else
-                this.lastLandingTicks = 0;
-
-            if (stats.getFreefallHandler().pjumpticks > 0)
+    
+    public boolean isSneaking() {
+        if (this.player.worldObj.provider instanceof IZeroGDimension) {
+            final GCPlayerStatsClient stats = GCPlayerStatsClient.get(this.player);
+            if (stats.landingTicks > 0) {
+                if (this.lastLandingTicks == 0) {
+                    this.lastLandingTicks = stats.landingTicks;
+                }
+                return stats.landingTicks < this.lastLandingTicks;
+            }
+            this.lastLandingTicks = 0;
+            if (stats.pjumpticks > 0) {
                 return true;
-
-            if (EventHandlerClient.sneakRenderOverride)
-            {
-                if (stats.getFreefallHandler().testFreefall(this.player))
+            }
+            if (ClientProxyCore.sneakRenderOverride) {
+                if (FreefallHandler.testFreefall((EntityPlayer)this.player)) {
                     return false;
-                if (stats.isInFreefall())
+                }
+                if (stats.inFreefall) {
                     return false;
+                }
             }
         }
         return super.isSneaking();
-    }
-
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public float getBedOrientationInDegrees()
-//    {
-//        return this.getClientHandler().getBedOrientationInDegrees(this, super.getBedOrientationInDegrees());
-//    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getBrightnessForRender()
-    {
-        double height = this.player.posY + (double) this.player.getEyeHeight();
-        if (height > 255D)
-            height = 255D;
-        BlockPos blockpos = new BlockPos(this.player.posX, height, this.player.posZ);
-        return this.player.world.isBlockLoaded(blockpos) ? this.player.world.getCombinedLight(blockpos, 0) : 0;
     }
 }

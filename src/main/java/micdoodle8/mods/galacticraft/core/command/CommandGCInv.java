@@ -1,229 +1,167 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.command;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.inventory.InventoryExtended;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import net.minecraft.item.*;
+import net.minecraft.server.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import net.minecraft.command.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.inventory.*;
+import net.minecraft.nbt.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.world.*;
+import java.util.*;
 
 public class CommandGCInv extends CommandBase
 {
-
-    protected static final Map<String, ItemStack[]> savedata = new HashMap<String, ItemStack[]>();
-    private static final Set<String> dontload = new HashSet<String>();
-    private static boolean firstuse = true;
+    protected static final Map<String, ItemStack[]> savedata;
+    private static final Set<String> dontload;
+    private static boolean firstuse;
     private static GCInvSaveData savefile;
-
-    @Override
-    public String getUsage(ICommandSender var1)
-    {
-        return "/" + this.getName() + " [save|restore|drop|clear] <playername>";
+    
+    public String getCommandUsage(final ICommandSender var1) {
+        return "/" + this.getCommandName() + " [save|restore|drop|clear] <playername>";
     }
-
-    @Override
-    public int getRequiredPermissionLevel()
-    {
+    
+    public int getRequiredPermissionLevel() {
         return 2;
     }
-
-    @Override
-    public String getName()
-    {
+    
+    public String getCommandName() {
         return "gcinv";
     }
-
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
-    {
-        if (args.length == 1)
-        {
-            return getListOfStringsMatchingLastWord(args, "save", "restore", "drop", "clear");
+    
+    public List addTabCompletionOptions(final ICommandSender par1ICommandSender, final String[] par2ArrayOfStr) {
+        if (par2ArrayOfStr.length == 1) {
+            return getListOfStringsMatchingLastWord(par2ArrayOfStr, new String[] { "save", "restore", "drop", "clear" });
         }
-        if (args.length == 2)
-        {
-            return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+        if (par2ArrayOfStr.length == 2) {
+            return getListOfStringsMatchingLastWord(par2ArrayOfStr, this.getPlayers());
         }
         return null;
     }
-
-    @Override
-    public boolean isUsernameIndex(String[] par1ArrayOfStr, int par2)
-    {
+    
+    protected String[] getPlayers() {
+        return MinecraftServer.getServer().getAllUsernames();
+    }
+    
+    public boolean isUsernameIndex(final String[] par1ArrayOfStr, final int par2) {
         return par2 == 1;
     }
-
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-    {
-        if (CommandGCInv.firstuse)
-        {
+    
+    public void processCommand(final ICommandSender icommandsender, final String[] astring) {
+        if (CommandGCInv.firstuse) {
             CommandGCInv.firstuse = false;
-            CommandGCInv.initialise();
+            initialise();
         }
-
-        if (args.length == 2)
-        {
-            try
-            {
-                EntityPlayerMP thePlayer = PlayerUtil.getPlayerBaseServerFromPlayerUsername(args[1], true);
-                if (thePlayer != null && !thePlayer.isDead && thePlayer.world != null)
-                {
-                    GCPlayerStats stats = GCPlayerStats.get(thePlayer);
-
-                    if (args[0].equalsIgnoreCase("drop"))
-                    {
-                        InventoryExtended gcInventory = stats.getExtendedInventory();
-                        gcInventory.dropExtendedItems(thePlayer);
-                    } else if (args[0].equalsIgnoreCase("save"))
-                    {
-                        InventoryExtended gcInventory = stats.getExtendedInventory();
-                        ItemStack[] saveinv = new ItemStack[gcInventory.getSizeInventory()];
-                        for (int i = 0; i < gcInventory.getSizeInventory(); i++)
-                        {
+        if (astring.length == 2) {
+            try {
+                final EntityPlayerMP thePlayer = PlayerUtil.getPlayerBaseServerFromPlayerUsername(astring[1], true);
+                if (thePlayer != null && !thePlayer.isDead && thePlayer.worldObj != null) {
+                    final GCPlayerStats stats = GCPlayerStats.get(thePlayer);
+                    if (astring[0].equalsIgnoreCase("drop")) {
+                        final InventoryExtended gcInventory = stats.extendedInventory;
+                        gcInventory.dropExtendedItems((EntityPlayer)thePlayer);
+                    }
+                    else if (astring[0].equalsIgnoreCase("save")) {
+                        final InventoryExtended gcInventory = stats.extendedInventory;
+                        final ItemStack[] saveinv = new ItemStack[gcInventory.getSizeInventory()];
+                        for (int i = 0; i < gcInventory.getSizeInventory(); ++i) {
                             saveinv[i] = gcInventory.getStackInSlot(i);
-                            gcInventory.setInventorySlotContents(i, ItemStack.EMPTY);
+                            gcInventory.setInventorySlotContents(i, null);
                         }
-
-                        CommandGCInv.savedata.put(args[1].toLowerCase(), saveinv);
-                        CommandGCInv.dontload.add(args[1].toLowerCase());
-                        CommandGCInv.writefile();
-                        System.out.println("[GCInv] Saving and clearing GC inventory slots of " + PlayerUtil.getName(thePlayer));
-                    } else if (args[0].equalsIgnoreCase("restore"))
-                    {
-                        ItemStack[] saveinv = CommandGCInv.savedata.get(args[1].toLowerCase());
-                        CommandGCInv.dontload.remove(args[1].toLowerCase());
-                        if (saveinv == null)
-                        {
-                            System.out.println("[GCInv] Tried to restore but player " + PlayerUtil.getName(thePlayer) + " had no saved GC inventory items.");
+                        CommandGCInv.savedata.put(astring[1].toLowerCase(), saveinv);
+                        CommandGCInv.dontload.add(astring[1].toLowerCase());
+                        writefile();
+                        System.out.println("[GCInv] Saving and clearing GC inventory slots of " + thePlayer.getGameProfile().getName());
+                    }
+                    else if (astring[0].equalsIgnoreCase("restore")) {
+                        final ItemStack[] saveinv2 = CommandGCInv.savedata.get(astring[1].toLowerCase());
+                        CommandGCInv.dontload.remove(astring[1].toLowerCase());
+                        if (saveinv2 == null) {
+                            System.out.println("[GCInv] Tried to restore but player " + thePlayer.getGameProfile().getName() + " had no saved GC inventory items.");
                             return;
                         }
-
-                        CommandGCInv.doLoad(thePlayer);
-                    } else if (args[0].equalsIgnoreCase("clear"))
-                    {
-                        InventoryExtended gcInventory = stats.getExtendedInventory();
-                        for (int i = 0; i < gcInventory.getSizeInventory(); i++)
-                        {
-                            gcInventory.setInventorySlotContents(i, ItemStack.EMPTY);
-                        }
-                    } else
-                    {
-                        throw new WrongUsageException("Invalid GCInv command. Usage: " + this.getUsage(sender));
+                        doLoad(thePlayer);
                     }
-                } else
-                {
-                    // Special rule for 'restore' command if player not found -
-                    // look to see if the player is offline (i.e. had a saved
-                    // inventory already)
-                    if (args[0].equalsIgnoreCase("restore"))
-                    {
-                        ItemStack[] saveinv = CommandGCInv.savedata.get(args[1].toLowerCase());
-                        if (saveinv != null)
-                        {
-                            System.out.println("[GCInv] Restore command for offline player " + args[1] + ", setting to restore GCInv on next login.");
-                            CommandGCInv.dontload.remove(args[1].toLowerCase());
-                            // Now it can autoload on next player logon
-                            return;
+                    else {
+                        if (!astring[0].equalsIgnoreCase("clear")) {
+                            throw new WrongUsageException("Invalid GCInv command. Usage: " + this.getCommandUsage(icommandsender), new Object[0]);
                         }
-                    }
-
-                    // No player found, and not a 'restore' command
-                    if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("save") || args[0].equalsIgnoreCase("drop"))
-                    {
-                        System.out.println("GCInv command: player " + args[1] + " not found.");
-                    } else
-                    {
-                        throw new WrongUsageException("Invalid GCInv command. Usage: " + this.getUsage(sender), new Object[0]);
+                        final InventoryExtended gcInventory = stats.extendedInventory;
+                        for (int j = 0; j < gcInventory.getSizeInventory(); ++j) {
+                            gcInventory.setInventorySlotContents(j, null);
+                        }
                     }
                 }
-            } catch (final Exception e)
-            {
+                else {
+                    if (astring[0].equalsIgnoreCase("restore")) {
+                        final ItemStack[] saveinv3 = CommandGCInv.savedata.get(astring[1].toLowerCase());
+                        if (saveinv3 != null) {
+                            System.out.println("[GCInv] Restore command for offline player " + astring[1] + ", setting to restore GCInv on next login.");
+                            CommandGCInv.dontload.remove(astring[1].toLowerCase());
+                            return;
+                        }
+                    }
+                    if (!astring[0].equalsIgnoreCase("clear") && !astring[0].equalsIgnoreCase("save") && !astring[0].equalsIgnoreCase("drop")) {
+                        throw new WrongUsageException("Invalid GCInv command. Usage: " + this.getCommandUsage(icommandsender), new Object[0]);
+                    }
+                    System.out.println("GCInv command: player " + astring[1] + " not found.");
+                }
+            }
+            catch (Exception e) {
                 System.out.println(e.toString());
                 e.printStackTrace();
             }
-        } else
-        {
-            throw new WrongUsageException("Not enough command arguments! Usage: " + this.getUsage(sender), new Object[0]);
+            return;
         }
+        throw new WrongUsageException("Not enough command arguments! Usage: " + this.getCommandUsage(icommandsender), new Object[0]);
     }
-
-    public static void doLoad(EntityPlayerMP thePlayer)
-    {
-        String theName = PlayerUtil.getName(thePlayer).toLowerCase();
-        if (!CommandGCInv.dontload.contains(theName))
-        // This is a simple flag: if the playername is in dontload then no
-        // restore command has yet been run.
-        // Dontload resets to nothing on server restart so that all will
-        // auto-restore on a server restart.
-        {
-            ItemStack[] saveinv = CommandGCInv.savedata.get(theName);
-            InventoryExtended gcInventory = GCPlayerStats.get(thePlayer).getExtendedInventory();
-            for (int i = 0; i < gcInventory.getSizeInventory(); i++)
-            {
+    
+    public static void doLoad(final EntityPlayerMP thePlayer) {
+        final String theName = thePlayer.getGameProfile().getName().toLowerCase();
+        if (!CommandGCInv.dontload.contains(theName)) {
+            final ItemStack[] saveinv = CommandGCInv.savedata.get(theName);
+            final InventoryExtended gcInventory = GCPlayerStats.get(thePlayer).extendedInventory;
+            for (int i = 0; i < gcInventory.getSizeInventory(); ++i) {
                 gcInventory.setInventorySlotContents(i, saveinv[i]);
             }
             CommandGCInv.savedata.remove(theName);
-            CommandGCInv.writefile();
-            System.out.println("[GCInv] Restored GC inventory slots of " + PlayerUtil.getName(thePlayer));
-
-        } else
-        {
-            System.out.println("[GCInv] Player " + PlayerUtil.getName(thePlayer) + " was spawned without restoring the GCInv save.  Run /gcinv restore playername to restore it.");
+            writefile();
+            System.out.println("[GCInv] Restored GC inventory slots of " + thePlayer.getGameProfile().getName());
+        }
+        else {
+            System.out.println("[GCInv] Player " + thePlayer.getGameProfile().getName() + " was spawned without restoring the GCInv save.  Run /gcinv restore playername to restore it.");
         }
     }
-
-    private static void writefile()
-    {
+    
+    private static void writefile() {
         CommandGCInv.savefile.writeToNBT(new NBTTagCompound());
         CommandGCInv.savefile.markDirty();
     }
-
-    private static void initialise()
-    {
-        World world0 = WorldUtil.getWorldForDimensionServer(0);
-        if (world0 == null)
-        {
+    
+    private static void initialise() {
+        final World world0 = GalacticraftCore.proxy.getWorldForID(0);
+        if (world0 == null) {
             return;
         }
-        CommandGCInv.savefile = (GCInvSaveData) world0.loadData(GCInvSaveData.class, GCInvSaveData.SAVE_ID);
-        if (CommandGCInv.savefile == null)
-        {
-            CommandGCInv.savefile = new GCInvSaveData();
-            world0.setData(GCInvSaveData.SAVE_ID, CommandGCInv.savefile);
+        CommandGCInv.savefile = (GCInvSaveData)world0.loadItemData((Class)GCInvSaveData.class, "GCInv_savefile");
+        if (CommandGCInv.savefile == null) {
+            world0.setItemData("GCInv_savefile", (WorldSavedData)(CommandGCInv.savefile = new GCInvSaveData()));
         }
     }
-
-    public static ItemStack[] getSaveData(String p)
-    {
-        if (CommandGCInv.firstuse)
-        {
+    
+    public static ItemStack[] getSaveData(final String p) {
+        if (CommandGCInv.firstuse) {
             CommandGCInv.firstuse = false;
-            CommandGCInv.initialise();
+            initialise();
         }
-
         return CommandGCInv.savedata.get(p);
+    }
+    
+    static {
+        savedata = new HashMap<String, ItemStack[]>();
+        dontload = new HashSet<String>();
+        CommandGCInv.firstuse = true;
     }
 }

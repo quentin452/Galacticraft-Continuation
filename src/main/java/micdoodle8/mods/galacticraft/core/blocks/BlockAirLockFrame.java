@@ -1,201 +1,282 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import java.util.*;
+import net.minecraft.item.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraftforge.common.util.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityAirLock;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityAirLockController;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
-
-public class BlockAirLockFrame extends BlockAdvancedTile implements IShiftDescription, ISortableBlock
+public class BlockAirLockFrame extends BlockAdvancedTile implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    private enum EnumAirLockType implements IStringSerializable
-    {
-
-        AIR_LOCK_FRAME(0, "air_lock_frame"), AIR_LOCK_CONTROLLER(1, "air_lock_controller");
-
-        private final int meta;
-        private final String name;
-
-        EnumAirLockType(int meta, String name)
-        {
-            this.meta = meta;
-            this.name = name;
-        }
-
-        public int getMeta()
-        {
-            return this.meta;
-        }
-
-        private final static EnumAirLockType[] values = values();
-
-        public static EnumAirLockType byMetadata(int meta)
-        {
-            return values[meta % values.length];
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
+    @SideOnly(Side.CLIENT)
+    private IIcon[] airLockIcons;
+    public static int METADATA_AIR_LOCK_FRAME;
+    public static int METADATA_AIR_LOCK_CONTROLLER;
+    
+    public BlockAirLockFrame(final String assetName) {
+        super(Material.rock);
+        this.setHardness(1.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    public static final PropertyEnum<EnumAirLockType> AIR_LOCK_TYPE = PropertyEnum.create("airlocktype", EnumAirLockType.class);
-
-    public BlockAirLockFrame(String assetName)
-    {
-        super(Material.ROCK);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(AIR_LOCK_TYPE, EnumAirLockType.AIR_LOCK_FRAME));
-        this.setHardness(1.0F);
-        this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(assetName);
+    
+    @SideOnly(Side.CLIENT)
+    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        par3List.add(new ItemStack(par1, 1, BlockAirLockFrame.METADATA_AIR_LOCK_FRAME));
+        par3List.add(new ItemStack(par1, 1, BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER));
     }
-
-    @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        list.add(new ItemStack(this, 1, EnumAirLockType.AIR_LOCK_FRAME.getMeta()));
-        list.add(new ItemStack(this, 1, EnumAirLockType.AIR_LOCK_CONTROLLER.getMeta()));
-    }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
-    {
+    
+    public boolean canPlaceBlockAt(final World par1World, final int par2, final int par3, final int par4) {
         return true;
     }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
-    {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-
-        TileEntity tile = worldIn.getTileEntity(pos);
-
-        if (tile instanceof TileEntityAirLockController && placer instanceof EntityPlayer)
-        {
-            ((TileEntityAirLockController) tile).ownerName = PlayerUtil.getName(((EntityPlayer) placer));
+    
+    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+        super.onBlockPlacedBy(world, x, y, z, entityLiving, itemStack);
+        final TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile instanceof TileEntityAirLockController && entityLiving instanceof EntityPlayer) {
+            ((TileEntityAirLockController)tile).ownerName = ((EntityPlayer)entityLiving).getGameProfile().getName();
         }
     }
-
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
-    {
-        if (state.getValue(AIR_LOCK_TYPE).getMeta() == EnumAirLockType.AIR_LOCK_FRAME.getMeta())
-        {
+    
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        (this.airLockIcons = new IIcon[8])[0] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "airlock_off");
+        this.airLockIcons[1] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "airlock_on_1");
+        this.airLockIcons[2] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "airlock_on_2");
+        this.airLockIcons[3] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "airlock_on_3");
+        this.airLockIcons[4] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "airlock_on_4");
+        this.airLockIcons[5] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "airlock_on_5");
+        this.airLockIcons[6] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "airlock_control_on");
+        this.airLockIcons[7] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "airlock_control_off");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(final int par1, final int par2) {
+        if (par2 < BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER) {
+            return this.airLockIcons[0];
+        }
+        if (par1 == ForgeDirection.UP.ordinal() || par1 == ForgeDirection.DOWN.ordinal()) {
+            return this.airLockIcons[0];
+        }
+        return this.airLockIcons[7];
+    }
+    
+    public IIcon getIcon(final IBlockAccess world, final int par2, final int par3, final int par4, final int side) {
+        if (world.getBlockMetadata(par2, par3, par4) < BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER) {
+            for (final ForgeDirection orientation : ForgeDirection.values()) {
+                if (orientation != ForgeDirection.UNKNOWN) {
+                    final Vector3 vector = new Vector3((double)par2, (double)par3, (double)par4);
+                    Vector3 blockVec = this.modifyPositionFromSide(vector.clone(), orientation, 1.0);
+                    Block connection = blockVec.getBlock(world);
+                    if (connection != null && connection.equals(GCBlocks.airLockSeal)) {
+                        if (orientation.offsetY == -1) {
+                            if (side == 0) {
+                                return this.airLockIcons[1];
+                            }
+                            if (side == 1) {
+                                return this.airLockIcons[0];
+                            }
+                            return this.airLockIcons[2];
+                        }
+                        else if (orientation.offsetY == 1) {
+                            if (side == 0) {
+                                return this.airLockIcons[0];
+                            }
+                            if (side == 1) {
+                                return this.airLockIcons[1];
+                            }
+                            return this.airLockIcons[3];
+                        }
+                        else if (orientation.ordinal() == side) {
+                            if (side == 0) {
+                                return this.airLockIcons[0];
+                            }
+                            if (side == 1) {
+                                return this.airLockIcons[1];
+                            }
+                            return this.airLockIcons[3];
+                        }
+                        else {
+                            if (orientation.getOpposite().ordinal() == side) {
+                                return this.airLockIcons[0];
+                            }
+                            blockVec = vector.clone().translate(new Vector3((double)orientation.offsetX, (double)orientation.offsetY, (double)orientation.offsetZ));
+                            connection = blockVec.getBlock(world);
+                            if (connection != null && connection.equals(GCBlocks.airLockSeal)) {
+                                if (orientation.offsetX == 1) {
+                                    if (side == 0) {
+                                        return this.airLockIcons[4];
+                                    }
+                                    if (side == 1) {
+                                        return this.airLockIcons[4];
+                                    }
+                                    if (side == 3) {
+                                        return this.airLockIcons[4];
+                                    }
+                                    if (side == 2) {
+                                        return this.airLockIcons[5];
+                                    }
+                                }
+                                else if (orientation.offsetX == -1) {
+                                    if (side == 0) {
+                                        return this.airLockIcons[5];
+                                    }
+                                    if (side == 1) {
+                                        return this.airLockIcons[5];
+                                    }
+                                    if (side == 3) {
+                                        return this.airLockIcons[5];
+                                    }
+                                    if (side == 2) {
+                                        return this.airLockIcons[4];
+                                    }
+                                }
+                                else if (orientation.offsetZ == 1) {
+                                    if (side == 0) {
+                                        return this.airLockIcons[2];
+                                    }
+                                    if (side == 1) {
+                                        return this.airLockIcons[2];
+                                    }
+                                    if (side == 4) {
+                                        return this.airLockIcons[4];
+                                    }
+                                    if (side == 5) {
+                                        return this.airLockIcons[5];
+                                    }
+                                }
+                                else if (orientation.offsetZ == -1) {
+                                    if (side == 0) {
+                                        return this.airLockIcons[3];
+                                    }
+                                    if (side == 1) {
+                                        return this.airLockIcons[3];
+                                    }
+                                    if (side == 4) {
+                                        return this.airLockIcons[5];
+                                    }
+                                    if (side == 5) {
+                                        return this.airLockIcons[4];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return this.airLockIcons[0];
+        }
+        if (side == ForgeDirection.UP.ordinal() || side == ForgeDirection.DOWN.ordinal()) {
+            return this.airLockIcons[0];
+        }
+        final TileEntity tile = world.getTileEntity(par2, par3, par4);
+        if (!(tile instanceof TileEntityAirLockController)) {
+            return this.airLockIcons[6];
+        }
+        final TileEntityAirLockController controller = (TileEntityAirLockController)tile;
+        if (controller.active) {
+            return this.airLockIcons[6];
+        }
+        return this.airLockIcons[7];
+    }
+    
+    public Vector3 modifyPositionFromSide(final Vector3 vec, final ForgeDirection side, final double amount) {
+        switch (side.ordinal()) {
+            case 0: {
+                vec.y -= amount;
+                break;
+            }
+            case 1: {
+                vec.y += amount;
+                break;
+            }
+            case 2: {
+                vec.z -= amount;
+                break;
+            }
+            case 3: {
+                vec.z += amount;
+                break;
+            }
+            case 4: {
+                vec.x -= amount;
+                break;
+            }
+            case 5: {
+                vec.x += amount;
+                break;
+            }
+        }
+        return vec;
+    }
+    
+    public TileEntity createTileEntity(final World world, final int metadata) {
+        if (metadata < BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER) {
             return new TileEntityAirLock();
-        } else
-        {
-            return new TileEntityAirLockController();
         }
+        return new TileEntityAirLockController();
     }
-
-    @Override
-    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side)
-    {
+    
+    public boolean canConnectRedstone(final IBlockAccess world, final int x, final int y, final int z, final int side) {
         return true;
     }
-
-    @Override
-    public boolean onMachineActivated(World world, BlockPos pos, IBlockState state, EntityPlayer entityPlayer, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        TileEntity tile = world.getTileEntity(pos);
-
-        if (state.getValue(AIR_LOCK_TYPE).getMeta() == EnumAirLockType.AIR_LOCK_CONTROLLER.getMeta() && tile instanceof TileEntityAirLockController)
-        {
-            entityPlayer.openGui(GalacticraftCore.instance, -1, world, pos.getX(), pos.getY(), pos.getZ());
+    
+    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        final TileEntity tile = world.getTileEntity(x, y, z);
+        if (metadata >= BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER && tile instanceof TileEntityAirLockController) {
+            entityPlayer.openGui((Object)GalacticraftCore.instance, -1, world, x, y, z);
             return true;
         }
-
         return false;
     }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        TileEntity tile = worldIn.getTileEntity(pos);
-
-        if (tile instanceof TileEntityAirLockController)
-        {
-            ((TileEntityAirLockController) tile).unsealAirLock();
+    
+    public void breakBlock(final World world, final int x, final int y, final int z, final Block block, final int par6) {
+        final TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile instanceof TileEntityAirLockController) {
+            ((TileEntityAirLockController)tile).unsealAirLock();
         }
-
-        super.breakBlock(worldIn, pos, state);
+        super.breakBlock(world, x, y, z, block, par6);
     }
-
-    @Override
-    public int damageDropped(IBlockState state)
-    {
-        return getMetaFromState(state);
+    
+    public int damageDropped(final int metadata) {
+        if (metadata >= BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER) {
+            return BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER;
+        }
+        if (metadata >= BlockAirLockFrame.METADATA_AIR_LOCK_FRAME) {
+            return BlockAirLockFrame.METADATA_AIR_LOCK_FRAME;
+        }
+        return 0;
     }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(AIR_LOCK_TYPE, EnumAirLockType.byMetadata(meta));
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return state.getValue(AIR_LOCK_TYPE).getMeta();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, AIR_LOCK_TYPE);
-    }
-
-    @Override
-    public String getShiftDescription(int itemDamage)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
-    }
-
-    @Override
-    public boolean showDescription(int itemDamage)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
     }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.MACHINE;
+    
+    static {
+        BlockAirLockFrame.METADATA_AIR_LOCK_FRAME = 0;
+        BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER = 1;
     }
 }

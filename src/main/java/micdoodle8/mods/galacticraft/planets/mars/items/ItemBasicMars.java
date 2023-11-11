@@ -1,112 +1,77 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import java.util.List;
-import javax.annotation.Nullable;
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.client.renderer.texture.*;
+import java.util.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-public class ItemBasicMars extends Item implements ISortableItem, GCRarity
+public class ItemBasicMars extends Item
 {
-
-    public static String[] names =
-    {"raw_desh", "desh_stick", "ingot_desh", "reinforced_plate_t2", "slimeling_cargo", "compressed_desh", "fluid_manip"};
-
-    public ItemBasicMars(String name)
-    {
-        super();
+    public static String[] names;
+    protected IIcon[] icons;
+    
+    public ItemBasicMars() {
+        this.icons = new IIcon[ItemBasicMars.names.length];
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
-        this.setTranslationKey(name);
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            for (int i = 0; i < ItemBasicMars.names.length; i++)
-            {
-                list.add(new ItemStack(this, 1, i));
-            }
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        int i = 0;
+        for (final String name : ItemBasicMars.names) {
+            this.icons[i++] = iconRegister.registerIcon("galacticraftmars:" + name);
         }
     }
-
-    @Override
-    public String getTranslationKey(ItemStack par1ItemStack)
-    {
-        if (names.length > par1ItemStack.getItemDamage())
-        {
+    
+    public IIcon getIconFromDamage(final int damage) {
+        if (this.icons.length > damage) {
+            return this.icons[damage];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < ItemBasicMars.names.length; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
+        }
+    }
+    
+    public String getUnlocalizedName(final ItemStack par1ItemStack) {
+        if (this.icons.length > par1ItemStack.getItemDamage()) {
             return "item." + ItemBasicMars.names[par1ItemStack.getItemDamage()];
         }
-
         return "unnamed";
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        if (par1ItemStack != null && par1ItemStack.getItemDamage() == 3)
-        {
-            tooltip.add(GCCoreUtil.translate("item.tier2.desc"));
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
+        if (par1ItemStack != null && par1ItemStack.getItemDamage() == 3) {
+            par3List.add(GCCoreUtil.translate("item.tier2.desc"));
         }
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
+    
+    public int getMetadata(final int par1) {
         return par1;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        switch (meta)
-        {
-            case 2:
-                return EnumSortCategoryItem.INGOT;
-            case 3:
-            case 5:
-                return EnumSortCategoryItem.PLATE;
-        }
-        return EnumSortCategoryItem.GENERAL;
-    }
-
-    @Override
-    public float getSmeltingExperience(ItemStack item)
-    {
-        switch (item.getItemDamage())
-        {
-            case 3:
-                return 1.5F;
-            case 5:
-                return 1F;
-        }
-        return -1F;
+    
+    static {
+        ItemBasicMars.names = new String[] { "rawDesh", "deshStick", "ingotDesh", "reinforcedPlateT2", "slimelingCargo", "compressedDesh", "fluidManip" };
     }
 }

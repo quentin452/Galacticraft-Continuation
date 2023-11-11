@@ -1,250 +1,165 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.inventory;
 
-import micdoodle8.mods.galacticraft.core.inventory.SlotRocketBenchResult;
-import micdoodle8.mods.galacticraft.planets.mars.util.RecipeUtilMars;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCraftResult;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.core.inventory.*;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.planets.mars.util.*;
+import net.minecraft.init.*;
+import net.minecraft.item.*;
+import net.minecraft.block.*;
 
 public class ContainerSchematicTier2Rocket extends Container
 {
+    public InventorySchematicTier2Rocket craftMatrix;
+    public IInventory craftResult;
+    private final World worldObj;
 
-    public InventorySchematicTier2Rocket craftMatrix = new InventorySchematicTier2Rocket(this);
-    public IInventory craftResult = new InventoryCraftResult();
-    private final World world;
-
-    public ContainerSchematicTier2Rocket(InventoryPlayer par1InventoryPlayer, BlockPos pos)
-    {
+    public ContainerSchematicTier2Rocket(final InventoryPlayer par1InventoryPlayer, final int x, final int y, final int z) {
+        this.craftMatrix = new InventorySchematicTier2Rocket(this);
+        this.craftResult = (IInventory)new InventoryCraftResult();
         final int change = 27;
-        this.world = par1InventoryPlayer.player.world;
-        this.addSlotToContainer(new SlotRocketBenchResult(par1InventoryPlayer.player, this.craftMatrix, this.craftResult, 0, 142, 18 + 69 + change));
-        int var6;
-        int var7;
-
-        // Cone
-        this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 1, 48, -8 + change, pos, par1InventoryPlayer.player));
-
-        // Body
-        for (var6 = 0; var6 < 5; ++var6)
-        {
-            this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 2 + var6, 39, -6 + var6 * 18 + 16 + change, pos, par1InventoryPlayer.player));
+        this.worldObj = par1InventoryPlayer.player.worldObj;
+        this.addSlotToContainer((Slot)new SlotRocketBenchResult(par1InventoryPlayer.player, (IInventory)this.craftMatrix, this.craftResult, 0, 142, 114));
+        this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 1, 48, 19, x, y, z, par1InventoryPlayer.player));
+        for (int var6 = 0; var6 < 5; ++var6) {
+            this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 2 + var6, 39, -6 + var6 * 18 + 16 + 27, x, y, z, par1InventoryPlayer.player));
         }
-
-        // Body Right
-        for (var6 = 0; var6 < 5; ++var6)
-        {
-            this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 7 + var6, 57, -6 + var6 * 18 + 16 + change, pos, par1InventoryPlayer.player));
+        for (int var6 = 0; var6 < 5; ++var6) {
+            this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 7 + var6, 57, -6 + var6 * 18 + 16 + 27, x, y, z, par1InventoryPlayer.player));
         }
-
-        // Left fins
-        this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 12, 21, 64 + change, pos, par1InventoryPlayer.player));
-        this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 13, 21, 82 + change, pos, par1InventoryPlayer.player));
-        this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 14, 21, 100 + change, pos, par1InventoryPlayer.player));
-
-        // Engine
-        this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 15, 48, 100 + change, pos, par1InventoryPlayer.player));
-
-        // Right fins
-        this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 16, 75, 64 + change, pos, par1InventoryPlayer.player));
-        this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 17, 75, 82 + change, pos, par1InventoryPlayer.player));
-        this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 18, 75, 100 + change, pos, par1InventoryPlayer.player));
-
-        // Addons
-        for (int var8 = 0; var8 < 3; var8++)
-        {
-            this.addSlotToContainer(new SlotSchematicTier2Rocket(this.craftMatrix, 19 + var8, 93 + var8 * 26, -15 + change, pos, par1InventoryPlayer.player));
+        this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 12, 21, 91, x, y, z, par1InventoryPlayer.player));
+        this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 13, 21, 109, x, y, z, par1InventoryPlayer.player));
+        this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 14, 21, 127, x, y, z, par1InventoryPlayer.player));
+        this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 15, 48, 127, x, y, z, par1InventoryPlayer.player));
+        this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 16, 75, 91, x, y, z, par1InventoryPlayer.player));
+        this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 17, 75, 109, x, y, z, par1InventoryPlayer.player));
+        this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 18, 75, 127, x, y, z, par1InventoryPlayer.player));
+        for (int var7 = 0; var7 < 3; ++var7) {
+            this.addSlotToContainer((Slot)new SlotSchematicTier2Rocket((IInventory)this.craftMatrix, 19 + var7, 93 + var7 * 26, 12, x, y, z, par1InventoryPlayer.player));
         }
-
-        // Player inv:
-
-        for (var6 = 0; var6 < 3; ++var6)
-        {
-            for (var7 = 0; var7 < 9; ++var7)
-            {
-                this.addSlotToContainer(new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 129 + var6 * 18 + change));
+        for (int var6 = 0; var6 < 3; ++var6) {
+            for (int var8 = 0; var8 < 9; ++var8) {
+                this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var8 + var6 * 9 + 9, 8 + var8 * 18, 129 + var6 * 18 + 27));
             }
         }
-
-        for (var6 = 0; var6 < 9; ++var6)
-        {
-            this.addSlotToContainer(new Slot(par1InventoryPlayer, var6, 8 + var6 * 18, 18 + 169 + change));
+        for (int var6 = 0; var6 < 9; ++var6) {
+            this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var6, 8 + var6 * 18, 214));
         }
-
-        this.onCraftMatrixChanged(this.craftMatrix);
+        this.onCraftMatrixChanged((IInventory)this.craftMatrix);
     }
 
-    @Override
-    public void onContainerClosed(EntityPlayer entityPlayer)
-    {
-        super.onContainerClosed(entityPlayer);
-
-        if (!this.world.isRemote)
-        {
-            for (int var2 = 1; var2 < this.craftMatrix.getSizeInventory(); ++var2)
-            {
-                final ItemStack var3 = this.craftMatrix.removeStackFromSlot(var2);
-
-                if (!var3.isEmpty())
-                {
-                    entityPlayer.entityDropItem(var3, 0.0F);
+    public void onContainerClosed(final EntityPlayer par1EntityPlayer) {
+        super.onContainerClosed(par1EntityPlayer);
+        if (!this.worldObj.isRemote) {
+            for (int var2 = 1; var2 < this.craftMatrix.getSizeInventory(); ++var2) {
+                final ItemStack var3 = this.craftMatrix.getStackInSlotOnClosing(var2);
+                if (var3 != null) {
+                    par1EntityPlayer.entityDropItem(var3, 0.0f);
                 }
             }
         }
     }
 
-    @Override
-    public void onCraftMatrixChanged(IInventory par1IInventory)
-    {
+    public void onCraftMatrixChanged(final IInventory par1IInventory) {
         this.craftResult.setInventorySlotContents(0, RecipeUtilMars.findMatchingSpaceshipT2Recipe(this.craftMatrix));
     }
 
-    @Override
-    public boolean canInteractWith(EntityPlayer entityPlayer)
-    {
+    public boolean canInteractWith(final EntityPlayer par1EntityPlayer) {
         return true;
     }
 
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer entityPlayer, int par1)
-    {
-        ItemStack var2 = ItemStack.EMPTY;
-        final Slot var3 = this.inventorySlots.get(par1);
-
-        if (var3 != null && var3.getHasStack())
-        {
+    public ItemStack transferStackInSlot(final EntityPlayer par1EntityPlayer, final int par1) {
+        ItemStack var2 = null;
+        final Slot var3 = (Slot) this.inventorySlots.get(par1);
+        if (var3 != null && var3.getHasStack()) {
             final ItemStack var4 = var3.getStack();
             var2 = var4.copy();
-
             boolean done = false;
-            if (par1 <= 21)
-            {
-                if (!this.mergeItemStack(var4, 22, 58, false))
-                {
-                    return ItemStack.EMPTY;
+            if (par1 <= 21) {
+                if (!this.mergeItemStack(var4, 22, 58, false)) {
+                    return null;
                 }
-
-                if (par1 == 0)
-                {
+                if (par1 == 0) {
                     var3.onSlotChange(var4, var2);
                 }
-            } else
-            {
-                for (int i = 1; i < 19; i++)
-                {
-                    Slot testSlot = (Slot) this.inventorySlots.get(i);
-                    if (!testSlot.getHasStack() && testSlot.isItemValid(var2))
-                    {
-                        if (!this.mergeOneItem(var4, i, i + 1, false))
-                        {
-                            return ItemStack.EMPTY;
+            }
+            else {
+                int i = 1;
+                while (i < 19) {
+                    final Slot testSlot = (Slot) this.inventorySlots.get(i);
+                    if (!testSlot.getHasStack() && testSlot.isItemValid(var2)) {
+                        if (!this.mergeOneItem(var4, i, i + 1, false)) {
+                            return null;
                         }
                         done = true;
                         break;
                     }
-                }
-
-                if (!done)
-                {
-                    boolean foundChest = false;
-                    for (ItemStack woodChest : OreDictionary.getOres("chestWood"))
-                    {
-                        if (var2.getItem() == woodChest.getItem())
-                        {
-                            foundChest = true;
-                            break;
-                        }
+                    else {
+                        ++i;
                     }
-                    if (foundChest)
-                    {
-                        if (!((Slot) this.inventorySlots.get(19)).getHasStack())
-                        {
-                            if (!this.mergeOneItem(var4, 19, 20, false))
-                            {
-                                return ItemStack.EMPTY;
+                }
+                if (!done) {
+                    Slot slot = (Slot) this.inventorySlots.get(19);
+                    if (slot != null && !slot.getHasStack()) {
+                        if (!this.mergeOneItem(var4, 19, 20, false)) {
+                            return null;
+                        }
+                    } else {
+                        Slot slot1 = (Slot) this.inventorySlots.get(20);
+                        if (slot1 != null && !slot1.getHasStack()) {
+                            if (!this.mergeOneItem(var4, 20, 21, false)) {
+                                return null;
                             }
-                        } else if (!((Slot) this.inventorySlots.get(20)).getHasStack())
-                        {
-                            if (!this.mergeOneItem(var4, 20, 21, false))
-                            {
-                                return ItemStack.EMPTY;
-                            }
-                        } else if (!((Slot) this.inventorySlots.get(21)).getHasStack())
-                        {
-                            if (!this.mergeOneItem(var4, 21, 22, false))
-                            {
-                                return ItemStack.EMPTY;
+                        } else {
+                            Slot slot2 = (Slot) this.inventorySlots.get(21);
+                            if (slot2 != null && !slot2.getHasStack()) {
+                                if (!this.mergeOneItem(var4, 21, 22, false)) {
+                                    return null;
+                                }
+                            } else {
+                                if (par1 >= 22 && par1 < 49) {
+                                    if (!this.mergeItemStack(var4, 49, 58, false)) {
+                                        return null;
+                                    }
+                                } else if (par1 >= 49 && par1 < 58) {
+                                    if (!this.mergeItemStack(var4, 22, 49, false)) {
+                                        return null;
+                                    }
+                                } else {
+                                    if (!this.mergeItemStack(var4, 22, 58, false)) {
+                                        return null;
+                                    }
+                                }
                             }
                         }
-                    } else if (par1 >= 22 && par1 < 49)
-                    {
-                        if (!this.mergeItemStack(var4, 49, 58, false))
-                        {
-                            return ItemStack.EMPTY;
-                        }
-                    } else if (par1 >= 49 && par1 < 58)
-                    {
-                        if (!this.mergeItemStack(var4, 22, 49, false))
-                        {
-                            return ItemStack.EMPTY;
-                        }
-                    } else if (!this.mergeItemStack(var4, 22, 58, false))
-                    {
-                        return ItemStack.EMPTY;
                     }
                 }
             }
-
-            if (var4.isEmpty())
-            {
-                var3.putStack(ItemStack.EMPTY);
-            } else
-            {
+            if (var4.stackSize == 0) {
+                var3.putStack((ItemStack)null);
+            }
+            else {
                 var3.onSlotChanged();
             }
-
-            if (var4.getCount() == var2.getCount())
-            {
-                return ItemStack.EMPTY;
+            if (var4.stackSize == var2.stackSize) {
+                return null;
             }
-
-            var3.onTake(entityPlayer, var4);
+            var3.onPickupFromSlot(par1EntityPlayer, var4);
         }
-
         return var2;
     }
 
-    protected boolean mergeOneItem(ItemStack par1ItemStack, int par2, int par3, boolean par4)
-    {
+    protected boolean mergeOneItem(final ItemStack par1ItemStack, final int par2, final int par3, final boolean par4) {
         boolean flag1 = false;
-        if (!par1ItemStack.isEmpty())
-        {
-            Slot slot;
-            ItemStack slotStack;
-
-            for (int k = par2; k < par3; k++)
-            {
-                slot = this.inventorySlots.get(k);
-                slotStack = slot.getStack();
-
-                if (slotStack.isEmpty())
-                {
-                    ItemStack stackOneItem = par1ItemStack.copy();
-                    stackOneItem.setCount(1);
-                    par1ItemStack.shrink(1);
+        if (par1ItemStack.stackSize > 0) {
+            for (int k = par2; k < par3; ++k) {
+                final Slot slot = (Slot) this.inventorySlots.get(k);
+                final ItemStack slotStack = slot.getStack();
+                if (slotStack == null) {
+                    final ItemStack stackOneItem = par1ItemStack.copy();
+                    stackOneItem.stackSize = 1;
+                    --par1ItemStack.stackSize;
                     slot.putStack(stackOneItem);
                     slot.onSlotChanged();
                     flag1 = true;
@@ -252,7 +167,6 @@ public class ContainerSchematicTier2Rocket extends Container
                 }
             }
         }
-
         return flag1;
     }
 }

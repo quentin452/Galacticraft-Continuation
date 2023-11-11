@@ -1,72 +1,71 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.api.item.IKeyItem;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.item.*;
+import net.minecraft.util.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.client.renderer.texture.*;
+import java.util.*;
 
-public class ItemKeyMars extends Item implements IKeyItem, ISortableItem, GCRarity
+public class ItemKeyMars extends Item implements IKeyItem
 {
-
-    public ItemKeyMars()
-    {
-        super();
+    public static String[] keyTypes;
+    public IIcon[] keyIcons;
+    
+    public ItemKeyMars() {
+        this.keyIcons = new IIcon[1];
         this.setMaxStackSize(1);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemStack)
-    {
-        return "item.key.t2";
+    
+    public String getUnlocalizedName(final ItemStack itemStack) {
+        return "item.key." + ItemKeyMars.keyTypes[itemStack.getItemDamage()];
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            list.add(new ItemStack(this, 1, 0));
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        int i = 0;
+        for (final String name : ItemKeyMars.keyTypes) {
+            this.keyIcons[i++] = iconRegister.registerIcon("galacticraftmars:key_" + name);
         }
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
+    
+    public IIcon getIconFromDamage(final int damage) {
+        if (this.keyIcons.length > damage) {
+            return this.keyIcons[damage];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < ItemKeyMars.keyTypes.length; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
+        }
+    }
+    
+    public int getMetadata(final int par1) {
         return par1;
     }
-
-    @Override
-    public int getTier(ItemStack keyStack)
-    {
+    
+    public int getTier(final ItemStack keyStack) {
         return 2;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.KEYS;
+    
+    static {
+        ItemKeyMars.keyTypes = new String[] { "T2" };
     }
 }

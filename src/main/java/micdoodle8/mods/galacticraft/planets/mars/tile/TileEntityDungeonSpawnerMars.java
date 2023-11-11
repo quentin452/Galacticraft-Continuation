@@ -1,45 +1,27 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.tile;
 
-import java.util.ArrayList;
-import java.util.List;
-import micdoodle8.mods.galacticraft.core.client.sounds.GCSounds;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSkeleton;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSpider;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedZombie;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityDungeonSpawner;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntityCreeperBoss;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.SoundCategory;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.planets.mars.entities.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.core.*;
 
-public class TileEntityDungeonSpawnerMars extends TileEntityDungeonSpawner<EntityCreeperBoss>
+public class TileEntityDungeonSpawnerMars extends TileEntityDungeonSpawner
 {
-
-    public TileEntityDungeonSpawnerMars()
-    {
-        super(EntityCreeperBoss.class);
+    public TileEntityDungeonSpawnerMars() {
+        super((Class)EntityCreeperBoss.class);
     }
-
-    @Override
-    public List<Class<? extends EntityLiving>> getDisabledCreatures()
-    {
-        List<Class<? extends EntityLiving>> list = new ArrayList<Class<? extends EntityLiving>>();
-        list.add(EntityEvolvedSkeleton.class);
-        list.add(EntityEvolvedZombie.class);
-        list.add(EntityEvolvedSpider.class);
+    
+    public List<Class<? extends EntityLiving>> getDisabledCreatures() {
+        final List<Class<? extends EntityLiving>> list = new ArrayList<Class<? extends EntityLiving>>();
+        list.add((Class<? extends EntityLiving>)EntityEvolvedSkeleton.class);
+        list.add((Class<? extends EntityLiving>)EntityEvolvedZombie.class);
+        list.add((Class<? extends EntityLiving>)EntityEvolvedSpider.class);
         return list;
     }
-
-    @Override
-    public void playSpawnSound(Entity entity)
-    {
-        this.world.playSound(null, entity.posX, entity.posY, entity.posZ, GCSounds.scaryScape, SoundCategory.AMBIENT, 9.0F, 1.4F);
+    
+    public void playSpawnSound(final Entity entity) {
+        this.worldObj.playSoundAtEntity(entity, GalacticraftCore.TEXTURE_PREFIX + "ambience.scaryscape", 9.0f, 1.4f);
     }
 }

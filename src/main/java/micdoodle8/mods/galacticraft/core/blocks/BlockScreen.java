@@ -1,219 +1,195 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.core.items.*;
+import micdoodle8.mods.galacticraft.api.block.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.*;
+import net.minecraft.item.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.util.*;
 
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityScreen;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class BlockScreen extends BlockAdvanced implements IShiftDescription, IPartialSealableBlock, ITileEntityProvider, ISortableBlock
+public class BlockScreen extends BlockAdvanced implements ItemBlockDesc.IBlockShiftDesc, IPartialSealableBlock
 {
-
-    public static final PropertyDirection FACING = PropertyDirection.create("facing");
-    public static final PropertyBool LEFT = PropertyBool.create("left");
-    public static final PropertyBool RIGHT = PropertyBool.create("right");
-    public static final PropertyBool UP = PropertyBool.create("up");
-    public static final PropertyBool DOWN = PropertyBool.create("down");
-
-    protected static final float boundsFront = 0.094F;
-    protected static final float boundsBack = 1.0F - boundsFront;
-    protected static final AxisAlignedBB DOWN_AABB = new AxisAlignedBB(0F, 0F, 0F, 1.0F, boundsBack, 1.0F);
-    protected static final AxisAlignedBB UP_AABB = new AxisAlignedBB(0F, boundsFront, 0F, 1.0F, 1.0F, 1.0F);
-    protected static final AxisAlignedBB NORTH_AABB = new AxisAlignedBB(0F, 0F, boundsFront, 1.0F, 1.0F, 1.0F);
-    protected static final AxisAlignedBB SOUTH_AABB = new AxisAlignedBB(0F, 0F, 0F, 1.0F, 1.0F, boundsBack);
-    protected static final AxisAlignedBB WEST_AABB = new AxisAlignedBB(boundsFront, 0F, 0F, 1.0F, 1.0F, 1.0F);
-    protected static final AxisAlignedBB EAST_AABB = new AxisAlignedBB(0F, 0F, 0F, boundsBack, 1.0F, 1.0F);
-
-    // Metadata: 0-5 = direction of screen back; bit 3 = reserved for future use
-    public BlockScreen(String assetName)
-    {
-        super(Material.CIRCUITS);
-        this.setDefaultState(
-            this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(LEFT, false).withProperty(RIGHT, false).withProperty(UP, false).withProperty(DOWN, false));
-        this.setHardness(0.1F);
-        this.setSoundType(SoundType.GLASS);
-        this.setTranslationKey(assetName);
+    private IIcon iconFront;
+    private IIcon iconSide;
+    
+    protected BlockScreen(final String assetName) {
+        super(Material.circuits);
+        this.setHardness(0.1f);
+        this.setStepSound(Block.soundTypeGlass);
+        this.setBlockTextureName("glass");
+        this.setBlockName(assetName);
     }
-
-    @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing direction)
-    {
-        return direction.ordinal() != getMetaFromState(base_state);
+    
+    public boolean isSideSolid(final IBlockAccess world, final int x, final int y, final int z, final ForgeDirection direction) {
+        return direction.ordinal() != world.getBlockMetadata(x, y, z);
     }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        ((TileEntityScreen) worldIn.getTileEntity(pos)).breakScreen(state);
-        super.breakBlock(worldIn, pos, state);
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return face.ordinal() == getMetaFromState(state) ? BlockFaceShape.UNDEFINED : BlockFaceShape.BOWL;
+    
+    public int getRenderType() {
+        return GalacticraftCore.proxy.getBlockRender((Block)this);
     }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
-    {
-        final int angle = MathHelper.floor(placer.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-        int change = EnumFacing.byHorizontalIndex(angle).getOpposite().getIndex();
-        worldIn.setBlockState(pos, getStateFromMeta(change), 3);
+    
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.iconFront = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "screenFront");
+        this.iconSide = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "screenSide");
     }
-
-    @Override
-    public boolean onUseWrench(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        int change = world.getBlockState(pos).getValue(FACING).rotateY().getIndex();
-        world.setBlockState(pos, this.getStateFromMeta(change), 3);
+    
+    public IIcon getIcon(final int side, final int metadata) {
+        if (side == (metadata & 0x7)) {
+            return this.iconSide;
+        }
+        return this.iconFront;
+    }
+    
+    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+        final int metadata = 0;
+        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
+        int change = 0;
+        switch (angle) {
+            case 0: {
+                change = 3;
+                break;
+            }
+            case 1: {
+                change = 4;
+                break;
+            }
+            case 2: {
+                change = 2;
+                break;
+            }
+            case 3: {
+                change = 5;
+                break;
+            }
+        }
+        world.setBlockMetadataWithNotify(x, y, z, change, 3);
+    }
+    
+    public boolean onUseWrench(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        final int facing = metadata & 0x7;
+        int change = 0;
+        switch (facing) {
+            case 0: {
+                change = 1;
+                break;
+            }
+            case 1: {
+                change = 3;
+                break;
+            }
+            case 2: {
+                change = 5;
+                break;
+            }
+            case 3: {
+                change = 4;
+                break;
+            }
+            case 4: {
+                change = 2;
+                break;
+            }
+            case 5: {
+                change = 0;
+                break;
+            }
+        }
+        change += (0x8 & metadata);
+        world.setBlockMetadataWithNotify(x, y, z, change, 2);
+        final TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile instanceof TileEntityScreen) {
+            ((TileEntityScreen)tile).breakScreen(facing);
+        }
         return true;
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
         return new TileEntityScreen();
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public boolean onMachineActivated(World world, BlockPos pos, IBlockState state, EntityPlayer entityPlayer, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof TileEntityScreen)
-        {
-            ((TileEntityScreen) tile).changeChannel();
+    
+    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer player, final int p_149727_6_, final float p_149727_7_, final float p_149727_8_, final float p_149727_9_) {
+        final TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile instanceof TileEntityScreen) {
+            ((TileEntityScreen)tile).changeChannel();
             return true;
         }
         return false;
     }
-
-    @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
-    {
-        TileEntity tile = worldIn.getTileEntity(pos);
-        if (tile instanceof TileEntityScreen)
-        {
-            ((TileEntityScreen) tile).refreshConnections(true);
+    
+    public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final Block neighbour) {
+        final TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile instanceof TileEntityScreen) {
+            ((TileEntityScreen)tile).refreshConnections(true);
         }
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
     }
-
-    @Override
-    public boolean isSealed(World worldIn, BlockPos pos, EnumFacing direction)
-    {
+    
+    public boolean isSealed(final World world, final int x, final int y, final int z, final ForgeDirection direction) {
         return true;
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        switch (state.getValue(FACING))
-        {
-            case EAST:
-                return EAST_AABB;
-            case WEST:
-                return WEST_AABB;
-            case SOUTH:
-                return SOUTH_AABB;
-            case NORTH:
-                return NORTH_AABB;
-            case DOWN:
-                return DOWN_AABB;
-            case UP:
-            default:
-                return UP_AABB;
+    
+    public MovingObjectPosition collisionRayTrace(final World par1World, final int x, final int y, final int z, final Vec3 par5Vec3, final Vec3 par6Vec3) {
+        final int metadata = par1World.getBlockMetadata(x, y, z) & 0x7;
+        final float boundsFront = 0.094f;
+        final float boundsBack = 1.0f - boundsFront;
+        switch (metadata) {
+            case 0: {
+                this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, boundsBack, 1.0f);
+                break;
+            }
+            case 1: {
+                this.setBlockBounds(0.0f, boundsFront, 0.0f, 1.0f, 1.0f, 1.0f);
+                break;
+            }
+            case 2: {
+                this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, boundsBack);
+                break;
+            }
+            case 3: {
+                this.setBlockBounds(0.0f, 0.0f, boundsFront, 1.0f, 1.0f, 1.0f);
+                break;
+            }
+            case 4: {
+                this.setBlockBounds(0.0f, 0.0f, 0.0f, boundsBack, 1.0f, 1.0f);
+                break;
+            }
+            case 5: {
+                this.setBlockBounds(boundsFront, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+                break;
+            }
         }
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        EnumFacing enumfacing = EnumFacing.byIndex(meta);
-        return this.getDefaultState().withProperty(FACING, enumfacing);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return (state.getValue(FACING)).getIndex();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, FACING, LEFT, RIGHT, UP, DOWN);
-    }
-
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        TileEntityScreen screen = (TileEntityScreen) worldIn.getTileEntity(pos);
-        return state.withProperty(LEFT, screen.connectedLeft).withProperty(RIGHT, screen.connectedRight).withProperty(UP, screen.connectedUp).withProperty(DOWN, screen.connectedDown);
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.MACHINE;
+        return super.collisionRayTrace(par1World, x, y, z, par5Vec3, par6Vec3);
     }
 }

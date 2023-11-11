@@ -1,97 +1,73 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.core.tile.IMultiBlock;
-import micdoodle8.mods.galacticraft.core.tile.TileEntitySpaceStationBase;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.world.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.entity.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.util.*;
 
 public class BlockSpaceStationBase extends BlockContainer implements ITileEntityProvider
 {
-
-    public BlockSpaceStationBase(String assetName)
-    {
-        super(Material.ROCK);
-        this.setHardness(-1);
-        this.setTranslationKey(assetName);
+    private IIcon[] spaceStationIcons;
+    
+    public BlockSpaceStationBase(final String assetName) {
+        super(Material.rock);
+        this.setHardness(-1.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    @Override
-    public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos)
-    {
-        return -1.0F;
+    
+    public float getBlockHardness(final World par1World, final int par2, final int par3, final int par4) {
+        return -1.0f;
     }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.MODEL;
+    
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        (this.spaceStationIcons = new IIcon[2])[0] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "space_station_top");
+        this.spaceStationIcons[1] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "space_station_side");
+        this.blockIcon = this.spaceStationIcons[0];
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        final TileEntity tileAt = worldIn.getTileEntity(pos);
-
-        if (tileAt instanceof IMultiBlock)
-        {
-            ((IMultiBlock) tileAt).onDestroy(tileAt);
+    
+    public IIcon getIcon(final int par1, final int par2) {
+        switch (par1) {
+            case 1: {
+                return this.spaceStationIcons[0];
+            }
+            default: {
+                return this.spaceStationIcons[1];
+            }
         }
-
-        super.breakBlock(worldIn, pos, state);
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
+    
+    public void breakBlock(final World var1, final int var2, final int var3, final int var4, final Block var5, final int var6) {
+        final TileEntity tileAt = var1.getTileEntity(var2, var3, var4);
+        if (tileAt instanceof IMultiBlock) {
+            ((IMultiBlock)tileAt).onDestroy(tileAt);
+        }
+        super.breakBlock(var1, var2, var3, var4, var5, var6);
+    }
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
         return new TileEntitySpaceStationBase();
     }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
-    {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-
-        TileEntity tile = worldIn.getTileEntity(pos);
-
-        if (tile instanceof IMultiBlock)
-        {
-            ((IMultiBlock) tile).onCreate(worldIn, pos);
+    
+    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+        super.onBlockPlacedBy(world, x, y, z, entityLiving, itemStack);
+        final TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile instanceof IMultiBlock) {
+            ((IMultiBlock)tile).onCreate(new BlockVec3(x, y, z));
         }
     }
-
-    @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
-    {
-        return ItemStack.EMPTY;
+    
+    public ItemStack getPickBlock(final MovingObjectPosition moving, final World world, final int x, final int y, final int z) {
+        return null;
     }
 }

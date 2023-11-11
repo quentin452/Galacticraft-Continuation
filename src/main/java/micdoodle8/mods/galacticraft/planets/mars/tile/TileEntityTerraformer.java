@@ -1,163 +1,124 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.tile;
 
-import io.netty.buffer.ByteBuf;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
-import micdoodle8.mods.galacticraft.annotations.ForRemoval;
-import micdoodle8.mods.galacticraft.annotations.ReplaceWith;
-import micdoodle8.mods.galacticraft.api.block.ITerraformableBlock;
-import micdoodle8.mods.galacticraft.api.tile.IDisableableMachine;
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlockWithInventory;
-import micdoodle8.mods.galacticraft.core.entities.IBubbleProviderColored;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-import micdoodle8.mods.galacticraft.core.wrappers.FluidHandlerWrapper;
-import micdoodle8.mods.galacticraft.core.wrappers.IFluidHandlerWrapper;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMars;
-import micdoodle8.mods.galacticraft.planets.mars.inventory.ContainerTerraformer;
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockBush;
-import net.minecraft.block.BlockSapling;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fluids.FluidTankInfo;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.galacticraft.api.tile.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import micdoodle8.mods.miccore.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.api.block.*;
+import net.minecraft.block.*;
+import java.util.*;
+import io.netty.buffer.*;
+import net.minecraft.nbt.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.energy.item.*;
+import net.minecraft.init.*;
+import micdoodle8.mods.galacticraft.planets.mars.inventory.*;
+import net.minecraftforge.common.util.*;
+import net.minecraftforge.fluids.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
 
-public class TileEntityTerraformer extends TileBaseElectricBlockWithInventory implements ISidedInventory, IDisableableMachine, IBubbleProviderColored, IFluidHandlerWrapper
+public class TileEntityTerraformer extends TileBaseElectricBlockWithInventory implements ISidedInventory, IDisableableMachine, IBubbleProvider, IFluidHandler
 {
-
-    private final int           tankCapacity                = 2000;
-    @NetworkedField(targetSide = Side.CLIENT)
-    public FluidTank            waterTank                   = new FluidTank(this.tankCapacity);
-    public boolean              active;
-    public boolean              lastActive;
-    public static final int     WATTS_PER_TICK              = 1;
-    private ArrayList<BlockPos> terraformableBlocksList     = new ArrayList<>();
-    private ArrayList<BlockPos> grassBlockList              = new ArrayList<>();
-    private ArrayList<BlockPos> grownTreesList              = new ArrayList<>();
-    @NetworkedField(targetSide = Side.CLIENT)
-    public int                  terraformableBlocksListSize = 0;
-    @NetworkedField(targetSide = Side.CLIENT)
-    public int                  grassBlocksListSize         = 0;
-    @NetworkedField(targetSide = Side.CLIENT)
-    public boolean              treesDisabled;
-    @NetworkedField(targetSide = Side.CLIENT)
-    public boolean              grassDisabled;
-    public final double         MAX_SIZE                    = 15.0D;
-    private int[]               useCount                    = new int[2];
-    private int                 saplingIndex                = 6;
-    public float                bubbleSize;
-    @NetworkedField(targetSide = Side.CLIENT)
-    public boolean              shouldRenderBubble          = true;
-
-    public TileEntityTerraformer()
-    {
-        super("container.tile_terraformer.name");
-        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 60 : 30);
-        this.inventory = NonNullList.withSize(14, ItemStack.EMPTY);
+    private final int tankCapacity = 2000;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public FluidTank waterTank;
+    public boolean active;
+    public boolean lastActive;
+    public static final int WATTS_PER_TICK = 1;
+    private ItemStack[] containingItems;
+    private ArrayList<BlockVec3> terraformableBlocksList;
+    private ArrayList<BlockVec3> grassBlockList;
+    private ArrayList<BlockVec3> grownTreesList;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int terraformableBlocksListSize;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int grassBlocksListSize;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public boolean treesDisabled;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public boolean grassDisabled;
+    public final double MAX_SIZE = 15.0;
+    private int[] useCount;
+    private int saplingIndex;
+    public float bubbleSize;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public boolean shouldRenderBubble;
+    
+    public TileEntityTerraformer() {
+        this.getClass();
+        this.waterTank = new FluidTank(2000);
+        this.containingItems = new ItemStack[14];
+        this.terraformableBlocksList = new ArrayList<BlockVec3>();
+        this.grassBlockList = new ArrayList<BlockVec3>();
+        this.grownTreesList = new ArrayList<BlockVec3>();
+        this.terraformableBlocksListSize = 0;
+        this.grassBlocksListSize = 0;
+        this.useCount = new int[2];
+        this.saplingIndex = 6;
+        this.shouldRenderBubble = true;
+        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 90.0f : 45.0f);
     }
-
-    public int getScaledWaterLevel(int i)
-    {
-        final double fuelLevel = this.waterTank.getFluid() == null ? 0 : this.waterTank.getFluid().amount;
-
-        return (int) (fuelLevel * i / this.tankCapacity);
+    
+    public int getScaledWaterLevel(final int i) {
+        final double fuelLevel = (this.waterTank.getFluid() == null) ? 0.0 : this.waterTank.getFluid().amount;
+        final double n = fuelLevel * i;
+        this.getClass();
+        return (int)(n / 2000.0);
     }
-
-    @Override
-    public void invalidate()
-    {
+    
+    public void invalidate() {
         super.invalidate();
     }
-
-    public double getDistanceFromServer(double par1, double par3, double par5)
-    {
-        final double d3 = this.getPos().getX() + 0.5D - par1;
-        final double d4 = this.getPos().getY() + 0.5D - par3;
-        final double d5 = this.getPos().getZ() + 0.5D - par5;
+    
+    public double getDistanceFromServer(final double par1, final double par3, final double par5) {
+        final double d3 = this.xCoord + 0.5 - par1;
+        final double d4 = this.yCoord + 0.5 - par3;
+        final double d5 = this.zCoord + 0.5 - par5;
         return d3 * d3 + d4 * d4 + d5 * d5;
     }
-
-    @Override
-    public void update()
-    {
-        super.update();
-
-        if (!this.world.isRemote)
-        {
-            final FluidStack liquid = FluidUtil.getFluidContained(this.getInventory().get(0));
-            if (FluidUtil.isFluidStrict(liquid, FluidRegistry.WATER.getName()))
-            {
-                FluidUtil.loadFromContainer(waterTank, FluidRegistry.WATER, this.getInventory(), 0, liquid.amount);
+    
+    public void updateEntity() {
+        super.updateEntity();
+        if (!this.worldObj.isRemote) {
+            if (this.containingItems[0] != null) {
+                final FluidStack liquid = FluidContainerRegistry.getFluidForFilledItem(this.containingItems[0]);
+                if (liquid != null && liquid.getFluid().getName().equals(FluidRegistry.WATER.getName()) && (this.waterTank.getFluid() == null || this.waterTank.getFluid().amount + liquid.amount <= this.waterTank.getCapacity())) {
+                    this.waterTank.fill(liquid, true);
+                    this.containingItems[0] = FluidUtil.getUsedContainer(this.containingItems[0]);
+                }
             }
-
-            this.active = this.bubbleSize == this.MAX_SIZE && this.hasEnoughEnergyToRun && !this.getFirstBonemealStack().isEmpty() && this.waterTank.getFluid() != null && this.waterTank.getFluid().amount > 0;
+            final double n = this.bubbleSize;
+            this.getClass();
+            this.active = (n == 15.0 && this.hasEnoughEnergyToRun && this.getFirstBonemealStack() != null && this.waterTank.getFluid() != null && this.waterTank.getFluid().amount > 0);
         }
-
-        if (!this.world.isRemote && (this.active != this.lastActive || this.ticks % 60 == 0))
-        {
+        if (!this.worldObj.isRemote && (this.active != this.lastActive || this.ticks % 60 == 0)) {
             this.terraformableBlocksList.clear();
             this.grassBlockList.clear();
-
-            if (this.active)
-            {
-                int bubbleSize = (int) Math.ceil(this.bubbleSize);
+            if (this.active) {
+                final int bubbleSize = (int)Math.ceil(this.bubbleSize);
                 double bubbleSizeSq = this.bubbleSize;
                 bubbleSizeSq *= bubbleSizeSq;
-                boolean doGrass = !this.grassDisabled && !this.getFirstSeedStack().isEmpty();
-                boolean doTrees = !this.treesDisabled && !this.getFirstSaplingStack().isEmpty();
-                for (int x = this.getPos().getX() - bubbleSize; x < this.getPos().getX() + bubbleSize; x++)
-                {
-                    for (int y = this.getPos().getY() - bubbleSize; y < this.getPos().getY() + bubbleSize; y++)
-                    {
-                        for (int z = this.getPos().getZ() - bubbleSize; z < this.getPos().getZ() + bubbleSize; z++)
-                        {
-                            BlockPos pos = new BlockPos(x, y, z);
-                            Block blockID = this.world.getBlockState(pos).getBlock();
-                            if (blockID == null)
-                            {
-                                continue;
-                            }
-
-                            if (!(blockID.isAir(this.world.getBlockState(pos), this.world, pos)) && this.getDistanceFromServer(x, y, z) < bubbleSizeSq)
-                            {
-                                if (doGrass && blockID instanceof ITerraformableBlock && ((ITerraformableBlock) blockID).isTerraformable(this.world, pos))
-                                {
-                                    this.terraformableBlocksList.add(new BlockPos(x, y, z));
-                                }
-                                else if (doTrees)
-                                {
-                                    Block blockIDAbove = this.world.getBlockState(pos.up()).getBlock();
-                                    if (blockID == Blocks.GRASS && blockIDAbove.isAir(this.world.getBlockState(pos.up()), this.world, pos.up()))
-                                    {
-                                        this.grassBlockList.add(new BlockPos(x, y, z));
+                final boolean doGrass = !this.grassDisabled && this.getFirstSeedStack() != null;
+                final boolean doTrees = !this.treesDisabled && this.getFirstSaplingStack() != null;
+                for (int x = this.xCoord - bubbleSize; x < this.xCoord + bubbleSize; ++x) {
+                    for (int y = this.yCoord - bubbleSize; y < this.yCoord + bubbleSize; ++y) {
+                        for (int z = this.zCoord - bubbleSize; z < this.zCoord + bubbleSize; ++z) {
+                            final Block blockID = this.worldObj.getBlock(x, y, z);
+                            if (blockID != null) {
+                                if (!blockID.isAir((IBlockAccess)this.worldObj, x, y, z) && this.getDistanceFromServer(x, y, z) < bubbleSizeSq) {
+                                    if (doGrass && blockID instanceof ITerraformableBlock && ((ITerraformableBlock)blockID).isTerraformable(this.worldObj, x, y, z)) {
+                                        this.terraformableBlocksList.add(new BlockVec3(x, y, z));
+                                    }
+                                    else if (doTrees) {
+                                        final Block blockIDAbove = this.worldObj.getBlock(x, y + 1, z);
+                                        if (blockID == Blocks.grass && (blockIDAbove == null || blockIDAbove.isAir((IBlockAccess)this.worldObj, x, y + 1, z))) {
+                                            this.grassBlockList.add(new BlockVec3(x, y, z));
+                                        }
                                     }
                                 }
                             }
@@ -166,567 +127,385 @@ public class TileEntityTerraformer extends TileBaseElectricBlockWithInventory im
                 }
             }
         }
-
-        if (!this.world.isRemote && this.terraformableBlocksList.size() > 0 && this.ticks % 15 == 0)
-        {
-            ArrayList<BlockPos> terraformableBlocks2 = new ArrayList<>(this.terraformableBlocksList);
-
-            int randomIndex = this.world.rand.nextInt(this.terraformableBlocksList.size());
-            BlockPos vec = terraformableBlocks2.get(randomIndex);
-
-            if (this.world.getBlockState(vec).getBlock() instanceof ITerraformableBlock)
-            {
-                Block id;
-
-                switch (this.world.rand.nextInt(40))
-                {
-                    case 0:
-                        if (this.world.isBlockFullCube(new BlockPos(vec.getX() - 1, vec.getY(), vec.getZ())) && this.world.isBlockFullCube(new BlockPos(vec.getX() + 1, vec.getY(), vec.getZ())) && this.world.isBlockFullCube(new BlockPos(vec.getX(), vec.getY(), vec.getZ() - 1))
-                            && this.world.isBlockFullCube(new BlockPos(vec.getX(), vec.getY(), vec.getZ() + 1)))
-                        {
-                            id = Blocks.FLOWING_WATER;
+        if (!this.worldObj.isRemote && this.terraformableBlocksList.size() > 0 && this.ticks % 15 == 0) {
+            final ArrayList<BlockVec3> terraformableBlocks2 = new ArrayList<BlockVec3>(this.terraformableBlocksList);
+            final int randomIndex = this.worldObj.rand.nextInt(this.terraformableBlocksList.size());
+            final BlockVec3 vec = terraformableBlocks2.get(randomIndex);
+            if (vec.getBlock((IBlockAccess)this.worldObj) instanceof ITerraformableBlock) {
+                Block id = null;
+                switch (this.worldObj.rand.nextInt(40)) {
+                    case 0: {
+                        if (this.worldObj.func_147469_q(vec.x - 1, vec.y, vec.z) && this.worldObj.func_147469_q(vec.x + 1, vec.y, vec.z) && this.worldObj.func_147469_q(vec.x, vec.y, vec.z - 1) && this.worldObj.func_147469_q(vec.x, vec.y, vec.z + 1)) {
+                            id = (Block)Blocks.flowing_water;
+                            break;
                         }
-                        else
-                        {
-                            id = Blocks.GRASS;
-                        }
+                        id = (Block)Blocks.grass;
                         break;
-                    default:
-                        id = Blocks.GRASS;
+                    }
+                    default: {
+                        id = (Block)Blocks.grass;
                         break;
+                    }
                 }
-
-                this.world.setBlockState(vec, id.getDefaultState());
-
-                if (id == Blocks.GRASS)
-                {
-                    this.useCount[0]++;
+                this.worldObj.setBlock(vec.x, vec.y, vec.z, id);
+                if (id == Blocks.grass) {
+                    final int[] useCount = this.useCount;
+                    final int n2 = 0;
+                    ++useCount[n2];
                     this.waterTank.drain(1, true);
                     this.checkUsage(1);
                 }
-                else if (id == Blocks.FLOWING_WATER)
-                {
+                else if (id == Blocks.flowing_water) {
                     this.checkUsage(2);
                 }
             }
-
             this.terraformableBlocksList.remove(randomIndex);
         }
-
-        if (!this.world.isRemote && !this.treesDisabled && this.grassBlockList.size() > 0 && this.ticks % 50 == 0)
-        {
-            int randomIndex = this.world.rand.nextInt(this.grassBlockList.size());
-            BlockPos vecGrass = grassBlockList.get(randomIndex);
-
-            if (this.world.getBlockState(vecGrass).getBlock() == Blocks.GRASS)
-            {
-                BlockPos vecSapling = vecGrass.add(0, 1, 0);
-                ItemStack sapling = this.getFirstSaplingStack();
+        if (!this.worldObj.isRemote && !this.treesDisabled && this.grassBlockList.size() > 0 && this.ticks % 50 == 0) {
+            final int randomIndex2 = this.worldObj.rand.nextInt(this.grassBlockList.size());
+            final BlockVec3 vecGrass = this.grassBlockList.get(randomIndex2);
+            if (vecGrass.getBlock((IBlockAccess)this.worldObj) == Blocks.grass) {
+                final BlockVec3 vecSapling = vecGrass.translate(0, 1, 0);
+                final ItemStack sapling = this.getFirstSaplingStack();
                 boolean flag = false;
-
-                // Attempt to prevent placement too close to other trees
-                for (BlockPos testVec : this.grownTreesList)
-                {
-                    if (testVec.distanceSq(vecSapling) < 9)
-                    {
+                for (final BlockVec3 testVec : this.grownTreesList) {
+                    if (testVec.distanceSquared(vecSapling) < 9) {
                         flag = true;
                         break;
                     }
                 }
-
-                if (!flag && sapling != null)
-                {
-                    Block b = Block.getBlockFromItem(sapling.getItem());
-                    this.world.setBlockState(vecSapling, b.getStateFromMeta(sapling.getItemDamage()), 3);
-                    if (b instanceof BlockSapling)
-                    {
-                        if (this.world.getLightFromNeighbors(vecSapling) >= 9)
-                        {
-                            ((BlockSapling) b).grow(this.world, vecSapling, this.world.getBlockState(vecSapling), this.world.rand);
-                            this.grownTreesList.add(new BlockPos(vecSapling.getX(), vecSapling.getY(), vecSapling.getZ()));
+                if (!flag && sapling != null) {
+                    final Block b = Block.getBlockFromItem(sapling.getItem());
+                    this.worldObj.setBlock(vecSapling.x, vecSapling.y, vecSapling.z, b, sapling.getItemDamage(), 3);
+                    if (b instanceof BlockSapling) {
+                        if (this.worldObj.getBlockLightValue(vecSapling.x, vecSapling.y, vecSapling.z) >= 9) {
+                            ((BlockSapling)b).func_149878_d(this.worldObj, vecSapling.x, vecSapling.y, vecSapling.z, this.worldObj.rand);
+                            this.grownTreesList.add(vecSapling.clone());
                         }
                     }
-                    else if (b instanceof BlockBush)
-                    {
-                        if (this.world.getLightFromNeighbors(vecSapling) >= 5)
-                        // Hammer the update tick a few times to try to get it
-                        // to grow - it won't always
-                        {
-                            for (int j = 0; j < 12; j++)
-                            {
-                                if (this.world.getBlockState(vecSapling).getBlock() == b)
-                                {
-                                    ((BlockBush) b).updateTick(this.world, vecSapling, this.world.getBlockState(vecSapling), this.world.rand);
-                                }
-                                else
-                                {
-                                    this.grownTreesList.add(new BlockPos(vecSapling.getX(), vecSapling.getY(), vecSapling.getZ()));
-                                    break;
-                                }
+                    else if (b instanceof BlockBush && this.worldObj.getBlockLightValue(vecSapling.x, vecSapling.y, vecSapling.z) >= 5) {
+                        for (int j = 0; j < 12; ++j) {
+                            if (this.worldObj.getBlock(vecSapling.x, vecSapling.y, vecSapling.z) != b) {
+                                this.grownTreesList.add(vecSapling.clone());
+                                break;
                             }
+                            ((BlockBush)b).updateTick(this.worldObj, vecSapling.x, vecSapling.y, vecSapling.z, this.worldObj.rand);
                         }
                     }
-
-                    this.useCount[1]++;
+                    final int[] useCount2 = this.useCount;
+                    final int n3 = 1;
+                    ++useCount2[n3];
                     this.waterTank.drain(50, true);
                     this.checkUsage(0);
                 }
             }
-
-            this.grassBlockList.remove(randomIndex);
+            this.grassBlockList.remove(randomIndex2);
         }
-
-        if (!this.world.isRemote)
-        {
+        if (!this.worldObj.isRemote) {
             this.terraformableBlocksListSize = this.terraformableBlocksList.size();
             this.grassBlocksListSize = this.grassBlockList.size();
         }
-
-        if (this.hasEnoughEnergyToRun && (!this.grassDisabled || !this.treesDisabled))
-        {
-            this.bubbleSize = (float) Math.min(Math.max(0, this.bubbleSize + 0.1F), this.MAX_SIZE);
+        if (this.hasEnoughEnergyToRun && (!this.grassDisabled || !this.treesDisabled)) {
+            final double n4 = Math.max(0.0f, this.bubbleSize + 0.1f);
+            this.getClass();
+            this.bubbleSize = (float)Math.min(n4, 15.0);
         }
-        else
-        {
-            this.bubbleSize = (float) Math.min(Math.max(0, this.bubbleSize - 0.1F), this.MAX_SIZE);
+        else {
+            final double n5 = Math.max(0.0f, this.bubbleSize - 0.1f);
+            this.getClass();
+            this.bubbleSize = (float)Math.min(n5, 15.0);
         }
-
         this.lastActive = this.active;
     }
-
-    @Override
-    public void addExtraNetworkedData(List<Object> networkedList)
-    {
-        if (!this.world.isRemote)
-        {
+    
+    public void addExtraNetworkedData(final List<Object> networkedList) {
+        if (!this.worldObj.isRemote) {
             networkedList.add(this.bubbleSize);
         }
     }
-
-    @Override
-    public void readExtraNetworkedData(ByteBuf dataStream)
-    {
-        if (this.world.isRemote)
-        {
+    
+    public void readExtraNetworkedData(final ByteBuf dataStream) {
+        if (this.worldObj.isRemote) {
             this.bubbleSize = dataStream.readFloat();
         }
     }
-
-    private void checkUsage(int type)
-    {
+    
+    private void checkUsage(final int type) {
         ItemStack stack = null;
-
-        if ((this.useCount[0] + this.useCount[1]) % 4 == 0)
-        {
+        if ((this.useCount[0] + this.useCount[1]) % 4 == 0) {
             stack = this.getFirstBonemealStack();
-
-            if (!stack.isEmpty())
-            {
-                stack.shrink(1);
+            if (stack != null) {
+                final ItemStack itemStack = stack;
+                --itemStack.stackSize;
+                if (stack.stackSize <= 0) {
+                    this.containingItems[this.getSelectiveStack(2, 6)] = null;
+                }
             }
         }
-
-        switch (type)
-        {
-            case 0:
-                stack = this.getInventory().get(this.saplingIndex);
-
-                if (!stack.isEmpty())
-                {
-                    stack.shrink(1);
+        switch (type) {
+            case 0: {
+                stack = this.containingItems[this.saplingIndex];
+                if (stack == null) {
+                    break;
+                }
+                final ItemStack itemStack2 = stack;
+                --itemStack2.stackSize;
+                if (stack.stackSize <= 0) {
+                    this.containingItems[this.saplingIndex] = null;
+                    break;
                 }
                 break;
-            case 1:
-                if (this.useCount[0] % 4 == 0)
-                {
-                    stack = this.getFirstSeedStack();
-
-                    if (!stack.isEmpty())
-                    {
-                        stack.shrink(1);
-                    }
+            }
+            case 1: {
+                if (this.useCount[0] % 4 != 0) {
+                    break;
+                }
+                stack = this.getFirstSeedStack();
+                if (stack == null) {
+                    break;
+                }
+                final ItemStack itemStack3 = stack;
+                --itemStack3.stackSize;
+                if (stack.stackSize <= 0) {
+                    this.containingItems[this.getSelectiveStack(10, 14)] = null;
+                    break;
                 }
                 break;
-            case 2:
+            }
+            case 2: {
                 this.waterTank.drain(50, true);
                 break;
+            }
         }
     }
-
-    private int getSelectiveStack(int start, int end)
-    {
-        for (int i = start; i < end; i++)
-        {
-            ItemStack stack = this.getInventory().get(i);
-
-            if (!stack.isEmpty())
-            {
+    
+    private int getSelectiveStack(final int start, final int end) {
+        for (int i = start; i < end; ++i) {
+            final ItemStack stack = this.containingItems[i];
+            if (stack != null) {
                 return i;
             }
         }
-
         return -1;
     }
-
-    private int getRandomStack(int start, int end)
-    {
+    
+    private int getRandomStack(final int start, final int end) {
         int stackcount = 0;
-        for (int i = start; i < end; i++)
-        {
-            if (!this.getInventory().get(i).isEmpty())
-            {
-                stackcount++;
+        for (int i = start; i < end; ++i) {
+            if (this.containingItems[i] != null) {
+                ++stackcount;
             }
         }
-
-        if (stackcount == 0)
-        {
+        if (stackcount == 0) {
             return -1;
         }
-
-        int random = this.world.rand.nextInt(stackcount);
-        for (int i = start; i < end; i++)
-        {
-            if (!this.getInventory().get(i).isEmpty())
-            {
-                if (random == 0)
-                {
-                    return i;
+        int random = this.worldObj.rand.nextInt(stackcount);
+        for (int j = start; j < end; ++j) {
+            if (this.containingItems[j] != null) {
+                if (random == 0) {
+                    return j;
                 }
-                random--;
+                --random;
             }
         }
-
         return -1;
     }
-
-    public ItemStack getFirstBonemealStack()
-    {
-        int index = this.getSelectiveStack(2, 6);
-
-        if (index != -1)
-        {
-            return this.getInventory().get(index);
+    
+    public ItemStack getFirstBonemealStack() {
+        final int index = this.getSelectiveStack(2, 6);
+        if (index != -1) {
+            return this.containingItems[index];
         }
-
-        return ItemStack.EMPTY;
+        return null;
     }
-
-    public ItemStack getFirstSaplingStack()
-    {
-        int index = this.getRandomStack(6, 10);
-
-        if (index != -1)
-        {
+    
+    public ItemStack getFirstSaplingStack() {
+        final int index = this.getRandomStack(6, 10);
+        if (index != -1) {
             this.saplingIndex = index;
-            return this.getInventory().get(index);
+            return this.containingItems[index];
         }
-
-        return ItemStack.EMPTY;
+        return null;
     }
-
-    public ItemStack getFirstSeedStack()
-    {
-        int index = this.getSelectiveStack(10, 14);
-
-        if (index != -1)
-        {
-            return this.getInventory().get(index);
+    
+    public ItemStack getFirstSeedStack() {
+        final int index = this.getSelectiveStack(10, 14);
+        if (index != -1) {
+            return this.containingItems[index];
         }
-
-        return ItemStack.EMPTY;
+        return null;
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readFromNBT(final NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-
+        this.containingItems = this.readStandardItemsFromNBT(nbt);
         this.bubbleSize = nbt.getFloat("BubbleSize");
         this.useCount = nbt.getIntArray("UseCountArray");
-
-        if (this.useCount.length == 0)
-        {
+        if (this.useCount.length == 0) {
             this.useCount = new int[2];
         }
-
-        if (nbt.hasKey("waterTank"))
-        {
+        if (nbt.hasKey("waterTank")) {
             this.waterTank.readFromNBT(nbt.getCompoundTag("waterTank"));
         }
-
-        if (nbt.hasKey("bubbleVisible"))
-        {
+        if (nbt.hasKey("bubbleVisible")) {
             this.setBubbleVisible(nbt.getBoolean("bubbleVisible"));
         }
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    
+    public void writeToNBT(final NBTTagCompound nbt) {
         super.writeToNBT(nbt);
+        this.writeStandardItemsToNBT(nbt);
         nbt.setFloat("BubbleSize", this.bubbleSize);
         nbt.setIntArray("UseCountArray", this.useCount);
-
-        if (this.waterTank.getFluid() != null)
-        {
-            nbt.setTag("waterTank", this.waterTank.writeToNBT(new NBTTagCompound()));
+        if (this.waterTank.getFluid() != null) {
+            nbt.setTag("waterTank", (NBTBase)this.waterTank.writeToNBT(new NBTTagCompound()));
         }
-
         nbt.setBoolean("bubbleVisible", this.shouldRenderBubble);
-        return nbt;
     }
-
-    // ISidedInventory Implementation:
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[]
-        {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+    
+    public ItemStack[] getContainingItems() {
+        return this.containingItems;
     }
-
-    @Override
-    public boolean canInsertItem(int slotID, ItemStack itemstack, EnumFacing side)
-    {
+    
+    public String getInventoryName() {
+        return GCCoreUtil.translate("container.tileTerraformer.name");
+    }
+    
+    public int[] getAccessibleSlotsFromSide(final int side) {
+        return new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+    }
+    
+    public boolean canInsertItem(final int slotID, final ItemStack itemstack, final int side) {
         return this.isItemValidForSlot(slotID, itemstack);
     }
-
-    @Override
-    public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side)
-    {
-        if (slotID == 0)
-        {
-            return FluidUtil.isEmptyContainer(itemstack);
+    
+    public boolean canExtractItem(final int slotID, final ItemStack itemstack, final int side) {
+        if (slotID == 0) {
+            return FluidContainerRegistry.isEmptyContainer(itemstack);
         }
-        if (slotID == 1)
-        {
-            return ItemElectricBase.isElectricItemEmpty(itemstack);
-        }
-
-        return false;
+        return slotID == 1 && ItemElectricBase.isElectricItemEmpty(itemstack);
     }
-
-    @Override
-    public boolean hasCustomName()
-    {
+    
+    public boolean hasCustomInventoryName() {
         return true;
     }
-
-    @Override
-    public boolean isItemValidForSlot(int slotID, ItemStack itemstack)
-    {
-        switch (slotID)
-        {
-            case 0:
-                FluidStack stack = net.minecraftforge.fluids.FluidUtil.getFluidContained(itemstack);
-                return stack != null && stack.getFluid() == FluidRegistry.WATER;
-            case 1:
+    
+    public boolean isItemValidForSlot(final int slotID, final ItemStack itemstack) {
+        switch (slotID) {
+            case 0: {
+                return FluidContainerRegistry.containsFluid(itemstack, new FluidStack(FluidRegistry.WATER, 1));
+            }
+            case 1: {
                 return ItemElectricBase.isElectricItem(itemstack.getItem());
+            }
             case 2:
             case 3:
             case 4:
-            case 5:
-                return itemstack.getItem() == Items.DYE && itemstack.getItemDamage() == 15;
+            case 5: {
+                return itemstack.getItem() == Items.dye && itemstack.getItemDamage() == 15;
+            }
             case 6:
             case 7:
             case 8:
-            case 9:
+            case 9: {
                 return ContainerTerraformer.isOnSaplingList(itemstack);
+            }
             case 10:
             case 11:
             case 12:
-            case 13:
-                return itemstack.getItem() == Items.WHEAT_SEEDS;
+            case 13: {
+                return itemstack.getItem() == Items.wheat_seeds;
+            }
+            default: {
+                return false;
+            }
         }
-        return false;
     }
-
-    @Override
-    public boolean shouldUseEnergy()
-    {
+    
+    public boolean shouldUseEnergy() {
         return !this.grassDisabled || !this.treesDisabled;
     }
-
-    @Override
-    public ItemStack getBatteryInSlot()
-    {
+    
+    public ItemStack getBatteryInSlot() {
         return this.getStackInSlot(1);
     }
-
-    @Override
-    public void setDisabled(int index, boolean disabled)
-    {
-        if (this.disableCooldown <= 0)
-        {
-            switch (index)
-            {
-                case 0:
+    
+    public void setDisabled(final int index, final boolean disabled) {
+        if (this.disableCooldown <= 0) {
+            switch (index) {
+                case 0: {
                     this.treesDisabled = !this.treesDisabled;
                     break;
-                case 1:
+                }
+                case 1: {
                     this.grassDisabled = !this.grassDisabled;
                     break;
+                }
             }
-
             this.disableCooldown = 10;
         }
     }
-
-    @Override
-    public boolean getDisabled(int index)
-    {
-        switch (index)
-        {
-            case 0:
+    
+    public boolean getDisabled(final int index) {
+        switch (index) {
+            case 0: {
                 return this.treesDisabled;
-            case 1:
+            }
+            case 1: {
                 return this.grassDisabled;
+            }
+            default: {
+                return false;
+            }
         }
-
-        return false;
     }
-
-    @Override
-    public void setBubbleVisible(boolean shouldRender)
-    {
+    
+    public void setBubbleVisible(final boolean shouldRender) {
         this.shouldRenderBubble = shouldRender;
     }
-
-    @Override
-    public double getPacketRange()
-    {
-        return 64.0F;
+    
+    public double getPacketRange() {
+        return 64.0;
     }
-
-    // Pipe handling
-    @Override
-    public boolean canDrain(EnumFacing from, Fluid fluid)
-    {
+    
+    public boolean canDrain(final ForgeDirection from, final Fluid fluid) {
         return false;
     }
-
-    @Override
-    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain)
-    {
+    
+    public FluidStack drain(final ForgeDirection from, final FluidStack resource, final boolean doDrain) {
         return null;
     }
-
-    @Override
-    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain)
-    {
+    
+    public FluidStack drain(final ForgeDirection from, final int maxDrain, final boolean doDrain) {
         return null;
     }
-
-    @Override
-    public boolean canFill(EnumFacing from, Fluid fluid)
-    {
-        return (fluid == null || "water".equals(fluid.getName())) && from != this.getElectricInputDirection();
+    
+    public boolean canFill(final ForgeDirection from, final Fluid fluid) {
+        return fluid != null && "water".equals(fluid.getName());
     }
-
-    @Override
-    public int fill(EnumFacing from, FluidStack resource, boolean doFill)
-    {
+    
+    public int fill(final ForgeDirection from, final FluidStack resource, final boolean doFill) {
         int used = 0;
-
-        if (resource != null && this.canFill(from, resource.getFluid()))
-        {
+        if (resource != null && this.canFill(from, resource.getFluid())) {
             used = this.waterTank.fill(resource, doFill);
         }
-
         return used;
     }
-
-    @Override
-    public FluidTankInfo[] getTankInfo(EnumFacing from)
-    {
-        return new FluidTankInfo[]
-        {new FluidTankInfo(this.waterTank)};
+    
+    public FluidTankInfo[] getTankInfo(final ForgeDirection from) {
+        return new FluidTankInfo[] { new FluidTankInfo((IFluidTank)this.waterTank) };
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getRenderBoundingBox()
-    {
-        return new AxisAlignedBB(this.getPos().getX() - this.bubbleSize, this.getPos().getY() - this.bubbleSize, this.getPos().getZ() - this.bubbleSize, this.getPos().getX() + this.bubbleSize, this.getPos().getY() + this.bubbleSize, this.getPos().getZ() + this.bubbleSize);
+    public AxisAlignedBB getRenderBoundingBox() {
+        return AxisAlignedBB.getBoundingBox((double)(this.xCoord - this.bubbleSize), (double)(this.yCoord - this.bubbleSize), (double)(this.zCoord - this.bubbleSize), (double)(this.xCoord + this.bubbleSize), (double)(this.yCoord + this.bubbleSize), (double)(this.zCoord + this.bubbleSize));
     }
-
-    @Override
-    public float getBubbleSize()
-    {
+    
+    public float getBubbleSize() {
         return this.bubbleSize;
     }
-
-    @Override
-    public boolean getBubbleVisible()
-    {
+    
+    public boolean getBubbleVisible() {
         return this.shouldRenderBubble;
-    }
-
-    @Override
-    public Vector3 getColor()
-    {
-        return new Vector3(0.125F, 0.5F, 0.125F);
-    }
-
-    @Override
-    public EnumFacing byIndex()
-    {
-        IBlockState state = this.world.getBlockState(getPos());
-        if (state.getBlock() instanceof BlockMachineMars)
-        {
-            return state.getValue(BlockMachineMars.FACING);
-        }
-        return EnumFacing.NORTH;
-    }
-
-    @Override
-    public EnumFacing getElectricInputDirection()
-    {
-        return byIndex().rotateY();
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
-    {
-        return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
-    }
-
-    @Nullable
-    @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
-    {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-        {
-            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(new FluidHandlerWrapper(this, facing));
-        }
-        return super.getCapability(capability, facing);
-    }
-
-    @Override
-    public boolean canConnect(EnumFacing direction, NetworkType type)
-    {
-        if (direction == null)
-        {
-            return false;
-        }
-        if (type == NetworkType.POWER)
-        {
-            return direction == this.getElectricInputDirection();
-        }
-        if (type == NetworkType.FLUID)
-        {
-            return direction != this.getElectricInputDirection();
-        }
-        return false;
-    }
-
-    @Override
-    @Deprecated
-    @ForRemoval(deadline = "4.1.0")
-    @ReplaceWith("byIndex()")
-    public EnumFacing getFront()
-    {
-        return this.byIndex();
     }
 }

@@ -1,126 +1,61 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import micdoodle8.mods.galacticraft.core.client.model.OBJLoaderGC;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.obj.OBJModel;
-import net.minecraftforge.common.model.TRSRTransformation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.tileentity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import net.minecraftforge.client.model.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import org.lwjgl.opengl.*;
+import cpw.mods.fml.client.*;
+import net.minecraft.client.renderer.*;
+import net.minecraft.tileentity.*;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityMinerBaseRenderer extends TileEntitySpecialRenderer<TileEntityMinerBase>
+public class TileEntityMinerBaseRenderer extends TileEntitySpecialRenderer
 {
-
-    public static OBJModel.OBJBakedModel minerBaseModelBaked;
-
-    public IBakedModel getBakedModel()
-    {
-        if (minerBaseModelBaked == null)
-        {
-            OBJModel minerBaseModel;
-            try
-            {
-                minerBaseModel = (OBJModel) OBJLoaderGC.instance.loadModel(new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "minerbase0.obj"));
-                minerBaseModel = (OBJModel) minerBaseModel.process(ImmutableMap.of("ambient", "false"));
-            } catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-            Function<ResourceLocation, TextureAtlasSprite> spriteFunction = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
-            minerBaseModelBaked = (OBJModel.OBJBakedModel) minerBaseModel.bake(TRSRTransformation.identity(), DefaultVertexFormats.ITEM, spriteFunction);
-        }
-        return minerBaseModelBaked;
+    public static final ResourceLocation telepadTexture;
+    public static IModelCustom telepadModel;
+    
+    public TileEntityMinerBaseRenderer() {
+        TileEntityMinerBaseRenderer.telepadModel = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/minerbase.obj"));
     }
-
-    @Override
-    public void render(TileEntityMinerBase tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
-    {
-        if (!tile.isMaster)
-        {
+    
+    public void renderModelAt(final TileEntityMinerBase tileEntity, final double d, final double d1, final double d2, final float f) {
+        GL11.glDisable(32826);
+        if (!tileEntity.isMaster) {
             return;
         }
-
-        int j = 0, k = 0;
-        int light = tile.getWorld().getCombinedLight(tile.getPos(), 0);
-        j += light % 65536;
-        k += light / 65536;
-        light = tile.getWorld().getCombinedLight(tile.getPos().add(1, 0, 0), 0);
-        j += light % 65536;
-        k += light / 65536;
-        light = tile.getWorld().getCombinedLight(tile.getPos().add(0, 0, 1), 0);
-        j += light % 65536;
-        k += light / 65536;
-        light = tile.getWorld().getCombinedLight(tile.getPos().add(1, 0, 1), 0);
-        j += light % 65536;
-        k += light / 65536;
-        light = tile.getWorld().getCombinedLight(tile.getPos().up(), 0);
-        j += light % 65536;
-        k += light / 65536;
-        light = tile.getWorld().getCombinedLight(tile.getPos().add(1, 1, 0), 0);
-        j += light % 65536;
-        k += light / 65536;
-        light = tile.getWorld().getCombinedLight(tile.getPos().add(0, 1, 1), 0);
-        j += light % 65536;
-        k += light / 65536;
-        light = tile.getWorld().getCombinedLight(tile.getPos().add(1, 1, 1), 0);
-        j += light % 65536;
-        k += light / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j / 8.0F, k / 8.0F);
-
+        FMLClientHandler.instance().getClient().renderEngine.bindTexture(TileEntityMinerBaseRenderer.telepadTexture);
+        final int i = tileEntity.getWorldObj().getLightBrightnessForSkyBlocks(tileEntity.xCoord, tileEntity.yCoord + 1, tileEntity.zCoord, 0);
+        final int j = i % 65536;
+        final int k = i / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j / 1.0f, k / 1.0f);
         GL11.glPushMatrix();
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-        GL11.glTranslatef((float) x + 1F, (float) y + 1F, (float) z + 1F);
-        GL11.glScalef(0.05F, 0.05F, 0.05F);
-
-        switch (tile.facing)
-        {
-            case SOUTH:
-                GL11.glRotatef(180F, 0, 1F, 0);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glTranslatef((float)d + 1.0f, (float)d1 + 1.0f, (float)d2 + 1.0f);
+        GL11.glScalef(0.05f, 0.05f, 0.05f);
+        switch (tileEntity.facing) {
+            case 0: {
+                GL11.glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+            }
+            case 2: {
+                GL11.glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
                 break;
-            case WEST:
-                GL11.glRotatef(90F, 0, 1F, 0);
+            }
+            case 3: {
+                GL11.glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
                 break;
-            case NORTH:
-                break;
-            case EAST:
-                GL11.glRotatef(270F, 0, 1F, 0);
-                break;
+            }
         }
-
-        RenderHelper.disableStandardItemLighting();
-        this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        tessellator.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        GlStateManager.translate(-tile.getPos().getX(), -tile.getPos().getY(), -tile.getPos().getZ());
-        Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer().renderModel(tile.getWorld(), getBakedModel(), tile.getWorld().getBlockState(tile.getPos()), tile.getPos(),
-            tessellator.getBuffer(), false);
-        tessellator.draw();
-
-        RenderHelper.enableStandardItemLighting();
+        TileEntityMinerBaseRenderer.telepadModel.renderAll();
         GL11.glPopMatrix();
+    }
+    
+    public void renderTileEntityAt(final TileEntity tileEntity, final double var2, final double var4, final double var6, final float var8) {
+        this.renderModelAt((TileEntityMinerBase)tileEntity, var2, var4, var6, var8);
+    }
+    
+    static {
+        telepadTexture = new ResourceLocation("galacticraftasteroids", "textures/model/minerbase.png");
     }
 }

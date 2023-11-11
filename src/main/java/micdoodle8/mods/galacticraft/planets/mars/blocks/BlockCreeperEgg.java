@@ -1,158 +1,98 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.ISortableBlock;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedCreeper;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
-import net.minecraft.block.BlockDragonEgg;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.util.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import net.minecraft.entity.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.planets.mars.items.*;
+import net.minecraftforge.common.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-public class BlockCreeperEgg extends BlockDragonEgg implements IShiftDescription, ISortableBlock
+public class BlockCreeperEgg extends BlockDragonEgg implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    protected static final AxisAlignedBB DRAGON_EGG_AABB = new AxisAlignedBB(0.0625D, 0.0D, 0.0625D, 0.9375D, 1.0D, 0.9375D);
-
-    public BlockCreeperEgg(String assetName)
-    {
-        super();
-        this.setTranslationKey(assetName);
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister iconRegister) {
+        this.blockIcon = iconRegister.registerIcon("galacticraftmars:creeperEgg");
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        return DRAGON_EGG_AABB;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
+    
+    public int getRenderType() {
+        return 27;
     }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
+    
+    public boolean onBlockActivated(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer, final int par6, final float par7, final float par8, final float par9) {
         return false;
     }
-
-    @Override
-    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn)
-    {
-
+    
+    public void onBlockClicked(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer) {
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
-    {
-        return ItemStack.EMPTY;
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        return null;
     }
-
-    @Override
-    public void onBlockExploded(World world, BlockPos pos, Explosion explosion)
-    {
-        if (!world.isRemote)
-        {
-            EntityEvolvedCreeper creeper = new EntityEvolvedCreeper(world);
-            creeper.setPosition(pos.getX() + 0.5, pos.getY() + 3, pos.getZ() + 0.5);
+    
+    public void onBlockExploded(final World world, final int x, final int y, final int z, final Explosion explosion) {
+        if (!world.isRemote) {
+            final EntityEvolvedCreeper creeper = new EntityEvolvedCreeper(world);
+            creeper.setPosition(x + 0.5, (double)(y + 3), z + 0.5);
             creeper.setChild(true);
-            world.spawnEntity(creeper);
+            world.spawnEntityInWorld((Entity)creeper);
         }
-
-        world.setBlockToAir(pos);
-        this.onExplosionDestroy(world, pos, explosion);
+        world.setBlockToAir(x, y, z);
+        this.onBlockDestroyedByExplosion(world, x, y, z, explosion);
     }
-
-    @Override
-    public boolean canDropFromExplosion(Explosion explose)
-    {
+    
+    public boolean canDropFromExplosion(final Explosion explose) {
         return false;
     }
-
-    // Can only be harvested with a Sticky Desh Pickaxe
-    @Override
-    public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player)
-    {
-        ItemStack stack = player.inventory.getCurrentItem();
-        if (stack.isEmpty())
-        {
-            return player.canHarvestBlock(world.getBlockState(pos));
+    
+    public boolean canHarvestBlock(final EntityPlayer player, final int metadata) {
+        final ItemStack stack = player.inventory.getCurrentItem();
+        if (stack == null) {
+            return player.canHarvestBlock((Block)this);
         }
         return stack.getItem() == MarsItems.deshPickSlime;
     }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World worldIn, BlockPos pos)
-    {
-        ItemStack stack = player.inventory.getCurrentItem();
-        if (stack != null && stack.getItem() == MarsItems.deshPickSlime)
-        {
-            return 0.2F;
+    
+    public float getPlayerRelativeBlockHardness(final EntityPlayer player, final World p_149737_2_, final int p_149737_3_, final int p_149737_4_, final int p_149737_5_) {
+        final ItemStack stack = player.inventory.getCurrentItem();
+        if (stack != null && stack.getItem() == MarsItems.deshPickSlime) {
+            return 0.2f;
         }
-
-        return super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
+        return ForgeHooks.blockStrength((Block)this, player, p_149737_2_, p_149737_3_, p_149737_4_, p_149737_5_);
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
+    
+    @SideOnly(Side.CLIENT)
+    public Item getItem(final World par1World, final int par2, final int par3, final int par4) {
+        return Item.getItemFromBlock((Block)this);
     }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
+    }
+    
+    public boolean showDescription(final int meta) {
         return true;
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.EGG;
     }
 }

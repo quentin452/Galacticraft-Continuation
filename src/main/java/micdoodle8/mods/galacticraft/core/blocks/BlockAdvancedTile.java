@@ -1,90 +1,74 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.api.tile.ILockable;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.block.material.*;
+import net.minecraft.world.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.block.*;
+import net.minecraft.inventory.*;
+import java.util.*;
+import net.minecraft.item.*;
+import net.minecraft.entity.item.*;
+import net.minecraft.nbt.*;
+import net.minecraft.entity.*;
 
 public abstract class BlockAdvancedTile extends BlockAdvanced implements ITileEntityProvider
 {
-
-    public BlockAdvancedTile(Material par3Material)
-    {
+    public BlockAdvancedTile(final Material par3Material) {
         super(par3Material);
-        this.hasTileEntity = true;
+        this.isBlockContainer = true;
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
         return null;
     }
-
-    @Override
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
-    {
-        super.onBlockAdded(worldIn, pos, state);
+    
+    public void onBlockAdded(final World par1World, final int par2, final int par3, final int par4) {
+        super.onBlockAdded(par1World, par2, par3, par4);
     }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        this.dropEntireInventory(worldIn, pos, state);
-        super.breakBlock(worldIn, pos, state);
-    }
-
-    public void dropEntireInventory(World worldIn, BlockPos pos, IBlockState state)
-    {
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (tileEntity instanceof ILockable)
-        {
-            ((ILockable) tileEntity).clearLockedInventory();
+    
+    public void breakBlock(final World world, final int x, final int y, final int z, final Block block, final int metadata) {
+        if (this.hasTileEntity(metadata)) {
+            final TileEntity tileNew = world.getTileEntity(x, y, z);
+            if (tileNew != null) {
+                this.dropEntireInventory(world, x, y, z, block, metadata);
+                tileNew.invalidate();
+            }
         }
-
-        if (tileEntity != null)
-        {
-            if (tileEntity instanceof IInventory)
-            {
-                IInventory inventory = (IInventory) tileEntity;
-
-                Random syncRandom = GCCoreUtil.getRandom(pos);
-
-                for (int var6 = 0; var6 < inventory.getSizeInventory(); ++var6)
-                {
-                    ItemStack var7 = inventory.getStackInSlot(var6);
-
-                    if (var7 != null && !var7.isEmpty())
-                    {
-                        float var8 = syncRandom.nextFloat() * 0.8F + 0.1F;
-                        float var9 = syncRandom.nextFloat() * 0.8F + 0.1F;
-                        float var10 = syncRandom.nextFloat() * 0.8F + 0.1F;
-
-                        while (!var7.isEmpty())
-                        {
-                            EntityItem var12 = new EntityItem(worldIn, pos.getX() + var8, pos.getY() + var9, pos.getZ() + var10, var7.splitStack(syncRandom.nextInt(21) + 10));
-                            float var13 = 0.05F;
-                            var12.motionX = (float) syncRandom.nextGaussian() * var13;
-                            var12.motionY = (float) syncRandom.nextGaussian() * var13 + 0.2F;
-                            var12.motionZ = (float) syncRandom.nextGaussian() * var13;
-                            worldIn.spawnEntity(var12);
+    }
+    
+    public boolean onBlockEventReceived(final World par1World, final int par2, final int par3, final int par4, final int par5, final int par6) {
+        super.onBlockEventReceived(par1World, par2, par3, par4, par5, par6);
+        final TileEntity tileentity = par1World.getTileEntity(par2, par3, par4);
+        return tileentity != null && tileentity.receiveClientEvent(par5, par6);
+    }
+    
+    public void dropEntireInventory(final World world, final int x, final int y, final int z, final Block par5, final int par6) {
+        final TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity != null && tileEntity instanceof IInventory) {
+            final IInventory inventory = (IInventory)tileEntity;
+            for (int var6 = 0; var6 < inventory.getSizeInventory(); ++var6) {
+                final ItemStack var7 = inventory.getStackInSlot(var6);
+                if (var7 != null) {
+                    final Random random = new Random();
+                    final float var8 = random.nextFloat() * 0.8f + 0.1f;
+                    final float var9 = random.nextFloat() * 0.8f + 0.1f;
+                    final float var10 = random.nextFloat() * 0.8f + 0.1f;
+                    while (var7.stackSize > 0) {
+                        int var11 = random.nextInt(21) + 10;
+                        if (var11 > var7.stackSize) {
+                            var11 = var7.stackSize;
                         }
+                        final ItemStack itemStack = var7;
+                        itemStack.stackSize -= var11;
+                        final EntityItem var12 = new EntityItem(world, (double)(x + var8), (double)(y + var9), (double)(z + var10), new ItemStack(var7.getItem(), var11, var7.getItemDamage()));
+                        if (var7.hasTagCompound()) {
+                            var12.getEntityItem().setTagCompound((NBTTagCompound)var7.getTagCompound().copy());
+                        }
+                        final float var13 = 0.05f;
+                        var12.motionX = (float)random.nextGaussian() * var13;
+                        var12.motionY = (float)random.nextGaussian() * var13 + 0.2f;
+                        var12.motionZ = (float)random.nextGaussian() * var13;
+                        world.spawnEntityInWorld((Entity)var12);
                     }
                 }
             }

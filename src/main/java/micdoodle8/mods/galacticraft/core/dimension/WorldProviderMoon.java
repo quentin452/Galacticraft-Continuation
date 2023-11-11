@@ -1,184 +1,139 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.gen.IChunkGenerator;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.galaxies.CelestialBody;
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.WorldProviderSpace;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.api.world.ISolarLevel;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.event.EventHandlerGC;
-import micdoodle8.mods.galacticraft.core.world.gen.ChunkProviderMoon;
-import micdoodle8.mods.galacticraft.core.world.gen.dungeon.RoomTreasure;
+import micdoodle8.mods.galacticraft.api.prefab.world.gen.*;
+import micdoodle8.mods.galacticraft.api.world.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.world.chunk.*;
+import net.minecraft.world.biome.*;
+import micdoodle8.mods.galacticraft.core.world.gen.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.core.event.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.api.galaxies.*;
+import micdoodle8.mods.galacticraft.core.*;
 
 public class WorldProviderMoon extends WorldProviderSpace implements IGalacticraftWorldProvider, ISolarLevel
 {
-
-    @Override
-    public DimensionType getDimensionType()
-    {
-        return GCDimensions.MOON;
+    public Vector3 getFogColor() {
+        return new Vector3(0.0, 0.0, 0.0);
     }
-
-    @Override
-    public Vector3 getFogColor()
-    {
-        return new Vector3(0, 0, 0);
+    
+    public Vector3 getSkyColor() {
+        return new Vector3(0.0, 0.0, 0.0);
     }
-
-    @Override
-    public Vector3 getSkyColor()
-    {
-        return new Vector3(0, 0, 0);
-    }
-
-    @Override
-    public boolean hasSunset()
-    {
+    
+    public boolean canRainOrSnow() {
         return false;
     }
-
-    @Override
-    public long getDayLength()
-    {
+    
+    public boolean hasSunset() {
+        return false;
+    }
+    
+    public long getDayLength() {
         return 192000L;
     }
-
-    @Override
-    public Class<? extends IChunkGenerator> getChunkProviderClass()
-    {
-        return ChunkProviderMoon.class;
+    
+    public boolean shouldForceRespawn() {
+        return !ConfigManagerCore.forceOverworldRespawn;
     }
-
-    @Override
+    
+    public Class<? extends IChunkProvider> getChunkProviderClass() {
+        return (Class<? extends IChunkProvider>)ChunkProviderMoon.class;
+    }
+    
+    public Class<? extends WorldChunkManager> getWorldChunkManagerClass() {
+        return (Class<? extends WorldChunkManager>)WorldChunkManagerMoon.class;
+    }
+    
     @SideOnly(Side.CLIENT)
-    public float getStarBrightness(float par1)
-    {
-        final float var2 = this.world.getCelestialAngle(par1);
-        float var3 = 1.0F - (MathHelper.cos(var2 * Constants.twoPI) * 2.0F + 0.25F);
-
-        if (var3 < 0.0F)
-        {
-            var3 = 0.0F;
+    public float getStarBrightness(final float par1) {
+        final float var2 = this.worldObj.getCelestialAngle(par1);
+        float var3 = 1.0f - (MathHelper.cos(var2 * 3.1415927f * 2.0f) * 2.0f + 0.25f);
+        if (var3 < 0.0f) {
+            var3 = 0.0f;
         }
-
-        if (var3 > 1.0F)
-        {
-            var3 = 1.0F;
+        if (var3 > 1.0f) {
+            var3 = 1.0f;
         }
-
-        return var3 * var3 * 0.5F + 0.3F;
+        return var3 * var3 * 0.5f + 0.3f;
     }
-
-    @Override
-    public boolean isSkyColored()
-    {
+    
+    public boolean isSkyColored() {
         return false;
     }
-
-    @Override
-    public double getHorizon()
-    {
-        return 44.0D;
+    
+    public double getHorizon() {
+        return 44.0;
     }
-
-    @Override
-    public int getAverageGroundLevel()
-    {
+    
+    public int getAverageGroundLevel() {
         return 68;
     }
-
-    @Override
-    public boolean canCoordinateBeSpawn(int var1, int var2)
-    {
+    
+    public boolean canCoordinateBeSpawn(final int var1, final int var2) {
         return true;
     }
-
-    // Overriding so that beds do not explode on Moon
-    @Override
-    public boolean canRespawnHere()
-    {
-        if (EventHandlerGC.bedActivated)
-        {
+    
+    public boolean isSurfaceWorld() {
+        return this.worldObj != null && this.worldObj.isRemote;
+    }
+    
+    public boolean canRespawnHere() {
+        if (EventHandlerGC.bedActivated) {
             EventHandlerGC.bedActivated = false;
             return true;
         }
         return false;
     }
-
-    @Override
-    public float getGravity()
-    {
-        return 0.062F;
+    
+    public int getRespawnDimension(final EntityPlayerMP player) {
+        return this.shouldForceRespawn() ? this.dimensionId : 0;
     }
-
-    @Override
-    public double getFuelUsageMultiplier()
-    {
-        return 0.7D;
+    
+    public float getGravity() {
+        return 0.062f;
     }
-
-    @Override
-    public double getSolarEnergyMultiplier()
-    {
-        return 1.4D;
+    
+    public double getMeteorFrequency() {
+        return 7.0;
     }
-
-    @Override
-    public boolean canSpaceshipTierPass(int tier)
-    {
+    
+    public double getFuelUsageMultiplier() {
+        return 0.7;
+    }
+    
+    public double getSolarEnergyMultiplier() {
+        return 1.4;
+    }
+    
+    public boolean canSpaceshipTierPass(final int tier) {
         return tier > 0;
     }
-
-    @Override
-    public float getFallDamageModifier()
-    {
-        return 0.18F;
+    
+    public float getFallDamageModifier() {
+        return 0.18f;
     }
-
-    @Override
-    public CelestialBody getCelestialBody()
-    {
-        return GalacticraftCore.moonMoon;
+    
+    public float getSoundVolReductionAmount() {
+        return 20.0f;
     }
-
-    @Override
-    public int getDungeonSpacing()
-    {
-        return 704;
+    
+    public CelestialBody getCelestialBody() {
+        return (CelestialBody)GalacticraftCore.moonMoon;
     }
-
-    @Override
-    public ResourceLocation getDungeonChestType()
-    {
-        return RoomTreasure.MOONCHEST;
+    
+    public boolean hasBreathableAtmosphere() {
+        return false;
     }
-
-    @Override
-    public List<Block> getSurfaceBlocks()
-    {
-        List<Block> list = new LinkedList<>();
-        list.add(GCBlocks.blockMoon);
-        return list;
+    
+    public float getThermalLevelModifier() {
+        return 0.0f;
+    }
+    
+    public float getWindLevel() {
+        return 0.0f;
     }
 }

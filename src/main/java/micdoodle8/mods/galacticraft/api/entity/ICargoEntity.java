@@ -1,40 +1,30 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.entity;
 
-import javax.annotation.Nonnull;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 
-/**
- * Implement into entities that can be loaded with cargo
- */
 public interface ICargoEntity
 {
-
-    enum EnumCargoLoadingState
+    EnumCargoLoadingState addCargo(final ItemStack p0, final boolean p1);
+    
+    RemovalResult removeCargo(final boolean p0);
+    
+    public enum EnumCargoLoadingState
     {
-        FULL, EMPTY, NOTARGET, NOINVENTORY, SUCCESS
+        FULL, 
+        EMPTY, 
+        NOTARGET, 
+        NOINVENTORY, 
+        SUCCESS;
     }
-
-    class RemovalResult
+    
+    public static class RemovalResult
     {
-
         public final EnumCargoLoadingState resultState;
-        @Nonnull public final ItemStack resultStack;
-
-        public RemovalResult(EnumCargoLoadingState resultState, @Nonnull ItemStack resultStack)
-        {
+        public final ItemStack resultStack;
+        
+        public RemovalResult(final EnumCargoLoadingState resultState, final ItemStack resultStack) {
             this.resultState = resultState;
             this.resultStack = resultStack;
         }
     }
-
-    EnumCargoLoadingState addCargo(ItemStack stack, boolean doAdd);
-
-    RemovalResult removeCargo(boolean doRemove);
 }

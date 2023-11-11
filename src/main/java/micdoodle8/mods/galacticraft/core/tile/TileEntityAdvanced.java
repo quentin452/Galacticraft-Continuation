@@ -1,250 +1,168 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import net.minecraft.tileentity.*;
+import java.lang.reflect.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.common.network.*;
+import micdoodle8.mods.miccore.*;
+import java.lang.annotation.*;
+import cpw.mods.fml.relauncher.*;
+import io.netty.buffer.*;
+import micdoodle8.mods.galacticraft.core.network.*;
+import java.util.*;
+import net.minecraft.entity.player.*;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
-import net.minecraftforge.fml.relauncher.Side;
-
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.network.IPacketReceiver;
-import micdoodle8.mods.galacticraft.core.network.NetworkUtil;
-import micdoodle8.mods.galacticraft.core.network.PacketDynamic;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-import io.netty.buffer.ByteBuf;
-
-public abstract class TileEntityAdvanced extends TileEntityInventory implements IPacketReceiver, ITickable
+public abstract class TileEntityAdvanced extends TileEntity implements IPacketReceiver
 {
-
-    public int ticks = 0;
+    public int ticks;
     private LinkedHashSet<Field> fieldCacheClient;
     private LinkedHashSet<Field> fieldCacheServer;
-    private Map<Field, Object> lastSentData = new HashMap<Field, Object>(4, 1F);
-    private boolean networkDataChanged = false;
-
-    public TileEntityAdvanced(String tileName)
-    {
-        super(tileName);
+    private Map<Field, Object> lastSentData;
+    private boolean networkDataChanged;
+    
+    public TileEntityAdvanced() {
+        this.ticks = 0;
+        this.lastSentData = new HashMap<Field, Object>();
+        this.networkDataChanged = false;
     }
-
-    @Override
-    public void update()
-    {
-        if (this.ticks == 0)
-        {
+    
+    public void updateEntity() {
+        if (this.ticks == 0) {
             this.initiate();
-
-            if (this.isNetworkedTile())
-            {
-                if (this.fieldCacheClient == null || this.fieldCacheServer == null)
-                {
+            if (this.isNetworkedTile()) {
+                if (this.fieldCacheClient == null || this.fieldCacheServer == null) {
                     this.initFieldCache();
                 }
-
-                if (this.world != null && this.world.isRemote && this.fieldCacheClient.size() > 0)
-                {
-                    // Request any networked information from server on first
-                    // client update (maybe client just logged on, but server
-                    // networkdata didn't change recently)
-                    GalacticraftCore.packetPipeline.sendToServer(new PacketDynamic(this));
+                if (this.worldObj != null && this.worldObj.isRemote && this.fieldCacheClient.size() > 0) {
+                    GalacticraftCore.packetPipeline.sendToServer((IPacket)new PacketDynamic((TileEntity)this));
                 }
             }
         }
-
-        this.ticks++;
-
-        if (this.isNetworkedTile() && this.ticks % this.getPacketCooldown() == 0)
-        {
-            if (this.world.isRemote && this.fieldCacheServer.size() > 0)
-            {
-                PacketDynamic packet = new PacketDynamic(this);
-                if (networkDataChanged)
-                {
-                    GalacticraftCore.packetPipeline.sendToServer(packet);
+        ++this.ticks;
+        if (this.isNetworkedTile() && this.ticks % this.getPacketCooldown() == 0) {
+            if (this.worldObj.isRemote && this.fieldCacheServer.size() > 0) {
+                final PacketDynamic packet = new PacketDynamic((TileEntity)this);
+                if (this.networkDataChanged) {
+                    GalacticraftCore.packetPipeline.sendToServer((IPacket)packet);
                 }
-            } else if (!this.world.isRemote && this.fieldCacheClient.size() > 0)
-            {
-                PacketDynamic packet = new PacketDynamic(this);
-                if (networkDataChanged)
-                {
-                    GalacticraftCore.packetPipeline.sendToAllAround(packet,
-                        new TargetPoint(GCCoreUtil.getDimensionID(this.world), getPos().getX(), getPos().getY(), getPos().getZ(), this.getPacketRange()));
+            }
+            else if (!this.worldObj.isRemote && this.fieldCacheClient.size() > 0) {
+                final PacketDynamic packet = new PacketDynamic((TileEntity)this);
+                if (this.networkDataChanged) {
+                    GalacticraftCore.packetPipeline.sendToAllAround((IPacket)packet, new NetworkRegistry.TargetPoint(this.worldObj.provider.dimensionId, (double)this.xCoord, (double)this.yCoord, (double)this.zCoord, this.getPacketRange()));
                 }
             }
         }
     }
-
-    private void initFieldCache()
-    {
-        try
-        {
+    
+    private void initFieldCache() {
+        try {
             this.fieldCacheClient = new LinkedHashSet<Field>();
             this.fieldCacheServer = new LinkedHashSet<Field>();
-
-            for (Field field : this.getClass().getFields())
-            {
-                if (field.isAnnotationPresent(NetworkedField.class))
-                {
-                    NetworkedField f = field.getAnnotation(NetworkedField.class);
-
-                    if (f.targetSide() == Side.CLIENT)
-                    {
+            for (final Field field : this.getClass().getFields()) {
+                if (field.isAnnotationPresent(Annotations.NetworkedField.class)) {
+                    final Annotations.NetworkedField f = field.getAnnotation(Annotations.NetworkedField.class);
+                    if (f.targetSide() == Side.CLIENT) {
                         this.fieldCacheClient.add(field);
-                    } else
-                    {
+                    }
+                    else {
                         this.fieldCacheServer.add(field);
                     }
                 }
             }
-        } catch (Exception e)
-        {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    
     public abstract double getPacketRange();
-
+    
     public abstract int getPacketCooldown();
-
+    
     public abstract boolean isNetworkedTile();
-
-    public void addExtraNetworkedData(List<Object> networkedList)
-    {
+    
+    public void addExtraNetworkedData(final List<Object> networkedList) {
     }
-
-    public void readExtraNetworkedData(ByteBuf dataStream)
-    {
+    
+    public void readExtraNetworkedData(final ByteBuf dataStream) {
     }
-
-    public void initiate()
-    {
+    
+    public void initiate() {
     }
-
-    @Override
-    public void getNetworkedData(ArrayList<Object> sendData)
-    {
+    
+    public void getNetworkedData(final ArrayList<Object> sendData) {
         Set<Field> fieldList = null;
         boolean changed = false;
-
-        if (this.fieldCacheClient == null || this.fieldCacheServer == null)
-        {
+        if (this.fieldCacheClient == null || this.fieldCacheServer == null) {
             this.initFieldCache();
         }
-
-        if (this.world.isRemote)
-        {
+        if (this.worldObj.isRemote) {
             fieldList = this.fieldCacheServer;
-        } else
-        {
+        }
+        else {
             fieldList = this.fieldCacheClient;
         }
-
-        for (Field f : fieldList)
-        {
+        for (final Field f : fieldList) {
             boolean fieldChanged = false;
-            try
-            {
-                Object data = f.get(this);
-                Object lastData = lastSentData.get(f);
-
-                if (!NetworkUtil.fuzzyEquals(lastData, data))
-                {
+            try {
+                final Object data = f.get(this);
+                final Object lastData = this.lastSentData.get(f);
+                if (!NetworkUtil.fuzzyEquals(lastData, data)) {
                     fieldChanged = true;
                 }
-
                 sendData.add(data);
-
-                if (fieldChanged)
-                {
-                    lastSentData.put(f, NetworkUtil.cloneNetworkedObject(data));
+                if (fieldChanged) {
+                    this.lastSentData.put(f, NetworkUtil.cloneNetworkedObject(data));
                 }
-            } catch (Exception e)
-            {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
-
             changed |= fieldChanged;
         }
-
-        if (changed)
-        {
+        if (changed) {
             this.addExtraNetworkedData(sendData);
-        } else
-        {
-            ArrayList<Object> prevSendData = new ArrayList<Object>(sendData);
-
+        }
+        else {
+            final ArrayList<Object> prevSendData = new ArrayList<Object>(sendData);
             this.addExtraNetworkedData(sendData);
-
-            if (!prevSendData.equals(sendData))
-            {
+            if (!prevSendData.equals(sendData)) {
                 changed = true;
             }
         }
-
-        networkDataChanged = changed;
+        this.networkDataChanged = changed;
     }
-
-    @Override
-    public void decodePacketdata(ByteBuf buffer)
-    {
-        if (this.world == null)
-        {
-            GalacticraftCore.logger.error("World is NULL! Connot decode packet data!");
-            return;
-        }
-
-        if (this.fieldCacheClient == null || this.fieldCacheServer == null)
-        {
+    
+    public void decodePacketdata(final ByteBuf buffer) {
+        if (this.fieldCacheClient == null || this.fieldCacheServer == null) {
             this.initFieldCache();
         }
+        if (this.worldObj.isRemote && this.fieldCacheClient.size() == 0) {
+            return;
+        }
+        if (!this.worldObj.isRemote && this.fieldCacheServer.size() == 0) {
+            return;
+        }
         Set<Field> fieldSet = null;
-
-        if (this.world.isRemote)
-        {
+        if (this.worldObj.isRemote) {
             fieldSet = this.fieldCacheClient;
-        } else
-        {
+        }
+        else {
             fieldSet = this.fieldCacheServer;
         }
-
-        for (Field field : fieldSet)
-        {
-            try
-            {
-                Object obj = NetworkUtil.getFieldValueFromStream(field, buffer, this.world);
+        for (final Field field : fieldSet) {
+            try {
+                final Object obj = NetworkUtil.getFieldValueFromStream(field, buffer, this.worldObj);
                 field.set(this, obj);
-            } catch (Exception e)
-            {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
         this.readExtraNetworkedData(buffer);
     }
-
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
-    {
-        return oldState.getBlock() != newSate.getBlock();
+    
+    public void handlePacketData(final Side side, final EntityPlayer player) {
     }
 }

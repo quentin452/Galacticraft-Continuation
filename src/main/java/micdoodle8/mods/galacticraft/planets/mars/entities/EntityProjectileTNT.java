@@ -1,78 +1,46 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.entities;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.projectile.EntityFireball;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.entity.projectile.*;
+import net.minecraft.world.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.entity.monster.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
 public class EntityProjectileTNT extends EntityFireball
 {
-
-    public EntityProjectileTNT(World par1World)
-    {
+    public EntityProjectileTNT(final World par1World) {
         super(par1World);
-        this.setSize(1.0F, 1.0F);
+        this.setSize(1.0f, 1.0f);
     }
-
-    public EntityProjectileTNT(World par1World, EntityLivingBase par2EntityLivingBase, double par3, double par5, double par7)
-    {
+    
+    public EntityProjectileTNT(final World par1World, final EntityLivingBase par2EntityLivingBase, final double par3, final double par5, final double par7) {
         super(par1World, par2EntityLivingBase, par3, par5, par7);
-        this.setSize(1.0F, 1.0F);
+        this.setSize(1.0f, 1.0f);
     }
-
+    
     @SideOnly(Side.CLIENT)
-    public EntityProjectileTNT(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
-    {
+    public EntityProjectileTNT(final World par1World, final double par2, final double par4, final double par6, final double par8, final double par10, final double par12) {
         super(par1World, par2, par4, par6, par8, par10, par12);
-        this.setSize(0.3125F, 0.3125F);
+        this.setSize(0.3125f, 0.3125f);
     }
-
-    @Override
-    public boolean isBurning()
-    {
+    
+    public boolean isBurning() {
         return false;
     }
-
-    @Override
-    protected void onImpact(RayTraceResult movingObjectPosition)
-    {
-        if (!this.world.isRemote)
-        {
-            if (movingObjectPosition.entityHit != null && !(movingObjectPosition.entityHit instanceof EntityCreeper))
-            {
-                float difficulty = 0;
-                switch (this.world.getDifficulty())
-                {
-                    case HARD:
-                        difficulty = 2F;
-                        break;
-                    case NORMAL:
-                        difficulty = 1F;
-                        break;
-                }
-                movingObjectPosition.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity), 6.0F + 3.0F * difficulty);
+    
+    protected void onImpact(final MovingObjectPosition movingObjectPosition) {
+        if (!this.worldObj.isRemote) {
+            if (movingObjectPosition.entityHit != null && !(movingObjectPosition.entityHit instanceof EntityCreeper)) {
+                movingObjectPosition.entityHit.attackEntityFrom(DamageSource.causeFireballDamage((EntityFireball)this, (Entity)this.shootingEntity), ConfigManagerCore.hardMode ? 12.0f : 6.0f);
             }
-
-            this.world.newExplosion((Entity) null, this.posX, this.posY, this.posZ, 1.0F, false, this.world.getGameRules().getBoolean("mobGriefing"));
+            this.worldObj.newExplosion((Entity)null, this.posX, this.posY, this.posZ, 1.0f, false, this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing"));
             this.setDead();
         }
     }
-
-    @Override
-    public boolean canBeCollidedWith()
-    {
+    
+    public boolean canBeCollidedWith() {
         return true;
     }
 }

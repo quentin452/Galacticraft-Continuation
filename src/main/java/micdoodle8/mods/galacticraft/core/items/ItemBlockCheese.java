@@ -1,37 +1,32 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-
-public class ItemBlockCheese extends ItemBlockDesc implements GCRarity
+public class ItemBlockCheese extends ItemBlockDesc
 {
-
-    public ItemBlockCheese(Block par2Block)
-    {
+    public ItemBlockCheese(final Block par2Block) {
         super(par2Block);
         this.setMaxStackSize(1);
     }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack)
-    {
-        return false;
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        this.itemIcon = iconRegister.registerIcon("galacticraftmoon:cheese_block");
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftBlocksTab;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    @Override
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
 }

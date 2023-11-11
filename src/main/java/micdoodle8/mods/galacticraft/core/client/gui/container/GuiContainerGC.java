@@ -1,79 +1,51 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.gui.container;
 
-import java.util.ArrayList;
-import java.util.List;
-import micdoodle8.mods.galacticraft.core.client.gui.element.GuiElementInfoRegion;
-import micdoodle8.mods.galacticraft.core.util.CompatibilityManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.inventory.*;
+import micdoodle8.mods.galacticraft.core.client.gui.element.*;
+import java.util.*;
+import net.minecraft.client.*;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.player.*;
+import cpw.mods.fml.common.*;
+import net.minecraft.item.*;
 
 public abstract class GuiContainerGC extends GuiContainer
 {
+    public List<GuiElementInfoRegion> infoRegions;
 
-    public List<GuiElementInfoRegion> infoRegions = new ArrayList<GuiElementInfoRegion>();
-
-    public GuiContainerGC(Container container)
-    {
+    public GuiContainerGC(final Container container) {
         super(container);
+        this.infoRegions = new ArrayList<GuiElementInfoRegion>();
     }
 
-    @Override
-    public void drawScreen(int par1, int par2, float par3)
-    {
-        this.drawDefaultBackground();
+    public void drawScreen(final int par1, final int par2, final float par3) {
         super.drawScreen(par1, par2, par3);
-        this.renderHoveredToolTip(par1, par2);
-
-        for (int k = 0; k < this.infoRegions.size(); ++k)
-        {
-            GuiElementInfoRegion guibutton = this.infoRegions.get(k);
+        for (int k = 0; k < this.infoRegions.size(); ++k) {
+            final GuiElementInfoRegion guibutton = this.infoRegions.get(k);
             guibutton.drawRegion(par1, par2);
         }
     }
 
-    @Override
-    public void setWorldAndResolution(Minecraft par1Minecraft, int par2, int par3)
-    {
+    public void setWorldAndResolution(final Minecraft par1Minecraft, final int par2, final int par3) {
         this.infoRegions.clear();
         super.setWorldAndResolution(par1Minecraft, par2, par3);
     }
 
-    public int getTooltipOffset(int par1, int par2)
-    {
-        for (int i1 = 0; i1 < this.inventorySlots.inventorySlots.size(); ++i1)
-        {
-            Slot slot = this.inventorySlots.inventorySlots.get(i1);
-
-            if (slot.isEnabled() && this.isPointInRegion(slot.xPos, slot.yPos, 16, 16, par1, par2))
-            {
-                ItemStack itemStack = slot.getStack();
-
-                if (!itemStack.isEmpty())
-                {
-                    List list = itemStack.getTooltip(this.mc.player, this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
+    public int getTooltipOffset(final int par1, final int par2) {
+        for (int i1 = 0; i1 < this.inventorySlots.inventorySlots.size(); ++i1) {
+            final Slot slot = (Slot) this.inventorySlots.inventorySlots.get(i1);
+            if (slot.func_111238_b() && this.func_146978_c(slot.xDisplayPosition, slot.yDisplayPosition, 16, 16, par1, par2)) {
+                final ItemStack itemStack = slot.getStack();
+                if (itemStack != null) {
+                    final List list = itemStack.getTooltip(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
                     int size = list.size();
-
-                    if (CompatibilityManager.isWailaLoaded())
-                    {
-                        size++;
+                    if (Loader.isModLoaded("Waila")) {
+                        ++size;
                     }
-
                     return size * 10 + 10;
                 }
             }
         }
-
         return 0;
     }
 }

@@ -1,158 +1,85 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
+import micdoodle8.mods.galacticraft.api.recipe.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import java.util.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import javax.annotation.Nullable;
-
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemHangingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.api.recipe.ISchematicItem;
-import micdoodle8.mods.galacticraft.api.recipe.SchematicRegistry;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.EntityHangingSchematic;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class ItemSchematic extends ItemHangingEntity implements ISchematicItem, ISortableItem, GCRarity
+public class ItemSchematic extends Item implements ISchematicItem
 {
-
-    public ItemSchematic(String assetName)
-    {
-        super(EntityHangingSchematic.class);
+    public static final String[] names;
+    protected IIcon[] icons;
+    
+    public ItemSchematic(final String assetName) {
+        this.icons = new IIcon[ItemSchematic.names.length];
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
         this.setMaxStackSize(1);
-        this.setTranslationKey(assetName);
+        this.setUnlocalizedName(assetName);
+        this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                list.add(new ItemStack(this, 1, i));
-            }
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < ItemSchematic.names.length; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
         }
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public int getMetadata(final int par1) {
         return par1;
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        switch (par1ItemStack.getItemDamage())
-        {
-            case 0:
-                tooltip.add(GCCoreUtil.translate("schematic.moonbuggy.name"));
-                break;
-            case 1:
-                tooltip.add(GCCoreUtil.translate("schematic.rocket_t2.name"));
-                break;
+    public void registerIcons(final IIconRegister iconRegister) {
+        for (int i = 0; i < this.icons.length; ++i) {
+            this.icons[i] = iconRegister.registerIcon(this.getIconString() + "_" + ItemSchematic.names[i]);
         }
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.SCHEMATIC;
+    
+    public IIcon getIconFromDamage(final int damage) {
+        if (this.icons.length > damage) {
+            return this.icons[damage];
+        }
+        return super.getIconFromDamage(damage);
     }
-
-    @Override
-    public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
-        ItemStack stack = playerIn.getHeldItem(hand);
-        BlockPos blockpos = pos.offset(facing);
-
-        if (facing != EnumFacing.DOWN && facing != EnumFacing.UP && playerIn.canPlayerEdit(blockpos, facing, stack))
-        {
-            EntityHangingSchematic entityhanging = this.createEntity(worldIn, blockpos, facing, this.getIndex(stack.getItemDamage()));
-
-            if (entityhanging != null && entityhanging.onValidSurface())
-            {
-                if (!worldIn.isRemote)
-                {
-                    entityhanging.playPlaceSound();
-                    worldIn.spawnEntity(entityhanging);
-                    entityhanging.sendToClient(worldIn, blockpos);
+    
+    @SideOnly(Side.CLIENT)
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
+        if (par2EntityPlayer.worldObj.isRemote) {
+            switch (par1ItemStack.getItemDamage()) {
+                case 0: {
+                    par3List.add(GCCoreUtil.translate("schematic.moonbuggy.name"));
+                    break;
                 }
-
-                stack.shrink(1);
+                case 1: {
+                    par3List.add(GCCoreUtil.translate("schematic.rocketT2.name"));
+                    if (!GalacticraftCore.isPlanetsLoaded) {
+                        par3List.add(EnumColor.DARK_AQUA + "\"Galacticraft: Planets\" Not Installed!");
+                        break;
+                    }
+                    break;
+                }
             }
-
-            return EnumActionResult.SUCCESS;
-        }
-        else
-        {
-            return EnumActionResult.FAIL;
         }
     }
-
-    private EntityHangingSchematic createEntity(World worldIn, BlockPos pos, EnumFacing clickedSide, int index)
-    {
-        return new EntityHangingSchematic(worldIn, pos, clickedSide, index);
-    }
-
-    /**
-     * Higher tiers should override - see ItemSchematicTier2 for example
-     **/
-    protected int getIndex(int damage)
-    {
-        return damage;
-    }
-
-    /**
-     * Make sure the number of these will match the index values
-     */
-    public static void registerSchematicItems()
-    {
-        SchematicRegistry.registerSchematicItem(new ItemStack(GCItems.schematic, 1, 0));
-        SchematicRegistry.registerSchematicItem(new ItemStack(GCItems.schematic, 1, 1));
-    }
-
-    /**
-     * Make sure the order of these will match the index values
-     */
-    @SideOnly(value = Side.CLIENT)
-    public static void registerTextures()
-    {
-        SchematicRegistry.registerTexture(new ResourceLocation(Constants.ASSET_PREFIX, "textures/items/schematic_buggy.png"));
-        SchematicRegistry.registerTexture(new ResourceLocation(Constants.ASSET_PREFIX, "textures/items/schematic_rocket_t2.png"));
+    
+    static {
+        names = new String[] { "buggy", "rocketT2" };
     }
 }

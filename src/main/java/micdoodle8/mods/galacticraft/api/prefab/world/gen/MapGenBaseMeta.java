@@ -1,62 +1,36 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.prefab.world.gen;
 
-import java.util.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkPrimer;
+import java.util.*;
+import net.minecraft.world.*;
+import net.minecraft.world.chunk.*;
+import net.minecraft.block.*;
 
-/**
- * Do not include this prefab class in your released mod download. <p> This is
- * a base class for World Gen such as caves. Override and generate features in
- * recursiveGenerate
- */
 public abstract class MapGenBaseMeta
 {
-
-    /**
-     * The number of Chunks to gen-check in any given direction.
-     */
-    protected int range = 8;
-
-    /**
-     * The RNG used by the MapGen classes.
-     */
-    protected Random rand = new Random();
-
-    /**
-     * This world object.
-     */
-    protected World world;
-
-    public void generate(World world, int chunkX, int chunkZ, ChunkPrimer primer)
-    {
-        this.world = world;
+    protected int range;
+    protected Random rand;
+    protected World worldObj;
+    
+    public MapGenBaseMeta() {
+        this.range = 8;
+        this.rand = new Random();
+    }
+    
+    public void generate(final IChunkProvider par1IChunkProvider, final World world, final int chunkX, final int chunkZ, final Block[] blocks, final byte[] metadata) {
+        this.worldObj = world;
         this.rand.setSeed(world.getSeed());
         final long r0 = this.rand.nextLong();
-        final long r1 = this.rand.nextLong();
-
-        for (int x0 = chunkX - this.range; x0 <= chunkX + this.range; ++x0)
-        {
-            for (int y0 = chunkZ - this.range; y0 <= chunkZ + this.range; ++y0)
-            {
+        final long r2 = this.rand.nextLong();
+        for (int x0 = chunkX - this.range; x0 <= chunkX + this.range; ++x0) {
+            for (int y0 = chunkZ - this.range; y0 <= chunkZ + this.range; ++y0) {
                 final long randX = x0 * r0;
-                final long randZ = y0 * r1;
+                final long randZ = y0 * r2;
                 this.rand.setSeed(randX ^ randZ ^ world.getSeed());
-                this.recursiveGenerate(world, x0, y0, chunkX, chunkZ, primer);
+                this.recursiveGenerate(world, x0, y0, chunkX, chunkZ, blocks, metadata);
             }
         }
     }
-
-    /**
-     * Recursively called by generate() (generate) and optionally by itself.
-     */
-    protected void recursiveGenerate(World world, int xChunkCoord, int zChunkCoord, int origXChunkCoord, int origZChunkCoord, ChunkPrimer primer)
-    {
+    
+    protected void recursiveGenerate(final World world, final int xChunkCoord, final int zChunkCoord, final int origXChunkCoord, final int origZChunkCoord, final Block[] blocks, final byte[] metadata) {
     }
 }

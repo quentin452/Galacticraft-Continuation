@@ -1,59 +1,38 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.network;
 
-import java.util.UUID;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.entity.*;
+import io.netty.channel.*;
+import io.netty.buffer.*;
+import net.minecraft.entity.player.*;
+import java.util.*;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-
-import micdoodle8.mods.galacticraft.api.vector.Vector2;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-import io.netty.buffer.ByteBuf;
-
-public class PacketEntityUpdate extends PacketBase
+public class PacketEntityUpdate implements IPacket
 {
-
     private int entityID;
     private Vector3 position;
     private float rotationYaw;
     private float rotationPitch;
     private Vector3 motion;
     private boolean onGround;
-
-    public PacketEntityUpdate()
-    {
-        super();
+    
+    public PacketEntityUpdate() {
     }
-
-    public PacketEntityUpdate(int entityID, Vector3 position, Vector2 rotation, Vector3 motion, boolean onGround, int dimID)
-    {
-        super(dimID);
+    
+    public PacketEntityUpdate(final int entityID, final Vector3 position, final Vector2 rotation, final Vector3 motion, final boolean onGround) {
         this.entityID = entityID;
         this.position = position;
-        this.rotationYaw = (float) rotation.x;
-        this.rotationPitch = (float) rotation.y;
+        this.rotationYaw = (float)rotation.x;
+        this.rotationPitch = (float)rotation.y;
         this.motion = motion;
         this.onGround = onGround;
     }
-
-    public PacketEntityUpdate(Entity entity)
-    {
-        this(entity.getEntityId(), new Vector3(entity.posX, entity.posY, entity.posZ), new Vector2(entity.rotationYaw, entity.rotationPitch),
-            new Vector3(entity.motionX, entity.motionY, entity.motionZ), entity.onGround, GCCoreUtil.getDimensionID(entity.world));
+    
+    public PacketEntityUpdate(final Entity entity) {
+        this(entity.getEntityId(), new Vector3(entity.posX, entity.posY, entity.posZ), new Vector2((double)entity.rotationYaw, (double)entity.rotationPitch), new Vector3(entity.motionX, entity.motionY, entity.motionZ), entity.onGround);
     }
-
-    @Override
-    public void encodeInto(ByteBuf buffer)
-    {
-        super.encodeInto(buffer);
+    
+    public void encodeInto(final ChannelHandlerContext context, final ByteBuf buffer) {
         buffer.writeInt(this.entityID);
         buffer.writeDouble(this.position.x);
         buffer.writeDouble(this.position.y);
@@ -65,11 +44,8 @@ public class PacketEntityUpdate extends PacketBase
         buffer.writeDouble(this.motion.z);
         buffer.writeBoolean(this.onGround);
     }
-
-    @Override
-    public void decodeInto(ByteBuf buffer)
-    {
-        super.decodeInto(buffer);
+    
+    public void decodeInto(final ChannelHandlerContext context, final ByteBuf buffer) {
         this.entityID = buffer.readInt();
         this.position = new Vector3(buffer.readDouble(), buffer.readDouble(), buffer.readDouble());
         this.rotationYaw = buffer.readFloat();
@@ -77,39 +53,27 @@ public class PacketEntityUpdate extends PacketBase
         this.motion = new Vector3(buffer.readDouble(), buffer.readDouble(), buffer.readDouble());
         this.onGround = buffer.readBoolean();
     }
-
-    @Override
-    public void handleClientSide(EntityPlayer player)
-    {
+    
+    public void handleClientSide(final EntityPlayer player) {
         this.setEntityData(player);
     }
-
-    @Override
-    public void handleServerSide(EntityPlayer player)
-    {
+    
+    public void handleServerSide(final EntityPlayer player) {
         this.setEntityData(player);
     }
-
-    private void setEntityData(EntityPlayer player)
-    {
-        Entity entity = player.world.getEntityByID(this.entityID);
-
-        if (entity instanceof IEntityFullSync)
-        {
-            if (player.world.isRemote || player.getUniqueID().equals(((IEntityFullSync) entity).getOwnerUUID()) || ((IEntityFullSync) entity).getOwnerUUID() == null)
-            {
-                IEntityFullSync controllable = (IEntityFullSync) entity;
-                controllable.setPositionRotationAndMotion(this.position.x, this.position.y, this.position.z, this.rotationYaw, this.rotationPitch, this.motion.x, this.motion.y, this.motion.z,
-                    this.onGround);
-            }
+    
+    private void setEntityData(final EntityPlayer player) {
+        final Entity entity = player.worldObj.getEntityByID(this.entityID);
+        if (entity instanceof IEntityFullSync && (player.worldObj.isRemote || player.getUniqueID().equals(((IEntityFullSync)entity).getOwnerUUID()) || ((IEntityFullSync)entity).getOwnerUUID() == null)) {
+            final IEntityFullSync controllable = (IEntityFullSync)entity;
+            controllable.setPositionRotationAndMotion(this.position.x, this.position.y, this.position.z, this.rotationYaw, this.rotationPitch, this.motion.x, this.motion.y, this.motion.z, this.onGround);
         }
     }
-
+    
     public interface IEntityFullSync
     {
-
-        void setPositionRotationAndMotion(double x, double y, double z, float yaw, float pitch, double motX, double motY, double motZ, boolean onGround);
-
+        void setPositionRotationAndMotion(final double p0, final double p1, final double p2, final float p3, final float p4, final double p5, final double p6, final double p7, final boolean p8);
+        
         UUID getOwnerUUID();
     }
 }

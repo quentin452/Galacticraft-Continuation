@@ -1,36 +1,30 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.event;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.event.entity.player.*;
+import cpw.mods.fml.common.eventhandler.*;
+import net.minecraft.entity.player.*;
 
 @Cancelable
 public class EventWakePlayer extends PlayerEvent
 {
-
-    public EntityPlayer.SleepResult result = null;
-    public final BlockPos pos;
-    public final boolean immediately;
-    public final boolean updateWorld;
-    public final boolean setSpawn;
+    public EntityPlayer.EnumStatus result;
+    public final int x;
+    public final int y;
+    public final int z;
+    public final boolean flag1;
+    public final boolean flag2;
+    public final boolean flag3;
     public final boolean bypassed;
-
-    public EventWakePlayer(EntityPlayer player, BlockPos pos, boolean immediately, boolean updateWorld, boolean setSpawn, boolean bypassed)
-    {
+    
+    public EventWakePlayer(final EntityPlayer player, final int x, final int y, final int z, final boolean flag1, final boolean flag2, final boolean flag3, final boolean bypassed) {
         super(player);
-        this.pos = pos;
-        this.immediately = immediately;
-        this.updateWorld = updateWorld;
-        this.setSpawn = setSpawn;
+        this.result = null;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.flag1 = flag1;
+        this.flag2 = flag2;
+        this.flag3 = flag3;
         this.bypassed = bypassed;
     }
 }

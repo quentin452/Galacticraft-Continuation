@@ -1,763 +1,531 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.tile;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.galacticraft.api.tile.*;
+import micdoodle8.mods.galacticraft.api.transmission.tile.*;
+import micdoodle8.mods.miccore.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.items.*;
+import net.minecraft.nbt.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.energy.item.*;
+import net.minecraft.init.*;
+import net.minecraft.item.*;
+import net.minecraftforge.fluids.*;
+import micdoodle8.mods.galacticraft.core.energy.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.core.oxygen.*;
+import mekanism.api.gas.*;
+import micdoodle8.mods.galacticraft.api.transmission.grid.*;
+import micdoodle8.mods.galacticraft.api.transmission.*;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fluids.FluidTankInfo;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.Optional.Interface;
-import net.minecraftforge.fml.relauncher.Side;
-
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-
-import micdoodle8.mods.galacticraft.annotations.ForRemoval;
-import micdoodle8.mods.galacticraft.annotations.ReplaceWith;
-import micdoodle8.mods.galacticraft.api.tile.IDisableableMachine;
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IOxygenReceiver;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IOxygenStorage;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.GCFluids;
-import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
-import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlockWithInventory;
-import micdoodle8.mods.galacticraft.core.fluid.FluidNetwork;
-import micdoodle8.mods.galacticraft.core.fluid.NetworkHelper;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenStorageModule;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-import micdoodle8.mods.galacticraft.core.wrappers.FluidHandlerWrapper;
-import micdoodle8.mods.galacticraft.core.wrappers.IFluidHandlerWrapper;
-import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
-import micdoodle8.mods.galacticraft.planets.asteroids.items.ItemAtmosphericValve;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMarsT2;
-
-import mekanism.api.gas.Gas;
-import mekanism.api.gas.GasStack;
-import mekanism.api.gas.IGasHandler;
-import mekanism.common.capabilities.Capabilities;
-
-@Interface(iface = "mekanism.api.gas.IGasHandler", modid = "mekanism")
-public class TileEntityElectrolyzer extends TileBaseElectricBlockWithInventory implements ISidedInventory, IDisableableMachine, IFluidHandlerWrapper, IOxygenStorage, IOxygenReceiver, IGasHandler
+public class TileEntityElectrolyzer extends TileBaseElectricBlockWithInventory implements ISidedInventory, IDisableableMachine, IFluidHandler, IOxygenStorage, IOxygenReceiver
 {
+    private final int tankCapacity = 4000;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public FluidTank waterTank;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public FluidTank liquidTank;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public FluidTank liquidTank2;
+    public int processTimeRequired;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int processTicks;
+    private ItemStack[] containingItems;
 
-    private final int tankCapacity        = 4000;
-
-    @NetworkedField(targetSide = Side.CLIENT)
-    public FluidTank  waterTank           = new FluidTank(this.tankCapacity);
-    @NetworkedField(targetSide = Side.CLIENT)
-    public FluidTank  liquidTank          = new FluidTank(this.tankCapacity);
-    @NetworkedField(targetSide = Side.CLIENT)
-    public FluidTank  liquidTank2         = new FluidTank(this.tankCapacity);
-
-    public int        processTimeRequired = 3;
-    @NetworkedField(targetSide = Side.CLIENT)
-    public int        processTicks        = 0;
-
-    public TileEntityElectrolyzer()
-    {
-        super("tile.mars_machine.6.name");
-        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 150 : 120);
+    public TileEntityElectrolyzer() {
+        this.getClass();
+        this.waterTank = new FluidTank(4000);
+        this.getClass();
+        this.liquidTank = new FluidTank(4000);
+        this.getClass();
+        this.liquidTank2 = new FluidTank(4000);
+        this.processTimeRequired = 3;
+        this.processTicks = 0;
+        this.containingItems = new ItemStack[4];
+        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 150.0f : 120.0f);
         this.setTierGC(2);
-        this.inventory = NonNullList.withSize(4, ItemStack.EMPTY);
     }
 
-    @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing)
-    {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-            return true;
-
-        if (EnergyUtil.checkMekGasHandler(capability))
-            return true;
-
-        return super.hasCapability(capability, facing);
-    }
-
-    @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing)
-    {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-        {
-            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(new FluidHandlerWrapper(this, facing));
-        }
-
-        if (EnergyUtil.checkMekGasHandler(capability))
-        {
-            return Capabilities.GAS_HANDLER_CAPABILITY.cast(this);
-        }
-
-        return super.getCapability(capability, facing);
-    }
-
-    @Override
-    public void update()
-    {
-        super.update();
-
-        if (!this.world.isRemote)
-        {
-            final FluidStack liquid = FluidUtil.getFluidContained(this.getInventory().get(1));
-            if (FluidUtil.isFluidStrict(liquid, FluidRegistry.WATER.getName()))
-            {
-                FluidUtil.loadFromContainer(waterTank, FluidRegistry.WATER, this.getInventory(), 1, liquid.amount);
-            }
-
-            // Only drain with atmospheric valve
-            checkFluidTankTransfer(2, this.liquidTank);
-            checkFluidTankTransfer(3, this.liquidTank2);
-
-            if (this.hasEnoughEnergyToRun && this.canProcess())
-            {
-                // 50% extra speed boost for Tier 2 machine if powered by Tier 2
-                // power
-                if (this.tierGC == 2)
-                {
-                    this.processTimeRequired = Math.max(1, 4 - this.poweredByTierGC);
+    public void updateEntity() {
+        super.updateEntity();
+        if (!this.worldObj.isRemote) {
+            if (this.containingItems[1] != null) {
+                final FluidStack liquid = FluidContainerRegistry.getFluidForFilledItem(this.containingItems[1]);
+                if (liquid != null && liquid.getFluid().getName().equals(FluidRegistry.WATER.getName()) && (this.waterTank.getFluid() == null || this.waterTank.getFluid().amount + liquid.amount <= this.waterTank.getCapacity())) {
+                    this.waterTank.fill(liquid, true);
+                    this.containingItems[1] = FluidUtil.getUsedContainer(this.containingItems[1]);
                 }
-
-                if (this.processTicks == 0)
-                {
+            }
+            this.checkFluidTankTransfer(2, this.liquidTank);
+            this.checkFluidTankTransfer(3, this.liquidTank2);
+            if (this.hasEnoughEnergyToRun && this.canProcess()) {
+                if (this.tierGC == 2) {
+                    this.processTimeRequired = ((this.poweredByTierGC == 2) ? 2 : 3);
+                }
+                if (this.processTicks == 0) {
                     this.processTicks = this.processTimeRequired;
                 }
-                else
-                {
-                    if (--this.processTicks <= 0)
-                    {
-                        this.doElectrolysis();
-                        this.processTicks = this.canProcess() ? this.processTimeRequired : 0;
-                    }
+                else if (--this.processTicks <= 0) {
+                    this.doElectrolysis();
+                    this.processTicks = (this.canProcess() ? this.processTimeRequired : 0);
                 }
             }
-            else
-            {
+            else {
                 this.processTicks = 0;
             }
-
-            this.produceOxygen(this.getOxygenOutputDirection());
-            this.produceHydrogen(this.getHydrogenOutputDirection());
+            this.produceOxygen(ForgeDirection.getOrientation(this.getOxygenOutputDirection()));
+            this.produceHydrogen(ForgeDirection.getOrientation(this.getHydrogenOutputDirection()));
         }
     }
 
-    private void doElectrolysis()
-    {
-        // Can't be called if the gasTank fluid is null
+    private void doElectrolysis() {
         final int waterAmount = this.waterTank.getFluid().amount;
-        if (waterAmount == 0)
-        {
+        if (waterAmount == 0) {
             return;
         }
-
         this.placeIntoFluidTanks(2);
         this.waterTank.drain(1, true);
     }
 
-    private int placeIntoFluidTanks(int amountToDrain)
-    {
+    private int placeIntoFluidTanks(int amountToDrain) {
         final int fuelSpace = this.liquidTank.getCapacity() - this.liquidTank.getFluidAmount();
         final int fuelSpace2 = this.liquidTank2.getCapacity() - this.liquidTank2.getFluidAmount();
         int amountToDrain2 = amountToDrain * 2;
-
-        if (amountToDrain > fuelSpace)
-        {
+        if (amountToDrain > fuelSpace) {
             amountToDrain = fuelSpace;
         }
         this.liquidTank.fill(FluidRegistry.getFluidStack("oxygen", amountToDrain), true);
-
-        if (amountToDrain2 > fuelSpace2)
-        {
+        if (amountToDrain2 > fuelSpace2) {
             amountToDrain2 = fuelSpace2;
         }
         this.liquidTank2.fill(FluidRegistry.getFluidStack("hydrogen", amountToDrain2), true);
-
         return amountToDrain;
     }
 
-    private void checkFluidTankTransfer(int slot, FluidTank tank)
-    {
-        if (!this.getInventory().get(slot).isEmpty() && this.getInventory().get(slot).getItem() instanceof ItemAtmosphericValve)
-        {
+    private void checkFluidTankTransfer(final int slot, final FluidTank tank) {
+        if (this.containingItems[slot] != null && this.containingItems[slot].getItem() instanceof ItemAtmosphericValve) {
             tank.drain(4, true);
         }
     }
 
-    public int getScaledGasLevel(int i)
-    {
-        return this.waterTank.getFluid() != null ? this.waterTank.getFluid().amount * i / this.waterTank.getCapacity() : 0;
+    public int getScaledGasLevel(final int i) {
+        return (this.waterTank.getFluid() != null) ? (this.waterTank.getFluid().amount * i / this.waterTank.getCapacity()) : 0;
     }
 
-    public int getScaledFuelLevel(int i)
-    {
-        return this.liquidTank.getFluid() != null ? this.liquidTank.getFluid().amount * i / this.liquidTank.getCapacity() : 0;
+    public int getScaledFuelLevel(final int i) {
+        return (this.liquidTank.getFluid() != null) ? (this.liquidTank.getFluid().amount * i / this.liquidTank.getCapacity()) : 0;
     }
 
-    public int getScaledFuelLevel2(int i)
-    {
-        return this.liquidTank2.getFluid() != null ? this.liquidTank2.getFluid().amount * i / this.liquidTank2.getCapacity() : 0;
+    public int getScaledFuelLevel2(final int i) {
+        return (this.liquidTank2.getFluid() != null) ? (this.liquidTank2.getFluid().amount * i / this.liquidTank2.getCapacity()) : 0;
     }
 
-    public boolean canProcess()
-    {
-        if (this.waterTank.getFluid() == null || this.waterTank.getFluid().amount <= 0 || this.getDisabled(0))
-        {
+    public boolean canProcess() {
+        if (this.waterTank.getFluid() == null || this.waterTank.getFluid().amount <= 0 || this.getDisabled(0)) {
             return false;
         }
-
-        boolean tank1HasSpace = this.liquidTank.getFluidAmount() < this.liquidTank.getCapacity();
-        boolean tank2HasSpace = this.liquidTank2.getFluidAmount() < this.liquidTank2.getCapacity();
-
+        final boolean tank1HasSpace = this.liquidTank.getFluidAmount() < this.liquidTank.getCapacity();
+        final boolean tank2HasSpace = this.liquidTank2.getFluidAmount() < this.liquidTank2.getCapacity();
         return tank1HasSpace || tank2HasSpace;
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    public void readFromNBT(final NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         this.processTicks = nbt.getInteger("processTicks");
-
-        if (nbt.hasKey("waterTank"))
-        {
+        this.containingItems = this.readStandardItemsFromNBT(nbt);
+        if (nbt.hasKey("waterTank")) {
             this.waterTank.readFromNBT(nbt.getCompoundTag("waterTank"));
         }
-
-        if (nbt.hasKey("gasTank"))
-        {
+        if (nbt.hasKey("gasTank")) {
             this.liquidTank.readFromNBT(nbt.getCompoundTag("gasTank"));
         }
-        if (nbt.hasKey("gasTank2"))
-        {
+        if (nbt.hasKey("gasTank2")) {
             this.liquidTank2.readFromNBT(nbt.getCompoundTag("gasTank2"));
         }
     }
 
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    public void writeToNBT(final NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setInteger("processTicks", this.processTicks);
-
-        if (this.waterTank.getFluid() != null)
-        {
-            nbt.setTag("waterTank", this.waterTank.writeToNBT(new NBTTagCompound()));
+        this.writeStandardItemsToNBT(nbt);
+        if (this.waterTank.getFluid() != null) {
+            nbt.setTag("waterTank", (NBTBase)this.waterTank.writeToNBT(new NBTTagCompound()));
         }
-
-        if (this.liquidTank.getFluid() != null)
-        {
-            nbt.setTag("gasTank", this.liquidTank.writeToNBT(new NBTTagCompound()));
+        if (this.liquidTank.getFluid() != null) {
+            nbt.setTag("gasTank", (NBTBase)this.liquidTank.writeToNBT(new NBTTagCompound()));
         }
-        if (this.liquidTank2.getFluid() != null)
-        {
-            nbt.setTag("gasTank2", this.liquidTank2.writeToNBT(new NBTTagCompound()));
+        if (this.liquidTank2.getFluid() != null) {
+            nbt.setTag("gasTank2", (NBTBase)this.liquidTank2.writeToNBT(new NBTTagCompound()));
         }
-
-        return nbt;
     }
 
-    @Override
-    public boolean hasCustomName()
-    {
+    protected ItemStack[] getContainingItems() {
+        return this.containingItems;
+    }
+
+    public boolean hasCustomInventoryName() {
         return true;
     }
 
-    // ISidedInventory Implementation:
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[] {0, 1};
+    public String getInventoryName() {
+        return GCCoreUtil.translate("tile.marsMachine.6.name");
     }
 
-    @Override
-    public boolean canInsertItem(int slotID, ItemStack itemstack, EnumFacing side)
-    {
-        if (this.isItemValidForSlot(slotID, itemstack))
-        {
-            switch (slotID)
-            {
-                case 0:
-                    return ItemElectricBase.isElectricItemCharged(itemstack);
-                case 1:
-                    return itemstack.getItem() == Items.WATER_BUCKET;
-                default:
-                    return false;
+    public int[] getAccessibleSlotsFromSide(final int side) {
+        return new int[] { 0, 1 };
+    }
+
+    public boolean canInsertItem(final int slotID, final ItemStack itemstack, final int side) {
+        if (!this.isItemValidForSlot(slotID, itemstack)) {
+            return false;
+        }
+        switch (slotID) {
+            case 0: {
+                return ItemElectricBase.isElectricItemCharged(itemstack);
+            }
+            case 1: {
+                return itemstack.getItem() == Items.water_bucket;
+            }
+            default: {
+                return false;
             }
         }
-        return false;
     }
 
-    @Override
-    public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side)
-    {
-        if (this.isItemValidForSlot(slotID, itemstack))
-        {
-            switch (slotID)
-            {
-                case 0:
-                    return ItemElectricBase.isElectricItemEmpty(itemstack);
-                case 1:
-                    return itemstack.getItem() == Items.BUCKET;
-                default:
-                    return false;
+    public boolean canExtractItem(final int slotID, final ItemStack itemstack, final int side) {
+        if (!this.isItemValidForSlot(slotID, itemstack)) {
+            return false;
+        }
+        switch (slotID) {
+            case 0: {
+                return ItemElectricBase.isElectricItemEmpty(itemstack);
+            }
+            case 1: {
+                return itemstack.getItem() == Items.bucket;
+            }
+            default: {
+                return false;
             }
         }
-        return false;
     }
 
-    @Override
-    public boolean isItemValidForSlot(int slotID, ItemStack itemstack)
-    {
-        Item item = itemstack.getItem();
-        switch (slotID)
-        {
-            case 0:
+    public boolean isItemValidForSlot(final int slotID, final ItemStack itemstack) {
+        final Item item = itemstack.getItem();
+        switch (slotID) {
+            case 0: {
                 return ItemElectricBase.isElectricItem(item);
-            case 1:
-                return item == Items.BUCKET || item == Items.WATER_BUCKET;
+            }
+            case 1: {
+                return item == Items.bucket || item == Items.water_bucket;
+            }
+            default: {
+                return false;
+            }
         }
-
-        return false;
     }
 
-    @Override
-    public boolean shouldUseEnergy()
-    {
+    public boolean shouldUseEnergy() {
         return this.canProcess();
     }
 
-    @Override
-    public double getPacketRange()
-    {
-        return 320.0D;
+    public double getPacketRange() {
+        return 320.0;
     }
 
-    @Override
-    public EnumFacing getElectricInputDirection()
-    {
-        return EnumFacing.DOWN;
+    public ForgeDirection getElectricInputDirection() {
+        return ForgeDirection.DOWN;
     }
 
-    @Override
-    public boolean canDrain(EnumFacing from, Fluid fluid)
-    {
-        if (from == this.getHydrogenOutputDirection())
-        {
+    public boolean canDrain(final ForgeDirection from, final Fluid fluid) {
+        final int metaside = this.getBlockMetadata() + 2;
+        final int side = from.ordinal();
+        if (side == (metaside ^ 0x1)) {
             return this.liquidTank2.getFluid() != null && this.liquidTank2.getFluidAmount() > 0;
         }
-        if (from == this.getOxygenOutputDirection())
-        {
-            return this.liquidTank.getFluid() != null && this.liquidTank.getFluidAmount() > 0;
-        }
-
-        return false;
+        return 7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) == (side ^ 0x1) && this.liquidTank.getFluid() != null && this.liquidTank.getFluidAmount() > 0;
     }
 
-    @Override
-    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain)
-    {
-        if (from == this.getHydrogenOutputDirection())
-        {
-            if (resource != null && resource.isFluidEqual(this.liquidTank2.getFluid()))
-            {
-                return this.liquidTank2.drain(resource.amount, doDrain);
-            }
+    public FluidStack drain(final ForgeDirection from, final FluidStack resource, final boolean doDrain) {
+        final int metaside = this.getBlockMetadata() + 2;
+        final int side = from.ordinal();
+        if (side == (metaside ^ 0x1) && resource != null && resource.isFluidEqual(this.liquidTank2.getFluid())) {
+            return this.liquidTank2.drain(resource.amount, doDrain);
         }
-
-        if (from == this.getOxygenOutputDirection())
-        {
-            if (resource != null && resource.isFluidEqual(this.liquidTank.getFluid()))
-            {
-                return this.liquidTank.drain(resource.amount, doDrain);
-            }
+        boolean b = false;
+        if (7 - ((b ^ ((b = (metaside != 0)) ? 1 : 0) <= 3) ? 1 : 0) == (side ^ 0x1) && resource != null && resource.isFluidEqual(this.liquidTank.getFluid())) {
+            return this.liquidTank.drain(resource.amount, doDrain);
         }
-
         return null;
     }
 
-    @Override
-    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain)
-    {
-        if (from == this.getHydrogenOutputDirection())
-        {
+    public FluidStack drain(final ForgeDirection from, final int maxDrain, final boolean doDrain) {
+        final int metaside = this.getBlockMetadata() + 2;
+        final int side = from.ordinal();
+        if (side == (metaside ^ 0x1)) {
             return this.liquidTank2.drain(maxDrain, doDrain);
         }
-
-        if (from == this.getOxygenOutputDirection())
-        {
+        if (7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) == (side ^ 0x1)) {
             return this.liquidTank.drain(maxDrain, doDrain);
         }
-
         return null;
     }
 
-    @Override
-    public boolean canFill(EnumFacing from, Fluid fluid)
-    {
-        if (from == this.byIndex().rotateY())
-        {
-            // Can fill with water
-            return fluid == null || fluid.getName().equals(FluidRegistry.WATER.getName());
-        }
-
-        return false;
+    public boolean canFill(final ForgeDirection from, final Fluid fluid) {
+        return from.ordinal() == this.getBlockMetadata() + 2 && fluid != null && fluid.getName().equals(FluidRegistry.WATER.getName());
     }
 
-    @Override
-    public int fill(EnumFacing from, FluidStack resource, boolean doFill)
-    {
+    public int fill(final ForgeDirection from, final FluidStack resource, final boolean doFill) {
         int used = 0;
-
-        if (resource != null && this.canFill(from, resource.getFluid()))
-        {
+        if (resource != null && this.canFill(from, resource.getFluid())) {
             used = this.waterTank.fill(resource, doFill);
         }
-
         return used;
     }
 
-    @Override
-    public FluidTankInfo[] getTankInfo(EnumFacing from)
-    {
-        FluidTankInfo[] tankInfo = new FluidTankInfo[] {};
-
-        if (from == this.byIndex().rotateY())
-        {
-            tankInfo = new FluidTankInfo[] {new FluidTankInfo(this.waterTank)};
+    public FluidTankInfo[] getTankInfo(final ForgeDirection from) {
+        FluidTankInfo[] tankInfo = new FluidTankInfo[0];
+        final int metaside = this.getBlockMetadata() + 2;
+        final int side = from.ordinal();
+        if (metaside == side) {
+            tankInfo = new FluidTankInfo[] { new FluidTankInfo((IFluidTank)this.waterTank) };
         }
-        else if (from == this.getHydrogenOutputDirection())
-        {
-            tankInfo = new FluidTankInfo[] {new FluidTankInfo(this.liquidTank2)};
+        else if (metaside == (side ^ 0x1)) {
+            tankInfo = new FluidTankInfo[] { new FluidTankInfo((IFluidTank)this.liquidTank2) };
         }
-        else if (from == this.getOxygenOutputDirection())
-        {
-            tankInfo = new FluidTankInfo[] {new FluidTankInfo(this.liquidTank)};
+        else if (7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) == (side ^ 0x1)) {
+            tankInfo = new FluidTankInfo[] { new FluidTankInfo((IFluidTank)this.liquidTank) };
         }
-
         return tankInfo;
     }
 
-    @Override
-    public int getBlockMetadata()
-    {
-        return getBlockType().getMetaFromState(this.world.getBlockState(getPos()));
+    public int getBlockMetadata() {
+        if (this.blockMetadata == -1) {
+            this.blockMetadata = this.worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
+        }
+        return this.blockMetadata & 0x3;
     }
 
-    @Override
-    @Optional.Method(modid = "mekanism")
-    public int receiveGas(EnumFacing side, GasStack stack, boolean doTransfer)
-    {
+    @Annotations.RuntimeInterface(clazz = "mekanism.api.gas.IGasHandler", modID = "Mekanism")
+    public int receiveGas(final ForgeDirection side, final GasStack stack, final boolean doTransfer) {
         return 0;
     }
 
-    @Optional.Method(modid = "mekanism")
-    public int receiveGas(EnumFacing side, GasStack stack)
-    {
+    @Annotations.RuntimeInterface(clazz = "mekanism.api.gas.IGasHandler", modID = "Mekanism")
+    public int receiveGas(final ForgeDirection side, final GasStack stack) {
         return 0;
     }
 
-    @Override
-    @Optional.Method(modid = "mekanism")
-    public GasStack drawGas(EnumFacing from, int amount, boolean doTransfer)
-    {
-        if (from == this.getHydrogenOutputDirection() && this.liquidTank2.getFluid() != null)
-        {
+    @Annotations.RuntimeInterface(clazz = "mekanism.api.gas.IGasHandler", modID = "Mekanism")
+    public GasStack drawGas(final ForgeDirection from, final int amount, final boolean doTransfer) {
+        final int metaside = this.getBlockMetadata() + 2;
+        final int side = from.ordinal();
+        if (metaside == (side ^ 0x1) && this.liquidTank2.getFluid() != null) {
             int amountH = Math.min(8, this.liquidTank2.getFluidAmount());
             amountH = this.liquidTank2.drain(amountH, doTransfer).amount;
-            return new GasStack((Gas) EnergyConfigHandler.gasHydrogen, amountH);
+            return new GasStack((Gas)EnergyConfigHandler.gasHydrogen, amountH);
         }
-        else if (from == this.getOxygenOutputDirection() && this.liquidTank.getFluid() != null)
-        {
+        boolean b = false;
+        if (7 - ((b ^ ((b = (metaside != 0)) ? 1 : 0) <= 3) ? 1 : 0) == (side ^ 0x1) && this.liquidTank.getFluid() != null) {
             int amountO = Math.min(8, this.liquidTank.getFluidAmount());
             amountO = this.liquidTank.drain(amountO, doTransfer).amount;
-            return new GasStack((Gas) EnergyConfigHandler.gasOxygen, amountO);
+            return new GasStack((Gas)EnergyConfigHandler.gasOxygen, amountO);
         }
         return null;
     }
 
-    @Optional.Method(modid = "mekanism")
-    public GasStack drawGas(EnumFacing from, int amount)
-    {
+    @Annotations.RuntimeInterface(clazz = "mekanism.api.gas.IGasHandler", modID = "Mekanism")
+    public GasStack drawGas(final ForgeDirection from, final int amount) {
         return this.drawGas(from, amount, true);
     }
 
-    @Override
-    @Optional.Method(modid = "mekanism")
-    public boolean canReceiveGas(EnumFacing side, Gas type)
-    {
+    @Annotations.RuntimeInterface(clazz = "mekanism.api.gas.IGasHandler", modID = "Mekanism")
+    public boolean canReceiveGas(final ForgeDirection side, final Gas type) {
         return false;
     }
 
-    @Override
-    @Optional.Method(modid = "mekanism")
-    public boolean canDrawGas(EnumFacing from, Gas type)
-    {
-        if (from == this.getHydrogenOutputDirection())
-        {
+    @Annotations.RuntimeInterface(clazz = "mekanism.api.gas.IGasHandler", modID = "Mekanism")
+    public boolean canDrawGas(final ForgeDirection from, final Gas type) {
+        final int metaside = this.getBlockMetadata() + 2;
+        final int side = from.ordinal();
+        if (metaside == (side ^ 0x1)) {
             return type.getName().equals("hydrogen");
         }
-        else if (from == this.getOxygenOutputDirection())
-        {
-            return type.getName().equals("oxygen");
-        }
-        return false;
+        return 7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) == (side ^ 0x1) && type.getName().equals("oxygen");
     }
 
-    @Optional.Method(modid = "mekanism")
-    public boolean canTubeConnect(EnumFacing from)
-    {
-        if (from == this.getHydrogenOutputDirection())
-        {
-            return true;
-        }
-        else if (from == this.getOxygenOutputDirection())
-        {
-            return true;
-        }
-        return false;
+    @Annotations.RuntimeInterface(clazz = "mekanism.api.gas.ITubeConnection", modID = "Mekanism")
+    public boolean canTubeConnect(final ForgeDirection from) {
+        final int metaside = this.getBlockMetadata() + 2;
+        final int side = from.ordinal();
+        return metaside == (side ^ 0x1) || 7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) == (side ^ 0x1);
     }
 
-    @Override
-    public void setOxygenStored(int amount)
-    {
-        this.liquidTank.setFluid(new FluidStack(AsteroidsModule.fluidOxygenGas, amount));
+    public void setOxygenStored(final float amount) {
+        this.liquidTank.setFluid(new FluidStack(AsteroidsModule.fluidOxygenGas, (int)amount));
     }
 
-    @Override
-    public int getOxygenStored()
-    {
-        return this.liquidTank.getFluidAmount();
+    public float getOxygenStored() {
+        return (float)this.liquidTank.getFluidAmount();
     }
 
-    public int getHydrogenStored()
-    {
+    public int getHydrogenStored() {
         return this.liquidTank2.getFluidAmount();
     }
 
-    @Override
-    public int getMaxOxygenStored()
-    {
-        return this.liquidTank.getCapacity();
+    public float getMaxOxygenStored() {
+        return (float)this.liquidTank.getCapacity();
     }
 
-    private EnumFacing getOxygenOutputDirection()
-    {
-        return this.byIndex().getOpposite();
+    private int getOxygenOutputDirection() {
+        final int metaside = this.getBlockMetadata() + 2;
+        return 7 - (metaside ^ ((metaside <= 3) ? 1 : 0)) ^ 0x1;
     }
 
-    private EnumFacing getHydrogenOutputDirection()
-    {
-        return this.byIndex().rotateYCCW();
+    private int getHydrogenOutputDirection() {
+        final int metaside = this.getBlockMetadata() + 2;
+        return metaside ^ 0x1;
     }
 
-    private boolean produceOxygen(EnumFacing outputDirection)
-    {
-        int provide = this.getOxygenProvide(outputDirection);
-
-        if (provide > 0)
-        {
-            TileEntity outputTile = new BlockVec3(this).modifyPositionFromSide(outputDirection).getTileEntity(this.world);
-            FluidNetwork outputNetwork = NetworkHelper.getFluidNetworkFromTile(outputTile, outputDirection);
-
-            if (outputNetwork != null)
-            {
-                int gasRequested = outputNetwork.getRequest();
-
-                if (gasRequested > 0)
-                {
-                    int usedGas = outputNetwork.emitToBuffer(new FluidStack(GCFluids.fluidOxygenGas, Math.min(gasRequested, provide)), true);
-
-                    this.drawOxygen(usedGas, true);
+    private boolean produceOxygen(final ForgeDirection outputDirection) {
+        final float provide = this.getOxygenProvide(outputDirection);
+        if (provide > 0.0f) {
+            final TileEntity outputTile = new BlockVec3((TileEntity)this).modifyPositionFromSide(outputDirection).getTileEntity((IBlockAccess)this.worldObj);
+            final IOxygenNetwork outputNetwork = NetworkHelper.getOxygenNetworkFromTileEntity(outputTile, outputDirection);
+            if (outputNetwork != null) {
+                final float powerRequest = outputNetwork.getRequest(new TileEntity[] { (TileEntity)this });
+                if (powerRequest > 0.0f) {
+                    final float toSend = Math.min(this.getOxygenStored(), provide);
+                    final float rejectedPower = outputNetwork.produce(toSend, new TileEntity[] { (TileEntity)this });
+                    this.provideOxygen(Math.max(toSend - rejectedPower, 0.0f), true);
                     return true;
                 }
             }
-            else if (outputTile instanceof IOxygenReceiver)
-            {
-                float requestedOxygen = ((IOxygenReceiver) outputTile).getOxygenRequest(outputDirection.getOpposite());
-
-                if (requestedOxygen > 0)
-                {
-                    int toSend = Math.min(this.getOxygenStored(), provide);
-                    int acceptedOxygen = ((IOxygenReceiver) outputTile).receiveOxygen(outputDirection.getOpposite(), toSend, true);
-                    this.drawOxygen(acceptedOxygen, true);
+            else if (outputTile instanceof IOxygenReceiver) {
+                final float requestedOxygen = ((IOxygenReceiver)outputTile).getOxygenRequest(outputDirection.getOpposite());
+                if (requestedOxygen > 0.0f) {
+                    final float toSend = Math.min(this.getOxygenStored(), provide);
+                    final float acceptedOxygen = ((IOxygenReceiver)outputTile).receiveOxygen(outputDirection.getOpposite(), toSend, true);
+                    this.provideOxygen(acceptedOxygen, true);
                     return true;
                 }
+            }
+            else if (EnergyConfigHandler.isMekanismLoaded() && outputTile instanceof IGasHandler && ((IGasHandler)outputTile).canReceiveGas(outputDirection.getOpposite(), (Gas)EnergyConfigHandler.gasOxygen)) {
+                final GasStack toSend2 = new GasStack((Gas)EnergyConfigHandler.gasOxygen, (int)Math.floor(Math.min(this.getOxygenStored(), provide)));
+                int acceptedOxygen2 = 0;
+                try {
+                    acceptedOxygen2 = ((IGasHandler)outputTile).receiveGas(outputDirection.getOpposite(), toSend2);
+                }
+                catch (Exception ex) {}
+                this.provideOxygen((float)acceptedOxygen2, true);
+                return true;
             }
         }
-
         return false;
     }
 
-    private boolean produceHydrogen(EnumFacing outputDirection)
-    {
-        int provide = this.getHydrogenProvide(outputDirection);
-
-        if (provide > 0)
-        {
-            TileEntity outputTile = new BlockVec3(this).modifyPositionFromSide(outputDirection).getTileEntity(this.world);
-            FluidNetwork outputNetwork = NetworkHelper.getFluidNetworkFromTile(outputTile, outputDirection);
-
-            if (outputNetwork != null)
-            {
-                int gasRequested = outputNetwork.getRequest();
-
-                if (gasRequested > 0)
-                {
-                    int usedGas = outputNetwork.emitToBuffer(new FluidStack(FluidRegistry.getFluid("hydrogen"), Math.min(gasRequested, provide)), true);
-
-                    this.drawHydrogen(usedGas, true);
+    private boolean produceHydrogen(final ForgeDirection outputDirection) {
+        final float provide = this.getHydrogenProvide(outputDirection);
+        if (provide > 0.0f) {
+            final TileEntity outputTile = new BlockVec3((TileEntity)this).modifyPositionFromSide(outputDirection).getTileEntity((IBlockAccess)this.worldObj);
+            final IHydrogenNetwork outputNetwork = NetworkHelper.getHydrogenNetworkFromTileEntity(outputTile, outputDirection);
+            if (outputNetwork != null) {
+                final float powerRequest = outputNetwork.getRequest(new TileEntity[] { (TileEntity)this });
+                if (powerRequest > 0.0f) {
+                    final float toSend = Math.min((float)this.getHydrogenStored(), provide);
+                    final float rejectedPower = outputNetwork.produce(toSend, new TileEntity[] { (TileEntity)this });
+                    this.provideHydrogen((int)Math.max(toSend - rejectedPower, 0.0f), true);
                     return true;
                 }
             }
-            else if (outputTile instanceof TileEntityMethaneSynthesizer)
-            {
-                float requestedHydrogen = ((TileEntityMethaneSynthesizer) outputTile).getHydrogenRequest(outputDirection.getOpposite());
-
-                if (requestedHydrogen > 0)
-                {
-                    int toSend = Math.min(this.getHydrogenStored(), provide);
-                    int acceptedHydrogen = ((TileEntityMethaneSynthesizer) outputTile).receiveHydrogen(outputDirection.getOpposite(), toSend, true);
-                    this.drawHydrogen(acceptedHydrogen, true);
+            else if (outputTile instanceof TileEntityMethaneSynthesizer) {
+                final float requestedHydrogen = ((TileEntityMethaneSynthesizer)outputTile).getHydrogenRequest(outputDirection.getOpposite());
+                if (requestedHydrogen > 0.0f) {
+                    final float toSend = Math.min((float)this.getHydrogenStored(), provide);
+                    final float acceptedHydrogen = ((TileEntityMethaneSynthesizer)outputTile).receiveHydrogen(outputDirection.getOpposite(), toSend, true);
+                    this.provideHydrogen((int)acceptedHydrogen, true);
                     return true;
                 }
+            }
+            else if (EnergyConfigHandler.isMekanismLoaded() && outputTile instanceof IGasHandler && ((IGasHandler)outputTile).canReceiveGas(outputDirection.getOpposite(), (Gas)EnergyConfigHandler.gasHydrogen)) {
+                final GasStack toSend2 = new GasStack((Gas)EnergyConfigHandler.gasHydrogen, (int)Math.floor(Math.min((float)this.getHydrogenStored(), provide)));
+                int acceptedHydrogen2 = 0;
+                try {
+                    acceptedHydrogen2 = ((IGasHandler)outputTile).receiveGas(outputDirection.getOpposite(), toSend2);
+                }
+                catch (Exception ex) {}
+                this.provideHydrogen(acceptedHydrogen2, true);
+                return true;
             }
         }
-
         return false;
     }
 
-    @Override
-    public int provideOxygen(EnumFacing from, int request, boolean doProvide)
-    {
-        if (this.getOxygenOutputDirection() == from)
-        {
-            return this.drawOxygen(request, doProvide);
+    public float provideOxygen(final ForgeDirection from, final float request, final boolean doProvide) {
+        if (this.getOxygenOutputDirection() == from.ordinal()) {
+            return this.provideOxygen(request, doProvide);
         }
-
-        return 0;
+        return 0.0f;
     }
 
-    public int drawOxygen(int request, boolean doProvide)
-    {
-        if (request > 0)
-        {
-            int requestedOxygen = Math.min(request, this.liquidTank.getFluidAmount());
-
-            if (doProvide)
-            {
+    public float provideOxygen(final float request, final boolean doProvide) {
+        if (request > 0.0f) {
+            final float requestedOxygen = Math.min(request, (float)this.liquidTank.getFluidAmount());
+            if (doProvide) {
                 this.setOxygenStored(this.liquidTank.getFluidAmount() - requestedOxygen);
             }
-
             return requestedOxygen;
         }
-
-        return 0;
+        return 0.0f;
     }
 
-    public int drawHydrogen(int request, boolean doProvide)
-    {
-        if (request > 0)
-        {
-            int currentHydrogen = this.liquidTank2.getFluidAmount();
-            int requestedHydrogen = Math.min(request, currentHydrogen);
-
-            if (doProvide)
-            {
+    public int provideHydrogen(final int request, final boolean doProvide) {
+        if (request > 0) {
+            final int currentHydrogen = this.liquidTank2.getFluidAmount();
+            final int requestedHydrogen = Math.min(request, currentHydrogen);
+            if (doProvide) {
                 this.liquidTank2.setFluid(new FluidStack(FluidRegistry.getFluid("hydrogen"), currentHydrogen - requestedHydrogen));
             }
-
             return requestedHydrogen;
         }
-
         return 0;
     }
 
-    @Override
-    public int getOxygenProvide(EnumFacing direction)
-    {
-        return this.getOxygenOutputDirection() == direction ? Math.min(TileEntityOxygenStorageModule.OUTPUT_PER_TICK, this.getOxygenStored()) : 0;
+    public float getOxygenProvide(final ForgeDirection direction) {
+        return (this.getOxygenOutputDirection() == direction.ordinal()) ? Math.min(500.0f, this.getOxygenStored()) : 0.0f;
     }
 
-    public int getHydrogenProvide(EnumFacing direction)
-    {
-        return this.getHydrogenOutputDirection() == direction ? Math.min(TileEntityOxygenStorageModule.OUTPUT_PER_TICK, this.getHydrogenStored()) : 0;
+    public float getHydrogenProvide(final ForgeDirection direction) {
+        return (this.getHydrogenOutputDirection() == direction.ordinal()) ? ((float)Math.min(500, this.getHydrogenStored())) : 0.0f;
     }
 
-    @Override
-    public boolean shouldPullOxygen()
-    {
+    public boolean shouldPullOxygen() {
         return false;
     }
 
-    @Override
-    public int receiveOxygen(EnumFacing from, int receive, boolean doReceive)
-    {
-        return 0;
+    public float receiveOxygen(final ForgeDirection from, final float receive, final boolean doReceive) {
+        return 0.0f;
     }
 
-    @Override
-    public int getOxygenRequest(EnumFacing direction)
-    {
-        return 0;
+    public float getOxygenRequest(final ForgeDirection direction) {
+        return 0.0f;
     }
 
-    @Override
-    public boolean canConnect(EnumFacing direction, NetworkType type)
-    {
-        if (direction == null)
-        {
+    public boolean canConnect(final ForgeDirection direction, final NetworkType type) {
+        if (direction == null || direction.equals((Object)ForgeDirection.UNKNOWN)) {
             return false;
         }
-
-        if (type == NetworkType.FLUID)
-        {
-            return this.getOxygenOutputDirection() == direction || this.getHydrogenOutputDirection() == direction || direction == this.byIndex().rotateY();
+        if (type == NetworkType.OXYGEN) {
+            return this.getOxygenOutputDirection() == direction.ordinal();
         }
-
-        if (type == NetworkType.POWER)
-        {
-            return direction == this.getElectricInputDirection();
+        if (type == NetworkType.HYDROGEN) {
+            return this.getHydrogenOutputDirection() == direction.ordinal();
         }
-
-        return false;
-    }
-
-    @Override
-    public EnumFacing byIndex()
-    {
-        IBlockState state = this.world.getBlockState(getPos());
-        if (state.getBlock() instanceof BlockMachineMarsT2)
-        {
-            return state.getValue(BlockMachineMarsT2.FACING);
-        }
-        return EnumFacing.NORTH;
-    }
-
-    @Override
-    @Deprecated
-    @ForRemoval(deadline = "4.1.0")
-    @ReplaceWith("byIndex()")
-    public EnumFacing getFront()
-    {
-        return this.byIndex();
+        return type == NetworkType.POWER && direction == this.getElectricInputDirection();
     }
 }

@@ -1,34 +1,25 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.power;
 
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
 
 public interface ILaserNode extends IEnergyHandlerGC
 {
-
     Vector3 getInputPoint();
-
-    Vector3 getOutputPoint(boolean offset);
-
+    
+    Vector3 getOutputPoint(final boolean p0);
+    
     ILaserNode getTarget();
-
+    
     TileEntity getTile();
-
-    boolean canConnectTo(ILaserNode node);
-
+    
+    boolean canConnectTo(final ILaserNode p0);
+    
     Vector3 getColor();
-
-    void addNode(ILaserNode node);
-
-    void removeNode(ILaserNode node);
-
-    int compareTo(ILaserNode otherNode, BlockVec3 origin);
+    
+    void addNode(final ILaserNode p0);
+    
+    void removeNode(final ILaserNode p0);
+    
+    int compareTo(final ILaserNode p0, final BlockVec3 p1);
 }

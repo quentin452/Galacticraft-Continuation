@@ -1,198 +1,105 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import javax.annotation.Nonnull;
+import net.minecraft.item.*;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.player.*;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-
-public class PersistantInventoryCrafting extends InventoryCrafting
+public class PersistantInventoryCrafting implements IInventory
 {
-
-    public NonNullList<ItemStack> stacks;
-
+    private ItemStack[] stackList;
     private int inventoryWidth;
-    private int inventoryHeight;
-
     public Container eventHandler;
-
-    public PersistantInventoryCrafting()
-    {
-        super(null, 3, 3);
-        int k = 9;
-        this.stacks = NonNullList.withSize(k, ItemStack.EMPTY);
+    
+    public PersistantInventoryCrafting() {
+        final int k = 9;
+        this.stackList = new ItemStack[k];
         this.inventoryWidth = 3;
-        this.inventoryHeight = 3;
     }
-
-    @Override
-    public int getSizeInventory()
-    {
-        return this.stacks.size();
+    
+    public int getSizeInventory() {
+        return this.stackList.length;
     }
-
-    @Override
-    @Nonnull
-    public ItemStack getStackInSlot(int index)
-    {
-        return this.stacks.get(index);
+    
+    public ItemStack getStackInSlot(final int par1) {
+        return (par1 >= this.getSizeInventory()) ? null : this.stackList[par1];
     }
-
-    @Override
-    public ItemStack decrStackSize(int index, int count)
-    {
-        ItemStack itemstack = ItemStackHelper.getAndSplit(this.stacks, index, count);
-
-        if (!itemstack.isEmpty())
-        {
-            this.markDirty();
-            if (this.eventHandler != null)
-            {
-                this.eventHandler.onCraftMatrixChanged(this);
-            }
+    
+    public ItemStack getStackInRowAndColumn(final int par1, final int par2) {
+        if (par1 >= 0 && par1 < this.inventoryWidth) {
+            final int k = par1 + par2 * this.inventoryWidth;
+            return this.getStackInSlot(k);
         }
-
-        return itemstack;
+        return null;
     }
-
-    @Override
-    public ItemStack getStackInRowAndColumn(int row, int column)
-    {
-        return row >= 0 && row < this.inventoryWidth && column >= 0 && column < this.inventoryHeight ? this.getStackInSlot(row + column * this.inventoryWidth) : ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeStackFromSlot(int index)
-    {
-        return ItemStackHelper.getAndRemove(this.stacks, index);
-    }
-
-    @Override
-    public void setInventorySlotContents(int index, ItemStack stack)
-    {
-        this.stacks.set(index, stack);
-
-        if (stack.getCount() > this.getInventoryStackLimit())
-        {
-            stack.setCount(this.getInventoryStackLimit());
-        }
-
-        this.markDirty();
-        if (this.eventHandler != null)
-        {
-            this.eventHandler.onCraftMatrixChanged(this);
-        }
-    }
-
-    public void setInventorySlotContentsNoUpdate(int index, ItemStack stack)
-    {
-        this.stacks.set(index, stack);
-
-        if (stack.getCount() > this.getInventoryStackLimit())
-        {
-            stack.setCount(this.getInventoryStackLimit());
-        }
-
-        this.markDirty();
-    }
-
-    @Override
-    public boolean isEmpty()
-    {
-        for (ItemStack itemstack : this.stacks)
-        {
-            if (!itemstack.isEmpty())
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public String getName()
-    {
+    
+    public String getInventoryName() {
         return "container.crafting";
     }
-
-    @Override
-    public boolean hasCustomName()
-    {
+    
+    public boolean hasCustomInventoryName() {
         return false;
     }
-
-    @Override
-    public int getInventoryStackLimit()
-    {
+    
+    public ItemStack getStackInSlotOnClosing(final int par1) {
+        if (this.stackList[par1] != null) {
+            final ItemStack itemstack = this.stackList[par1];
+            this.stackList[par1] = null;
+            return itemstack;
+        }
+        return null;
+    }
+    
+    public ItemStack decrStackSize(final int par1, final int par2) {
+        if (this.stackList[par1] == null) {
+            return null;
+        }
+        if (this.stackList[par1].stackSize <= par2) {
+            final ItemStack itemstack = this.stackList[par1];
+            this.stackList[par1] = null;
+            if (this.eventHandler != null) {
+                this.eventHandler.onCraftMatrixChanged((IInventory)this);
+            }
+            return itemstack;
+        }
+        final ItemStack itemstack = this.stackList[par1].splitStack(par2);
+        if (this.stackList[par1].stackSize == 0) {
+            this.stackList[par1] = null;
+        }
+        if (this.eventHandler != null) {
+            this.eventHandler.onCraftMatrixChanged((IInventory)this);
+        }
+        return itemstack;
+    }
+    
+    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+        this.stackList[par1] = par2ItemStack;
+        if (this.eventHandler != null) {
+            this.eventHandler.onCraftMatrixChanged((IInventory)this);
+        }
+    }
+    
+    public void setInventorySlotContentsNoUpdate(final int par1, final ItemStack par2ItemStack) {
+        this.stackList[par1] = par2ItemStack;
+    }
+    
+    public int getInventoryStackLimit() {
         return 64;
     }
-
-    @Override
-    public void markDirty()
-    {
+    
+    public void markDirty() {
     }
-
-    @Override
-    public boolean isUsableByPlayer(EntityPlayer entityPlayer)
-    {
+    
+    public boolean isUseableByPlayer(final EntityPlayer par1EntityPlayer) {
         return true;
     }
-
-    @Override
-    public void openInventory(EntityPlayer player)
-    {
+    
+    public void openInventory() {
     }
-
-    @Override
-    public void closeInventory(EntityPlayer player)
-    {
+    
+    public void closeInventory() {
     }
-
-    @Override
-    public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack)
-    {
+    
+    public boolean isItemValidForSlot(final int par1, final ItemStack par2ItemStack) {
         return true;
-    }
-
-    @Override
-    public int getField(int id)
-    {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value)
-    {
-
-    }
-
-    @Override
-    public int getFieldCount()
-    {
-        return 0;
-    }
-
-    @Override
-    public void clear()
-    {
-
-    }
-
-    @Override
-    public ITextComponent getDisplayName()
-    {
-        return null;
     }
 }

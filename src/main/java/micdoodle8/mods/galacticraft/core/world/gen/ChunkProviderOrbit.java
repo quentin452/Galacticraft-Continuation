@@ -1,95 +1,87 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.List;
-import java.util.Random;
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.BiomeAdaptive;
-import micdoodle8.mods.galacticraft.api.world.ChunkProviderBase;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.tile.IMultiBlock;
-import net.minecraft.block.BlockFalling;
-import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biome.SpawnListEntry;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.gen.*;
+import net.minecraft.world.*;
+import net.minecraft.util.*;
+import net.minecraft.init.*;
+import net.minecraft.world.chunk.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.entity.*;
+import java.util.*;
 
-public class ChunkProviderOrbit extends ChunkProviderBase
+public class ChunkProviderOrbit extends ChunkProviderGenerate
 {
-
     private final Random rand;
-
-    private final World world;
-
-    public ChunkProviderOrbit(World world, long seed, boolean mapFeaturesEnabled)
-    {
-        this.rand = new Random(seed);
-        this.world = world;
+    private final World worldObj;
+    
+    public ChunkProviderOrbit(final World par1World, final long par2, final boolean par4) {
+        super(par1World, par2, par4);
+        this.rand = new Random(par2);
+        this.worldObj = par1World;
     }
-
-    @Override
-    public Chunk generateChunk(int par1, int par2)
-    {
-        ChunkPrimer chunkprimer = new ChunkPrimer();
+    
+    public boolean unloadQueuedChunks() {
+        return false;
+    }
+    
+    public int getLoadedChunkCount() {
+        return 0;
+    }
+    
+    public boolean saveChunks(final boolean var1, final IProgressUpdate var2) {
+        return true;
+    }
+    
+    public boolean canSave() {
+        return true;
+    }
+    
+    public Chunk provideChunk(final int par1, final int par2) {
         this.rand.setSeed(par1 * 341873128712L + par2 * 132897987541L);
-
-        final Chunk var4 = new Chunk(this.world, chunkprimer, par1, par2);
-
-        final byte b = (byte) Biome.getIdForBiome(BiomeAdaptive.biomeDefault);
+        final Block[] ids = new Block[32768];
+        Arrays.fill(ids, Blocks.air);
+        final byte[] meta = new byte[32768];
+        final Chunk var4 = new Chunk(this.worldObj, ids, meta, par1, par2);
         final byte[] biomesArray = var4.getBiomeArray();
-        for (int i = 0; i < biomesArray.length; ++i)
-        {
-            biomesArray[i] = b;
+        for (int i = 0; i < biomesArray.length; ++i) {
+            biomesArray[i] = (byte)BiomeGenBaseOrbit.space.biomeID;
         }
-
         var4.generateSkylightMap();
         return var4;
     }
-
-    @Override
-    public void populate(int x, int z)
-    {
+    
+    public boolean chunkExists(final int par1, final int par2) {
+        return true;
+    }
+    
+    public void populate(final IChunkProvider par1IChunkProvider, final int par2, final int par3) {
         BlockFalling.fallInstantly = true;
-        final int k = x * 16;
-        final int l = z * 16;
-        this.rand.setSeed(this.world.getSeed());
+        final int k = par2 * 16;
+        final int l = par3 * 16;
+        this.rand.setSeed(this.worldObj.getSeed());
         final long i1 = this.rand.nextLong() / 2L * 2L + 1L;
         final long j1 = this.rand.nextLong() / 2L * 2L + 1L;
-        this.rand.setSeed(x * i1 + z * j1 ^ this.world.getSeed());
-        if (k == 0 && l == 0)
-        {
-            BlockPos pos = new BlockPos(k, 64, l);
-            this.world.setBlockState(pos, GCBlocks.spaceStationBase.getDefaultState(), 2);
-
-            final TileEntity var8 = this.world.getTileEntity(pos);
-
-            if (var8 instanceof IMultiBlock)
-            {
-                ((IMultiBlock) var8).onCreate(this.world, pos);
+        this.rand.setSeed(par2 * i1 + par3 * j1 ^ this.worldObj.getSeed());
+        if (k == 0 && l == 0) {
+            this.worldObj.setBlock(k, 64, l, GCBlocks.spaceStationBase, 0, 3);
+            final TileEntity var8 = this.worldObj.getTileEntity(k, 64, l);
+            if (var8 instanceof IMultiBlock) {
+                ((IMultiBlock)var8).onCreate(new BlockVec3(k, 64, l));
             }
-
-            new WorldGenSpaceStation().generate(this.world, this.rand, new BlockPos(k - 10, 62, l - 3));
+            new WorldGenSpaceStation().generate(this.worldObj, this.rand, k - 10, 62, l - 3);
         }
         BlockFalling.fallInstantly = false;
     }
-
-    @Override
-    public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos)
-    {
-        return null;
+    
+    public String makeString() {
+        return "OrbitLevelSource";
     }
-
-    @Override
-    public void recreateStructures(Chunk p_180514_1_, int p_180514_2_, int p_180514_3_)
-    {
+    
+    public List<?> getPossibleCreatures(final EnumCreatureType par1EnumCreatureType, final int i, final int j, final int k) {
+        return null;
     }
 }

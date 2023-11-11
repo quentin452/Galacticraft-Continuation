@@ -1,56 +1,37 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.sounds;
 
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.MusicTicker;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraft.client.*;
+import cpw.mods.fml.client.*;
+import micdoodle8.mods.galacticraft.api.world.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.util.*;
+import net.minecraft.client.audio.*;
 
 public class MusicTickerGC extends MusicTicker
 {
-
-    public MusicTickerGC(Minecraft mc)
-    {
+    public MusicTickerGC(final Minecraft mc) {
         super(mc);
     }
-
-    @Override
-    public void update()
-    {
-        MusicTicker.MusicType musictype = this.mc.getAmbientMusicType();
-        if (FMLClientHandler.instance().getWorldClient() != null && FMLClientHandler.instance().getWorldClient().provider instanceof IGalacticraftWorldProvider)
-        {
+    
+    public void update() {
+        MusicTicker.MusicType musictype = this.field_147677_b.func_147109_W();
+        if (FMLClientHandler.instance().getWorldClient() != null && FMLClientHandler.instance().getWorldClient().provider instanceof IGalacticraftWorldProvider) {
             musictype = ClientProxyCore.MUSIC_TYPE_MARS;
         }
-
-        if (this.currentMusic != null)
-        {
-            if (!musictype.getMusicLocation().getSoundName().equals(this.currentMusic.getSoundLocation()))
-            {
-                this.mc.getSoundHandler().stopSound(this.currentMusic);
-                this.timeUntilNextMusic = MathHelper.getInt(this.rand, 0, musictype.getMinDelay() / 2);
+        if (this.field_147678_c != null) {
+            if (!musictype.getMusicTickerLocation().equals((Object)this.field_147678_c.getPositionedSoundLocation())) {
+                this.field_147677_b.getSoundHandler().stopSound(this.field_147678_c);
+                this.field_147676_d = MathHelper.getRandomIntegerInRange(this.field_147679_a, 0, musictype.func_148634_b() / 2);
             }
-
-            if (!this.mc.getSoundHandler().isSoundPlaying(this.currentMusic))
-            {
-                this.currentMusic = null;
-                this.timeUntilNextMusic = Math.min(MathHelper.getInt(this.rand, musictype.getMinDelay(), musictype.getMaxDelay()), this.timeUntilNextMusic);
+            if (!this.field_147677_b.getSoundHandler().isSoundPlaying(this.field_147678_c)) {
+                this.field_147678_c = null;
+                this.field_147676_d = Math.min(MathHelper.getRandomIntegerInRange(this.field_147679_a, musictype.func_148634_b(), musictype.func_148633_c()), this.field_147676_d);
             }
         }
-
-        this.timeUntilNextMusic = Math.min(this.timeUntilNextMusic, musictype.getMaxDelay());
-
-        if (this.currentMusic == null && this.timeUntilNextMusic-- <= 0)
-        {
-            this.playMusic(musictype);
+        if (this.field_147678_c == null && this.field_147676_d-- <= 0) {
+            this.field_147678_c = (ISound)PositionedSoundRecord.func_147673_a(musictype.getMusicTickerLocation());
+            this.field_147677_b.getSoundHandler().playSound(this.field_147678_c);
+            this.field_147676_d = Integer.MAX_VALUE;
         }
     }
 }

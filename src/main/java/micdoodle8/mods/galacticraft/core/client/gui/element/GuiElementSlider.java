@@ -1,183 +1,144 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.gui.element;
 
-import java.util.Collections;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.gui.*;
+import micdoodle8.mods.galacticraft.core.client.gui.screen.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.client.*;
+import net.minecraft.util.*;
+import org.lwjgl.input.*;
+import org.lwjgl.opengl.*;
+import net.minecraft.client.renderer.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
 public class GuiElementSlider extends GuiButton
 {
-
+    private SmallFontRenderer customFontRenderer;
     private Vector3 firstColor;
     private Vector3 lastColor;
     private final boolean isVertical;
     private int sliderPos;
-
-    public GuiElementSlider(int id, int x, int y, int width, int height, boolean vertical, Vector3 firstColor, Vector3 lastColor)
-    {
+    
+    public GuiElementSlider(final int id, final int x, final int y, final int width, final int height, final boolean vertical, final Vector3 firstColor, final Vector3 lastColor) {
         this(id, x, y, width, height, vertical, firstColor, lastColor, "");
     }
-
-    public GuiElementSlider(int id, int x, int y, int width, int height, boolean vertical, Vector3 firstColor, Vector3 lastColor, String displayString)
-    {
+    
+    public GuiElementSlider(final int id, final int x, final int y, final int width, final int height, final boolean vertical, final Vector3 firstColor, final Vector3 lastColor, final String displayString) {
         super(id, x, y, width, height, displayString);
         this.isVertical = vertical;
         this.firstColor = firstColor;
         this.lastColor = lastColor;
+        this.customFontRenderer = new SmallFontRenderer(Minecraft.getMinecraft().gameSettings, new ResourceLocation("textures/font/ascii.png"), Minecraft.getMinecraft().renderEngine, false);
     }
-
-    @Override
-    public void drawButton(Minecraft par1Minecraft, int par2, int par3, float partial)
-    {
-        if (this.visible)
-        {
-            this.hovered = par2 >= this.x && par3 >= this.y && par2 < this.x + this.width && par3 < this.y + this.height;
-
-            if (Mouse.isButtonDown(0) && this.hovered)
-            {
-                if (this.isVertical)
-                {
-                    this.sliderPos = par3 - this.y;
-                } else
-                {
-                    this.sliderPos = par2 - this.x;
+    
+    public void drawButton(final Minecraft par1Minecraft, final int par2, final int par3) {
+        if (this.visible) {
+            this.field_146123_n = (par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + this.width && par3 < this.yPosition + this.height);
+            if (Mouse.isButtonDown(0) && this.field_146123_n) {
+                if (this.isVertical) {
+                    this.sliderPos = par3 - this.yPosition;
+                }
+                else {
+                    this.sliderPos = par2 - this.xPosition;
                 }
             }
-
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glDisable(GL11.GL_ALPHA_TEST);
+            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            GL11.glDisable(3553);
+            GL11.glEnable(3042);
+            GL11.glDisable(3008);
             OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-            GL11.glShadeModel(GL11.GL_SMOOTH);
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder worldRenderer = tessellator.getBuffer();
-
-            if (this.isVertical)
-            {
-                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                worldRenderer.pos((double) this.x + this.width, this.y, this.zLevel).color(0, 0, 0, 1.0F).endVertex();
-                worldRenderer.pos(this.x, this.y, this.zLevel).color(0, 0, 0, 1.0F).endVertex();
-                worldRenderer.pos(this.x, (double) this.y + this.height, this.zLevel).color(0, 0, 0, 1.0F).endVertex();
-                worldRenderer.pos((double) this.x + this.width, (double) this.y + this.height, this.zLevel).color(0, 0, 0, 1.0F).endVertex();
+            GL11.glShadeModel(7425);
+            final Tessellator tessellator = Tessellator.instance;
+            if (this.isVertical) {
+                tessellator.startDrawingQuads();
+                tessellator.setColorRGBA_F(0.0f, 0.0f, 0.0f, 1.0f);
+                tessellator.addVertex(this.xPosition + (double)this.width, (double)this.yPosition, (double)this.zLevel);
+                tessellator.addVertex((double)this.xPosition, (double)this.yPosition, (double)this.zLevel);
+                tessellator.addVertex((double)this.xPosition, this.yPosition + (double)this.height, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + (double)this.width, this.yPosition + (double)this.height, (double)this.zLevel);
                 tessellator.draw();
-
-                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                worldRenderer.pos((double) this.x + this.width - 1, (double) this.y + 1, this.zLevel).color(this.firstColor.floatX(), this.firstColor.floatY(), this.firstColor.floatZ(), 1.0F)
-                    .endVertex();
-                worldRenderer.pos((double) this.x + 1, (double) this.y + 1, this.zLevel).color(this.firstColor.floatX(), this.firstColor.floatY(), this.firstColor.floatZ(), 1.0F).endVertex();
-                worldRenderer.pos((double) this.x + 1, (double) this.y + this.height - 1, this.zLevel).color(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0F)
-                    .endVertex();
-                worldRenderer.pos((double) this.x + this.width - 1, (double) this.y + this.height - 1, this.zLevel)
-                    .color(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0F).endVertex();
+                tessellator.startDrawingQuads();
+                tessellator.setColorRGBA_F(this.firstColor.floatX(), this.firstColor.floatY(), this.firstColor.floatZ(), 1.0f);
+                tessellator.addVertex(this.xPosition + (double)this.width - 1.0, this.yPosition + 1.0, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + 1.0, this.yPosition + 1.0, (double)this.zLevel);
+                tessellator.setColorRGBA_F(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0f);
+                tessellator.addVertex(this.xPosition + 1.0, this.yPosition + (double)this.height - 1.0, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + (double)this.width - 1.0, this.yPosition + (double)this.height - 1.0, (double)this.zLevel);
                 tessellator.draw();
-
-                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                worldRenderer.pos((double) this.x + this.width, (double) this.y + this.sliderPos - 1, this.zLevel).color(1, 1, 1, 1.0F).endVertex();
-                worldRenderer.pos(this.x, (double) this.y + this.sliderPos - 1, this.zLevel).color(1, 1, 1, 1.0F).endVertex();
-                worldRenderer.pos(this.x, (double) this.y + this.sliderPos + 1, this.zLevel).color(1, 1, 1, 1.0F).endVertex();
-                worldRenderer.pos((double) this.x + this.width, (double) this.y + this.sliderPos + 1, this.zLevel).color(1, 1, 1, 1.0F).endVertex();
-                tessellator.draw();
-            } else
-            {
-                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                worldRenderer.pos((double) this.x + this.width, this.y, this.zLevel).color(0, 0, 0, 1.0F).endVertex();
-                worldRenderer.pos(this.x, this.y, this.zLevel).color(0, 0, 0, 1.0F).endVertex();
-                worldRenderer.pos(this.x, (double) this.y + this.height, this.zLevel).color(0, 0, 0, 1.0F).endVertex();
-                worldRenderer.pos((double) this.x + this.width, (double) this.y + this.height, this.zLevel).color(0, 0, 0, 1.0F).endVertex();
-                tessellator.draw();
-
-                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                worldRenderer.pos((double) this.x + this.width - 1, (double) this.y + 1, this.zLevel).color(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0F)
-                    .endVertex();
-                worldRenderer.pos((double) this.x + 1, (double) this.y + 1, this.zLevel).color(this.firstColor.floatX(), this.firstColor.floatY(), this.firstColor.floatZ(), 1.0F).endVertex();
-                worldRenderer.pos((double) this.x + 1, (double) this.y + this.height - 1, this.zLevel).color(this.firstColor.floatX(), this.firstColor.floatY(), this.firstColor.floatZ(), 1.0F)
-                    .endVertex();
-                worldRenderer.pos((double) this.x + this.width - 1, (double) this.y + this.height - 1, this.zLevel)
-                    .color(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0F).endVertex();
-                tessellator.draw();
-
-                GL11.glShadeModel(GL11.GL_FLAT);
-                GL11.glDisable(GL11.GL_BLEND);
-                GL11.glEnable(GL11.GL_ALPHA_TEST);
-                GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                GL11.glDisable(GL11.GL_TEXTURE_2D);
-                GL11.glEnable(GL11.GL_BLEND);
-                GL11.glDisable(GL11.GL_ALPHA_TEST);
-                OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-                GL11.glShadeModel(GL11.GL_SMOOTH);
-
-                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-                worldRenderer.pos((double) this.x + this.sliderPos + 1, this.y, this.zLevel).color(1, 1, 1, 1.0F).endVertex();
-                worldRenderer.pos((double) this.x + this.sliderPos - 1, this.y, this.zLevel).color(1, 1, 1, 1.0F).endVertex();
-                worldRenderer.pos((double) this.x + this.sliderPos - 1, (double) this.y + this.height, this.zLevel).color(1, 1, 1, 1.0F).endVertex();
-                worldRenderer.pos((double) this.x + this.sliderPos + 1, (double) this.y + this.height, this.zLevel).color(1, 1, 1, 1.0F).endVertex();
+                tessellator.startDrawingQuads();
+                tessellator.setColorRGBA_F(1.0f, 1.0f, 1.0f, 1.0f);
+                tessellator.addVertex(this.xPosition + (double)this.width, this.yPosition + (double)this.sliderPos - 1.0, (double)this.zLevel);
+                tessellator.addVertex((double)this.xPosition, this.yPosition + (double)this.sliderPos - 1.0, (double)this.zLevel);
+                tessellator.addVertex((double)this.xPosition, this.yPosition + (double)this.sliderPos + 1.0, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + (double)this.width, this.yPosition + (double)this.sliderPos + 1.0, (double)this.zLevel);
                 tessellator.draw();
             }
-
-            GL11.glShadeModel(GL11.GL_FLAT);
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glEnable(GL11.GL_ALPHA_TEST);
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            else {
+                tessellator.startDrawingQuads();
+                tessellator.setColorRGBA_F(0.0f, 0.0f, 0.0f, 1.0f);
+                tessellator.addVertex(this.xPosition + (double)this.width, (double)this.yPosition, (double)this.zLevel);
+                tessellator.addVertex((double)this.xPosition, (double)this.yPosition, (double)this.zLevel);
+                tessellator.addVertex((double)this.xPosition, this.yPosition + (double)this.height, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + (double)this.width, this.yPosition + (double)this.height, (double)this.zLevel);
+                tessellator.draw();
+                tessellator.startDrawingQuads();
+                tessellator.setColorRGBA_F(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0f);
+                tessellator.addVertex(this.xPosition + (double)this.width - 1.0, this.yPosition + 1.0, (double)this.zLevel);
+                tessellator.setColorRGBA_F(this.firstColor.floatX(), this.firstColor.floatY(), this.firstColor.floatZ(), 1.0f);
+                tessellator.addVertex(this.xPosition + 1.0, this.yPosition + 1.0, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + 1.0, this.yPosition + (double)this.height - 1.0, (double)this.zLevel);
+                tessellator.setColorRGBA_F(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0f);
+                tessellator.addVertex(this.xPosition + (double)this.width - 1.0, this.yPosition + (double)this.height - 1.0, (double)this.zLevel);
+                tessellator.draw();
+                GL11.glShadeModel(7424);
+                GL11.glDisable(3042);
+                GL11.glEnable(3008);
+                GL11.glEnable(3553);
+                if (this.displayString != null && this.displayString.length() > 0) {
+                    GL11.glPushMatrix();
+                    GL11.glTranslatef((float)(this.xPosition + this.width / 2), (float)(this.yPosition + this.height / 2), 0.0f);
+                    GL11.glScalef(0.5f, 0.5f, 1.0f);
+                    GL11.glTranslatef((float)(-1 * (this.xPosition + this.width / 2)), (float)(-1 * (this.yPosition + this.height / 2)), 0.0f);
+                    this.customFontRenderer.drawString(this.displayString, this.xPosition + this.width / 2 - this.customFontRenderer.getStringWidth(this.displayString) / 2, this.yPosition + this.height / 2 - 3, ColorUtil.to32BitColor(255, 240, 240, 240));
+                    GL11.glPopMatrix();
+                }
+                GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                GL11.glDisable(3553);
+                GL11.glEnable(3042);
+                GL11.glDisable(3008);
+                OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+                GL11.glShadeModel(7425);
+                tessellator.startDrawingQuads();
+                tessellator.setColorRGBA_F(1.0f, 1.0f, 1.0f, 1.0f);
+                tessellator.addVertex(this.xPosition + (double)this.sliderPos + 1.0, (double)this.yPosition, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + (double)this.sliderPos - 1.0, (double)this.yPosition, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + (double)this.sliderPos - 1.0, this.yPosition + (double)this.height, (double)this.zLevel);
+                tessellator.addVertex(this.xPosition + (double)this.sliderPos + 1.0, this.yPosition + (double)this.height, (double)this.zLevel);
+                tessellator.draw();
+            }
+            GL11.glShadeModel(7424);
+            GL11.glDisable(3042);
+            GL11.glEnable(3008);
+            GL11.glEnable(3553);
         }
     }
-
-    public void drawHoveringText()
-    {
-        if (this.hovered)
-        {
-            FontRenderer font = FMLClientHandler.instance().getClient().fontRenderer;
-            Minecraft mc = FMLClientHandler.instance().getClient();
-            ScaledResolution scaledresolution = ClientUtil.getScaledRes(mc, mc.displayWidth, mc.displayHeight);
-            int width = scaledresolution.getScaledWidth();
-            int height = scaledresolution.getScaledHeight();
-            int x = Mouse.getX() * width / mc.displayWidth;
-            int y = height - Mouse.getY() * height / mc.displayHeight - 1;
-            net.minecraftforge.fml.client.config.GuiUtils.drawHoveringText(Collections.singletonList(this.displayString), x, y, width, height, -1, font);
-        }
+    
+    public void setSliderPos(final float pos) {
+        this.sliderPos = (int)Math.floor(this.height * pos);
     }
-
-    public void setSliderPos(float pos)
-    {
-        this.sliderPos = (int) Math.floor(this.height * pos);
-    }
-
-    public int getSliderPos()
-    {
+    
+    public int getSliderPos() {
         return this.sliderPos;
     }
-
-    public float getNormalizedValue()
-    {
-        return this.sliderPos / (float) this.height;
+    
+    public float getNormalizedValue() {
+        return this.sliderPos / (float)this.height;
     }
-
-    public double getColorValueD()
-    {
-        return (this.sliderPos * 255.0D) / (this.height - 1);
+    
+    public double getColorValueD() {
+        return this.sliderPos * 255.0 / (this.height - 1);
     }
-
-    public int getButtonHeight()
-    {
+    
+    public int getButtonHeight() {
         return this.height;
     }
 }

@@ -1,68 +1,40 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import java.util.Random;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.api.world.ITeleportType;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
+import micdoodle8.mods.galacticraft.api.world.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import net.minecraft.entity.*;
+import java.util.*;
+import net.minecraft.world.*;
 
 public class TeleportTypeOverworld implements ITeleportType
 {
-
-    @Override
-    public boolean useParachute()
-    {
+    public boolean useParachute() {
         return true;
     }
-
-    @Override
-    public Vector3 getPlayerSpawnLocation(WorldServer world, EntityPlayerMP player)
-    {
-        if (player != null)
-        {
-            GCPlayerStats stats = GCPlayerStats.get(player);
-            return new Vector3(stats.getCoordsTeleportedFromX(), 250.0, stats.getCoordsTeleportedFromZ());
+    
+    public Vector3 getPlayerSpawnLocation(final WorldServer world, final EntityPlayerMP player) {
+        if (player != null) {
+            final GCPlayerStats stats = GCPlayerStats.get(player);
+            return new Vector3(stats.coordsTeleportedFromX, 250.0, stats.coordsTeleportedFromZ);
         }
-
         return null;
     }
-
-    @Override
-    public Vector3 getEntitySpawnLocation(WorldServer world, Entity entity)
-    {
+    
+    public Vector3 getEntitySpawnLocation(final WorldServer world, final Entity entity) {
         return new Vector3(entity.posX, 250.0, entity.posZ);
     }
-
-    @Override
-    public Vector3 getParaChestSpawnLocation(WorldServer world, EntityPlayerMP player, Random rand)
-    {
-        final double x = (rand.nextDouble() * 2 - 1.0D) * 5.0D;
-        final double z = (rand.nextDouble() * 2 - 1.0D) * 5.0D;
-
-        return new Vector3(player.posX + x, 230.0D, player.posZ + z);
+    
+    public Vector3 getParaChestSpawnLocation(final WorldServer world, final EntityPlayerMP player, final Random rand) {
+        final double x = (rand.nextDouble() * 2.0 - 1.0) * 5.0;
+        final double z = (rand.nextDouble() * 2.0 - 1.0) * 5.0;
+        return new Vector3(player.posX + x, 230.0, player.posZ + z);
     }
-
-    @Override
-    public void onSpaceDimensionChanged(World newWorld, EntityPlayerMP player, boolean ridingAutoRocket)
-    {
+    
+    public void onSpaceDimensionChanged(final World newWorld, final EntityPlayerMP player, final boolean ridingAutoRocket) {
     }
-
-    @Override
-    public void setupAdventureSpawn(EntityPlayerMP player)
-    {
-        // TODO Auto-generated method stub
-
+    
+    public void setupAdventureSpawn(final EntityPlayerMP player) {
     }
 }

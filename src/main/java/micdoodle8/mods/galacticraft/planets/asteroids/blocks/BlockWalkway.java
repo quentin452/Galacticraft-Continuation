@@ -1,291 +1,198 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockTransmitter;
-import micdoodle8.mods.galacticraft.core.blocks.ISortableBlock;
-import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityAluminumWire;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityFluidPipe;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityNull;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.planets.*;
+import net.minecraft.world.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.api.transmission.*;
+import micdoodle8.mods.galacticraft.core.energy.*;
+import net.minecraft.util.*;
+import java.util.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-public class BlockWalkway extends BlockTransmitter implements ITileEntityProvider, IShiftDescription, ISortableBlock
+public class BlockWalkway extends BlockTransmitter implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc
 {
-
-    public static final PropertyEnum<EnumWalkwayType> WALKWAY_TYPE = PropertyEnum.create("type", EnumWalkwayType.class);
-    protected static final AxisAlignedBB AABB_UNCONNECTED = new AxisAlignedBB(0.0, 0.32, 0.0, 1.0, 1.0, 1.0);
-    protected static final AxisAlignedBB AABB_CONNECTED_DOWN = new AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-
-    public enum EnumWalkwayType implements IStringSerializable
-    {
-
-        WALKWAY(0, "walkway"), WALKWAY_WIRE(1, "walkway_wire"), WALKWAY_PIPE(2, "walkway_pipe");
-
-        private final int meta;
-        private final String name;
-
-        private EnumWalkwayType(int meta, String name)
-        {
-            this.meta = meta;
-            this.name = name;
-        }
-
-        public int getMeta()
-        {
-            return this.meta;
-        }
-
-        private final static EnumWalkwayType[] values = values();
-
-        public static EnumWalkwayType byMetadata(int meta)
-        {
-            return values[meta % values.length];
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
+    protected BlockWalkway(final String assetName) {
+        super(Material.iron);
+        this.setHardness(1.0f);
+        this.setBlockTextureName("galacticraftasteroids:walkway");
+        this.setBlockName(assetName);
+        this.setStepSound(Block.soundTypeMetal);
+        this.isBlockContainer = true;
+        this.minVector = new Vector3(0.0, 0.32, 0.0);
+        this.maxVector = new Vector3(1.0, 1.0, 1.0);
     }
-
-    protected BlockWalkway(String assetName)
-    {
-        super(Material.IRON);
-        this.setHardness(1.0F);
-        this.setTranslationKey(assetName);
-        this.setSoundType(SoundType.METAL);
-        this.hasTileEntity = true;
-        this.setDefaultState(this.blockState.getBaseState().withProperty(WALKWAY_TYPE, EnumWalkwayType.WALKWAY));
-    }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        state = this.getActualState(state, source, pos);
-
-        if (state.getValue(DOWN))
-        {
-            return AABB_CONNECTED_DOWN;
-        }
-
-        return AABB_UNCONNECTED;
-    }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
-    {
+    public boolean shouldSideBeRendered(final IBlockAccess p_149646_1_, final int p_149646_2_, final int p_149646_3_, final int p_149646_4_, final int p_149646_5_) {
         return true;
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public int getRenderType() {
+        return GalacticraftPlanets.getBlockRenderID((Block)this);
+    }
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
+    
+    public int onBlockPlaced(final World world, final int x, final int y, final int z, final int side, final float hitX, final float hitY, final float hitZ, final int meta) {
+        return this.getWalkwayOrientation(world, x, y, z);
     }
-
-    @Override
-    public boolean canPlaceTorchOnTop(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
-        return true;
+    
+    public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final Block blockChanged) {
+        world.setBlock(x, y, z, (Block)this, this.getWalkwayOrientation(world, x, y, z), 3);
+        if (this.getNetworkType() != null) {
+            super.onNeighborBlockChange(world, x, y, z, blockChanged);
+        }
     }
-
-    @Override
-    public boolean isNormalCube(IBlockState state)
-    {
-        return state.getMaterial().blocksMovement() && state.getBlock().isFullCube(state);
+    
+    public int getWalkwayOrientation(final World world, final int x, final int y, final int z) {
+        final int connectedNorth = (this.isBlockNormalCube(world.getBlock(x, y, z - 1)) || world.getBlock(x, y, z - 1) instanceof BlockWalkway) ? 1 : 0;
+        final int connectedEast = (this.isBlockNormalCube(world.getBlock(x + 1, y, z)) || world.getBlock(x + 1, y, z) instanceof BlockWalkway) ? 2 : 0;
+        final int connectedSouth = (this.isBlockNormalCube(world.getBlock(x, y, z + 1)) || world.getBlock(x, y, z + 1) instanceof BlockWalkway) ? 4 : 0;
+        final int connectedWest = (this.isBlockNormalCube(world.getBlock(x - 1, y, z)) || world.getBlock(x - 1, y, z) instanceof BlockWalkway) ? 8 : 0;
+        return connectedNorth | connectedEast | connectedSouth | connectedWest;
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World worldIn, int metadata)
-    {
-        if (metadata == EnumWalkwayType.WALKWAY_PIPE.getMeta())
-        {
-            return new TileEntityFluidPipe();
-        }
-
-        if (metadata == EnumWalkwayType.WALKWAY_WIRE.getMeta())
-        {
-            return new TileEntityAluminumWire(2);
-        }
-
-        return new TileEntityNull();
+    
+    public boolean isBlockNormalCube(final Block block) {
+        return block.getMaterial().blocksMovement() && block.renderAsNormalBlock();
     }
-
-    @Override
-    public NetworkType getNetworkType(IBlockState state)
-    {
-        if (state.getValue(WALKWAY_TYPE) == EnumWalkwayType.WALKWAY_PIPE)
-        {
-            return NetworkType.FLUID;
+    
+    public TileEntity createNewTileEntity(final World world, final int metadata) {
+        if (this == AsteroidBlocks.blockWalkwayOxygenPipe) {
+            return (TileEntity)new TileEntityOxygenPipe();
         }
-
-        if (state.getValue(WALKWAY_TYPE) == EnumWalkwayType.WALKWAY_PIPE)
-        {
-            return NetworkType.POWER;
+        if (this == AsteroidBlocks.blockWalkwayWire) {
+            return (TileEntity)new TileEntityAluminumWire(2);
         }
-
         return null;
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        if (meta == EnumWalkwayType.WALKWAY.getMeta())
-        {
-            return GCCoreUtil.translate("tile.walkway.walkway.description");
-        } else if (meta == EnumWalkwayType.WALKWAY_WIRE.getMeta())
-        {
-            return GCCoreUtil.translate("tile.walkway.walkway_wire.description");
-        } else if (meta == EnumWalkwayType.WALKWAY_PIPE.getMeta())
-        {
-            return GCCoreUtil.translate("tile.walkway.walkway_pipe.description");
+    
+    public NetworkType getNetworkType() {
+        if (this == AsteroidBlocks.blockWalkwayOxygenPipe) {
+            return NetworkType.OXYGEN;
         }
-
+        if (this == AsteroidBlocks.blockWalkwayWire) {
+            return NetworkType.POWER;
+        }
+        return null;
+    }
+    
+    public void setBlockBoundsBasedOnState(final IBlockAccess world, final int x, final int y, final int z) {
+        final TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity[] connectable = new TileEntity[6];
+        if (tileEntity != null) {
+            if (this.getNetworkType() != null) {
+                switch (this.getNetworkType()) {
+                    case OXYGEN: {
+                        connectable = OxygenUtil.getAdjacentOxygenConnections(tileEntity);
+                        break;
+                    }
+                    case POWER: {
+                        connectable = EnergyUtil.getAdjacentPowerConnections(tileEntity);
+                        break;
+                    }
+                }
+            }
+            final float minX = 0.0f;
+            float minY = 0.32f;
+            final float minZ = 0.0f;
+            final float maxX = 1.0f;
+            final float maxY = 1.0f;
+            final float maxZ = 1.0f;
+            if (connectable[0] != null) {
+                minY = 0.0f;
+            }
+            this.setBlockBounds(minX, minY, minZ, maxX, maxY, maxZ);
+        }
+    }
+    
+    private void addCollisionBox(final World world, final int x, final int y, final int z, final AxisAlignedBB aabb, final List list) {
+        final AxisAlignedBB axisalignedbb1 = this.getCollisionBoundingBoxFromPool(world, x, y, z);
+        if (axisalignedbb1 != null && aabb.intersectsWith(axisalignedbb1)) {
+            list.add(axisalignedbb1);
+        }
+    }
+    
+    public void addCollisionBoxesToList(final World world, final int x, final int y, final int z, final AxisAlignedBB axisalignedbb, final List list, final Entity entity) {
+        final TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity[] connectable = new TileEntity[6];
+        if (this.getNetworkType() != null) {
+            switch (this.getNetworkType()) {
+                case OXYGEN: {
+                    connectable = OxygenUtil.getAdjacentOxygenConnections(tileEntity);
+                    break;
+                }
+                case POWER: {
+                    connectable = EnergyUtil.getAdjacentPowerConnections(tileEntity);
+                    break;
+                }
+            }
+        }
+        this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, (float)this.minVector.z, (float)this.maxVector.x, (float)this.maxVector.y, (float)this.maxVector.z);
+        this.addCollisionBox(world, x, y, z, axisalignedbb, list);
+        this.setBlockBounds(0.0f, 0.9f, 0.0f, 1.0f, 1.0f, 1.0f);
+        this.addCollisionBox(world, x, y, z, axisalignedbb, list);
+        if (connectable[4] != null) {
+            this.setBlockBounds(0.0f, (float)this.minVector.y, (float)this.minVector.z, (float)this.maxVector.x, (float)this.maxVector.y, (float)this.maxVector.z);
+            this.addCollisionBox(world, x, y, z, axisalignedbb, list);
+        }
+        if (connectable[5] != null) {
+            this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, (float)this.minVector.z, 1.0f, (float)this.maxVector.y, (float)this.maxVector.z);
+            this.addCollisionBox(world, x, y, z, axisalignedbb, list);
+        }
+        if (connectable[0] != null) {
+            this.setBlockBounds((float)this.minVector.x, 0.0f, (float)this.minVector.z, (float)this.maxVector.x, (float)this.maxVector.y, (float)this.maxVector.z);
+            this.addCollisionBox(world, x, y, z, axisalignedbb, list);
+        }
+        if (connectable[1] != null) {
+            this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, (float)this.minVector.z, (float)this.maxVector.x, 1.0f, (float)this.maxVector.z);
+            this.addCollisionBox(world, x, y, z, axisalignedbb, list);
+        }
+        if (connectable[2] != null) {
+            this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, 0.0f, (float)this.maxVector.x, (float)this.maxVector.y, (float)this.maxVector.z);
+            this.addCollisionBox(world, x, y, z, axisalignedbb, list);
+        }
+        if (connectable[3] != null) {
+            this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, (float)this.minVector.z, (float)this.maxVector.x, (float)this.maxVector.y, 1.0f);
+            this.addCollisionBox(world, x, y, z, axisalignedbb, list);
+        }
+        this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+    }
+    
+    public String getShiftDescription(final int meta) {
+        if (this == AsteroidBlocks.blockWalkway) {
+            return GCCoreUtil.translate("tile.walkway.description");
+        }
+        if (this == AsteroidBlocks.blockWalkwayWire) {
+            return GCCoreUtil.translate("tile.walkwayAluminumWire.description");
+        }
+        if (this == AsteroidBlocks.blockWalkwayOxygenPipe) {
+            return GCCoreUtil.translate("tile.walkwayOxygenPipe.description");
+        }
         return "";
     }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, WALKWAY_TYPE, NORTH, EAST, SOUTH, WEST, DOWN);
-    }
-
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        Object[] connectable = new Object[EnumFacing.VALUES.length];
-
-        TileEntity tileEntity = null;
-
-        if (state.getValue(WALKWAY_TYPE) != EnumWalkwayType.WALKWAY)
-        {
-            tileEntity = worldIn.getTileEntity(pos);
-        }
-        for (EnumFacing direction : EnumFacing.VALUES)
-        {
-            if (direction == EnumFacing.UP || (direction == EnumFacing.DOWN && tileEntity == null))
-            {
-                continue;
-            }
-
-            if (state.getValue(WALKWAY_TYPE) == EnumWalkwayType.WALKWAY)
-            {
-                BlockPos neighbour = pos.offset(direction);
-                Block block = worldIn.getBlockState(neighbour).getBlock();
-
-                if (block == this || block.isSideSolid(worldIn.getBlockState(neighbour), worldIn, neighbour, direction.getOpposite()))
-                {
-                    connectable[direction.ordinal()] = block;
-                }
-            } else if (tileEntity != null && state.getValue(WALKWAY_TYPE) == EnumWalkwayType.WALKWAY_PIPE)
-            {
-                connectable = OxygenUtil.getAdjacentFluidConnections(tileEntity);
-            } else if (tileEntity != null && state.getValue(WALKWAY_TYPE) == EnumWalkwayType.WALKWAY_WIRE)
-            {
-                connectable = EnergyUtil.getAdjacentPowerConnections(tileEntity);
-            }
-        }
-
-        return state.withProperty(NORTH, Boolean.valueOf(connectable[EnumFacing.NORTH.ordinal()] != null)).withProperty(EAST, Boolean.valueOf(connectable[EnumFacing.EAST.ordinal()] != null))
-            .withProperty(SOUTH, Boolean.valueOf(connectable[EnumFacing.SOUTH.ordinal()] != null)).withProperty(WEST, Boolean.valueOf(connectable[EnumFacing.WEST.ordinal()] != null))
-            .withProperty(DOWN, Boolean.valueOf(connectable[EnumFacing.DOWN.ordinal()] != null));
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(WALKWAY_TYPE, EnumWalkwayType.byMetadata(meta));
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return ((EnumWalkwayType) state.getValue(WALKWAY_TYPE)).getMeta();
-    }
-
-    @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        list.add(new ItemStack(this, 1, 0));
-        list.add(new ItemStack(this, 1, 1));
-        list.add(new ItemStack(this, 1, 2));
-    }
-
-    @Override
-    public int damageDropped(IBlockState state)
-    {
-        return this.getMetaFromState(state);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getRenderLayer()
-    {
-        return BlockRenderLayer.CUTOUT;
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.GENERAL;
     }
 }

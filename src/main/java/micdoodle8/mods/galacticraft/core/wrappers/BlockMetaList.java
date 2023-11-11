@@ -1,67 +1,45 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.wrappers;
 
-import java.util.Arrays;
-import java.util.List;
-import net.minecraft.block.Block;
+import net.minecraft.block.*;
+import java.util.*;
 
 public class BlockMetaList
 {
-
     private Block block;
     private List<Integer> metaList;
-
-    public BlockMetaList(Block blockID, Integer... metadata)
-    {
+    
+    public BlockMetaList(final Block blockID, final Integer... metadata) {
         this(blockID, Arrays.asList(metadata));
     }
-
-    public BlockMetaList(Block blockID, List<Integer> metadata)
-    {
+    
+    public BlockMetaList(final Block blockID, final List<Integer> metadata) {
         this.block = blockID;
         this.metaList = metadata;
     }
-
-    public Block getBlock()
-    {
+    
+    public Block getBlock() {
         return this.block;
     }
-
-    public List<Integer> getMetaList()
-    {
+    
+    public List<Integer> getMetaList() {
         return this.metaList;
     }
-
-    public void addMetadata(int meta)
-    {
+    
+    public void addMetadata(final int meta) {
         this.metaList.add(meta);
     }
-
-    public void removeMetadata(int meta)
-    {
+    
+    public void removeMetadata(final int meta) {
         this.metaList.remove(meta);
     }
-
+    
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return this.block.hashCode();
     }
-
+    
     @Override
-    public boolean equals(Object obj)
-    {
-        if (obj instanceof BlockMetaList)
-        {
-            return (BlockMetaList) obj == this;
-        }
-
-        return false;
+    public boolean equals(final Object obj) {
+        return obj instanceof BlockMetaList && obj == this;
     }
 }

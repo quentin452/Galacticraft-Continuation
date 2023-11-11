@@ -1,683 +1,529 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.vector;
 
-import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.chunk.*;
+import net.minecraft.entity.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.block.*;
+import net.minecraft.crash.*;
+import net.minecraft.init.*;
+import net.minecraft.world.*;
+import net.minecraftforge.common.util.*;
+import net.minecraft.nbt.*;
+import net.minecraft.util.*;
+import net.minecraft.world.gen.*;
 
-/* BlockVec3 is similar to galacticraft.api.vector.Vector3?
- *
- * But for speed it uses integer arithmetic not doubles, for block coordinates
- * This reduces unnecessary type conversion between integers and doubles and back again.
- * (Minecraft block coordinates are always integers, only entity coordinates are doubles.)
- *
- */
 public class BlockVec3 implements Cloneable
 {
-
     public int x;
     public int y;
     public int z;
-    public int sideDoneBits = 0;
+    public int sideDoneBits;
     private static Chunk chunkCached;
-    public static int chunkCacheDim = Integer.MAX_VALUE;
-    private static int chunkCacheX = 1876000; // outside the world edge
-    private static int chunkCacheZ = 1876000; // outside the world edge
-    private static Chunk chunkCached_Client;
-    public static int chunkCacheDim_Client = Integer.MAX_VALUE;
-    private static int chunkCacheX_Client = 1876000; // outside the world edge
-    private static int chunkCacheZ_Client = 1876000; // outside the world edge
-    // INVALID_VECTOR is used in cases where a null vector cannot be used
-    public static final BlockVec3 INVALID_VECTOR = new BlockVec3(-1, -1, -1);
-
-    public BlockVec3()
-    {
+    public static int chunkCacheDim;
+    private static int chunkCacheX;
+    private static int chunkCacheZ;
+    public static final BlockVec3 INVALID_VECTOR;
+    
+    public BlockVec3() {
         this(0, 0, 0);
     }
-
-    public BlockVec3(BlockPos pos)
-    {
-        this(pos.getX(), pos.getY(), pos.getZ());
-    }
-
-    public BlockVec3(int x, int y, int z)
-    {
+    
+    public BlockVec3(final int x, final int y, final int z) {
+        this.sideDoneBits = 0;
         this.x = x;
         this.y = y;
         this.z = z;
     }
-
-    public BlockVec3(Entity par1)
-    {
-        this.x = (int) Math.floor(par1.posX);
-        this.y = (int) Math.floor(par1.posY);
-        this.z = (int) Math.floor(par1.posZ);
+    
+    public BlockVec3(final Entity par1) {
+        this.sideDoneBits = 0;
+        this.x = (int)Math.floor(par1.posX);
+        this.y = (int)Math.floor(par1.posY);
+        this.z = (int)Math.floor(par1.posZ);
     }
-
-    public BlockVec3(TileEntity par1)
-    {
-        this.x = par1.getPos().getX();
-        this.y = par1.getPos().getY();
-        this.z = par1.getPos().getZ();
+    
+    public BlockVec3(final TileEntity par1) {
+        this.sideDoneBits = 0;
+        this.x = par1.xCoord;
+        this.y = par1.yCoord;
+        this.z = par1.zCoord;
     }
-
-    /**
-     * Makes a new copy of this Vector. Prevents variable referencing problems.
-     */
-    @Override
-    public final BlockVec3 clone()
-    {
+    
+    public final BlockVec3 clone() {
         return new BlockVec3(this.x, this.y, this.z);
     }
-
-    public BlockPos toBlockPos()
-    {
-        return new BlockPos(this.x, this.y, this.z);
-    }
-
-    /**
-     * Get block ID at the BlockVec3 coordinates, with a forced chunk load if
-     * the coordinates are unloaded.
-     *
-     * @param world
-     * @return the block ID, or null if the y-coordinate is less than 0 or
-     *         greater than 256 or the x or z is outside the Minecraft worldmap.
-     */
-    public IBlockState getBlockState(World world)
-    {
-        if (this.y < 0 || this.y >= 256 || this.x < -30000000 || this.z < -30000000 || this.x >= 30000000 || this.z >= 30000000)
-        {
+    
+    public Block getBlockID(final World world) {
+        if (this.y < 0 || this.y >= 256 || this.x < -30000000 || this.z < -30000000 || this.x >= 30000000 || this.z >= 30000000) {
             return null;
         }
-
-        int chunkx = this.x >> 4;
-        int chunkz = this.z >> 4;
-        try
-        {
-            if (world.isRemote)
-            {
-                if (BlockVec3.chunkCacheX_Client == chunkx && BlockVec3.chunkCacheZ_Client == chunkz && BlockVec3.chunkCacheDim_Client == world.provider.getDimension()
-                    && BlockVec3.chunkCached_Client.isLoaded())
-                {
-                    return BlockVec3.chunkCached_Client.getBlockState(this.x & 15, this.y, this.z & 15);
-                }
-                final Chunk chunk = world.getChunk(chunkx, chunkz);
-                BlockVec3.chunkCached_Client = chunk;
-                BlockVec3.chunkCacheDim_Client = world.provider.getDimension();
-                BlockVec3.chunkCacheX_Client = chunkx;
-                BlockVec3.chunkCacheZ_Client = chunkz;
-                return chunk.getBlockState(this.x & 15, this.y, this.z & 15);
+        final int chunkx = this.x >> 4;
+        final int chunkz = this.z >> 4;
+        try {
+            if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz && BlockVec3.chunkCacheDim == world.provider.dimensionId && BlockVec3.chunkCached.isChunkLoaded) {
+                return BlockVec3.chunkCached.getBlock(this.x & 0xF, this.y, this.z & 0xF);
             }
-            // this will be within the same chunk
-            if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz && BlockVec3.chunkCacheDim == world.provider.getDimension() && BlockVec3.chunkCached.isLoaded())
-            {
-                return BlockVec3.chunkCached.getBlockState(this.x & 15, this.y, this.z & 15);
-            }
-            final Chunk chunk = world.getChunk(chunkx, chunkz);
-            BlockVec3.chunkCached = chunk;
-            BlockVec3.chunkCacheDim = world.provider.getDimension();
+            Chunk chunk = null;
+            chunk = (BlockVec3.chunkCached = world.getChunkFromChunkCoords(chunkx, chunkz));
+            BlockVec3.chunkCacheDim = world.provider.dimensionId;
             BlockVec3.chunkCacheX = chunkx;
             BlockVec3.chunkCacheZ = chunkz;
-            return chunk.getBlockState(this.x & 15, this.y, this.z & 15);
-        } catch (Throwable throwable)
-        {
-            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
-            CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
-            crashreportcategory.addCrashSection("Location", CrashReportCategory.getCoordinateInfo(new BlockPos(this.x, this.y, this.z)));
+            return chunk.getBlock(this.x & 0xF, this.y, this.z & 0xF);
+        }
+        catch (Throwable throwable) {
+            final CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
+            final CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
+            crashreportcategory.addCrashSection("Location", (Object)CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
             throw new ReportedException(crashreport);
         }
     }
-
-    /**
-     * Get block ID at the BlockVec3 coordinates without forcing a chunk load.
-     *
-     * @param world
-     * @return the block ID, or null if the y-coordinate is less than 0 or
-     *         greater than 256 or the x or z is outside the Minecraft worldmap.
-     *         Returns Blocks.BEDROCK if the coordinates being checked are in an
-     *         unloaded chunk
-     */
-    public IBlockState getBlockState_noChunkLoad(World world)
-    {
-        if (this.y < 0 || this.y >= 256 || this.x < -30000000 || this.z < -30000000 || this.x >= 30000000 || this.z >= 30000000)
-        {
+    
+    public Block getBlockID_noChunkLoad(final World world) {
+        if (this.y < 0 || this.y >= 256 || this.x < -30000000 || this.z < -30000000 || this.x >= 30000000 || this.z >= 30000000) {
             return null;
         }
-
-        int chunkx = this.x >> 4;
-        int chunkz = this.z >> 4;
-        try
-        {
-            if (world.getChunkProvider().getLoadedChunk(chunkx, chunkz) != null)
-            {
-                if (world.isRemote)
-                {
-                    if (BlockVec3.chunkCacheX_Client == chunkx && BlockVec3.chunkCacheZ_Client == chunkz && BlockVec3.chunkCacheDim_Client == world.provider.getDimension()
-                        && BlockVec3.chunkCached_Client.isLoaded())
-                    {
-                        return BlockVec3.chunkCached_Client.getBlockState(this.x & 15, this.y, this.z & 15);
-                    }
-                    final Chunk chunk = world.getChunk(chunkx, chunkz);
-                    BlockVec3.chunkCached_Client = chunk;
-                    BlockVec3.chunkCacheDim_Client = world.provider.getDimension();
-                    BlockVec3.chunkCacheX_Client = chunkx;
-                    BlockVec3.chunkCacheZ_Client = chunkz;
-                    return chunk.getBlockState(this.x & 15, this.y, this.z & 15);
-                }
-                // calls to
-                // this will be within the same chunk
-                if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz && BlockVec3.chunkCacheDim == world.provider.getDimension() && BlockVec3.chunkCached.isLoaded())
-                {
-                    return BlockVec3.chunkCached.getBlockState(this.x & 15, this.y, this.z & 15);
-                }
-                final Chunk chunk = world.getChunk(chunkx, chunkz);
-                BlockVec3.chunkCached = chunk;
-                BlockVec3.chunkCacheDim = world.provider.getDimension();
-                BlockVec3.chunkCacheX = chunkx;
-                BlockVec3.chunkCacheZ = chunkz;
-                return chunk.getBlockState(this.x & 15, this.y, this.z & 15);
+        final int chunkx = this.x >> 4;
+        final int chunkz = this.z >> 4;
+        try {
+            if (!world.getChunkProvider().chunkExists(chunkx, chunkz)) {
+                return Blocks.bedrock;
             }
-            // Chunk doesn't exist - meaning, it is not loaded
-            return Blocks.BEDROCK.getDefaultState();
-        } catch (Throwable throwable)
-        {
-            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
-            CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
-            crashreportcategory.addCrashSection("Location", CrashReportCategory.getCoordinateInfo(new BlockPos(this.x, this.y, this.z)));
+            if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz && BlockVec3.chunkCacheDim == world.provider.dimensionId && BlockVec3.chunkCached.isChunkLoaded) {
+                return BlockVec3.chunkCached.getBlock(this.x & 0xF, this.y, this.z & 0xF);
+            }
+            Chunk chunk = null;
+            chunk = (BlockVec3.chunkCached = world.getChunkFromChunkCoords(chunkx, chunkz));
+            BlockVec3.chunkCacheDim = world.provider.dimensionId;
+            BlockVec3.chunkCacheX = chunkx;
+            BlockVec3.chunkCacheZ = chunkz;
+            return chunk.getBlock(this.x & 0xF, this.y, this.z & 0xF);
+        }
+        catch (Throwable throwable) {
+            final CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
+            final CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
+            crashreportcategory.addCrashSection("Location", (Object)CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
             throw new ReportedException(crashreport);
         }
     }
-
-    public IBlockState getBlockState(IBlockAccess par1iBlockAccess)
-    {
-        return par1iBlockAccess.getBlockState(new BlockPos(this.x, this.y, this.z));
+    
+    public Block getBlock(final IBlockAccess par1iBlockAccess) {
+        return par1iBlockAccess.getBlock(this.x, this.y, this.z);
     }
-
-    /**
-     * Get block ID at the BlockVec3 coordinates without forcing a chunk load.
-     * Only call this 'safe' version if x and z coordinates are within the
-     * Minecraft world map (-30m to +30m)
-     *
-     * @param world
-     * @return the block ID, or null if the y-coordinate is less than 0 or
-     *         greater than 256. Returns Blocks.BEDROCK if the coordinates being
-     *         checked are in an unloaded chunk
-     */
-    @Nullable
-    public IBlockState getBlockStateSafe_noChunkLoad(World world)
-    {
-        if (this.y < 0 || this.y >= 256)
-        {
+    
+    public Block getBlockIDsafe_noChunkLoad(final World world) {
+        if (this.y < 0 || this.y >= 256) {
             return null;
         }
-
-        int chunkx = this.x >> 4;
-        int chunkz = this.z >> 4;
-        try
-        {
-            if (world.getChunkProvider().getLoadedChunk(chunkx, chunkz) != null)
-            {
-                if (world.isRemote)
-                {
-                    if (BlockVec3.chunkCacheX_Client == chunkx && BlockVec3.chunkCacheZ_Client == chunkz && BlockVec3.chunkCacheDim_Client == world.provider.getDimension()
-                        && BlockVec3.chunkCached_Client.isLoaded())
-                    {
-                        return BlockVec3.chunkCached_Client.getBlockState(this.x & 15, this.y, this.z & 15);
-                    }
-                    final Chunk chunk = world.getChunk(chunkx, chunkz);
-                    BlockVec3.chunkCached_Client = chunk;
-                    BlockVec3.chunkCacheDim_Client = world.provider.getDimension();
-                    BlockVec3.chunkCacheX_Client = chunkx;
-                    BlockVec3.chunkCacheZ_Client = chunkz;
-                    return chunk.getBlockState(this.x & 15, this.y, this.z & 15);
-                }
-                // calls to
-                // this will be within the same chunk
-                if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz && BlockVec3.chunkCacheDim == world.provider.getDimension() && BlockVec3.chunkCached.isLoaded())
-                {
-                    return BlockVec3.chunkCached.getBlockState(this.x & 15, this.y, this.z & 15);
-                }
-                final Chunk chunk = world.getChunk(chunkx, chunkz);
-                BlockVec3.chunkCached = chunk;
-                BlockVec3.chunkCacheDim = world.provider.getDimension();
-                BlockVec3.chunkCacheX = chunkx;
-                BlockVec3.chunkCacheZ = chunkz;
-                return chunk.getBlockState(this.x & 15, this.y, this.z & 15);
+        final int chunkx = this.x >> 4;
+        final int chunkz = this.z >> 4;
+        try {
+            if (!world.getChunkProvider().chunkExists(chunkx, chunkz)) {
+                return Blocks.bedrock;
             }
-            // Chunk doesn't exist - meaning, it is not loaded
-            return Blocks.BEDROCK.getDefaultState();
-        } catch (Throwable throwable)
-        {
-            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
-            CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
-            crashreportcategory.addCrashSection("Location", CrashReportCategory.getCoordinateInfo(new BlockPos(this.x, this.y, this.z)));
+            if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz && BlockVec3.chunkCacheDim == world.provider.dimensionId && BlockVec3.chunkCached.isChunkLoaded) {
+                return BlockVec3.chunkCached.getBlock(this.x & 0xF, this.y, this.z & 0xF);
+            }
+            Chunk chunk = null;
+            chunk = (BlockVec3.chunkCached = world.getChunkFromChunkCoords(chunkx, chunkz));
+            BlockVec3.chunkCacheDim = world.provider.dimensionId;
+            BlockVec3.chunkCacheX = chunkx;
+            BlockVec3.chunkCacheZ = chunkz;
+            return chunk.getBlock(this.x & 0xF, this.y, this.z & 0xF);
+        }
+        catch (Throwable throwable) {
+            final CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
+            final CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
+            crashreportcategory.addCrashSection("Location", (Object)CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
             throw new ReportedException(crashreport);
         }
     }
-
-    public BlockVec3 translate(BlockVec3 par1)
-    {
+    
+    public BlockVec3 add(final BlockVec3 par1) {
         this.x += par1.x;
         this.y += par1.y;
         this.z += par1.z;
         return this;
     }
-
-    public BlockVec3 translate(int par1x, int par1y, int par1z)
-    {
+    
+    public BlockVec3 translate(final BlockVec3 par1) {
+        this.x += par1.x;
+        this.y += par1.y;
+        this.z += par1.z;
+        return this;
+    }
+    
+    public BlockVec3 translate(final int par1x, final int par1y, final int par1z) {
         this.x += par1x;
         this.y += par1y;
         this.z += par1z;
         return this;
     }
-
-    public static BlockVec3 add(BlockVec3 par1, BlockVec3 a)
-    {
+    
+    public static BlockVec3 add(final BlockVec3 par1, final BlockVec3 a) {
         return new BlockVec3(par1.x + a.x, par1.y + a.y, par1.z + a.z);
     }
-
-    public BlockVec3 subtract(BlockVec3 par1)
-    {
+    
+    public BlockVec3 subtract(final BlockVec3 par1) {
         this.x -= par1.x;
         this.y -= par1.y;
         this.z -= par1.z;
-
         return this;
     }
-
-    public BlockVec3 scale(int par1)
-    {
+    
+    public BlockVec3 scale(final int par1) {
         this.x *= par1;
         this.y *= par1;
         this.z *= par1;
-
         return this;
     }
-
-    public BlockVec3 modifyPositionFromSide(EnumFacing side, int amount)
-    {
-        switch (side.ordinal())
-        {
-            case 0:
+    
+    public BlockVec3 modifyPositionFromSide(final ForgeDirection side, final int amount) {
+        switch (side.ordinal()) {
+            case 0: {
                 this.y -= amount;
                 break;
-            case 1:
+            }
+            case 1: {
                 this.y += amount;
                 break;
-            case 2:
+            }
+            case 2: {
                 this.z -= amount;
                 break;
-            case 3:
+            }
+            case 3: {
                 this.z += amount;
                 break;
-            case 4:
+            }
+            case 4: {
                 this.x -= amount;
                 break;
-            case 5:
+            }
+            case 5: {
                 this.x += amount;
                 break;
+            }
         }
         return this;
     }
-
-    public BlockVec3 newVecSide(int side)
-    {
+    
+    public BlockVec3 newVecSide(final int side) {
         final BlockVec3 vec = new BlockVec3(this.x, this.y, this.z);
-        vec.sideDoneBits = (1 << (side ^ 1)) + (side << 6);
-        switch (side)
-        {
-            case 0:
-                vec.y--;
+        vec.sideDoneBits = (1 << (side ^ 0x1)) + (side << 6);
+        switch (side) {
+            case 0: {
+                final BlockVec3 blockVec3 = vec;
+                --blockVec3.y;
                 return vec;
-            case 1:
-                vec.y++;
+            }
+            case 1: {
+                final BlockVec3 blockVec4 = vec;
+                ++blockVec4.y;
                 return vec;
-            case 2:
-                vec.z--;
+            }
+            case 2: {
+                final BlockVec3 blockVec5 = vec;
+                --blockVec5.z;
                 return vec;
-            case 3:
-                vec.z++;
+            }
+            case 3: {
+                final BlockVec3 blockVec6 = vec;
+                ++blockVec6.z;
                 return vec;
-            case 4:
-                vec.x--;
+            }
+            case 4: {
+                final BlockVec3 blockVec7 = vec;
+                --blockVec7.x;
                 return vec;
-            case 5:
-                vec.x++;
+            }
+            case 5: {
+                final BlockVec3 blockVec8 = vec;
+                ++blockVec8.x;
                 return vec;
+            }
+            default: {
+                return vec;
+            }
         }
-        return vec;
     }
-
-    public BlockVec3 modifyPositionFromSide(EnumFacing side)
-    {
+    
+    public BlockVec3 modifyPositionFromSide(final ForgeDirection side) {
         return this.modifyPositionFromSide(side, 1);
     }
-
+    
     @Override
-    public int hashCode()
-    {
-        // Upgraded hashCode calculation from the one in VecDirPair to something
-        // a bit stronger and faster
+    public int hashCode() {
         return ((this.y * 379 + this.x) * 373 + this.z) * 7;
     }
-
+    
     @Override
-    public boolean equals(Object o)
-    {
-        if (o instanceof BlockVec3)
-        {
-            final BlockVec3 vector = (BlockVec3) o;
+    public boolean equals(final Object o) {
+        if (o instanceof BlockVec3) {
+            final BlockVec3 vector = (BlockVec3)o;
             return this.x == vector.x && this.y == vector.y && this.z == vector.z;
         }
-
         return false;
     }
-
+    
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "[" + this.x + "," + this.y + "," + this.z + "]";
     }
-
-    /**
-     * This will load the chunk.
-     *
-     * @param world
-     * @return TileEntity
-     */
-    public TileEntity getTileEntity(IBlockAccess world)
-    {
-        return world.getTileEntity(new BlockPos(this.x, this.y, this.z));
+    
+    public TileEntity getTileEntity(final IBlockAccess world) {
+        return world.getTileEntity(this.x, this.y, this.z);
     }
-
-    /**
-     * No chunk load: returns null if chunk to side is unloaded
-     *
-     * @param world
-     * @param side
-     * @return TileEntity
-     */
-    public TileEntity getTileEntityOnSide(World world, EnumFacing side)
-    {
-        if (side == null)
-        {
-            return null;
-        }
-
+    
+    public TileEntity getTileEntityOnSide(final World world, final ForgeDirection side) {
         int x = this.x;
         int y = this.y;
         int z = this.z;
-        switch (side.ordinal())
-        {
-            case 0:
-                y--;
+        switch (side.ordinal()) {
+            case 0: {
+                --y;
                 break;
-            case 1:
-                y++;
+            }
+            case 1: {
+                ++y;
                 break;
-            case 2:
-                z--;
+            }
+            case 2: {
+                --z;
                 break;
-            case 3:
-                z++;
+            }
+            case 3: {
+                ++z;
                 break;
-            case 4:
-                x--;
+            }
+            case 4: {
+                --x;
                 break;
-            case 5:
-                x++;
+            }
+            case 5: {
+                ++x;
                 break;
-            default:
+            }
+            default: {
                 return null;
+            }
         }
-        final BlockPos pos = new BlockPos(x, y, z);
-        return world.isBlockLoaded(pos, false) ? world.getTileEntity(pos) : null;
+        if (world.blockExists(x, y, z)) {
+            return world.getTileEntity(x, y, z);
+        }
+        return null;
     }
-
-    /**
-     * No chunk load: returns null if chunk to side is unloaded
-     *
-     * @param world
-     * @param side
-     * @return TileEntity
-     */
-    public TileEntity getTileEntityOnSide(World world, int side)
-    {
+    
+    public TileEntity getTileEntityOnSide(final World world, final int side) {
         int x = this.x;
         int y = this.y;
         int z = this.z;
-        switch (side)
-        {
-            case 0:
-                y--;
+        switch (side) {
+            case 0: {
+                --y;
                 break;
-            case 1:
-                y++;
+            }
+            case 1: {
+                ++y;
                 break;
-            case 2:
-                z--;
+            }
+            case 2: {
+                --z;
                 break;
-            case 3:
-                z++;
+            }
+            case 3: {
+                ++z;
                 break;
-            case 4:
-                x--;
+            }
+            case 4: {
+                --x;
                 break;
-            case 5:
-                x++;
+            }
+            case 5: {
+                ++x;
                 break;
-            default:
+            }
+            default: {
                 return null;
+            }
         }
-        final BlockPos pos = new BlockPos(x, y, z);
-        return world.isBlockLoaded(pos, false) ? world.getTileEntity(pos) : null;
+        if (world.blockExists(x, y, z)) {
+            return world.getTileEntity(x, y, z);
+        }
+        return null;
     }
-
-    /**
-     * This will load the chunk to the side.
-     *
-     * @param world
-     * @param side
-     * @return boolean true if face is solid, false if not solid
-     */
-    public boolean blockOnSideHasSolidFace(World world, int side)
-    {
+    
+    public boolean blockOnSideHasSolidFace(final World world, final int side) {
         int x = this.x;
         int y = this.y;
         int z = this.z;
-        switch (side)
-        {
-            case 0:
-                y--;
+        switch (side) {
+            case 0: {
+                --y;
                 break;
-            case 1:
-                y++;
+            }
+            case 1: {
+                ++y;
                 break;
-            case 2:
-                z--;
+            }
+            case 2: {
+                --z;
                 break;
-            case 3:
-                z++;
+            }
+            case 3: {
+                ++z;
                 break;
-            case 4:
-                x--;
+            }
+            case 4: {
+                --x;
                 break;
-            case 5:
-                x++;
+            }
+            case 5: {
+                ++x;
                 break;
-            default:
+            }
+            default: {
                 return false;
+            }
         }
-        final BlockPos pos = new BlockPos(x, y, z);
-        return world.getBlockState(pos).getBlock().isSideSolid(world.getBlockState(pos), world, pos, EnumFacing.byIndex(side ^ 1));
+        return world.getBlock(x, y, z).isSideSolid((IBlockAccess)world, x, y, z, ForgeDirection.getOrientation(side ^ 0x1));
     }
-
-    /**
-     * No chunk load: returns null if chunk is unloaded
-     *
-     * @param world
-     * @param side
-     * @return Block
-     */
-    public Block getBlockOnSide(World world, int side)
-    {
+    
+    public Block getBlockOnSide(final World world, final int side) {
         int x = this.x;
         int y = this.y;
         int z = this.z;
-        switch (side)
-        {
-            case 0:
-                y--;
+        switch (side) {
+            case 0: {
+                --y;
                 break;
-            case 1:
-                y++;
+            }
+            case 1: {
+                ++y;
                 break;
-            case 2:
-                z--;
+            }
+            case 2: {
+                --z;
                 break;
-            case 3:
-                z++;
+            }
+            case 3: {
+                ++z;
                 break;
-            case 4:
-                x--;
+            }
+            case 4: {
+                --x;
                 break;
-            case 5:
-                x++;
+            }
+            case 5: {
+                ++x;
                 break;
-            default:
+            }
+            default: {
                 return null;
+            }
         }
-        final BlockPos pos = new BlockPos(x, y, z);
-        return world.isBlockLoaded(pos, false) ? world.getBlockState(pos).getBlock() : null;
+        if (world.blockExists(x, y, z)) {
+            return world.getBlock(x, y, z);
+        }
+        return null;
     }
-
-    public int getBlockMetadata(IBlockAccess world)
-    {
-        final IBlockState state = world.getBlockState(new BlockPos(x, y, z));
-        return state.getBlock().getMetaFromState(state);
+    
+    public int getBlockMetadata(final IBlockAccess world) {
+        return world.getBlockMetadata(this.x, this.y, this.z);
     }
-
-    public static BlockVec3 readFromNBT(NBTTagCompound nbtCompound)
-    {
+    
+    public static BlockVec3 readFromNBT(final NBTTagCompound nbtCompound) {
         final BlockVec3 tempVector = new BlockVec3();
         tempVector.x = nbtCompound.getInteger("x");
         tempVector.y = nbtCompound.getInteger("y");
         tempVector.z = nbtCompound.getInteger("z");
         return tempVector;
     }
-
-    public int distanceTo(BlockVec3 vector)
-    {
-        int var2 = vector.x - this.x;
-        int var4 = vector.y - this.y;
-        int var6 = vector.z - this.z;
-        return MathHelper.floor(Math.sqrt(var2 * var2 + var4 * var4 + var6 * var6));
+    
+    public int distanceTo(final BlockVec3 vector) {
+        final int var2 = vector.x - this.x;
+        final int var3 = vector.y - this.y;
+        final int var4 = vector.z - this.z;
+        return MathHelper.floor_double(Math.sqrt(var2 * var2 + var3 * var3 + var4 * var4));
     }
-
-    public int distanceSquared(BlockVec3 vector)
-    {
-        int var2 = vector.x - this.x;
-        int var4 = vector.y - this.y;
-        int var6 = vector.z - this.z;
-        return var2 * var2 + var4 * var4 + var6 * var6;
+    
+    public int distanceSquared(final BlockVec3 vector) {
+        final int var2 = vector.x - this.x;
+        final int var3 = vector.y - this.y;
+        final int var4 = vector.z - this.z;
+        return var2 * var2 + var3 * var3 + var4 * var4;
     }
-
-    public NBTTagCompound writeToNBT(NBTTagCompound tag)
-    {
-        tag.setInteger("x", this.x);
-        tag.setInteger("y", this.y);
-        tag.setInteger("z", this.z);
-        return tag;
+    
+    public NBTTagCompound writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+        par1NBTTagCompound.setInteger("x", this.x);
+        par1NBTTagCompound.setInteger("y", this.y);
+        par1NBTTagCompound.setInteger("z", this.z);
+        return par1NBTTagCompound;
     }
-
-    public BlockVec3(NBTTagCompound tag)
-    {
-        this.x = tag.getInteger("x");
-        this.y = tag.getInteger("y");
-        this.z = tag.getInteger("z");
+    
+    public BlockVec3(final NBTTagCompound par1NBTTagCompound) {
+        this.sideDoneBits = 0;
+        this.x = par1NBTTagCompound.getInteger("x");
+        this.y = par1NBTTagCompound.getInteger("y");
+        this.z = par1NBTTagCompound.getInteger("z");
     }
-
-    public NBTTagCompound writeToNBT(NBTTagCompound tag, String prefix)
-    {
-        tag.setInteger(prefix + "_x", this.x);
-        tag.setInteger(prefix + "_y", this.y);
-        tag.setInteger(prefix + "_z", this.z);
-        return tag;
+    
+    public NBTTagCompound writeToNBT(final NBTTagCompound par1NBTTagCompound, final String prefix) {
+        par1NBTTagCompound.setInteger(prefix + "_x", this.x);
+        par1NBTTagCompound.setInteger(prefix + "_y", this.y);
+        par1NBTTagCompound.setInteger(prefix + "_z", this.z);
+        return par1NBTTagCompound;
     }
-
-    public static BlockVec3 readFromNBT(NBTTagCompound tag, String prefix)
-    {
-        Integer readX = tag.getInteger(prefix + "_x");
-        if (readX == 0)
+    
+    public static BlockVec3 readFromNBT(final NBTTagCompound par1NBTTagCompound, final String prefix) {
+        final Integer readX = par1NBTTagCompound.getInteger(prefix + "_x");
+        if (readX == null) {
             return null;
-        Integer readY = tag.getInteger(prefix + "_y");
-        if (readY == 0)
+        }
+        final Integer readY = par1NBTTagCompound.getInteger(prefix + "_y");
+        if (readY == null) {
             return null;
-        Integer readZ = tag.getInteger(prefix + "_z");
-        if (readZ == 0)
+        }
+        final Integer readZ = par1NBTTagCompound.getInteger(prefix + "_z");
+        if (readZ == null) {
             return null;
+        }
         return new BlockVec3(readX, readY, readZ);
     }
-
-    public double getMagnitude()
-    {
+    
+    public double getMagnitude() {
         return Math.sqrt(this.getMagnitudeSquared());
     }
-
-    public int getMagnitudeSquared()
-    {
+    
+    public int getMagnitudeSquared() {
         return this.x * this.x + this.y * this.y + this.z * this.z;
     }
-
-    public void setBlock(World worldObj, IBlockState block)
-    {
-        worldObj.setBlockState(new BlockPos(x, y, z), block, 3);
+    
+    public void setBlock(final World worldObj, final Block block) {
+        worldObj.setBlock(this.x, this.y, this.z, block, 0, 3);
     }
-
-    public boolean blockExists(World world)
-    {
-        return world.isBlockLoaded(new BlockPos(this.x, this.y, this.z), false);
+    
+    public boolean blockExists(final World world) {
+        return world.blockExists(this.x, this.y, this.z);
     }
-
-    public void setSideDone(int side)
-    {
+    
+    public void setSideDone(final int side) {
         this.sideDoneBits |= 1 << side;
     }
-
-    public TileEntity getTileEntityForce(World world)
-    {
-        int chunkx = this.x >> 4;
-        int chunkz = this.z >> 4;
-
-        if (world.getChunkProvider().getLoadedChunk(chunkx, chunkz) != null)
-            return world.getTileEntity(this.toBlockPos());
-
-        Chunk chunk = ((ChunkProviderServer) world.getChunkProvider()).loadChunk(chunkx, chunkz);
-        return chunk.getTileEntity(new BlockPos(this.x & 15, this.y, this.z & 15), Chunk.EnumCreateEntityType.IMMEDIATE);
+    
+    public TileEntity getTileEntityForce(final World world) {
+        final int chunkx = this.x >> 4;
+        final int chunkz = this.z >> 4;
+        if (world.getChunkProvider().chunkExists(chunkx, chunkz)) {
+            return world.getTileEntity(this.x, this.y, this.z);
+        }
+        final Chunk chunk = ((ChunkProviderServer)world.getChunkProvider()).originalLoadChunk(chunkx, chunkz);
+        return chunk.func_150806_e(this.x & 0xF, this.y, this.z & 0xF);
     }
-
-    public Vector3 midPoint()
-    {
-        return new Vector3(this.x + 0.5, this.y + 0.5, this.z + 0.5);
+    
+    static {
+        BlockVec3.chunkCacheDim = Integer.MAX_VALUE;
+        BlockVec3.chunkCacheX = 1876000;
+        BlockVec3.chunkCacheZ = 1876000;
+        INVALID_VECTOR = new BlockVec3(-1, -1, -1);
     }
 }

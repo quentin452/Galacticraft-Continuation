@@ -1,525 +1,279 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import java.util.List;
-import micdoodle8.mods.galacticraft.api.entity.ICameraZoomEntity;
-import micdoodle8.mods.galacticraft.api.event.ZeroGravityEvent;
-import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
-import micdoodle8.mods.galacticraft.api.prefab.entity.EntitySpaceshipBase;
-import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.client.EventHandlerClient;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.init.MobEffects;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.stats.RecipeBook;
-import net.minecraft.stats.StatisticsManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.*;
+import net.minecraft.client.network.*;
+import net.minecraft.stats.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.client.entity.*;
+import net.minecraft.client.gui.*;
+import net.minecraft.client.audio.*;
+import net.minecraft.potion.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import cpw.mods.fml.common.*;
+import net.minecraft.util.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.api.event.*;
+import net.minecraft.entity.*;
+import net.minecraftforge.common.*;
+import cpw.mods.fml.common.eventhandler.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.api.world.*;
 
-public class GCEntityClientPlayerMP extends EntityPlayerSP
+public class GCEntityClientPlayerMP extends EntityClientPlayerMP
 {
+    boolean lastIsFlying;
+    int lastLandingTicks;
 
-    private boolean lastIsFlying;
-    private boolean sneakLast;
-    private int lastLandingTicks;
-    private boolean checkedCape = false;
-    private ResourceLocation galacticraftCape = null;
-
-    public GCEntityClientPlayerMP(Minecraft mcIn, World worldIn, NetHandlerPlayClient netHandler, StatisticsManager statFileWriter, RecipeBook book)
-    {
-        super(mcIn, worldIn, netHandler, statFileWriter, book);
+    public GCEntityClientPlayerMP(final Minecraft minecraft, final World world, final Session session, final NetHandlerPlayClient netHandler, final StatFileWriter statFileWriter) {
+        super(minecraft, world, session, netHandler, statFileWriter);
     }
 
-    @Override
-    public void wakeUpPlayer(boolean immediately, boolean updateWorldFlag, boolean setSpawn)
-    {
-        if (!ClientProxyCore.playerClientHandler.wakeUpPlayer(this, immediately, updateWorldFlag, setSpawn))
-        {
-            super.wakeUpPlayer(immediately, updateWorldFlag, setSpawn);
+    public void wakeUpPlayer(final boolean par1, final boolean par2, final boolean par3) {
+        if (!ClientProxyCore.playerClientHandler.wakeUpPlayer((EntityPlayerSP)this, par1, par2, par3)) {
+            super.wakeUpPlayer(par1, par2, par3);
         }
     }
 
-    @Override
-    public boolean isEntityInsideOpaqueBlock()
-    {
-        return ClientProxyCore.playerClientHandler.isEntityInsideOpaqueBlock(this, super.isEntityInsideOpaqueBlock());
+    public boolean isEntityInsideOpaqueBlock() {
+        return ClientProxyCore.playerClientHandler.isEntityInsideOpaqueBlock((EntityPlayerSP)this, super.isEntityInsideOpaqueBlock());
     }
 
-    @Override
-    public boolean isServerWorld()
-    {
-        return true;
-    }
-
-    @Override
-    public void onLivingUpdate()
-    {
-        ClientProxyCore.playerClientHandler.onLivingUpdatePre(this);
-        try
-        {
-            if (this.world.provider instanceof IZeroGDimension)
-            {
-                // from: EntityPlayerSP
-                if (this.sprintingTicksLeft > 0)
-                {
+    public void onLivingUpdate() {
+        ClientProxyCore.playerClientHandler.onLivingUpdatePre((EntityPlayerSP)this);
+        try {
+            if (this.worldObj.provider instanceof IZeroGDimension) {
+                if (this.sprintingTicksLeft > 0) {
                     --this.sprintingTicksLeft;
-
-                    if (this.sprintingTicksLeft == 0)
-                    {
+                    if (this.sprintingTicksLeft == 0) {
                         this.setSprinting(false);
                     }
                 }
-
-                if (this.sprintToggleTimer > 0)
-                {
+                if (this.sprintToggleTimer > 0) {
                     --this.sprintToggleTimer;
                 }
-
                 this.prevTimeInPortal = this.timeInPortal;
-
-                if (this.inPortal)
-                {
-                    if (this.mc.currentScreen != null && !this.mc.currentScreen.doesGuiPauseGame())
-                    {
-                        this.mc.displayGuiScreen((GuiScreen) null);
+                if (this.inPortal) {
+                    if (this.mc.currentScreen != null) {
+                        this.mc.displayGuiScreen((GuiScreen)null);
                     }
-
-                    if (this.timeInPortal == 0.0F)
-                    {
-                        this.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.BLOCK_PORTAL_TRIGGER, this.rand.nextFloat() * 0.4F + 0.8F));
+                    if (this.timeInPortal == 0.0f) {
+                        this.mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.func_147674_a(new ResourceLocation("portal.trigger"), this.rand.nextFloat() * 0.4f + 0.8f));
                     }
-
-                    this.timeInPortal += 0.0125F;
-
-                    if (this.timeInPortal >= 1.0F)
-                    {
-                        this.timeInPortal = 1.0F;
+                    this.timeInPortal += 0.0125f;
+                    if (this.timeInPortal >= 1.0f) {
+                        this.timeInPortal = 1.0f;
                     }
-
                     this.inPortal = false;
-                } else if (this.isPotionActive(MobEffects.NAUSEA) && this.getActivePotionEffect(MobEffects.NAUSEA).getDuration() > 60)
-                {
-                    this.timeInPortal += 0.006666667F;
-
-                    if (this.timeInPortal > 1.0F)
-                    {
-                        this.timeInPortal = 1.0F;
-                    }
-                } else
-                {
-                    if (this.timeInPortal > 0.0F)
-                    {
-                        this.timeInPortal -= 0.05F;
-                    }
-
-                    if (this.timeInPortal < 0.0F)
-                    {
-                        this.timeInPortal = 0.0F;
+                }
+                else if (this.isPotionActive(Potion.confusion) && this.getActivePotionEffect(Potion.confusion).getDuration() > 60) {
+                    this.timeInPortal += 0.006666667f;
+                    if (this.timeInPortal > 1.0f) {
+                        this.timeInPortal = 1.0f;
                     }
                 }
-
-                if (this.timeUntilPortal > 0)
-                {
+                else {
+                    if (this.timeInPortal > 0.0f) {
+                        this.timeInPortal -= 0.05f;
+                    }
+                    if (this.timeInPortal < 0.0f) {
+                        this.timeInPortal = 0.0f;
+                    }
+                }
+                if (this.timeUntilPortal > 0) {
                     --this.timeUntilPortal;
                 }
-
-                boolean flag1 = this.movementInput.sneak;
-                float sprintlevel = 0.8F;
-                boolean flag2 = this.movementInput.moveForward >= sprintlevel;
+                final boolean flag = this.movementInput.jump;
+                final float ff = 0.8f;
+                final boolean flag2 = this.movementInput.moveForward >= ff;
                 this.movementInput.updatePlayerMoveState();
-
-                if (this.isHandActive() && !this.isRiding())
-                {
-                    this.movementInput.moveStrafe *= 0.2F;
-                    this.movementInput.moveForward *= 0.2F;
+                if (this.isUsingItem() && !this.isRiding()) {
+                    final MovementInput movementInput = this.movementInput;
+                    movementInput.moveStrafe *= 0.2f;
+                    final MovementInput movementInput2 = this.movementInput;
+                    movementInput2.moveForward *= 0.2f;
                     this.sprintToggleTimer = 0;
                 }
-
-                // CUSTOM-------------------
-                GCPlayerStatsClient stats = GCPlayerStatsClient.get(this);
-                if (stats.getLandingTicks() > 0)
-                {
-                    this.movementInput.moveStrafe *= 0.5F;
-                    this.movementInput.moveForward *= 0.5F;
+                final GCPlayerStatsClient stats = GCPlayerStatsClient.get((EntityPlayerSP)this);
+                if (stats.landingTicks > 0) {
+                    this.ySize = stats.landingYOffset[stats.landingTicks];
+                    final MovementInput movementInput3 = this.movementInput;
+                    movementInput3.moveStrafe *= 0.5f;
+                    final MovementInput movementInput4 = this.movementInput;
+                    movementInput4.moveForward *= 0.5f;
+                    if (this.movementInput.sneak && this.ySize < 0.2f) {
+                        this.ySize = 0.2f;
+                    }
                 }
-                // -----------END CUSTOM
-
-                this.pushOutOfBlocks(this.posX - this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + this.width * 0.35D);
-                this.pushOutOfBlocks(this.posX - this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - this.width * 0.35D);
-                this.pushOutOfBlocks(this.posX + this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - this.width * 0.35D);
-                this.pushOutOfBlocks(this.posX + this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + this.width * 0.35D);
-                boolean flag4 = this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying;
-
-                if (this.onGround && !flag1 && !flag2 && this.movementInput.moveForward >= 0.8F && !this.isSprinting() && flag4 && !this.isHandActive() && !this.isPotionActive(MobEffects.BLINDNESS))
-                {
-                    if (this.sprintToggleTimer <= 0 && !this.mc.gameSettings.keyBindSprint.isKeyDown())
-                    {
+                else if (stats.pjumpticks > 0) {
+                    this.ySize = 0.01f * stats.pjumpticks;
+                }
+                else if (this.movementInput.sneak && this.ySize < 0.2f && this.onGround && !stats.inFreefall) {
+                    this.ySize = 0.2f;
+                }
+                this.func_145771_j(this.posX - this.width * 0.35, this.boundingBox.minY + 0.5, this.posZ + this.width * 0.35);
+                this.func_145771_j(this.posX - this.width * 0.35, this.boundingBox.minY + 0.5, this.posZ - this.width * 0.35);
+                this.func_145771_j(this.posX + this.width * 0.35, this.boundingBox.minY + 0.5, this.posZ - this.width * 0.35);
+                this.func_145771_j(this.posX + this.width * 0.35, this.boundingBox.minY + 0.5, this.posZ + this.width * 0.35);
+                final boolean flag3 = this.getFoodStats().getFoodLevel() > 6.0f || this.capabilities.allowFlying;
+                if (this.onGround && !flag2 && this.movementInput.moveForward >= ff && !this.isSprinting() && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness)) {
+                    if (this.sprintToggleTimer <= 0 && !this.mc.gameSettings.keyBindSprint.getIsKeyPressed()) {
                         this.sprintToggleTimer = 7;
-                    } else
-                    {
+                    }
+                    else {
                         this.setSprinting(true);
                     }
                 }
-
-                if (!this.isSprinting() && this.movementInput.moveForward >= sprintlevel && flag4 && !this.isHandActive() && !this.isPotionActive(MobEffects.BLINDNESS) && this.mc.gameSettings.keyBindSprint.isKeyDown())
-                {
+                if (!this.isSprinting() && this.movementInput.moveForward >= ff && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness) && this.mc.gameSettings.keyBindSprint.getIsKeyPressed()) {
                     this.setSprinting(true);
                 }
-
-                if (this.isSprinting() && (this.movementInput.moveForward < sprintlevel || this.collidedHorizontally || !flag4))
-                {
+                if (this.isSprinting() && (this.movementInput.moveForward < ff || this.isCollidedHorizontally || !flag3)) {
                     this.setSprinting(false);
                 }
-
-                // Omit flying toggles - flying will be controlled by freefall
-                // status
-
-                if (this.capabilities.isFlying && this.isCurrentViewEntity())
-                {
-                    if (this.movementInput.sneak)
-                    {
-                        this.motionY -= this.capabilities.getFlySpeed() * 3.0F;
+                if (this.capabilities.isFlying) {
+                    if (this.movementInput.sneak) {
+                        this.motionY -= 0.15;
                     }
-
-                    if (this.movementInput.jump)
-                    {
-                        this.motionY += this.capabilities.getFlySpeed() * 3.0F;
+                    if (this.movementInput.jump) {
+                        this.motionY += 0.15;
                     }
                 }
-
-                // Omit horse jumping - no horse jumping in space!
-
-                // -from: EntityPlayer
-
-                // Omit fly toggle timer
-
-                if (this.world.getDifficulty() == EnumDifficulty.PEACEFUL && this.world.getGameRules().getBoolean("naturalRegeneration"))
-                {
-                    if (this.getHealth() < this.getMaxHealth() && this.ticksExisted % 20 == 0)
-                    {
-                        this.heal(1.0F);
-                    }
-
-                    if (this.foodStats.needFood() && this.ticksExisted % 10 == 0)
-                    {
-                        this.foodStats.setFoodLevel(this.foodStats.getFoodLevel() + 1);
-                    }
+                if (this.worldObj.difficultySetting == EnumDifficulty.PEACEFUL && this.getHealth() < this.getMaxHealth() && this.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration") && this.ticksExisted % 20 * 12 == 0) {
+                    this.heal(1.0f);
                 }
-
                 this.inventory.decrementAnimations();
                 this.prevCameraYaw = this.cameraYaw;
-
-                // from: EntityLivingBase
-                if (this.newPosRotationIncrements > 0)
-                {
-                    double d0 = this.posX + (this.interpTargetX - this.posX) / this.newPosRotationIncrements;
-                    double d1 = this.posY + (this.interpTargetY - this.posY) / this.newPosRotationIncrements;
-                    double d2 = this.posZ + (this.interpTargetZ - this.posZ) / this.newPosRotationIncrements;
-                    double d3 = MathHelper.wrapDegrees(this.interpTargetYaw - this.rotationYaw);
-                    this.rotationYaw = (float) (this.rotationYaw + d3 / this.newPosRotationIncrements);
-                    this.rotationPitch = (float) (this.rotationPitch + (this.interpTargetPitch - this.rotationPitch) / this.newPosRotationIncrements);
+                if (this.newPosRotationIncrements > 0) {
+                    final double d0 = this.posX + (this.newPosX - this.posX) / this.newPosRotationIncrements;
+                    final double d2 = this.posY + (this.newPosY - this.posY) / this.newPosRotationIncrements;
+                    final double d3 = this.posZ + (this.newPosZ - this.posZ) / this.newPosRotationIncrements;
+                    final double d4 = MathHelper.wrapAngleTo180_double(this.newRotationYaw - this.rotationYaw);
+                    this.rotationYaw += (float)(d4 / this.newPosRotationIncrements);
+                    this.rotationPitch += (float)((this.newRotationPitch - this.rotationPitch) / this.newPosRotationIncrements);
                     --this.newPosRotationIncrements;
-                    this.setPosition(d0, d1, d2);
+                    this.setPosition(d0, d2, d3);
                     this.setRotation(this.rotationYaw, this.rotationPitch);
-                } else if (!this.isServerWorld())
-                {
-                    this.motionX *= 0.98D;
-                    this.motionY *= 0.98D;
-                    this.motionZ *= 0.98D;
                 }
-
-                if (Math.abs(this.motionX) < 0.005D)
-                {
-                    this.motionX = 0.0D;
+                if (Math.abs(this.motionX) < 0.005) {
+                    this.motionX = 0.0;
                 }
-
-                if (Math.abs(this.motionY) < 0.005D)
-                {
-                    this.motionY = 0.0D;
+                if (Math.abs(this.motionY) < 0.005) {
+                    this.motionY = 0.0;
                 }
-
-                if (Math.abs(this.motionZ) < 0.005D)
-                {
-                    this.motionZ = 0.0D;
+                if (Math.abs(this.motionZ) < 0.005) {
+                    this.motionZ = 0.0;
                 }
-
-                this.world.profiler.startSection("ai");
-
-                if (this.isMovementBlocked())
-                {
+                this.updateEntityActionState();
+                this.rotationYawHead = this.rotationYaw;
+                if (this.isMovementBlocked()) {
                     this.isJumping = false;
-                    this.moveStrafing = 0.0F;
-                    this.moveForward = 0.0F;
-                    this.randomYawVelocity = 0.0F;
-                } else
-                    this.updateEntityActionState();
-
-                this.world.profiler.endSection();
-                this.world.profiler.startSection("travel");
-                this.moveStrafing *= 0.98F;
-                this.moveForward *= 0.98F;
-                this.randomYawVelocity *= 0.9F;
-
-                // CUSTOM--------------
-                AxisAlignedBB aABB = this.getEntityBoundingBox();
-                if ((aABB.minY % 1D) == 0.5D)
-                    this.setEntityBoundingBox(aABB.offset(0D, 0.00001D, 0D));
-                // -----------END CUSTOM
-
-                // NOTE: No Elytra movement from this.updateElytra() in a zero G
-                // dimension
-                this.travel(this.moveStrafing, this.moveVertical, this.moveForward);
-                this.world.profiler.endSection();
-                this.world.profiler.startSection("push");
-
-                if (!this.world.isRemote)
-                {
-                    this.collideWithNearbyEntities();
+                    this.moveStrafing = 0.0f;
+                    this.moveForward = 0.0f;
+                    this.randomYawVelocity = 0.0f;
                 }
-
-                this.world.profiler.endSection();
-
-                // -from: EntityPlayer
-
-                // Omit IAttributeInstance - seems relevant only on server
-
-                // Omit this.jumpMovementFactor = this.speedInAir;
-                // (no bounding in space)
-
-                float f = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-                float f1 = (float) (Math.atan(-this.motionY * 0.20000000298023224D) * 15.0D);
-
-                if (f > 0.1F)
-                {
-                    f = 0.1F;
+                this.moveStrafing *= 0.98f;
+                this.moveForward *= 0.98f;
+                this.randomYawVelocity *= 0.9f;
+                if (this.boundingBox.minY % 1.0 == 0.5) {
+                    final AxisAlignedBB boundingBox = this.boundingBox;
+                    boundingBox.minY += 9.999999747378752E-6;
                 }
-
-                if (!this.onGround || this.getHealth() <= 0.0F)
-                {
-                    f = 0.0F;
+                this.moveEntityWithHeading(this.moveStrafing, this.moveForward);
+                float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+                float f2 = (float)Math.atan(-this.motionY * 0.20000000298023224) * 15.0f;
+                if (f > 0.1f) {
+                    f = 0.1f;
                 }
-
-                if (this.onGround || this.getHealth() <= 0.0F)
-                {
-                    f1 = 0.0F;
+                if (!this.onGround || this.getHealth() <= 0.0f) {
+                    f = 0.0f;
                 }
-
-                this.cameraYaw += (f - this.cameraYaw) * 0.4F;
-                this.cameraPitch += (f1 - this.cameraPitch) * 0.8F;
-
-                if (this.getHealth() > 0.0F && !this.isSpectator())
-                {
+                if (this.onGround || this.getHealth() <= 0.0f) {
+                    f2 = 0.0f;
+                }
+                this.cameraYaw += (f - this.cameraYaw) * 0.4f;
+                this.cameraPitch += (f2 - this.cameraPitch) * 0.8f;
+                if (this.getHealth() > 0.0f) {
                     AxisAlignedBB axisalignedbb = null;
-
-                    if (this.getRidingEntity() != null && !this.getRidingEntity().isDead)
-                    {
-                        axisalignedbb = this.getEntityBoundingBox().union(this.getRidingEntity().getEntityBoundingBox()).grow(1.0D, 0.0D, 1.0D);
-                    } else
-                    {
-                        axisalignedbb = this.getEntityBoundingBox().grow(1.0D, 0.5D, 1.0D);
+                    if (this.ridingEntity != null && !this.ridingEntity.isDead) {
+                        axisalignedbb = this.boundingBox.func_111270_a(this.ridingEntity.boundingBox).expand(1.0, 0.0, 1.0);
                     }
-
-                    List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this, axisalignedbb);
-
-                    for (Entity entity : list)
-                    {
-                        if (!entity.isDead)
-                        {
-                            entity.onCollideWithPlayer(this);
+                    else {
+                        axisalignedbb = this.boundingBox.expand(1.0, 0.5, 1.0);
+                    }
+                    final List list = this.worldObj.getEntitiesWithinAABBExcludingEntity((Entity)this, axisalignedbb);
+                    if (list != null) {
+                        for (int i = 0; i < list.size(); ++i) {
+                            final Entity entity = (Entity) list.get(i);
+                            if (!entity.isDead) {
+                                entity.onCollideWithPlayer((EntityPlayer)this);
+                            }
                         }
                     }
                 }
-
-                // from: EntityPlayerSP
-                // (modified CUSTOM)
-                if (this.lastIsFlying != this.capabilities.isFlying)
-                {
+                if (this.lastIsFlying != this.capabilities.isFlying) {
                     this.lastIsFlying = this.capabilities.isFlying;
                     this.sendPlayerAbilities();
                 }
-            } else
-            {
+            }
+            else {
                 super.onLivingUpdate();
             }
-        } catch (RuntimeException e)
-        {
-            GalacticraftCore.logger.error(e,
-                "A mod has crashed while Minecraft was doing a normal player tick update.  See details below.  GCEntityClientPlayerMP is in this because that is the player class name when Galacticraft is installed.  This is =*NOT*= a bug in Galacticraft, please report it to the mod indicated by the first lines of the crash report.");
-            throw (e);
         }
-        ClientProxyCore.playerClientHandler.onLivingUpdatePost(this);
+        catch (RuntimeException e) {
+            FMLLog.severe("A mod has crashed while Minecraft was doing a normal player tick update.  See details below.  GCEntityClientPlayerMP is in this because that is the player class name when Galacticraft is installed.  This is =*NOT*= a bug in Galacticraft, please report it to the mod indicated by the first lines of the crash report.", new Object[0]);
+            throw e;
+        }
+        ClientProxyCore.playerClientHandler.onLivingUpdatePost((EntityPlayerSP)this);
     }
 
-    @Override
-    public void move(MoverType type, double x, double y, double z)
-    {
-        super.move(type, x, y, z);
-        ClientProxyCore.playerClientHandler.move(this, type, x, y, z);
+    public void moveEntity(final double par1, final double par3, final double par5) {
+        super.moveEntity(par1, par3, par5);
+        ClientProxyCore.playerClientHandler.moveEntity((EntityPlayerSP)this, par1, par3, par5);
     }
 
-    @Override
-    public void onUpdate()
-    {
-        ClientProxyCore.playerClientHandler.onUpdate(this);
+    public void onUpdate() {
+        ClientProxyCore.playerClientHandler.onUpdate((EntityPlayerSP)this);
         super.onUpdate();
     }
 
-    @Override
-    public boolean isSneaking()
-    {
-        if (this.world.provider instanceof IZeroGDimension)
-        {
-            ZeroGravityEvent zeroGEvent = new ZeroGravityEvent.SneakOverride(this);
-            MinecraftForge.EVENT_BUS.post(zeroGEvent);
-            if (zeroGEvent.isCanceled())
-            {
+    public boolean isSneaking() {
+        if (this.worldObj.provider instanceof IZeroGDimension) {
+            final ZeroGravityEvent zeroGEvent = (ZeroGravityEvent)new ZeroGravityEvent.SneakOverride((EntityLivingBase)this);
+            MinecraftForge.EVENT_BUS.post((Event)zeroGEvent);
+            if (zeroGEvent.isCanceled()) {
                 return super.isSneaking();
             }
-
-            GCPlayerStatsClient stats = GCPlayerStatsClient.get(this);
-            if (stats.getLandingTicks() > 0)
-            {
-                if (this.lastLandingTicks == 0)
-                    this.lastLandingTicks = stats.getLandingTicks();
-
-                this.sneakLast = stats.getLandingTicks() < this.lastLandingTicks;
-                return sneakLast;
+            final GCPlayerStatsClient stats = GCPlayerStatsClient.get((EntityPlayerSP)this);
+            if (stats.landingTicks > 0) {
+                if (this.lastLandingTicks == 0) {
+                    this.lastLandingTicks = stats.landingTicks;
+                }
+                return stats.landingTicks < this.lastLandingTicks;
             }
             this.lastLandingTicks = 0;
-            if (stats.getFreefallHandler().pjumpticks > 0)
-            {
-                this.sneakLast = true;
+            if (stats.pjumpticks > 0) {
                 return true;
             }
-            if (EventHandlerClient.sneakRenderOverride)
-            {
-                if (this.movementInput != null && this.movementInput.sneak != this.sneakLast)
-                {
+            if (ClientProxyCore.sneakRenderOverride) {
+                if (FreefallHandler.testFreefall((EntityPlayer)this)) {
                     return false;
                 }
-                if (stats.isInFreefall() || stats.getFreefallHandler().onWall)
-                {
-                    this.sneakLast = false;
+                if (stats.inFreefall) {
                     return false;
-                }
-            }
-            this.sneakLast = this.movementInput == null ? false : this.movementInput.sneak;
-        } else
-        {
-            this.sneakLast = false;
-            if (EventHandlerClient.sneakRenderOverride && this.onGround && this.inventory.getCurrentItem() != null && this.inventory.getCurrentItem().getItem() instanceof IHoldableItem && !(this.getRidingEntity() instanceof ICameraZoomEntity))
-            {
-                IHoldableItem holdableItem = (IHoldableItem) this.inventory.getCurrentItem().getItem();
-
-                if (holdableItem.shouldCrouch(this))
-                {
-                    return true;
                 }
             }
         }
         return super.isSneaking();
     }
 
-    @Override
-    public float getEyeHeight()
-    {
-        float f = eyeHeight;
-
-        if (this.isPlayerSleeping())
-        {
-            return 0.2F;
-        }
-
-        float ySize = 0.0F;
-        if (this.world.provider instanceof IZeroGDimension)
-        {
-            GCPlayerStatsClient stats = GCPlayerStatsClient.get(this);
-            if (stats.getLandingTicks() > 0)
-            {
-                ySize = stats.getLandingYOffset()[stats.getLandingTicks()];
-                if (this.movementInput.sneak && ySize < 0.08F)
-                {
-                    ySize = 0.08F;
-                }
-            } else if (stats.getFreefallHandler().pjumpticks > 0)
-            {
-                ySize = 0.01F * stats.getFreefallHandler().pjumpticks;
-            } else if (this.isSneaking() && !stats.isInFreefall() && !stats.getFreefallHandler().onWall)
-            {
-                ySize = 0.08F;
-            }
-        } else if (this.isSneaking() && this.movementInput != null && this.movementInput.sneak)
-        {
-            ySize = 0.08F;
-        }
-
-        return f - ySize;
-    }
-
-    @Override
     @SideOnly(Side.CLIENT)
-    public float getBedOrientationInDegrees()
-    {
-        return ClientProxyCore.playerClientHandler.getBedOrientationInDegrees(this, super.getBedOrientationInDegrees());
+    public float getBedOrientationInDegrees() {
+        return ClientProxyCore.playerClientHandler.getBedOrientationInDegrees((EntityPlayerSP)this, super.getBedOrientationInDegrees());
     }
 
-    @Override
-    public ResourceLocation getLocationCape()
-    {
-        if (this.getRidingEntity() instanceof EntitySpaceshipBase)
-        {
-            // Don't draw any cape if riding a rocket (the cape renders outside the rocket model!)
-            return null;
+    public void setInPortal() {
+        if (!(this.worldObj.provider instanceof IGalacticraftWorldProvider)) {
+            super.setInPortal();
         }
-
-        ResourceLocation vanillaCape = super.getLocationCape();
-
-        if (!this.checkedCape)
-        {
-            NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
-            this.galacticraftCape = ClientProxyCore.capeMap.get(networkplayerinfo.getGameProfile().getId().toString().replace("-", ""));
-            this.checkedCape = true;
-        }
-
-        if ((ConfigManagerCore.overrideCapes || vanillaCape == null) && galacticraftCape != null)
-        {
-            return galacticraftCape;
-        }
-
-        return vanillaCape;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public int getBrightnessForRender()
-    {
-        double offset = this.posY + this.getEyeHeight();
-        if (offset > 255D)
-            offset = 255D;
-        BlockPos blockpos = new BlockPos(this.posX, offset, this.posZ);
-        return this.world.isBlockLoaded(blockpos) ? this.world.getCombinedLight(blockpos, 0) : 0;
     }
 }

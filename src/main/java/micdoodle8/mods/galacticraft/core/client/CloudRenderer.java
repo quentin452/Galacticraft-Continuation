@@ -1,26 +1,13 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-
-import net.minecraftforge.client.IRenderHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.client.*;
+import net.minecraft.client.multiplayer.*;
+import net.minecraft.client.*;
+import cpw.mods.fml.relauncher.*;
 
 public class CloudRenderer extends IRenderHandler
 {
-
-    @Override
     @SideOnly(Side.CLIENT)
-    public void render(float partialTicks, WorldClient world, Minecraft mc)
-    {
-        // Do nothing
+    public void render(final float partialTicks, final WorldClient world, final Minecraft mc) {
     }
 }

@@ -1,64 +1,35 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
+import net.minecraft.tileentity.*;
+import net.minecraft.init.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import java.util.*;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.blocks.BlockLandingPadFull;
-
-public class TileEntityBuggyFuelerSingle extends TileEntity implements ITickable
+public class TileEntityBuggyFuelerSingle extends TileEntity
 {
-
-    private int corner = 0;
-
-    @Override
-    public void update()
-    {
-        if (!this.world.isRemote && this.corner == 0)
-        {
+    public void updateEntity() {
+        if (!this.worldObj.isRemote) {
             final ArrayList<TileEntity> attachedLaunchPads = new ArrayList<TileEntity>();
-
-            for (int x = this.getPos().getX() - 1; x < this.getPos().getX() + 2; x++)
-            {
-                for (int z = this.getPos().getZ() - 1; z < this.getPos().getZ() + 2; z++)
-                {
-                    final TileEntity tile = this.world.getTileEntity(new BlockPos(x, this.getPos().getY(), z));
-
-                    if (tile instanceof TileEntityBuggyFuelerSingle && !tile.isInvalid() && ((TileEntityBuggyFuelerSingle) tile).corner == 0)
-                    {
+            for (int x = this.xCoord - 1; x < this.xCoord + 2; ++x) {
+                for (int z = this.zCoord - 1; z < this.zCoord + 2; ++z) {
+                    final TileEntity tile = this.worldObj.getTileEntity(x, this.yCoord, z);
+                    if (tile instanceof TileEntityBuggyFuelerSingle) {
                         attachedLaunchPads.add(tile);
                     }
                 }
             }
-
-            if (attachedLaunchPads.size() == 9)
-            {
-                for (final TileEntity tile : attachedLaunchPads)
-                {
-                    this.world.markTileEntityForRemoval(tile);
-                    ((TileEntityBuggyFuelerSingle) tile).corner = 1;
+            if (attachedLaunchPads.size() == 9) {
+                for (final TileEntity tile2 : attachedLaunchPads) {
+                    tile2.invalidate();
+                    tile2.getWorldObj().setBlock(tile2.xCoord, tile2.yCoord, tile2.zCoord, Blocks.air, 0, 3);
                 }
-
-                this.world.setBlockState(this.getPos(), GCBlocks.landingPadFull.getStateFromMeta(BlockLandingPadFull.EnumLandingPadFullType.BUGGY_PAD.getMeta()), 2);
+                this.worldObj.setBlock(this.xCoord, this.yCoord, this.zCoord, GCBlocks.landingPadFull, 1, 3);
+                final TileEntityBuggyFueler tile3 = (TileEntityBuggyFueler)this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord);
+                if (tile3 != null) {
+                    tile3.onCreate(new BlockVec3(this.xCoord, this.yCoord, this.zCoord));
+                }
             }
         }
-    }
-
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
-    {
-        return oldState.getBlock() != newSate.getBlock();
     }
 }

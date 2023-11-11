@@ -1,55 +1,29 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
+import micdoodle8.mods.galacticraft.core.energy.item.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-
-public class ItemBattery extends ItemElectricBase implements ISortableItem, GCRarity
+public class ItemBattery extends ItemElectricBase
 {
-
-    public ItemBattery(String assetName)
-    {
-        super();
-        this.setMaxStackSize(4);
-        this.setTranslationKey(assetName);
+    public ItemBattery(final String assetName) {
+        this.setUnlocalizedName(assetName);
+        this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public float getMaxElectricityStored(ItemStack itemStack)
-    {
-        return 15000;
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.GENERAL;
-    }
-
-    @Override
-    public int getItemStackLimit(ItemStack stack)
-    {
-        if (stack.getItemDamage() < 100 || stack.hasTagCompound() && stack.getTagCompound().hasKey("electricity"))
-        {
-            return 1;
-        }
-        return this.getItemStackLimit();
+    
+    public float getMaxElectricityStored(final ItemStack itemStack) {
+        return 15000.0f;
     }
 }

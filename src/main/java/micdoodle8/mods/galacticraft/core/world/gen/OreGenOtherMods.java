@@ -1,271 +1,235 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.ArrayList;
-import java.util.Random;
+import net.minecraft.world.gen.feature.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.api.event.wgen.*;
+import micdoodle8.mods.galacticraft.api.world.*;
+import micdoodle8.mods.galacticraft.core.dimension.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.planets.mars.dimension.*;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.*;
+import net.minecraft.world.*;
+import java.util.*;
+import cpw.mods.fml.common.eventhandler.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.gen.feature.WorldGenerator;
-
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import micdoodle8.mods.galacticraft.api.event.wgen.GCCoreEventPopulate;
-import micdoodle8.mods.galacticraft.api.vector.BlockTuple;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.dimension.WorldProviderMoon;
-import micdoodle8.mods.galacticraft.core.dimension.WorldProviderSpaceStation;
-import micdoodle8.mods.galacticraft.core.util.BlockUtil;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
-import micdoodle8.mods.galacticraft.planets.mars.dimension.WorldProviderMars;
-
-//TODO: Seriously redo this
 public class OreGenOtherMods
 {
-
-    private World                       world;
-    private Random                      randomGenerator;
-    private BlockPos                    pos;
-    private WorldGenerator              oreGen;
-    public static ArrayList<OreGenData> data = new ArrayList<>();
-    static
-    {
-        for (final String str : ConfigManagerCore.oregenIDs)
-        {
-            try
-            {
-                int slash = str.indexOf('/');
-                String s;
-                int rarity = 0; // 0 = common 1 = uncommon 2 = rare
-                int depth = 0; // 0 = even 1 = deep 2 = shallow
-                int size = 1; // 0 = single 1 = standard 2 = large
-                boolean extraRandom = false;
-                int dim = 0;
-                if (slash >= 0)
-                {
-                    s = str.substring(0, slash).trim();
-                    String params = str.substring(slash).toUpperCase();
-                    if (params.contains("UNCOMMON"))
-                    {
-                        rarity = 1;
-                    }
-                    else if (params.contains("RARE"))
-                    {
-                        rarity = 2;
-                    }
-                    if (params.contains("DEEP"))
-                    {
-                        depth = 1;
-                    }
-                    else if (params.contains("SHALLOW"))
-                    {
-                        depth = 2;
-                    }
-                    if (params.contains("SINGLE"))
-                    {
-                        size = 0;
-                    }
-                    else if (params.contains("LARGE"))
-                    {
-                        size = 2;
-                    }
-                    if (params.contains("XTRARANDOM"))
-                    {
-                        extraRandom = true;
-                    }
-                    if (params.contains("ONLYMOON"))
-                    {
-                        dim = 1;
-                    }
-                    else if (params.contains("ONLYMARS"))
-                    {
-                        dim = 2;
-                    }
-                }
-                else
-                {
-                    s = str;
-                }
-                BlockTuple bt = BlockUtil.getBlockTupleFromString(s);
-                if (bt == null)
-                {
-                    continue;
-                }
-                int meta = bt.meta;
-                if (meta == -1)
-                {
-                    meta = 0;
-                }
-                OreGenOtherMods.addOre(bt.block, meta, rarity, depth, size, extraRandom, dim);
-            } catch (final Exception e)
-            {
-                GalacticraftCore.logger.error("[config] External Sealable IDs: error parsing '" + str + "'. Must be in the form Blockname or BlockName:metadata followed by / parameters ");
-            }
-        }
-    }
-
-    public static void addOre(Block block, int meta, int rarity, int depth, int clumpSize, boolean extraRandom, int dim)
-    {
+    private World worldObj;
+    private Random randomGenerator;
+    private int chunkX;
+    private int chunkZ;
+    private WorldGenerator oreGen;
+    public static ArrayList<OreGenData> data;
+    
+    public static void addOre(final Block block, final int meta, final int rarity, final int depth, final int clumpSize, final boolean extraRandom, final int dim) {
         int clusters = 12;
         int size = 4;
         int min = 0;
         int max = 64;
-        switch (depth)
-        {
-            case 0:
-                // Evenly distributed
+        switch (depth) {
+            case 0: {
                 size = 6;
                 clusters = 20;
                 max = 80;
-                if (rarity == 1)
-                {
+                if (rarity == 1) {
                     clusters = 9;
                     size = 4;
+                    break;
                 }
-                else if (rarity == 2)
-                {
+                if (rarity == 2) {
                     clusters = 6;
                     size = 3;
                     max = 96;
+                    break;
                 }
                 break;
-            case 1:
-                // Deep
+            }
+            case 1: {
                 size = 5;
                 clusters = 12;
                 max = 32;
-                if (rarity == 1)
-                {
+                if (rarity == 1) {
                     clusters = 6;
                     size = 4;
                     max = 20;
+                    break;
                 }
-                else if (rarity == 2)
-                {
+                if (rarity == 2) {
                     clusters = 2;
                     size = 3;
                     max = 16;
+                    break;
                 }
                 break;
-            case 2:
-                // Shallow
+            }
+            case 2: {
                 size = 6;
                 clusters = 15;
                 min = 32;
                 max = 80;
-                if (rarity == 1)
-                {
+                if (rarity == 1) {
                     clusters = 8;
                     size = 4;
                     min = 32;
                     max = 72;
+                    break;
                 }
-                else if (rarity == 2)
-                {
+                if (rarity == 2) {
                     clusters = 3;
                     size = 3;
                     min = 40;
                     max = 64;
+                    break;
                 }
+                break;
+            }
         }
-        if (clumpSize == 0)
-        {
+        if (clumpSize == 0) {
             size = 1;
-            clusters = (3 * clusters) / 2;
+            clusters = 3 * clusters / 2;
         }
-        else if (clumpSize == 2)
-        {
+        else if (clumpSize == 2) {
             size *= 4;
             clusters /= 2;
         }
-        if (extraRandom)
-        {
-            if (depth == 1)
-            {
+        if (extraRandom) {
+            if (depth == 1) {
                 min = -max * 3;
             }
-            else
-            {
+            else {
                 max *= 4;
             }
         }
-        OreGenData ore = new OreGenData(block, meta, clusters, size, min, max, dim);
+        final OreGenData ore = new OreGenData(block, meta, clusters, size, min, max, dim);
         OreGenOtherMods.data.add(ore);
     }
-
+    
     @SubscribeEvent
-    public void onPlanetDecorated(GCCoreEventPopulate.Post event)
-    {
-        this.world = event.world;
+    public void onPlanetDecorated(final GCCoreEventPopulate.Post event) {
+        this.worldObj = event.worldObj;
         this.randomGenerator = event.rand;
-        this.pos = event.pos;
+        this.chunkX = event.chunkX;
+        this.chunkZ = event.chunkZ;
         int dimDetected = 0;
-        WorldProvider prov = world.provider;
-        if (!(prov instanceof IGalacticraftWorldProvider) || (prov instanceof WorldProviderSpaceStation))
-        {
+        final WorldProvider prov = this.worldObj.provider;
+        if (!(prov instanceof IGalacticraftWorldProvider) || prov instanceof WorldProviderSpaceStation) {
             return;
         }
         Block stoneBlock = null;
         int stoneMeta = 0;
-        if (prov instanceof WorldProviderMoon)
-        {
+        if (prov instanceof WorldProviderMoon) {
             stoneBlock = GCBlocks.blockMoon;
             stoneMeta = 4;
             dimDetected = 1;
         }
-        else if (prov instanceof WorldProviderMars)
-        {
+        else if (GalacticraftCore.isPlanetsLoaded && prov instanceof WorldProviderMars) {
             stoneBlock = MarsBlocks.marsBlock;
             stoneMeta = 9;
             dimDetected = 2;
         }
-        if (stoneBlock == null)
-        {
+        if (stoneBlock == null) {
             return;
         }
-        for (OreGenData ore : OreGenOtherMods.data)
-        {
-            if (ore.dimRestrict == 0 || ore.dimRestrict == dimDetected)
-            {
-                this.oreGen = new WorldGenMinableMeta(ore.oreBlock, ore.sizeCluster, ore.oreMeta, true, stoneBlock, stoneMeta);
+        for (final OreGenData ore : OreGenOtherMods.data) {
+            if (ore.dimRestrict == 0 || ore.dimRestrict == dimDetected) {
+                this.oreGen = (WorldGenerator)new WorldGenMinableMeta(ore.oreBlock, ore.sizeCluster, ore.oreMeta, true, stoneBlock, stoneMeta);
                 this.genStandardOre1(ore.numClusters, this.oreGen, ore.minHeight, ore.maxHeight);
             }
         }
     }
-
-    void genStandardOre1(int amountPerChunk, WorldGenerator worldGenerator, int minY, int maxY)
-    {
-        for (int var5 = 0; var5 < amountPerChunk; ++var5)
-        {
-            BlockPos blockpos = this.pos.add(this.randomGenerator.nextInt(16), this.randomGenerator.nextInt(maxY - minY) + minY, this.randomGenerator.nextInt(16));
-            worldGenerator.generate(this.world, this.randomGenerator, blockpos);
+    
+    void genStandardOre1(final int amountPerChunk, final WorldGenerator worldGenerator, final int minY, final int maxY) {
+        for (int var5 = 0; var5 < amountPerChunk; ++var5) {
+            final int var6 = this.chunkX + this.randomGenerator.nextInt(16);
+            final int var7 = this.randomGenerator.nextInt(maxY - minY) + minY;
+            if (var7 >= 0) {
+                final int var8 = this.chunkZ + this.randomGenerator.nextInt(16);
+                worldGenerator.generate(this.worldObj, this.randomGenerator, var6, var7, var8);
+            }
         }
     }
-
+    
+    static {
+        OreGenOtherMods.data = new ArrayList<OreGenData>();
+        for (final String str : ConfigManagerCore.oregenIDs) {
+            try {
+                final int slash = str.indexOf(47);
+                int rarity = 0;
+                int depth = 0;
+                int size = 1;
+                boolean extraRandom = false;
+                int dim = 0;
+                String s;
+                if (slash >= 0) {
+                    s = str.substring(0, slash).trim();
+                    final String params = str.substring(slash).toUpperCase();
+                    if (params.contains("UNCOMMON")) {
+                        rarity = 1;
+                    }
+                    else if (params.contains("RARE")) {
+                        rarity = 2;
+                    }
+                    if (params.contains("DEEP")) {
+                        depth = 1;
+                    }
+                    else if (params.contains("SHALLOW")) {
+                        depth = 2;
+                    }
+                    if (params.contains("SINGLE")) {
+                        size = 0;
+                    }
+                    else if (params.contains("LARGE")) {
+                        size = 2;
+                    }
+                    if (params.contains("XTRARANDOM")) {
+                        extraRandom = true;
+                    }
+                    if (params.contains("ONLYMOON")) {
+                        dim = 1;
+                    }
+                    else if (params.contains("ONLYMARS")) {
+                        dim = 2;
+                    }
+                }
+                else {
+                    s = str;
+                }
+                final BlockTuple bt = ConfigManagerCore.stringToBlock(s, "Other mod ore generate IDs", true);
+                if (bt != null) {
+                    int meta = bt.meta;
+                    if (meta == -1) {
+                        meta = 0;
+                    }
+                    addOre(bt.block, meta, rarity, depth, size, extraRandom, dim);
+                }
+            }
+            catch (Exception e) {
+                GCLog.severe("[config] External Sealable IDs: error parsing '" + str + "'. Must be in the form Blockname or BlockName:metadata followed by / parameters ");
+            }
+        }
+    }
+    
     public static class OreGenData
     {
-
-        public Block oreBlock    = GCBlocks.blockMoon;
-        public int   oreMeta     = 0;
-        public int   sizeCluster = 4;
-        public int   numClusters = 8;
-        public int   minHeight   = 0;
-        public int   maxHeight   = 128;
-        public int   dimRestrict = 0;
-
-        public OreGenData(Block block, int meta, int num, int cluster, int min, int max, int dim)
-        {
+        public Block oreBlock;
+        public int oreMeta;
+        public int sizeCluster;
+        public int numClusters;
+        public int minHeight;
+        public int maxHeight;
+        public int dimRestrict;
+        
+        public OreGenData(final Block block, final int meta, final int num, final int cluster, final int min, final int max, final int dim) {
+            this.oreBlock = GCBlocks.blockMoon;
+            this.oreMeta = 0;
+            this.sizeCluster = 4;
+            this.numClusters = 8;
+            this.minHeight = 0;
+            this.maxHeight = 128;
+            this.dimRestrict = 0;
             this.oreBlock = block;
             this.oreMeta = meta;
             this.sizeCluster = cluster;
@@ -274,9 +238,15 @@ public class OreGenOtherMods
             this.maxHeight = max;
             this.dimRestrict = dim;
         }
-
-        public OreGenData(Block block, int meta, int num, int cluster)
-        {
+        
+        public OreGenData(final Block block, final int meta, final int num, final int cluster) {
+            this.oreBlock = GCBlocks.blockMoon;
+            this.oreMeta = 0;
+            this.sizeCluster = 4;
+            this.numClusters = 8;
+            this.minHeight = 0;
+            this.maxHeight = 128;
+            this.dimRestrict = 0;
             this.oreBlock = block;
             this.oreMeta = meta;
             this.sizeCluster = cluster;
@@ -284,9 +254,15 @@ public class OreGenOtherMods
             this.minHeight = 0;
             this.maxHeight = 128;
         }
-
-        public OreGenData(Block block, int meta, int num)
-        {
+        
+        public OreGenData(final Block block, final int meta, final int num) {
+            this.oreBlock = GCBlocks.blockMoon;
+            this.oreMeta = 0;
+            this.sizeCluster = 4;
+            this.numClusters = 8;
+            this.minHeight = 0;
+            this.maxHeight = 128;
+            this.dimRestrict = 0;
             this.oreBlock = block;
             this.oreMeta = meta;
             this.sizeCluster = 4;

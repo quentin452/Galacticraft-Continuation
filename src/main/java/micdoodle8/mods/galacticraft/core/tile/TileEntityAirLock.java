@@ -1,55 +1,20 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
-
-import net.minecraft.util.EnumFacing;
 
 public class TileEntityAirLock extends TileEntityAdvanced
 {
-
-    public TileEntityAirLock()
-    {
-        super("tile.air_lock_seal.name");
+    public void updateEntity() {
+        super.updateEntity();
     }
-
-    @Override
-    public void update()
-    {
-        super.update();
+    
+    public double getPacketRange() {
+        return 0.0;
     }
-
-    @Override
-    public double getPacketRange()
-    {
+    
+    public int getPacketCooldown() {
         return 0;
     }
-
-    @Override
-    public int getPacketCooldown()
-    {
-        return 0;
-    }
-
-    @Override
-    public boolean isNetworkedTile()
-    {
-        return false;
-    }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[0];
-    }
-
-    @Override
-    protected boolean handleInventory()
-    {
+    
+    public boolean isNetworkedTile() {
         return false;
     }
 }

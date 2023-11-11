@@ -1,167 +1,263 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import java.util.ArrayList;
-import micdoodle8.mods.galacticraft.api.recipe.ISchematicPage;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityPlatform;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.common.*;
+import java.lang.ref.*;
+import net.minecraft.client.entity.*;
+import net.minecraft.util.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.api.recipe.*;
+import net.minecraft.nbt.*;
+import net.minecraft.entity.*;
+import net.minecraft.world.*;
 
-public abstract class GCPlayerStatsClient
+public class GCPlayerStatsClient implements IExtendedEntityProperties
 {
-
-    public static GCPlayerStatsClient get(Entity entity)
-    {
-        return entity.getCapability(GCCapabilities.GC_STATS_CLIENT_CAPABILITY, null);
+    public static final String GC_PLAYER_PROP = "GCPlayerStatsClient";
+    public WeakReference<EntityPlayerSP> player;
+    public boolean usingParachute;
+    public boolean lastUsingParachute;
+    public boolean usingAdvancedGoggles;
+    public int thermalLevel;
+    public boolean thermalLevelNormalising;
+    public int thirdPersonView;
+    public long tick;
+    public boolean oxygenSetupValid;
+    AxisAlignedBB boundingBoxBefore;
+    public boolean lastOnGround;
+    public int pjumpticks;
+    public boolean pWasOnGround;
+    public double distanceSinceLastStep;
+    public int lastStep;
+    public boolean inFreefall;
+    public boolean inFreefallLast;
+    public boolean inFreefallFirstCheck;
+    public double downMotionLast;
+    public boolean lastRidingCameraZoomEntity;
+    public int landingTicks;
+    public static final int MAX_LANDINGTICKS = 15;
+    public float[] landingYOffset;
+    public EnumGravity gdir;
+    public float gravityTurnRate;
+    public float gravityTurnRatePrev;
+    public float gravityTurnVecX;
+    public float gravityTurnVecY;
+    public float gravityTurnVecZ;
+    public float gravityTurnYaw;
+    public int spaceRaceInviteTeamID;
+    public boolean lastZoomed;
+    public int buildFlags;
+    public ArrayList<ISchematicPage> unlockedSchematics;
+    public FreefallHandler freefallHandler;
+    
+    public GCPlayerStatsClient(final EntityPlayerSP player) {
+        this.thirdPersonView = 0;
+        this.oxygenSetupValid = true;
+        this.pjumpticks = 0;
+        this.landingYOffset = new float[16];
+        this.gdir = EnumGravity.down;
+        this.buildFlags = -1;
+        this.unlockedSchematics = new ArrayList<ISchematicPage>();
+        this.freefallHandler = new FreefallHandler(this);
+        this.player = new WeakReference<EntityPlayerSP>(player);
     }
-
-    public abstract void setGravity(EnumGravity newGravity);
-
-    public abstract boolean isUsingParachute();
-
-    public abstract void setUsingParachute(boolean usingParachute);
-
-    public abstract boolean isLastUsingParachute();
-
-    public abstract void setLastUsingParachute(boolean lastUsingParachute);
-
-    public abstract boolean isUsingAdvancedGoggles();
-
-    public abstract void setUsingAdvancedGoggles(boolean usingAdvancedGoggles);
-
-    public abstract int getThermalLevel();
-
-    public abstract void setThermalLevel(int thermalLevel);
-
-    public abstract boolean isThermalLevelNormalising();
-
-    public abstract void setThermalLevelNormalising(boolean thermalLevelNormalising);
-
-    public abstract int getThirdPersonView();
-
-    public abstract void setThirdPersonView(int thirdPersonView);
-
-    public abstract long getTick();
-
-    public abstract void setTick(long tick);
-
-    public abstract boolean isOxygenSetupValid();
-
-    public abstract void setOxygenSetupValid(boolean oxygenSetupValid);
-
-    public abstract AxisAlignedBB getBoundingBoxBefore();
-
-    public abstract void setBoundingBoxBefore(AxisAlignedBB boundingBoxBefore);
-
-    public abstract boolean isLastOnGround();
-
-    public abstract void setLastOnGround(boolean lastOnGround);
-
-    public abstract double getDistanceSinceLastStep();
-
-    public abstract void setDistanceSinceLastStep(double distanceSinceLastStep);
-
-    public abstract int getLastStep();
-
-    public abstract void setLastStep(int lastStep);
-
-    public abstract boolean isInFreefall();
-
-    public abstract void setInFreefall(boolean inFreefall);
-
-    public abstract boolean isInFreefallLast();
-
-    public abstract void setInFreefallLast(boolean inFreefallLast);
-
-    public abstract boolean isInFreefallFirstCheck();
-
-    public abstract void setInFreefallFirstCheck(boolean inFreefallFirstCheck);
-
-    public abstract double getDownMotionLast();
-
-    public abstract void setDownMotionLast(double downMotionLast);
-
-    public abstract boolean isLastRidingCameraZoomEntity();
-
-    public abstract void setLastRidingCameraZoomEntity(boolean lastRidingCameraZoomEntity);
-
-    public abstract int getLandingTicks();
-
-    public abstract void setLandingTicks(int landingTicks);
-
-    public abstract EnumGravity getGdir();
-
-    public abstract void setGdir(EnumGravity gdir);
-
-    public abstract float getGravityTurnRate();
-
-    public abstract void setGravityTurnRate(float gravityTurnRate);
-
-    public abstract float getGravityTurnRatePrev();
-
-    public abstract void setGravityTurnRatePrev(float gravityTurnRatePrev);
-
-    public abstract float getGravityTurnVecX();
-
-    public abstract void setGravityTurnVecX(float gravityTurnVecX);
-
-    public abstract float getGravityTurnVecY();
-
-    public abstract void setGravityTurnVecY(float gravityTurnVecY);
-
-    public abstract float getGravityTurnVecZ();
-
-    public abstract void setGravityTurnVecZ(float gravityTurnVecZ);
-
-    public abstract float getGravityTurnYaw();
-
-    public abstract void setGravityTurnYaw(float gravityTurnYaw);
-
-    public abstract int getSpaceRaceInviteTeamID();
-
-    public abstract void setSpaceRaceInviteTeamID(int spaceRaceInviteTeamID);
-
-    public abstract boolean isLastZoomed();
-
-    public abstract void setLastZoomed(boolean lastZoomed);
-
-    public abstract int getBuildFlags();
-
-    public abstract void setBuildFlags(int buildFlags);
-
-    public abstract boolean isSsOnGroundLast();
-
-    public abstract void setSsOnGroundLast(boolean ssOnGroundLast);
-
-    public abstract FreefallHandler getFreefallHandler();
-
-    public abstract void setFreefallHandler(FreefallHandler freefallHandler);
-
-    public abstract ArrayList<ISchematicPage> getUnlockedSchematics();
-
-    public abstract void setUnlockedSchematics(ArrayList<ISchematicPage> unlockedSchematics);
-
-    public abstract int getMaxLandingticks();
-
-    public abstract float[] getLandingYOffset();
-
-    public abstract void setLandingYOffset(float[] landingYOffset);
-
-    public abstract void setDungeonDirection(float dir);
-
-    public abstract float getDungeonDirection();
-
-    public abstract void startPlatformAscent(TileEntityPlatform noCollide, TileEntityPlatform moving, double target);
-
-    public abstract void finishPlatformAscent();
-
-    public abstract boolean getPlatformControlled();
-
-    public abstract double getPlatformVelocity(double posY);
+    
+    public void setGravity(final EnumGravity newGravity) {
+        if (this.gdir == newGravity) {
+            return;
+        }
+        final float n = 0.0f;
+        this.gravityTurnRate = n;
+        this.gravityTurnRatePrev = n;
+        final float turnSpeed = 0.05f;
+        this.gravityTurnVecX = 0.0f;
+        this.gravityTurnVecY = 0.0f;
+        this.gravityTurnVecZ = 0.0f;
+        this.gravityTurnYaw = 0.0f;
+        Label_0688: {
+            switch (this.gdir.getIntValue()) {
+                case 1: {
+                    switch (newGravity.getIntValue()) {
+                        case 2: {
+                            this.gravityTurnVecX = -2.0f;
+                            break;
+                        }
+                        case 3: {
+                            this.gravityTurnVecY = -1.0f;
+                            this.gravityTurnYaw = -90.0f;
+                            break;
+                        }
+                        case 4: {
+                            this.gravityTurnVecY = 1.0f;
+                            this.gravityTurnYaw = 90.0f;
+                            break;
+                        }
+                        case 5: {
+                            this.gravityTurnVecX = 1.0f;
+                            break;
+                        }
+                        case 6: {
+                            this.gravityTurnVecX = -1.0f;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 2: {
+                    switch (newGravity.getIntValue()) {
+                        case 1: {
+                            this.gravityTurnVecX = -2.0f;
+                        }
+                        case 3: {
+                            this.gravityTurnVecY = 1.0f;
+                            this.gravityTurnYaw = 90.0f;
+                            break;
+                        }
+                        case 4: {
+                            this.gravityTurnVecY = -1.0f;
+                            this.gravityTurnYaw = -90.0f;
+                            break;
+                        }
+                        case 5: {
+                            this.gravityTurnVecX = -1.0f;
+                            break;
+                        }
+                        case 6: {
+                            this.gravityTurnVecX = 1.0f;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 3: {
+                    switch (newGravity.getIntValue()) {
+                        case 1: {
+                            this.gravityTurnVecY = 1.0f;
+                            this.gravityTurnYaw = 90.0f;
+                            break;
+                        }
+                        case 2: {
+                            this.gravityTurnVecY = -1.0f;
+                            this.gravityTurnYaw = -90.0f;
+                        }
+                        case 4: {
+                            this.gravityTurnVecZ = -2.0f;
+                            break;
+                        }
+                        case 5: {
+                            this.gravityTurnVecZ = -1.0f;
+                            this.gravityTurnYaw = -180.0f;
+                            break;
+                        }
+                        case 6: {
+                            this.gravityTurnVecZ = 1.0f;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 4: {
+                    switch (newGravity.getIntValue()) {
+                        case 1: {
+                            this.gravityTurnVecY = -1.0f;
+                            this.gravityTurnYaw = -90.0f;
+                            break;
+                        }
+                        case 2: {
+                            this.gravityTurnVecY = 1.0f;
+                            this.gravityTurnYaw = 90.0f;
+                            break;
+                        }
+                        case 3: {
+                            this.gravityTurnVecZ = -2.0f;
+                        }
+                        case 5: {
+                            this.gravityTurnVecZ = 1.0f;
+                            this.gravityTurnYaw = -180.0f;
+                            break;
+                        }
+                        case 6: {
+                            this.gravityTurnVecZ = -1.0f;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 5: {
+                    switch (newGravity.getIntValue()) {
+                        case 1: {
+                            this.gravityTurnVecX = -1.0f;
+                            break;
+                        }
+                        case 2: {
+                            this.gravityTurnVecX = 1.0f;
+                            break;
+                        }
+                        case 3: {
+                            this.gravityTurnVecZ = 1.0f;
+                            this.gravityTurnYaw = 180.0f;
+                            break;
+                        }
+                        case 4: {
+                            this.gravityTurnVecZ = -1.0f;
+                            this.gravityTurnYaw = 180.0f;
+                        }
+                        case 6: {
+                            this.gravityTurnVecX = -2.0f;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 6: {
+                    switch (newGravity.getIntValue()) {
+                        case 1: {
+                            this.gravityTurnVecX = 1.0f;
+                            break Label_0688;
+                        }
+                        case 2: {
+                            this.gravityTurnVecX = -1.0f;
+                            break Label_0688;
+                        }
+                        case 3: {
+                            this.gravityTurnVecZ = -1.0f;
+                            break Label_0688;
+                        }
+                        case 4: {
+                            this.gravityTurnVecZ = 1.0f;
+                            break Label_0688;
+                        }
+                        case 5: {
+                            this.gravityTurnVecX = -2.0f;
+                            break Label_0688;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        this.gdir = newGravity;
+    }
+    
+    public void setParachute(final boolean tf) {
+        if (!(this.usingParachute = tf)) {
+            this.lastUsingParachute = false;
+        }
+    }
+    
+    public void saveNBTData(final NBTTagCompound nbt) {
+    }
+    
+    public void loadNBTData(final NBTTagCompound nbt) {
+    }
+    
+    public void init(final Entity entity, final World world) {
+    }
+    
+    public static void register(final EntityPlayerSP player) {
+        player.registerExtendedProperties("GCPlayerStatsClient", (IExtendedEntityProperties)new GCPlayerStatsClient(player));
+    }
+    
+    public static GCPlayerStatsClient get(final EntityPlayerSP player) {
+        return (GCPlayerStatsClient)player.getExtendedProperties("GCPlayerStatsClient");
+    }
 }

@@ -1,601 +1,491 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.entity;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.Random;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.client.model.OBJLoaderGC;
-import micdoodle8.mods.galacticraft.core.perlin.NoiseModule;
-import micdoodle8.mods.galacticraft.core.perlin.generator.Gradient;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.obj.OBJModel;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.entity.*;
+import micdoodle8.mods.galacticraft.core.perlin.*;
+import micdoodle8.mods.galacticraft.core.perlin.generator.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.*;
+import net.minecraft.util.*;
+import org.lwjgl.opengl.*;
+import cpw.mods.fml.client.*;
+import net.minecraft.client.renderer.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import java.util.*;
+import net.minecraftforge.client.model.*;
 
-public class RenderAstroMiner extends Render<EntityAstroMiner>
+public class RenderAstroMiner extends Render
 {
-
-    private static final float LSIZE = 0.12F;
-    private static final float RETRACTIONSPEED = 0.02F;
+    private static final float LSIZE = 0.12f;
+    private static final float RETRACTIONSPEED = 0.02f;
+    private RenderBlocks blockRenderer;
+    private float spin;
     private float lastPartTime;
-
     public static ResourceLocation scanTexture;
-    private OBJModel.OBJBakedModel mainModel;
-    private OBJModel.OBJBakedModel hoverPadMain;
-    private OBJModel.OBJBakedModel hoverPadGlow;
-    private OBJModel.OBJBakedModel mainModelInactive;
-    private OBJModel.OBJBakedModel modellaser1;
-    private OBJModel.OBJBakedModel modellaser3;
-    private OBJModel.OBJBakedModel modellasergl;
-
+    public static ResourceLocation modelTexture;
+    public static ResourceLocation modelTextureFX;
+    public static ResourceLocation modelTextureOff;
+    public static IModelCustom modelObj;
+    public static IModelCustom modellaser1;
+    public static IModelCustom modellaser2;
+    public static IModelCustom modellaser3;
+    public static IModelCustom modellasergl;
+    public static IModelCustom modellasergr;
     private final NoiseModule wobbleX;
     private final NoiseModule wobbleY;
     private final NoiseModule wobbleZ;
     private final NoiseModule wobbleXX;
     private final NoiseModule wobbleYY;
     private final NoiseModule wobbleZZ;
-
-    private void updateModels()
-    {
-        if (this.mainModel == null)
-        {
-            try
-            {
-                IModel model = OBJLoaderGC.instance.loadModel(new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "astro_miner_full.obj"));
-                Function<ResourceLocation, TextureAtlasSprite> spriteFunction = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
-                this.mainModel = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Hull", "Lasers"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                this.hoverPadMain = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("HoverPad"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                this.hoverPadGlow = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Glow"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                this.modellaser1 = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Main_Laser_Front"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                this.modellaser3 = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Main_Laser_Center"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                this.modellasergl = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Main_Laser_Left_Guard"), false), DefaultVertexFormats.ITEM, spriteFunction);
-
-                model = OBJLoaderGC.instance.loadModel(new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "astro_miner_full_off.obj"));
-                this.mainModelInactive = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Hull", "Lasers", "HoverPad"), false), DefaultVertexFormats.ITEM, spriteFunction);
-            } catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
+    
+    public RenderAstroMiner() {
+        this.blockRenderer = new RenderBlocks();
+        this.shadowSize = 2.0f;
+        final Random rand = new Random();
+        this.wobbleX = (NoiseModule)new Gradient(rand.nextLong(), 2, 1.0f);
+        this.wobbleX.amplitude = 0.5f;
+        this.wobbleX.frequencyX = 0.025f;
+        this.wobbleY = (NoiseModule)new Gradient(rand.nextLong(), 2, 1.0f);
+        this.wobbleY.amplitude = 0.6f;
+        this.wobbleY.frequencyX = 0.025f;
+        this.wobbleZ = (NoiseModule)new Gradient(rand.nextLong(), 2, 1.0f);
+        this.wobbleZ.amplitude = 0.1f;
+        this.wobbleZ.frequencyX = 0.025f;
+        this.wobbleXX = (NoiseModule)new Gradient(rand.nextLong(), 2, 1.0f);
+        this.wobbleXX.amplitude = 0.1f;
+        this.wobbleXX.frequencyX = 0.8f;
+        this.wobbleYY = (NoiseModule)new Gradient(rand.nextLong(), 2, 1.0f);
+        this.wobbleYY.amplitude = 0.15f;
+        this.wobbleYY.frequencyX = 0.8f;
+        this.wobbleZZ = (NoiseModule)new Gradient(rand.nextLong(), 2, 1.0f);
+        this.wobbleZZ.amplitude = 0.04f;
+        this.wobbleZZ.frequencyX = 0.8f;
     }
-
-    static
-    {
-        scanTexture = new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "textures/misc/gradient.png");
-    }
-
-    public RenderAstroMiner(RenderManager renderManager)
-    {
-        super(renderManager);
-        this.shadowSize = 2F;
-
-        Random rand = new Random();
-        this.wobbleX = new Gradient(rand.nextLong(), 2, 1);
-        this.wobbleX.amplitude = 0.5F;
-        this.wobbleX.frequencyX = 0.025F;
-
-        this.wobbleY = new Gradient(rand.nextLong(), 2, 1);
-        this.wobbleY.amplitude = 0.6F;
-        this.wobbleY.frequencyX = 0.025F;
-
-        this.wobbleZ = new Gradient(rand.nextLong(), 2, 1);
-        this.wobbleZ.amplitude = 0.1F;
-        this.wobbleZ.frequencyX = 0.025F;
-
-        this.wobbleXX = new Gradient(rand.nextLong(), 2, 1);
-        this.wobbleXX.amplitude = 0.1F;
-        this.wobbleXX.frequencyX = 0.8F;
-
-        this.wobbleYY = new Gradient(rand.nextLong(), 2, 1);
-        this.wobbleYY.amplitude = 0.15F;
-        this.wobbleYY.frequencyX = 0.8F;
-
-        this.wobbleZZ = new Gradient(rand.nextLong(), 2, 1);
-        this.wobbleZZ.amplitude = 0.04F;
-        this.wobbleZZ.frequencyX = 0.8F;
-    }
-
-    @Override
-    public void doRender(EntityAstroMiner astroMiner, double x, double y, double z, float f, float partialTickTime)
-    {
-        int ais = astroMiner.AIstate;
-        boolean active = ais > EntityAstroMiner.AISTATE_ATBASE;
-        float time = astroMiner.ticksExisted + partialTickTime;
-        float sinOfTheTime = (MathHelper.sin(time / 4) + 1F) / 4F + 0.5F;
-        float wx = active ? this.wobbleX.getNoise(time) + this.wobbleXX.getNoise(time) : 0F;
-        float wy = active ? this.wobbleY.getNoise(time) + this.wobbleYY.getNoise(time) : 0F;
-        float wz = active ? this.wobbleZ.getNoise(time) + this.wobbleZZ.getNoise(time) : 0F;
+    
+    public void doRender(final Entity entity, final double x, final double y, final double z, final float f, final float partialTickTime) {
+        final EntityAstroMiner astroMiner = (EntityAstroMiner)entity;
+        final int ais = ((EntityAstroMiner)entity).AIstate;
+        final boolean active = ais > 1;
+        final float time = astroMiner.ticksExisted + partialTickTime;
+        final float sinOfTheTime = (MathHelper.sin(time / 4.0f) + 1.0f) / 4.0f + 0.5f;
+        final float wx = active ? (this.wobbleX.getNoise(time) + this.wobbleXX.getNoise(time)) : 0.0f;
+        final float wy = active ? (this.wobbleY.getNoise(time) + this.wobbleYY.getNoise(time)) : 0.0f;
+        final float wz = active ? (this.wobbleZ.getNoise(time) + this.wobbleZZ.getNoise(time)) : 0.0f;
         float partTime = partialTickTime - this.lastPartTime;
         this.lastPartTime = partialTickTime;
-
-        while (partTime < 0)
-        {
-            partTime += 1F;
+        while (partTime < 0.0f) {
+            ++partTime;
         }
-
-        this.updateModels();
-        this.bindEntityTexture(astroMiner);
-
-        if (Minecraft.isAmbientOcclusionEnabled())
-        {
-            GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        } else
-        {
-            GlStateManager.shadeModel(GL11.GL_FLAT);
+        GL11.glDisable(32826);
+        GL11.glPushMatrix();
+        final float rotPitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTickTime;
+        final float rotYaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTickTime;
+        GL11.glTranslatef((float)x, (float)y + 1.4f, (float)z);
+        float partBlock = 0.0f;
+        switch (astroMiner.facing) {
+            case 0: {
+                partBlock = (float)(astroMiner.posY % 1.0);
+                break;
+            }
+            case 1: {
+                partBlock = 1.0f - (float)(astroMiner.posY % 1.0);
+                break;
+            }
+            case 2: {
+                partBlock = (float)(astroMiner.posZ % 1.0);
+                break;
+            }
+            case 3: {
+                partBlock = 1.0f - (float)(astroMiner.posZ % 1.0);
+                break;
+            }
+            case 4: {
+                partBlock = (float)(astroMiner.posX % 1.0);
+                break;
+            }
+            case 5: {
+                partBlock = 1.0f - (float)(astroMiner.posX % 1.0);
+                break;
+            }
+            default: {
+                partBlock = 0.0f;
+                break;
+            }
         }
-
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.pushMatrix();
-
-        final float rotPitch = astroMiner.prevRotationPitch + (astroMiner.rotationPitch - astroMiner.prevRotationPitch) * partialTickTime;
-        final float rotYaw = astroMiner.prevRotationYaw + (astroMiner.rotationYaw - astroMiner.prevRotationYaw) * partialTickTime;
-
-        GlStateManager.translate((float) x, (float) y + 1.4F, (float) z);
-        float partBlock;
-
-        switch (astroMiner.facing)
-        {
-            case DOWN:
-                partBlock = (float) (astroMiner.posY % 2D);
-                break;
-            case UP:
-                partBlock = 1F - (float) (astroMiner.posY % 2D);
-                break;
-            case NORTH:
-                partBlock = (float) (astroMiner.posZ % 2D);
-                break;
-            case SOUTH:
-                partBlock = 1F - (float) (astroMiner.posZ % 2D);
-                break;
-            case WEST:
-                partBlock = (float) (astroMiner.posX % 2D);
-                break;
-            case EAST:
-                partBlock = 1F - (float) (astroMiner.posX % 2D);
-                break;
-            default:
-                partBlock = 0F;
+        partBlock /= 0.06f;
+        GL11.glRotatef(rotYaw + 180.0f, 0.0f, 1.0f, 0.0f);
+        if (rotPitch != 0.0f) {
+            GL11.glTranslatef(-0.65f, -0.65f, 0.0f);
+            GL11.glRotatef(rotPitch / 4.0f, 1.0f, 0.0f, 0.0f);
+            GL11.glTranslatef(0.65f, 0.65f, 0.0f);
         }
-        partBlock /= 0.06F;
-
-        GlStateManager.rotate(rotYaw + 180F, 0, 1, 0);
-
-        if (rotPitch != 0F)
-        {
-            GlStateManager.translate(-0.65F, -0.65F, 0);
-            GlStateManager.rotate(rotPitch / 4F, 1, 0, 0);
-            GlStateManager.translate(0.65F, 0.65F, 0);
-        }
-
-        GlStateManager.translate(0F, -0.42F, 0.28F);
-        GlStateManager.scale(0.0495F, 0.0495F, 0.0495F);
-        GlStateManager.translate(wx, wy, wz);
-
-        if (active)
-        {
-            ClientUtil.drawBakedModel(this.mainModel);
+        GL11.glTranslatef(0.0f, -0.42f, 0.28f);
+        GL11.glScalef(0.0495f, 0.0495f, 0.0495f);
+        GL11.glTranslatef(wx, wy, wz);
+        if (active) {
+            FMLClientHandler.instance().getClient().renderEngine.bindTexture(RenderAstroMiner.modelTexture);
+            RenderAstroMiner.modelObj.renderAllExcept(new String[] { "Hoverpad_Front_Left_Top", "Hoverpad_Front_Right_Top", "Hoverpad_Front_Left_Bottom", "Hoverpad_Front_Right_Bottom", "Hoverpad_Rear_Right", "Hoverpad_Rear_Left", "Hoverpad_Heavy_Right", "Hoverpad_Heavy_Left", "Hoverpad_Heavy_Rear", "Hoverpad_Front_Left_Top_Glow", "Hoverpad_Front_Right_Top_Glow", "Hoverpad_Front_Left_Bottom_Glow", "Hoverpad_Front_Right_Bottom_Glow", "Hoverpad_Rear_Right_Glow", "Hoverpad_Rear_Left_Glow", "Hoverpad_Heavy___Glow002", "Hoverpad_Heavy___Glow001", "Hoverpad_Heavy___Glow003" });
             this.renderLaserModel(astroMiner.retraction);
-
-            float lightMapSaveX = OpenGlHelper.lastBrightnessX;
-            float lightMapSaveY = OpenGlHelper.lastBrightnessY;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
-            GlStateManager.disableLighting();
-            GlStateManager.color(sinOfTheTime, sinOfTheTime, sinOfTheTime, 1.0F);
-            ClientUtil.drawBakedModel(this.hoverPadMain);
-
-            GlStateManager.disableCull();
-            GlStateManager.disableAlpha();
-            GlStateManager.depthMask(false);
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-            GlStateManager.enableBlend();
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-            GlStateManager.color(sinOfTheTime, sinOfTheTime, sinOfTheTime, 0.6F);
-            ClientUtil.drawBakedModel(this.hoverPadGlow);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-
-            if (ais < EntityAstroMiner.AISTATE_DOCKING)
-            {
-                // This is the scanning lasers:
-                FMLClientHandler.instance().getClient().renderEngine.bindTexture(scanTexture);
-                final Tessellator tess = Tessellator.getInstance();
-                GlStateManager.color(0, 0.6F, 1.0F, 0.2F);
-                BufferBuilder worldRenderer = tess.getBuffer();
-                float scanProgress = (MathHelper.cos(partBlock * 0.012F * 6.283F)) * 0.747F;
-                float scanAngle = 0.69866F - scanProgress * scanProgress;
-                float scanEndX = 38.77F * MathHelper.sin(scanAngle);
-                float scanEndY = 32F;
-                float scanEndZ = 38.77F * MathHelper.cos(scanAngle);
-                scanEndZ += 20F;
-                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                worldRenderer.pos(15.6F, -0.6F, -20F).tex(0D, 0D).endVertex();
-                worldRenderer.pos(15.6F + scanEndX, scanEndY - 0.6F, -scanEndZ).tex(1D, 0D).endVertex();
-                worldRenderer.pos(15.6F + scanEndX, -0.6F - scanEndY, -scanEndZ).tex(1D, 1D).endVertex();
-                worldRenderer.pos(15.6F, -0.7F, -20F).tex(0D, 1D).endVertex();
+            final float lightMapSaveX = OpenGlHelper.lastBrightnessX;
+            final float lightMapSaveY = OpenGlHelper.lastBrightnessY;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0f, 240.0f);
+            GL11.glDisable(2896);
+            GL11.glColor4f(sinOfTheTime, sinOfTheTime, sinOfTheTime, 1.0f);
+            RenderAstroMiner.modelObj.renderOnly(new String[] { "Hoverpad_Front_Left_Top", "Hoverpad_Front_Right_Top", "Hoverpad_Front_Left_Bottom", "Hoverpad_Front_Right_Bottom", "Hoverpad_Rear_Right", "Hoverpad_Rear_Left", "Hoverpad_Heavy_Right", "Hoverpad_Heavy_Left", "Hoverpad_Heavy_Rear" });
+            FMLClientHandler.instance().getClient().renderEngine.bindTexture(RenderAstroMiner.modelTextureFX);
+            GL11.glDisable(2884);
+            GL11.glDisable(3008);
+            GL11.glDepthMask(false);
+            GL11.glBlendFunc(770, 1);
+            GL11.glEnable(3042);
+            GL11.glTexParameteri(3553, 10241, 9729);
+            GL11.glTexParameteri(3553, 10240, 9729);
+            GL11.glColor4f(sinOfTheTime, sinOfTheTime, sinOfTheTime, 0.6f);
+            RenderAstroMiner.modelObj.renderOnly(new String[] { "Hoverpad_Front_Left_Top_Glow", "Hoverpad_Front_Right_Top_Glow", "Hoverpad_Front_Left_Bottom_Glow", "Hoverpad_Front_Right_Bottom_Glow", "Hoverpad_Rear_Right_Glow", "Hoverpad_Rear_Left_Glow", "Hoverpad_Heavy___Glow002", "Hoverpad_Heavy___Glow001", "Hoverpad_Heavy___Glow003" });
+            if (ais < 5) {
+                FMLClientHandler.instance().getClient().renderEngine.bindTexture(RenderAstroMiner.scanTexture);
+                final Tessellator tess = Tessellator.instance;
+                GL11.glColor4f(0.0f, 0.6f, 1.0f, 0.2f);
+                tess.startDrawingQuads();
+                tess.addVertexWithUV(15.600000381469727, -0.6000000238418579, -20.0, 0.0, 0.0);
+                tess.addVertexWithUV(37.79999923706055, 31.399999618530273, (double)(-45.0f - partBlock), 1.0, 0.0);
+                tess.addVertexWithUV(37.79999923706055, -32.599998474121094, (double)(-45.0f - partBlock), 1.0, 1.0);
+                tess.addVertexWithUV(15.600000381469727, -0.699999988079071, -20.0, 0.0, 1.0);
                 tess.draw();
-                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                worldRenderer.pos(-15.6F, -0.6F, -20F).tex(0D, 0D).endVertex();
-                worldRenderer.pos(-15.6F - scanEndX, scanEndY - 0.6F, -scanEndZ).tex(1D, 0D).endVertex();
-                worldRenderer.pos(-15.6F - scanEndX, -0.6F - scanEndY, -scanEndZ).tex(1D, 1D).endVertex();
-                worldRenderer.pos(-15.6F, -0.7F, -20F).tex(0D, 1D).endVertex();
+                tess.startDrawingQuads();
+                tess.addVertexWithUV(-15.600000381469727, -0.6000000238418579, -20.0, 0.0, 0.0);
+                tess.addVertexWithUV(-37.79999923706055, 31.399999618530273, (double)(-45.0f - partBlock), 1.0, 0.0);
+                tess.addVertexWithUV(-37.79999923706055, -32.599998474121094, (double)(-45.0f - partBlock), 1.0, 1.0);
+                tess.addVertexWithUV(-15.600000381469727, -0.699999988079071, -20.0, 0.0, 1.0);
                 tess.draw();
-
                 int removeCount = 0;
                 int afterglowCount = 0;
-                GlStateManager.popMatrix();
-                GlStateManager.pushMatrix();
-                GlStateManager.translate((float) (x - astroMiner.posX), (float) (y - astroMiner.posY), (float) (z - astroMiner.posZ));
-
-                for (Integer blockTime : new ArrayList<Integer>(astroMiner.laserTimes))
-                {
-                    if (blockTime < astroMiner.ticksExisted - 19)
-                    {
-                        removeCount++;
-                    } else if (blockTime < astroMiner.ticksExisted - 3)
-                    {
-                        afterglowCount++;
+                GL11.glPopMatrix();
+                GL11.glPushMatrix();
+                GL11.glTranslatef((float)(x - astroMiner.posX), (float)(y - astroMiner.posY), (float)(z - astroMiner.posZ));
+                for (final Integer blockTime : new ArrayList<Integer>(astroMiner.laserTimes)) {
+                    if (blockTime < astroMiner.ticksExisted - 19) {
+                        ++removeCount;
+                    }
+                    else {
+                        if (blockTime >= astroMiner.ticksExisted - 3) {
+                            continue;
+                        }
+                        ++afterglowCount;
                     }
                 }
-                if (removeCount > 0)
-                {
+                if (removeCount > 0) {
                     astroMiner.removeLaserBlocks(removeCount);
                 }
                 int count = 0;
-                for (BlockVec3 blockLaser : new ArrayList<BlockVec3>(astroMiner.laserBlocks))
-                {
-                    if (count < afterglowCount)
-                    {
+                for (final BlockVec3 blockLaser : new ArrayList<BlockVec3>(astroMiner.laserBlocks)) {
+                    if (count < afterglowCount) {
                         int fade = astroMiner.ticksExisted - astroMiner.laserTimes.get(count) - 8;
-                        if (fade < 0)
-                        {
+                        if (fade < 0) {
                             fade = 0;
                         }
                         this.doAfterGlow(blockLaser, fade);
-                    } else
-                    {
+                    }
+                    else {
                         this.doLaser(astroMiner, blockLaser);
                     }
-                    count++;
+                    ++count;
                 }
-                if (astroMiner.retraction > 0F)
-                {
-                    astroMiner.retraction -= RETRACTIONSPEED * partTime;
-                    if (astroMiner.retraction < 0F)
-                    {
-                        astroMiner.retraction = 0F;
+                if (astroMiner.retraction > 0.0f) {
+                    final EntityAstroMiner entityAstroMiner = astroMiner;
+                    entityAstroMiner.retraction -= 0.02f * partTime;
+                    if (astroMiner.retraction < 0.0f) {
+                        astroMiner.retraction = 0.0f;
                     }
                 }
-                GlStateManager.popMatrix();
-            } else
-            {
-                if (astroMiner.retraction < 1F)
-                {
-                    astroMiner.retraction += RETRACTIONSPEED * partTime;
-                    if (astroMiner.retraction > 1F)
-                    {
-                        astroMiner.retraction = 1F;
-                    }
-                }
-                GlStateManager.popMatrix();
+                GL11.glPopMatrix();
             }
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            GlStateManager.disableBlend();
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GlStateManager.enableCull();
-            GlStateManager.enableAlpha();
-            GlStateManager.enableLighting();
-            GlStateManager.depthMask(true);
+            else {
+                if (astroMiner.retraction < 1.0f) {
+                    final EntityAstroMiner entityAstroMiner2 = astroMiner;
+                    entityAstroMiner2.retraction += 0.02f * partTime;
+                    if (astroMiner.retraction > 1.0f) {
+                        astroMiner.retraction = 1.0f;
+                    }
+                }
+                GL11.glPopMatrix();
+            }
+            GL11.glTexParameteri(3553, 10241, 9728);
+            GL11.glTexParameteri(3553, 10240, 9728);
+            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            GL11.glDisable(3042);
+            GL11.glBlendFunc(770, 771);
+            GL11.glEnable(2884);
+            GL11.glEnable(3008);
+            GL11.glEnable(2896);
+            GL11.glDepthMask(true);
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightMapSaveX, lightMapSaveY);
-        } else
-        {
-            this.bindEntityTexture(astroMiner);
-            ClientUtil.drawBakedModel(this.mainModelInactive);
+        }
+        else {
+            this.bindEntityTexture((Entity)astroMiner);
+            RenderAstroMiner.modelObj.renderAllExcept(new String[] { "Hoverpad_Front_Left_Top_Glow", "Hoverpad_Front_Right_Top_Glow", "Hoverpad_Front_Left_Bottom_Glow", "Hoverpad_Front_Right_Bottom_Glow", "Hoverpad_Rear_Right_Glow", "Hoverpad_Rear_Left_Glow", "Hoverpad_Heavy___Glow002", "Hoverpad_Heavy___Glow001", "Hoverpad_Heavy___Glow003" });
             this.renderLaserModel(astroMiner.retraction);
-            if (astroMiner.retraction < 1F)
-            {
-                astroMiner.retraction += RETRACTIONSPEED * partTime;
-                if (astroMiner.retraction > 1F)
-                {
-                    astroMiner.retraction = 1F;
+            if (astroMiner.retraction < 1.0f) {
+                final EntityAstroMiner entityAstroMiner3 = astroMiner;
+                entityAstroMiner3.retraction += 0.02f * partTime;
+                if (astroMiner.retraction > 1.0f) {
+                    astroMiner.retraction = 1.0f;
                 }
             }
-            GlStateManager.popMatrix();
+            GL11.glPopMatrix();
         }
     }
-
-    private void doAfterGlow(BlockVec3 blockLaser, int level)
-    {
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(blockLaser.x, blockLaser.y, blockLaser.z);
-        final Tessellator tess = Tessellator.getInstance();
-        BufferBuilder worldRenderer = tess.getBuffer();
-        GlStateManager.color(1.0F, 0.7F, 0.7F, 0.016667F * (12 - level));
-        float cA = -0.01F;
-        float cB = 1.01F;
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cA, cB, cA).tex(0D, 1D).endVertex();
-        worldRenderer.pos(cB, cB, cA).tex(1D, 1D).endVertex();
-        worldRenderer.pos(cB, cB, cB).tex(1D, 0D).endVertex();
-        worldRenderer.pos(cA, cB, cB).tex(0D, 0D).endVertex();
+    
+    private void doAfterGlow(final BlockVec3 blockLaser, final int level) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)blockLaser.x, (float)blockLaser.y, (float)blockLaser.z);
+        final Tessellator tess = Tessellator.instance;
+        GL11.glColor4f(1.0f, 0.7f, 0.7f, 0.016667f * (12 - level));
+        final float cA = -0.01f;
+        final float cB = 1.01f;
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cA, (double)cB, (double)cA, 0.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cB, (double)cA, 1.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cB, (double)cB, 1.0, 0.0);
+        tess.addVertexWithUV((double)cA, (double)cB, (double)cB, 0.0, 0.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cA, cA, cA).tex(0D, 0D).endVertex();
-        worldRenderer.pos(cA, cA, cB).tex(0D, 1D).endVertex();
-        worldRenderer.pos(cB, cA, cB).tex(1D, 1D).endVertex();
-        worldRenderer.pos(cB, cA, cA).tex(1D, 0D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cA, 0.0, 0.0);
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cB, 0.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cA, (double)cB, 1.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cA, (double)cA, 1.0, 0.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cA, cA, cA).tex(1D, 0D).endVertex();
-        worldRenderer.pos(cA, cB, cA).tex(0D, 0D).endVertex();
-        worldRenderer.pos(cA, cB, cB).tex(0D, 1D).endVertex();
-        worldRenderer.pos(cA, cA, cB).tex(1D, 1D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cA, 1.0, 0.0);
+        tess.addVertexWithUV((double)cA, (double)cB, (double)cA, 0.0, 0.0);
+        tess.addVertexWithUV((double)cA, (double)cB, (double)cB, 0.0, 1.0);
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cB, 1.0, 1.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cB, cA, cA).tex(1D, 1D).endVertex();
-        worldRenderer.pos(cB, cA, cB).tex(1D, 0D).endVertex();
-        worldRenderer.pos(cB, cB, cB).tex(0D, 0D).endVertex();
-        worldRenderer.pos(cB, cB, cA).tex(0D, 1D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cB, (double)cA, (double)cA, 1.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cA, (double)cB, 1.0, 0.0);
+        tess.addVertexWithUV((double)cB, (double)cB, (double)cB, 0.0, 0.0);
+        tess.addVertexWithUV((double)cB, (double)cB, (double)cA, 0.0, 1.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cA, cA, cA).tex(1D, 0D).endVertex();
-        worldRenderer.pos(1F, cA, cA).tex(0D, 0D).endVertex();
-        worldRenderer.pos(1F, 1F, cA).tex(0D, 1D).endVertex();
-        worldRenderer.pos(cA, 1F, cA).tex(1D, 1D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cA, 1.0, 0.0);
+        tess.addVertexWithUV(1.0, (double)cA, (double)cA, 0.0, 0.0);
+        tess.addVertexWithUV(1.0, 1.0, (double)cA, 0.0, 1.0);
+        tess.addVertexWithUV((double)cA, 1.0, (double)cA, 1.0, 1.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(1F, cA, 1F).tex(1D, 1D).endVertex();
-        worldRenderer.pos(cA, cA, 1F).tex(1D, 0D).endVertex();
-        worldRenderer.pos(cA, 1F, 1F).tex(0D, 0D).endVertex();
-        worldRenderer.pos(1F, 1F, 1F).tex(0D, 1D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV(1.0, (double)cA, 1.0, 1.0, 1.0);
+        tess.addVertexWithUV((double)cA, (double)cA, 1.0, 1.0, 0.0);
+        tess.addVertexWithUV((double)cA, 1.0, 1.0, 0.0, 0.0);
+        tess.addVertexWithUV(1.0, 1.0, 1.0, 0.0, 1.0);
         tess.draw();
-        GlStateManager.popMatrix();
+        GL11.glPopMatrix();
     }
-
-    private void doLaser(EntityAstroMiner entity, BlockVec3 blockLaser)
-    {
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(blockLaser.x, blockLaser.y, blockLaser.z);
-        final Tessellator tess = Tessellator.getInstance();
-        BufferBuilder worldRenderer = tess.getBuffer();
-        GlStateManager.color(1.0F, 0.7F, 0.7F, 0.2F);
-        float cA = -0.01F;
-        float cB = 1.01F;
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cA, cB, cA).tex(0D, 1D).endVertex();
-        worldRenderer.pos(cB, cB, cA).tex(1D, 1D).endVertex();
-        worldRenderer.pos(cB, cB, cB).tex(1D, 0D).endVertex();
-        worldRenderer.pos(cA, cB, cB).tex(0D, 0D).endVertex();
+    
+    private void doLaser(final EntityAstroMiner entity, final BlockVec3 blockLaser) {
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)blockLaser.x, (float)blockLaser.y, (float)blockLaser.z);
+        final Tessellator tess = Tessellator.instance;
+        GL11.glColor4f(1.0f, 0.7f, 0.7f, 0.2f);
+        final float cA = -0.01f;
+        final float cB = 1.01f;
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cA, (double)cB, (double)cA, 0.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cB, (double)cA, 1.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cB, (double)cB, 1.0, 0.0);
+        tess.addVertexWithUV((double)cA, (double)cB, (double)cB, 0.0, 0.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cA, cA, cA).tex(0D, 0D).endVertex();
-        worldRenderer.pos(cA, cA, cB).tex(0D, 1D).endVertex();
-        worldRenderer.pos(cB, cA, cB).tex(1D, 1D).endVertex();
-        worldRenderer.pos(cB, cA, cA).tex(1D, 0D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cA, 0.0, 0.0);
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cB, 0.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cA, (double)cB, 1.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cA, (double)cA, 1.0, 0.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cA, cA, cA).tex(1D, 0D).endVertex();
-        worldRenderer.pos(cA, cB, cA).tex(0D, 0D).endVertex();
-        worldRenderer.pos(cA, cB, cB).tex(0D, 1D).endVertex();
-        worldRenderer.pos(cA, cA, cB).tex(1D, 1D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cA, 1.0, 0.0);
+        tess.addVertexWithUV((double)cA, (double)cB, (double)cA, 0.0, 0.0);
+        tess.addVertexWithUV((double)cA, (double)cB, (double)cB, 0.0, 1.0);
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cB, 1.0, 1.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cB, cA, cA).tex(1D, 1D).endVertex();
-        worldRenderer.pos(cB, cA, cB).tex(1D, 0D).endVertex();
-        worldRenderer.pos(cB, cB, cB).tex(0D, 0D).endVertex();
-        worldRenderer.pos(cB, cB, cA).tex(0D, 1D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cB, (double)cA, (double)cA, 1.0, 1.0);
+        tess.addVertexWithUV((double)cB, (double)cA, (double)cB, 1.0, 0.0);
+        tess.addVertexWithUV((double)cB, (double)cB, (double)cB, 0.0, 0.0);
+        tess.addVertexWithUV((double)cB, (double)cB, (double)cA, 0.0, 1.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(cA, cA, cA).tex(1D, 0D).endVertex();
-        worldRenderer.pos(1F, cA, cA).tex(0D, 0D).endVertex();
-        worldRenderer.pos(1F, 1F, cA).tex(0D, 1D).endVertex();
-        worldRenderer.pos(cA, 1F, cA).tex(1D, 1D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV((double)cA, (double)cA, (double)cA, 1.0, 0.0);
+        tess.addVertexWithUV(1.0, (double)cA, (double)cA, 0.0, 0.0);
+        tess.addVertexWithUV(1.0, 1.0, (double)cA, 0.0, 1.0);
+        tess.addVertexWithUV((double)cA, 1.0, (double)cA, 1.0, 1.0);
         tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos(1F, cA, 1F).tex(1D, 1D).endVertex();
-        worldRenderer.pos(cA, cA, 1F).tex(1D, 0D).endVertex();
-        worldRenderer.pos(cA, 1F, 1F).tex(0D, 0D).endVertex();
-        worldRenderer.pos(1F, 1F, 1F).tex(0D, 1D).endVertex();
+        tess.startDrawingQuads();
+        tess.addVertexWithUV(1.0, (double)cA, 1.0, 1.0, 1.0);
+        tess.addVertexWithUV((double)cA, (double)cA, 1.0, 1.0, 0.0);
+        tess.addVertexWithUV((double)cA, 1.0, 1.0, 0.0, 0.0);
+        tess.addVertexWithUV(1.0, 1.0, 1.0, 0.0, 1.0);
         tess.draw();
-
-        GlStateManager.color(1.0F, 0.79F, 0.79F, 0.17F);
-        float bb = 1.7F;
-        float cc = 0.4F;
-        float radiansYaw = entity.rotationYaw / Constants.RADIANS_TO_DEGREES;
-        float radiansPitch = entity.rotationPitch / Constants.RADIANS_TO_DEGREES / 4F;
+        GL11.glColor4f(1.0f, 0.79f, 0.79f, 0.17f);
+        final float bb = 1.7f;
+        final float cc = 0.4f;
+        final float radiansYaw = entity.rotationYaw * 0.017453292f;
+        final float radiansPitch = entity.rotationPitch * 0.017453292f / 4.0f;
         float mainLaserX = bb * MathHelper.sin(radiansYaw) * MathHelper.cos(radiansPitch);
         float mainLaserY = cc + bb * MathHelper.sin(radiansPitch);
         float mainLaserZ = bb * MathHelper.cos(radiansYaw) * MathHelper.cos(radiansPitch);
-
-        mainLaserX += entity.posX - blockLaser.x;
-        mainLaserY += entity.posY - blockLaser.y;
-        mainLaserZ += entity.posZ - blockLaser.z;
-
-        float xD = mainLaserX - 0.5F;
-        float yD = mainLaserY - 0.5F;
-        float zD = mainLaserZ - 0.5F;
-        float xx, yy, zz;
-
-        if (entity.facing.getIndex() > EnumFacing.SOUTH.getIndex())
-        {
-            xx = xD < 0 ? cA : cB;
-            this.drawLaserX(mainLaserX, mainLaserY, mainLaserZ, xx, 0.5F, 0.5F);
-        } else if (entity.facing.getIndex() <= EnumFacing.UP.getIndex())
-        {
-            yy = yD < 0 ? cA : cB;
-            this.drawLaserY(mainLaserX, mainLaserY, mainLaserZ, 0.5F, yy, 0.5F);
-        } else
-        {
-            zz = zD < 0 ? cA : cB;
-            this.drawLaserZ(mainLaserX, mainLaserY, mainLaserZ, 0.5F, 0.5F, zz);
+        mainLaserX += (float)(entity.posX - blockLaser.x);
+        mainLaserY += (float)(entity.posY - blockLaser.y);
+        mainLaserZ += (float)(entity.posZ - blockLaser.z);
+        final float xD = mainLaserX - 0.5f;
+        final float yD = mainLaserY - 0.5f;
+        final float zD = mainLaserZ - 0.5f;
+        final float xDa = Math.abs(xD);
+        final float yDa = Math.abs(yD);
+        final float zDa = Math.abs(zD);
+        if (entity.facing > 3) {
+            final float xx = (xD < 0.0f) ? cA : cB;
+            this.drawLaserX(mainLaserX, mainLaserY, mainLaserZ, xx, 0.5f, 0.5f);
         }
-
-        GlStateManager.popMatrix();
-    }
-
-    private void drawLaserX(float x1, float y1, float z1, float x2, float y2, float z2)
-    {
-        final Tessellator tess = Tessellator.getInstance();
-        BufferBuilder worldRenderer = tess.getBuffer();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1, y1 - 0.01F, z1 - 0.01F).endVertex();
-        worldRenderer.pos(x2, y2 - LSIZE, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x2, y2 + LSIZE, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x1, y1 + 0.01F, z1 - 0.01F).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1, y1 - 0.01F, z1 + 0.01F).endVertex();
-        worldRenderer.pos(x2, y2 - LSIZE, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x2, y2 + LSIZE, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x1, y1 + 0.01F, z1 + 0.01F).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1, y1 - 0.01F, z1 - 0.01F).endVertex();
-        worldRenderer.pos(x2, y2 - LSIZE, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x2, y2 - LSIZE, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x1, y1 - 0.01F, z1 + 0.01F).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1, y1 + 0.01F, z1 + 0.01F).endVertex();
-        worldRenderer.pos(x2, y2 + LSIZE, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x2, y2 + LSIZE, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x1, y1 + 0.01F, z1 - 0.01F).endVertex();
-        tess.draw();
-    }
-
-    private void drawLaserY(float x1, float y1, float z1, float x2, float y2, float z2)
-    {
-        final Tessellator tess = Tessellator.getInstance();
-        BufferBuilder worldRenderer = tess.getBuffer();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1 - 0.01F, y1, z1 - 0.01F).endVertex();
-        worldRenderer.pos(x2 - LSIZE, y2, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x2 + LSIZE, y2, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x1 + 0.01F, y1, z1 - 0.01F).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1 - 0.01F, y1, z1 + 0.01F).endVertex();
-        worldRenderer.pos(x2 - LSIZE, y2, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x2 + LSIZE, y2, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x1 + 0.01F, y1, z1 + 0.01F).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1 - 0.01F, y1, z1 - 0.01F).endVertex();
-        worldRenderer.pos(x2 - LSIZE, y2, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x2 - LSIZE, y2, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x1 - 0.01F, y1, z1 + 0.01F).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1 + 0.01F, y1, z1 + 0.01F).endVertex();
-        worldRenderer.pos(x2 + LSIZE, y2, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x2 + LSIZE, y2, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x1 + 0.01F, y1, z1 - 0.01F).endVertex();
-        tess.draw();
-    }
-
-    private void drawLaserZ(float x1, float y1, float z1, float x2, float y2, float z2)
-    {
-        final Tessellator tess = Tessellator.getInstance();
-        BufferBuilder worldRenderer = tess.getBuffer();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1 - 0.01F, y1 - 0.01F, z1).endVertex();
-        worldRenderer.pos(x2 - LSIZE, y2 - LSIZE, z2).endVertex();
-        worldRenderer.pos(x2 - LSIZE, y2 + LSIZE, z2).endVertex();
-        worldRenderer.pos(x1 - 0.01F, y1 + 0.01F, z1).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1 + 0.01F, y1 - 0.01F, z1).endVertex();
-        worldRenderer.pos(x2 + LSIZE, y2 - LSIZE, z2).endVertex();
-        worldRenderer.pos(x2 + LSIZE, y2 + LSIZE, z2).endVertex();
-        worldRenderer.pos(x1 + 0.01F, y1 + 0.01F, z1).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1 - 0.01F, y1 - 0.01F, z1).endVertex();
-        worldRenderer.pos(x2 - LSIZE, y2 - LSIZE, z2).endVertex();
-        worldRenderer.pos(x2 + LSIZE, y2 - LSIZE, z2).endVertex();
-        worldRenderer.pos(x1 + 0.01F, y1 - 0.01F, z1).endVertex();
-        tess.draw();
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldRenderer.pos(x1, y1 + 0.01F, z1 + 0.01F).endVertex();
-        worldRenderer.pos(x2, y2 + LSIZE, z2 + LSIZE).endVertex();
-        worldRenderer.pos(x2, y2 + LSIZE, z2 - LSIZE).endVertex();
-        worldRenderer.pos(x1, y1 + 0.01F, z1 - 0.01F).endVertex();
-        tess.draw();
-    }
-
-    private void renderLaserModel(float retraction)
-    {
-        float laserretraction = retraction / 0.8F;
-        if (laserretraction > 1F)
-        {
-            laserretraction = 1F;
+        else if (entity.facing < 2) {
+            final float yy = (yD < 0.0f) ? cA : cB;
+            this.drawLaserY(mainLaserX, mainLaserY, mainLaserZ, 0.5f, yy, 0.5f);
         }
-        float guardmovement = (retraction - 0.6F) / 0.4F * 1.875F;
-        if (guardmovement < 0F)
-        {
-            guardmovement = 0F;
+        else {
+            final float zz = (zD < 0.0f) ? cA : cB;
+            this.drawLaserZ(mainLaserX, mainLaserY, mainLaserZ, 0.5f, 0.5f, zz);
         }
-        GlStateManager.pushMatrix();
-        float zadjust = laserretraction * 5F;
-        float yadjust = zadjust;
-
-        if (yadjust > 0.938F)
-        {
-            yadjust = 0.938F;
-            zadjust = (zadjust - yadjust) * 2.5F + yadjust;
-        }
-        GlStateManager.translate(0F, yadjust, zadjust);
-        ClientUtil.drawBakedModel(this.modellaser1);
-        if (yadjust == 0.938F)
-        {
-            // Do not move laser centre into body
-            GlStateManager.translate(0F, 0F, -zadjust + 0.938F);
-        }
-        ClientUtil.drawBakedModel(this.modellaser3);
-        GlStateManager.popMatrix();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(guardmovement, 0F, 0F);
-        ClientUtil.drawBakedModel(this.modellasergl);
-        GlStateManager.translate(-2 * guardmovement + 8.75F, 0F, 0F);
-        ClientUtil.drawBakedModel(this.modellasergl);
-        GlStateManager.popMatrix();
+        GL11.glPopMatrix();
     }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityAstroMiner entity)
-    {
-        return TextureMap.LOCATION_BLOCKS_TEXTURE;
+    
+    private void drawLaserX(final float x1, final float y1, final float z1, final float x2, final float y2, final float z2) {
+        final Tessellator tess = Tessellator.instance;
+        tess.startDrawingQuads();
+        tess.addVertex((double)x1, (double)(y1 - 0.01f), (double)(z1 - 0.01f));
+        tess.addVertex((double)x2, (double)(y2 - 0.12f), (double)(z2 - 0.12f));
+        tess.addVertex((double)x2, (double)(y2 + 0.12f), (double)(z2 - 0.12f));
+        tess.addVertex((double)x1, (double)(y1 + 0.01f), (double)(z1 - 0.01f));
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)x1, (double)(y1 - 0.01f), (double)(z1 + 0.01f));
+        tess.addVertex((double)x2, (double)(y2 - 0.12f), (double)(z2 + 0.12f));
+        tess.addVertex((double)x2, (double)(y2 + 0.12f), (double)(z2 + 0.12f));
+        tess.addVertex((double)x1, (double)(y1 + 0.01f), (double)(z1 + 0.01f));
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)x1, (double)(y1 - 0.01f), (double)(z1 - 0.01f));
+        tess.addVertex((double)x2, (double)(y2 - 0.12f), (double)(z2 - 0.12f));
+        tess.addVertex((double)x2, (double)(y2 - 0.12f), (double)(z2 + 0.12f));
+        tess.addVertex((double)x1, (double)(y1 - 0.01f), (double)(z1 + 0.01f));
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)x1, (double)(y1 + 0.01f), (double)(z1 + 0.01f));
+        tess.addVertex((double)x2, (double)(y2 + 0.12f), (double)(z2 + 0.12f));
+        tess.addVertex((double)x2, (double)(y2 + 0.12f), (double)(z2 - 0.12f));
+        tess.addVertex((double)x1, (double)(y1 + 0.01f), (double)(z1 - 0.01f));
+        tess.draw();
     }
-
-    @Override
-    public boolean shouldRender(EntityAstroMiner miner, ICamera camera, double camX, double camY, double camZ)
-    {
-        return miner.isInRangeToRender3d(camX, camY, camZ);
+    
+    private void drawLaserY(final float x1, final float y1, final float z1, final float x2, final float y2, final float z2) {
+        final Tessellator tess = Tessellator.instance;
+        tess.startDrawingQuads();
+        tess.addVertex((double)(x1 - 0.01f), (double)y1, (double)(z1 - 0.01f));
+        tess.addVertex((double)(x2 - 0.12f), (double)y2, (double)(z2 - 0.12f));
+        tess.addVertex((double)(x2 + 0.12f), (double)y2, (double)(z2 - 0.12f));
+        tess.addVertex((double)(x1 + 0.01f), (double)y1, (double)(z1 - 0.01f));
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)(x1 - 0.01f), (double)y1, (double)(z1 + 0.01f));
+        tess.addVertex((double)(x2 - 0.12f), (double)y2, (double)(z2 + 0.12f));
+        tess.addVertex((double)(x2 + 0.12f), (double)y2, (double)(z2 + 0.12f));
+        tess.addVertex((double)(x1 + 0.01f), (double)y1, (double)(z1 + 0.01f));
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)(x1 - 0.01f), (double)y1, (double)(z1 - 0.01f));
+        tess.addVertex((double)(x2 - 0.12f), (double)y2, (double)(z2 - 0.12f));
+        tess.addVertex((double)(x2 - 0.12f), (double)y2, (double)(z2 + 0.12f));
+        tess.addVertex((double)(x1 - 0.01f), (double)y1, (double)(z1 + 0.01f));
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)(x1 + 0.01f), (double)y1, (double)(z1 + 0.01f));
+        tess.addVertex((double)(x2 + 0.12f), (double)y2, (double)(z2 + 0.12f));
+        tess.addVertex((double)(x2 + 0.12f), (double)y2, (double)(z2 - 0.12f));
+        tess.addVertex((double)(x1 + 0.01f), (double)y1, (double)(z1 - 0.01f));
+        tess.draw();
+    }
+    
+    private void drawLaserZ(final float x1, final float y1, final float z1, final float x2, final float y2, final float z2) {
+        final Tessellator tess = Tessellator.instance;
+        tess.startDrawingQuads();
+        tess.addVertex((double)(x1 - 0.01f), (double)(y1 - 0.01f), (double)z1);
+        tess.addVertex((double)(x2 - 0.12f), (double)(y2 - 0.12f), (double)z2);
+        tess.addVertex((double)(x2 - 0.12f), (double)(y2 + 0.12f), (double)z2);
+        tess.addVertex((double)(x1 - 0.01f), (double)(y1 + 0.01f), (double)z1);
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)(x1 + 0.01f), (double)(y1 - 0.01f), (double)z1);
+        tess.addVertex((double)(x2 + 0.12f), (double)(y2 - 0.12f), (double)z2);
+        tess.addVertex((double)(x2 + 0.12f), (double)(y2 + 0.12f), (double)z2);
+        tess.addVertex((double)(x1 + 0.01f), (double)(y1 + 0.01f), (double)z1);
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)(x1 - 0.01f), (double)(y1 - 0.01f), (double)z1);
+        tess.addVertex((double)(x2 - 0.12f), (double)(y2 - 0.12f), (double)z2);
+        tess.addVertex((double)(x2 + 0.12f), (double)(y2 - 0.12f), (double)z2);
+        tess.addVertex((double)(x1 + 0.01f), (double)(y1 - 0.01f), (double)z1);
+        tess.draw();
+        tess.startDrawingQuads();
+        tess.addVertex((double)x1, (double)(y1 + 0.01f), (double)(z1 + 0.01f));
+        tess.addVertex((double)x2, (double)(y2 + 0.12f), (double)(z2 + 0.12f));
+        tess.addVertex((double)x2, (double)(y2 + 0.12f), (double)(z2 - 0.12f));
+        tess.addVertex((double)x1, (double)(y1 + 0.01f), (double)(z1 - 0.01f));
+        tess.draw();
+    }
+    
+    private void renderLaserModel(final float retraction) {
+        float laserretraction = retraction / 0.8f;
+        if (laserretraction > 1.0f) {
+            laserretraction = 1.0f;
+        }
+        float guardmovement = (retraction - 0.6f) / 0.4f * 1.875f;
+        if (guardmovement < 0.0f) {
+            guardmovement = 0.0f;
+        }
+        GL11.glPushMatrix();
+        float yadjust;
+        float zadjust = yadjust = laserretraction * 5.0f;
+        if (yadjust > 0.938f) {
+            yadjust = 0.938f;
+            zadjust = (zadjust - yadjust) * 2.5f + yadjust;
+        }
+        GL11.glTranslatef(0.0f, yadjust, zadjust);
+        RenderAstroMiner.modellaser1.renderAll();
+        RenderAstroMiner.modellaser2.renderAll();
+        if (yadjust == 0.938f) {
+            GL11.glTranslatef(0.0f, 0.0f, -zadjust + 0.938f);
+        }
+        RenderAstroMiner.modellaser3.renderAll();
+        GL11.glPopMatrix();
+        GL11.glPushMatrix();
+        GL11.glTranslatef(guardmovement, 0.0f, 0.0f);
+        RenderAstroMiner.modellasergl.renderAll();
+        GL11.glTranslatef(-2.0f * guardmovement, 0.0f, 0.0f);
+        RenderAstroMiner.modellasergr.renderAll();
+        GL11.glPopMatrix();
+    }
+    
+    protected ResourceLocation getEntityTexture(final Entity entity) {
+        return RenderAstroMiner.modelTextureOff;
+    }
+    
+    static {
+        RenderAstroMiner.modelObj = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/astroMiner.obj"));
+        RenderAstroMiner.modellaser1 = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/astroMinerLaserFront.obj"));
+        RenderAstroMiner.modellaser2 = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/astroMinerLaserBottom.obj"));
+        RenderAstroMiner.modellaser3 = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/astroMinerLaserCenter.obj"));
+        RenderAstroMiner.modellasergl = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/astroMinerLeftGuard.obj"));
+        RenderAstroMiner.modellasergr = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/astroMinerRightGuard.obj"));
+        RenderAstroMiner.modelTexture = new ResourceLocation("galacticraftasteroids", "textures/model/astroMiner.png");
+        RenderAstroMiner.modelTextureFX = new ResourceLocation("galacticraftasteroids", "textures/model/astroMinerFX.png");
+        RenderAstroMiner.modelTextureOff = new ResourceLocation("galacticraftasteroids", "textures/model/astroMiner_off.png");
+        RenderAstroMiner.scanTexture = new ResourceLocation("galacticraftasteroids", "textures/misc/gradient.png");
     }
 }

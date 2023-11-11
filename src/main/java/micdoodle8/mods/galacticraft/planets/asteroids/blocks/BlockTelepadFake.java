@@ -1,251 +1,186 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.blocks.BlockAdvancedTile;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityTelepadFake;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirectional;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import java.util.Random;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.entity.player.*;
+import java.util.*;
+import net.minecraft.util.*;
+import net.minecraft.item.*;
+import net.minecraft.init.*;
+import net.minecraft.block.*;
+import net.minecraft.entity.*;
+import net.minecraft.client.particle.*;
+import cpw.mods.fml.relauncher.*;
 
 public class BlockTelepadFake extends BlockAdvancedTile implements ITileEntityProvider
 {
-
-    public static final PropertyBool TOP = PropertyBool.create("top");
-    public static final PropertyBool CONNECTABLE = PropertyBool.create("connectable");
-    protected static final AxisAlignedBB AABB_TOP = new AxisAlignedBB(0.0F, 0.55F, 0.0F, 1.0F, 1.0F, 1.0F);
-    protected static final AxisAlignedBB AABB_BOTTOM = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 0.2F, 1.0F);
-
-    public BlockTelepadFake(String assetName)
-    {
+    public BlockTelepadFake(final String assetName) {
         super(GCBlocks.machine);
-        this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(assetName);
-        this.setResistance(1000000000000000.0F);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + "launch_pad");
+        this.setResistance(9.9999999E14f);
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        return state.getValue(TOP) ? AABB_TOP : AABB_BOTTOM;
+    
+    public void setBlockBoundsBasedOnState(final IBlockAccess world, final int x, final int y, final int z) {
+        final int meta = world.getBlockMetadata(x, y, z);
+        if (meta == 0) {
+            this.setBlockBounds(0.0f, 0.55f, 0.0f, 1.0f, 1.0f, 1.0f);
+        }
+        else if (meta == 1) {
+            this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.38f, 1.0f);
+        }
+        else {
+            this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+        }
     }
-
-    @Override
-    public boolean canDropFromExplosion(Explosion par1Explosion)
-    {
+    
+    public void addCollisionBoxesToList(final World world, final int x, final int y, final int z, final AxisAlignedBB axisalignedbb, final List list, final Entity entity) {
+        final int meta = world.getBlockMetadata(x, y, z);
+        if (meta == 0) {
+            this.setBlockBounds(0.0f, 0.55f, 0.0f, 1.0f, 1.0f, 1.0f);
+            super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
+        }
+        else if (meta == 1) {
+            this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.38f, 1.0f);
+            super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
+        }
+        else {
+            super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
+        }
+    }
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        this.setBlockBoundsBasedOnState((IBlockAccess)world, x, y, z);
+        return super.getCollisionBoundingBoxFromPool(world, x, y, z);
+    }
+    
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        this.setBlockBoundsBasedOnState((IBlockAccess)world, x, y, z);
+        return super.getSelectedBoundingBoxFromPool(world, x, y, z);
+    }
+    
+    public boolean canDropFromExplosion(final Explosion par1Explosion) {
         return false;
     }
-
-    public void makeFakeBlock(World worldObj, BlockPos pos, BlockPos mainBlock, IBlockState state)
-    {
-        worldObj.setBlockState(pos, state, 3);
-        ((TileEntityTelepadFake) worldObj.getTileEntity(pos)).setMainBlock(mainBlock);
+    
+    public void makeFakeBlock(final World worldObj, final BlockVec3 position, final BlockVec3 mainBlock, final int meta) {
+        worldObj.setBlock(position.x, position.y, position.z, (Block)this, meta, 3);
+        ((TileEntityTelepadFake)worldObj.getTileEntity(position.x, position.y, position.z)).setMainBlock(mainBlock);
     }
-
-    @Override
-    public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos)
-    {
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-
-        if (tileEntity instanceof TileEntityTelepadFake)
-        {
-            BlockPos mainBlockPosition = ((TileEntityTelepadFake) tileEntity).mainBlockPosition;
-
-            if (mainBlockPosition != null)
-            {
-                return worldIn.getBlockState(mainBlockPosition).getBlockHardness(worldIn, mainBlockPosition);
+    
+    public float getBlockHardness(final World par1World, final int par2, final int par3, final int par4) {
+        final TileEntity tileEntity = par1World.getTileEntity(par2, par3, par4);
+        if (tileEntity instanceof TileEntityTelepadFake) {
+            final BlockVec3 mainBlockPosition = ((TileEntityTelepadFake)tileEntity).mainBlockPosition;
+            if (mainBlockPosition != null) {
+                return mainBlockPosition.getBlock((IBlockAccess)par1World).getBlockHardness(par1World, par2, par3, par4);
             }
         }
-
         return this.blockHardness;
     }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        TileEntity tileEntity = worldIn.getTileEntity(pos);
-
-        if (tileEntity instanceof TileEntityTelepadFake)
-        {
-            ((TileEntityTelepadFake) tileEntity).onBlockRemoval();
+    
+    public Block setBlockTextureName(final String name) {
+        this.textureName = name;
+        return (Block)this;
+    }
+    
+    public void breakBlock(final World world, final int x, final int y, final int z, final Block par5, final int par6) {
+        final TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity instanceof TileEntityTelepadFake) {
+            ((TileEntityTelepadFake)tileEntity).onBlockRemoval();
         }
-
-        super.breakBlock(worldIn, pos, state);
+        super.breakBlock(world, x, y, z, par5, par6);
     }
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        TileEntityTelepadFake tileEntity = (TileEntityTelepadFake) worldIn.getTileEntity(pos);
-        return tileEntity.onActivated(playerIn);
+    
+    public boolean onBlockActivated(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int par6, final float par7, final float par8, final float par9) {
+        final TileEntityTelepadFake tileEntity = (TileEntityTelepadFake)par1World.getTileEntity(x, y, z);
+        return tileEntity.onActivated(par5EntityPlayer);
     }
-
-    @Override
-    public int quantityDropped(Random par1Random)
-    {
+    
+    public int quantityDropped(final Random par1Random) {
         return 0;
     }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.INVISIBLE;
+    
+    public int getRenderType() {
+        return -1;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
+    
+    public TileEntity createNewTileEntity(final World var1, final int meta) {
+        return (TileEntity)new TileEntityTelepadFake();
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World var1, int meta)
-    {
-        return new TileEntityTelepadFake();
-    }
-
-    @Override
-    public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand)
-    {
-    }
-
-    @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
-    {
-        TileEntity tileEntity = world.getTileEntity(pos);
-        BlockPos mainBlockPosition = ((TileEntityTelepadFake) tileEntity).mainBlockPosition;
-
-        if (mainBlockPosition != null)
-        {
-			IBlockState mainBlockState = world.getBlockState(mainBlockPosition);
-			Block mainBlockID = mainBlockState.getBlock();
-
-            if (Blocks.AIR != mainBlockID)
-            {
-                return mainBlockID.getPickBlock(mainBlockState, target, world, mainBlockPosition, player);
+    
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        final TileEntity tileEntity = world.getTileEntity(x, y, z);
+        final BlockVec3 mainBlockPosition = ((TileEntityTelepadFake)tileEntity).mainBlockPosition;
+        if (mainBlockPosition != null) {
+            final Block mainBlockID = world.getBlock(mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z);
+            if (Blocks.air != mainBlockID) {
+                return mainBlockID.getPickBlock(target, world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z);
             }
         }
-
-        return ItemStack.EMPTY;
+        return null;
     }
-
-    @Override
-    public EnumFacing getBedDirection(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
-        TileEntity tileEntity = world.getTileEntity(pos);
-        BlockPos mainBlockPosition = ((TileEntityTelepadFake) tileEntity).mainBlockPosition;
-
-        if (mainBlockPosition != null)
-        {
-			IBlockState mainBlockState = world.getBlockState(mainBlockPosition);
-			return mainBlockState.getBlock().getBedDirection(mainBlockState, world, mainBlockPosition);
+    
+    public int getBedDirection(final IBlockAccess world, final int x, final int y, final int z) {
+        final TileEntity tileEntity = world.getTileEntity(x, y, z);
+        final BlockVec3 mainBlockPosition = ((TileEntityTelepadFake)tileEntity).mainBlockPosition;
+        if (mainBlockPosition != null) {
+            return mainBlockPosition.getBlock(world).getBedDirection(world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z);
         }
-
-        return getActualState(world.getBlockState(pos), world, pos).getValue(BlockDirectional.FACING);
+        return BlockDirectional.getDirection(world.getBlockMetadata(x, y, z));
     }
-
-    @Override
-    public boolean isBed(IBlockState state, IBlockAccess world, BlockPos pos, Entity player)
-    {
-        TileEntity tileEntity = world.getTileEntity(pos);
-        BlockPos mainBlockPosition = ((TileEntityTelepadFake) tileEntity).mainBlockPosition;
-
-        if (mainBlockPosition != null)
-        {
-            return world.getBlockState(pos).getBlock().isBed(world.getBlockState(mainBlockPosition), world, mainBlockPosition, player);
+    
+    public boolean isBed(final IBlockAccess world, final int x, final int y, final int z, final EntityLivingBase player) {
+        final TileEntity tileEntity = world.getTileEntity(x, y, z);
+        final BlockVec3 mainBlockPosition = ((TileEntityTelepadFake)tileEntity).mainBlockPosition;
+        if (mainBlockPosition != null) {
+            return mainBlockPosition.getBlock(world).isBed(world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z, player);
         }
-
-        return super.isBed(state, world, pos, player);
+        return super.isBed(world, x, y, z, player);
     }
-
-    @Override
-    public void setBedOccupied(IBlockAccess world, BlockPos pos, EntityPlayer player, boolean occupied)
-    {
-        TileEntity tileEntity = world.getTileEntity(pos);
-        BlockPos mainBlockPosition = ((TileEntityTelepadFake) tileEntity).mainBlockPosition;
-
-        if (mainBlockPosition != null)
-        {
-            world.getBlockState(pos).getBlock().setBedOccupied(world, mainBlockPosition, player, occupied);
-        } else
-        {
-            super.setBedOccupied(world, pos, player, occupied);
+    
+    public void setBedOccupied(final IBlockAccess world, final int x, final int y, final int z, final EntityPlayer player, final boolean occupied) {
+        final TileEntity tileEntity = world.getTileEntity(x, y, z);
+        final BlockVec3 mainBlockPosition = ((TileEntityTelepadFake)tileEntity).mainBlockPosition;
+        if (mainBlockPosition != null) {
+            mainBlockPosition.getBlock(world).setBedOccupied(world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z, player, occupied);
+        }
+        else {
+            super.setBedOccupied(world, x, y, z, player, occupied);
         }
     }
-
-    @Override
-    public boolean addHitEffects(IBlockState state, World worldObj, RayTraceResult target, ParticleManager manager)
-    {
-        TileEntity tileEntity = worldObj.getTileEntity(target.getBlockPos());
-
-        if (tileEntity instanceof TileEntityTelepadFake)
-        {
-            BlockPos mainBlockPosition = ((TileEntityTelepadFake) tileEntity).mainBlockPosition;
-
-            if (mainBlockPosition != null)
-            {
-                manager.addBlockHitEffects(mainBlockPosition, target);
+    
+    @SideOnly(Side.CLIENT)
+    public boolean addHitEffects(final World worldObj, final MovingObjectPosition target, final EffectRenderer effectRenderer) {
+        if (worldObj.getBlockMetadata(target.blockX, target.blockY, target.blockZ) == 6) {
+            return true;
+        }
+        final TileEntity tileEntity = worldObj.getTileEntity(target.blockX, target.blockY, target.blockZ);
+        if (tileEntity instanceof TileEntityTelepadFake) {
+            final BlockVec3 mainBlockPosition = ((TileEntityTelepadFake)tileEntity).mainBlockPosition;
+            if (mainBlockPosition != null) {
+                effectRenderer.addBlockHitEffects(mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z, target);
             }
         }
-
-        return super.addHitEffects(state, worldObj, target, manager);
+        return super.addHitEffects(worldObj, target, effectRenderer);
     }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, TOP, CONNECTABLE);
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(TOP, meta % 2 == 1).withProperty(CONNECTABLE, meta > 1);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return (state.getValue(TOP) ? 1 : 0) + (state.getValue(CONNECTABLE) ? 2 : 0);
+    
+    @SideOnly(Side.CLIENT)
+    public boolean addDestroyEffects(final World world, final int x, final int y, final int z, final int meta, final EffectRenderer effectRenderer) {
+        return world.getBlockMetadata(x, y, z) == 6 || super.addDestroyEffects(world, x, y, z, meta, effectRenderer);
     }
 }

@@ -1,38 +1,23 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.dimension;
 
-import micdoodle8.mods.galacticraft.core.Constants;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.world.*;
+import net.minecraft.nbt.*;
 
 public class AsteroidSaveData extends WorldSavedData
 {
-
-    public static final String saveDataID = Constants.GCDATAFOLDER + "GCAsteroidData";
+    public static final String saveDataID = "GCAsteroidData";
     public NBTTagCompound datacompound;
-
-    public AsteroidSaveData(String s)
-    {
-        super(AsteroidSaveData.saveDataID);
+    
+    public AsteroidSaveData(final String s) {
+        super("GCAsteroidData");
         this.datacompound = new NBTTagCompound();
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readFromNBT(final NBTTagCompound nbt) {
         this.datacompound = nbt.getCompoundTag("asteroids");
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
-        nbt.setTag("asteroids", this.datacompound);
-        return nbt;
+    
+    public void writeToNBT(final NBTTagCompound nbt) {
+        nbt.setTag("asteroids", (NBTBase)this.datacompound);
     }
 }

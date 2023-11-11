@@ -1,154 +1,81 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.network;
 
-import java.util.EnumMap;
-
-import net.minecraft.entity.player.EntityPlayerMP;
-
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.FMLEmbeddedChannel;
-import net.minecraftforge.fml.common.network.FMLIndexedMessageToMessageCodec;
-import net.minecraftforge.fml.common.network.FMLOutboundHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
+import java.util.*;
+import cpw.mods.fml.relauncher.*;
+import io.netty.channel.*;
+import io.netty.buffer.*;
+import cpw.mods.fml.common.network.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import cpw.mods.fml.common.*;
 
 public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<IPacket>
 {
-
     private EnumMap<Side, FMLEmbeddedChannel> channels;
 
-    private GalacticraftChannelHandler()
-    {
-        this.addDiscriminator(0, PacketSimple.class);
-        this.addDiscriminator(1, PacketRotateRocket.class);
-        this.addDiscriminator(2, PacketDynamic.class);
-        this.addDiscriminator(3, PacketFluidNetworkUpdate.class);
-        this.addDiscriminator(4, PacketEntityUpdate.class);
-        this.addDiscriminator(5, PacketDynamicInventory.class);
+    private GalacticraftChannelHandler() {
+        this.addDiscriminator(0, (Class)PacketSimple.class);
+        this.addDiscriminator(1, (Class)PacketRotateRocket.class);
+        this.addDiscriminator(2, (Class)PacketDynamic.class);
+        this.addDiscriminator(3, (Class)PacketControllableEntity.class);
+        this.addDiscriminator(4, (Class)PacketEntityUpdate.class);
+        this.addDiscriminator(5, (Class)PacketDynamicInventory.class);
     }
 
-    public static GalacticraftChannelHandler init()
-    {
-        GalacticraftChannelHandler channelHandler = new GalacticraftChannelHandler();
-        channelHandler.channels = NetworkRegistry.INSTANCE.newChannel(Constants.MOD_ID_CORE, channelHandler, new GalacticraftPacketHandler());
+    public static GalacticraftChannelHandler init() {
+        final GalacticraftChannelHandler channelHandler = new GalacticraftChannelHandler();
+        channelHandler.channels = (EnumMap<Side, FMLEmbeddedChannel>)NetworkRegistry.INSTANCE.newChannel("GalacticraftCore", new ChannelHandler[] { (ChannelHandler)channelHandler, (ChannelHandler)new GalacticraftPacketHandler() });
         return channelHandler;
     }
 
-    @Override
-    public void encodeInto(ChannelHandlerContext ctx, IPacket msg, ByteBuf target) throws Exception
-    {
-        msg.encodeInto(target);
+    public void encodeInto(final ChannelHandlerContext ctx, final IPacket msg, final ByteBuf target) throws Exception {
+        msg.encodeInto(ctx, target);
     }
 
-    @Override
-    public void decodeInto(ChannelHandlerContext ctx, ByteBuf source, IPacket msg)
-    {
-        try
-        {
-            msg.decodeInto(source);
-        } catch (IndexOutOfBoundsException ex)
-        {
-            GalacticraftCore.logger.error("Incomplete Galacticraft entity packet: dimension " + msg.getDimensionID());
+    public void decodeInto(final ChannelHandlerContext ctx, final ByteBuf source, final IPacket msg) {
+        msg.decodeInto(ctx, source);
+    }
+
+    public void sendToAll(final IPacket message) {
+        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set((FMLOutboundHandler.OutboundTarget) FMLOutboundHandler.OutboundTarget.ALL);
+        this.channels.get(Side.SERVER).writeOutbound(new Object[] { message });
+    }
+
+    public void sendTo(final IPacket message, final EntityPlayerMP player) {
+        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set((FMLOutboundHandler.OutboundTarget) FMLOutboundHandler.OutboundTarget.PLAYER);
+        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set((Object)player);
+        this.channels.get(Side.SERVER).writeOutbound(new Object[] { message });
+    }
+
+    public void sendToAllAround(final IPacket message, final NetworkRegistry.TargetPoint point) {
+        try {
+            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set((FMLOutboundHandler.OutboundTarget) FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
+            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set((Object)point);
+            this.channels.get(Side.SERVER).writeOutbound(new Object[] { message });
         }
-    }
-
-    /**
-     * Send this message to everyone. <p> Adapted from CPW's code in
-     * cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper
-     *
-     * @param message The message to send
-     */
-    public void sendToAll(IPacket message)
-    {
-        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALL);
-        this.channels.get(Side.SERVER).writeOutbound(message);
-    }
-
-    /**
-     * Send this message to the specified player. <p> Adapted from CPW's code
-     * in cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper
-     *
-     * @param message The message to send
-     * @param player The player to send it to
-     */
-    public void sendTo(IPacket message, EntityPlayerMP player)
-    {
-        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
-        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
-        this.channels.get(Side.SERVER).writeOutbound(message);
-    }
-
-    /**
-     * Send this message to everyone within a certain range of a point. <p>
-     * Adapted from CPW's code in
-     * cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper
-     *
-     * @param message The message to send
-     * @param point The
-     *        {@link net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint}
-     *        around which to send
-     */
-    public void sendToAllAround(IPacket message, NetworkRegistry.TargetPoint point)
-    {
-        try
-        {
-            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
-            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(point);
-            this.channels.get(Side.SERVER).writeOutbound(message);
-        } catch (Exception e)
-        {
-            GalacticraftCore.logger.error("Forge error when sending network packet to nearby players - this is not a Galacticraft bug, does another mod make fake players?");
+        catch (Exception e) {
+            GCLog.severe("Forge error when sending network packet to nearby players - this is not a Galacticraft bug, does another mod make fake players?");
             e.printStackTrace();
         }
     }
 
-    /**
-     * Send this message to everyone within the supplied dimension. <p> Adapted
-     * from CPW's code in
-     * cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper
-     *
-     * @param message The message to send
-     * @param dimensionID The dimension id to target
-     */
-    public void sendToDimension(IPacket message, int dimensionID)
-    {
-        try
-        {
-            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.DIMENSION);
-            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(dimensionID);
-            this.channels.get(Side.SERVER).writeOutbound(message);
-        } catch (Exception e)
-        {
-            GalacticraftCore.logger.error("Forge error when sending network packet to all players in dimension - this is not a Galacticraft bug, does another mod make fake players?");
+    public void sendToDimension(final IPacket message, final int dimensionId) {
+        try {
+            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set((FMLOutboundHandler.OutboundTarget) FMLOutboundHandler.OutboundTarget.DIMENSION);
+            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set((Object)dimensionId);
+            this.channels.get(Side.SERVER).writeOutbound(new Object[] { message });
+        }
+        catch (Exception e) {
+            GCLog.severe("Forge error when sending network packet to all players in dimension - this is not a Galacticraft bug, does another mod make fake players?");
             e.printStackTrace();
         }
     }
 
-    /**
-     * Send this message to the server. <p> Adapted from CPW's code in
-     * cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper
-     *
-     * @param message The message to send
-     */
-    public void sendToServer(IPacket message)
-    {
-        if (FMLCommonHandler.instance().getSide() != Side.CLIENT)
-        {
+    public void sendToServer(final IPacket message) {
+        if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
             return;
         }
-        this.channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.TOSERVER);
-        this.channels.get(Side.CLIENT).writeOutbound(message);
+        this.channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET).set((FMLOutboundHandler.OutboundTarget) FMLOutboundHandler.OutboundTarget.TOSERVER);
+        this.channels.get(Side.CLIENT).writeOutbound(new Object[] { message });
     }
 }

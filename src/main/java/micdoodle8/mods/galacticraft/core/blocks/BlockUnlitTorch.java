@@ -1,244 +1,282 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.api.block.*;
+import net.minecraft.block.material.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraftforge.common.util.*;
+import net.minecraft.world.*;
+import net.minecraft.init.*;
+import micdoodle8.mods.galacticraft.api.world.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
+import java.util.*;
+import net.minecraft.item.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.block.IOxygenReliantBlock;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
-
-public class BlockUnlitTorch extends BlockTorchBase implements IOxygenReliantBlock
+public class BlockUnlitTorch extends Block implements IOxygenReliantBlock
 {
-
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", facing -> facing != EnumFacing.DOWN);
-
     public boolean lit;
     public Block litVersion;
     public Block unlitVersion;
     public Block fallback;
-    public static HashMap<Block, Block> registeredTorches = new HashMap<>();
-
-    public BlockUnlitTorch(boolean lit, String assetName)
-    {
-        super(Material.CIRCUITS);
+    
+    protected BlockUnlitTorch(final boolean lit, final String assetName) {
+        super(Material.circuits);
         this.setTickRandomly(true);
         this.lit = lit;
-        this.setLightLevel(lit ? 0.9375F : 0.2F);
-        this.setHardness(0.0F);
-        this.setSoundType(SoundType.WOOD);
-        this.setTranslationKey(assetName);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.UP));
+        this.setLightLevel(lit ? 0.9375f : 0.2f);
+        this.setHardness(0.0f);
+        this.setStepSound(Block.soundTypeWood);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    public static void register(BlockUnlitTorch unlittorch, BlockUnlitTorch littorch, Block vanillatorch)
-    {
+    
+    public static void register(final BlockUnlitTorch unlittorch, final BlockUnlitTorch littorch, final Block vanillatorch) {
         littorch.litVersion = littorch;
         littorch.unlitVersion = unlittorch;
         littorch.fallback = vanillatorch;
         unlittorch.litVersion = littorch;
         unlittorch.unlitVersion = unlittorch;
         unlittorch.fallback = vanillatorch;
-        registeredTorches.put(littorch, vanillatorch);
-        GCBlocks.itemChanges.put(unlittorch, littorch);
+        GalacticraftCore.handler.registerTorchType(littorch, vanillatorch);
     }
-
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
-    {
+    
+    public Block changeState() {
+        if (this.lit) {
+            return this.litVersion;
+        }
+        return this.unlitVersion;
+    }
+    
+    private static boolean isBlockSolidOnSide(final World world, final int x, final int y, final int z, final ForgeDirection direction, final boolean nope) {
+        return world.getBlock(x, y, z).isSideSolid((IBlockAccess)world, x, y, z, direction);
+    }
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World par1World, final int par2, final int par3, final int par4) {
         return null;
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
-    {
-        for (EnumFacing enumfacing : FACING.getAllowedValues())
-        {
-            if (this.canPlaceAt(worldIn, pos, enumfacing))
-            {
-                return true;
+    
+    public int getRenderType() {
+        return GalacticraftCore.proxy.getBlockRender(this);
+    }
+    
+    private boolean canPlaceTorchOn(final World par1World, final int par2, final int par3, final int par4) {
+        if (World.doesBlockHaveSolidTopSurface((IBlockAccess)par1World, par2, par3, par4)) {
+            return true;
+        }
+        final Block var5 = par1World.getBlock(par2, par3, par4);
+        return var5.canPlaceTorchOnTop(par1World, par2, par3, par4);
+    }
+    
+    public boolean canPlaceBlockAt(final World par1World, final int par2, final int par3, final int par4) {
+        return isBlockSolidOnSide(par1World, par2 - 1, par3, par4, ForgeDirection.EAST, true) || isBlockSolidOnSide(par1World, par2 + 1, par3, par4, ForgeDirection.WEST, true) || isBlockSolidOnSide(par1World, par2, par3, par4 - 1, ForgeDirection.SOUTH, true) || isBlockSolidOnSide(par1World, par2, par3, par4 + 1, ForgeDirection.NORTH, true) || this.canPlaceTorchOn(par1World, par2, par3 - 1, par4);
+    }
+    
+    public int onBlockPlaced(final World par1World, final int par2, final int par3, final int par4, final int par5, final float par6, final float par7, final float par8, final int par9) {
+        int var10 = par9;
+        if (par5 == 1 && this.canPlaceTorchOn(par1World, par2, par3 - 1, par4)) {
+            var10 = 5;
+        }
+        if (par5 == 2 && isBlockSolidOnSide(par1World, par2, par3, par4 + 1, ForgeDirection.NORTH, true)) {
+            var10 = 4;
+        }
+        if (par5 == 3 && isBlockSolidOnSide(par1World, par2, par3, par4 - 1, ForgeDirection.SOUTH, true)) {
+            var10 = 3;
+        }
+        if (par5 == 4 && isBlockSolidOnSide(par1World, par2 + 1, par3, par4, ForgeDirection.WEST, true)) {
+            var10 = 2;
+        }
+        if (par5 == 5 && isBlockSolidOnSide(par1World, par2 - 1, par3, par4, ForgeDirection.EAST, true)) {
+            var10 = 1;
+        }
+        return var10;
+    }
+    
+    public void updateTick(final World par1World, final int par2, final int par3, final int par4, final Random par5Random) {
+        if (par1World.getBlockMetadata(par2, par3, par4) == 0) {
+            this.onBlockAdded(par1World, par2, par3, par4);
+        }
+        else {
+            this.checkOxygen(par1World, par2, par3, par4);
+        }
+    }
+    
+    public void onBlockAdded(final World par1World, final int par2, final int par3, final int par4) {
+        if (par1World.getBlockMetadata(par2, par3, par4) == 0) {
+            if (isBlockSolidOnSide(par1World, par2 - 1, par3, par4, ForgeDirection.EAST, true)) {
+                par1World.setBlockMetadataWithNotify(par2, par3, par4, 1, 2);
+            }
+            else if (isBlockSolidOnSide(par1World, par2 + 1, par3, par4, ForgeDirection.WEST, true)) {
+                par1World.setBlockMetadataWithNotify(par2, par3, par4, 2, 2);
+            }
+            else if (isBlockSolidOnSide(par1World, par2, par3, par4 - 1, ForgeDirection.SOUTH, true)) {
+                par1World.setBlockMetadataWithNotify(par2, par3, par4, 3, 2);
+            }
+            else if (isBlockSolidOnSide(par1World, par2, par3, par4 + 1, ForgeDirection.NORTH, true)) {
+                par1World.setBlockMetadataWithNotify(par2, par3, par4, 4, 2);
+            }
+            else if (this.canPlaceTorchOn(par1World, par2, par3 - 1, par4)) {
+                par1World.setBlockMetadataWithNotify(par2, par3, par4, 5, 2);
             }
         }
-
-        return false;
-    }
-
-    @Override
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
-    {
-        if (state.getBlock().getMetaFromState(state) == 0)
-        {
-            this.onBlockAdded(worldIn, pos, state);
-        } else
-        {
-            this.checkOxygen(worldIn, pos, state);
+        if (this.dropTorchIfCantStay(par1World, par2, par3, par4)) {
+            this.checkOxygen(par1World, par2, par3, par4);
         }
     }
-
-    @Override
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
-    {
-        if (this.checkForDrop(worldIn, pos, state))
-        {
-            this.checkOxygen(worldIn, pos, state);
-        }
-    }
-
-    @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
-    {
-        if (this.checkForDrop(worldIn, pos, state))
-        {
-            EnumFacing enumfacing = state.getValue(FACING);
-            EnumFacing.Axis enumfacingAxis = enumfacing.getAxis();
-            EnumFacing enumfacing1 = enumfacing.getOpposite();
-            boolean flag = false;
-
-            if (enumfacingAxis.isHorizontal() && !worldIn.isSideSolid(pos.offset(enumfacing1), enumfacing, true))
-            {
-                flag = true;
-            } else if (enumfacingAxis.isVertical() && !this.canPlaceOn(worldIn, pos.offset(enumfacing1)))
-            {
-                flag = true;
+    
+    public void onNeighborBlockChange(final World par1World, final int par2, final int par3, final int par4, final Block par5) {
+        if (this.dropTorchIfCantStay(par1World, par2, par3, par4)) {
+            final int var6 = par1World.getBlockMetadata(par2, par3, par4);
+            boolean var7 = false;
+            if (!isBlockSolidOnSide(par1World, par2 - 1, par3, par4, ForgeDirection.EAST, true) && var6 == 1) {
+                var7 = true;
             }
-
-            if (flag)
-            {
-                this.dropBlockAsItem(worldIn, pos, state, 0);
-                worldIn.setBlockToAir(pos);
-            } else
-            {
-                this.checkOxygen(worldIn, pos, state);
+            if (!isBlockSolidOnSide(par1World, par2 + 1, par3, par4, ForgeDirection.WEST, true) && var6 == 2) {
+                var7 = true;
+            }
+            if (!isBlockSolidOnSide(par1World, par2, par3, par4 - 1, ForgeDirection.SOUTH, true) && var6 == 3) {
+                var7 = true;
+            }
+            if (!isBlockSolidOnSide(par1World, par2, par3, par4 + 1, ForgeDirection.NORTH, true) && var6 == 4) {
+                var7 = true;
+            }
+            if (!this.canPlaceTorchOn(par1World, par2, par3 - 1, par4) && var6 == 5) {
+                var7 = true;
+            }
+            if (var7) {
+                this.dropBlockAsItem(par1World, par2, par3, par4, par1World.getBlockMetadata(par2, par3, par4), 0);
+                par1World.setBlock(par2, par3, par4, Blocks.air);
+            }
+            else {
+                this.checkOxygen(par1World, par2, par3, par4);
             }
         }
     }
-
-    private void checkOxygen(World world, BlockPos pos, IBlockState state)
-    {
-        if (world.provider instanceof IGalacticraftWorldProvider)
-        {
-            if (OxygenUtil.checkTorchHasOxygen(world, pos))
-            {
-                this.onOxygenAdded(world, pos, state);
-            } else
-            {
-                this.onOxygenRemoved(world, pos, state);
+    
+    private void checkOxygen(final World world, final int x, final int y, final int z) {
+        if (world.provider instanceof IGalacticraftWorldProvider) {
+            if (OxygenUtil.checkTorchHasOxygen(world, this, x, y, z)) {
+                this.onOxygenAdded(world, x, y, z);
             }
-        } else
-        {
-            EnumFacing enumfacing = state.getValue(FACING);
-            world.setBlockState(pos, this.fallback.getDefaultState().withProperty(FACING, enumfacing), 2);
+            else {
+                this.onOxygenRemoved(world, x, y, z);
+            }
+        }
+        else {
+            world.setBlock(x, y, z, this.fallback, world.getBlockMetadata(x, y, z), 2);
         }
     }
-
+    
+    private boolean dropTorchIfCantStay(final World par1World, final int par2, final int par3, final int par4) {
+        if (!this.canPlaceBlockAt(par1World, par2, par3, par4)) {
+            if (par1World.getBlock(par2, par3, par4) == this) {
+                this.dropBlockAsItem(par1World, par2, par3, par4, par1World.getBlockMetadata(par2, par3, par4), 0);
+                par1World.setBlock(par2, par3, par4, Blocks.air);
+            }
+            return false;
+        }
+        return true;
+    }
+    
+    public MovingObjectPosition collisionRayTrace(final World par1World, final int par2, final int par3, final int par4, final Vec3 par5Vec3, final Vec3 par6Vec3) {
+        final int var7 = par1World.getBlockMetadata(par2, par3, par4) & 0x7;
+        float var8 = 0.15f;
+        if (var7 == 1) {
+            this.setBlockBounds(0.0f, 0.2f, 0.5f - var8, var8 * 2.0f, 0.8f, 0.5f + var8);
+        }
+        else if (var7 == 2) {
+            this.setBlockBounds(1.0f - var8 * 2.0f, 0.2f, 0.5f - var8, 1.0f, 0.8f, 0.5f + var8);
+        }
+        else if (var7 == 3) {
+            this.setBlockBounds(0.5f - var8, 0.2f, 0.0f, 0.5f + var8, 0.8f, var8 * 2.0f);
+        }
+        else if (var7 == 4) {
+            this.setBlockBounds(0.5f - var8, 0.2f, 1.0f - var8 * 2.0f, 0.5f + var8, 0.8f, 1.0f);
+        }
+        else {
+            var8 = 0.1f;
+            this.setBlockBounds(0.5f - var8, 0.0f, 0.5f - var8, 0.5f + var8, 0.6f, 0.5f + var8);
+        }
+        return super.collisionRayTrace(par1World, par2, par3, par4, par5Vec3, par6Vec3);
+    }
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand)
-    {
-        EnumFacing enumfacing = stateIn.getValue(FACING);
-        double d0 = (double) pos.getX() + 0.5D;
-        double d1 = (double) pos.getY() + 0.7D;
-        double d2 = (double) pos.getZ() + 0.5D;
-        double d3 = 0.22D;
-        double d4 = 0.27D;
-
-        if (enumfacing.getAxis().isHorizontal())
-        {
-            EnumFacing enumfacing1 = enumfacing.getOpposite();
-            worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 + d4 * (double) enumfacing1.getXOffset(), d1 + d3, d2 + d4 * (double) enumfacing1.getZOffset(), 0.0D, 0.0D, 0.0D, new int[0]);
-            if (this == GCBlocks.unlitTorchLit)
-            {
-                worldIn.spawnParticle(EnumParticleTypes.FLAME, d0 + d4 * (double) enumfacing1.getXOffset(), d1 + d3, d2 + d4 * (double) enumfacing1.getZOffset(), 0.0D, 0.0D, 0.0D, new int[0]);
+    public void randomDisplayTick(final World par1World, final int par2, final int par3, final int par4, final Random par5Random) {
+        final boolean doSmoke = par5Random.nextInt(5) == 0;
+        if (this.lit || doSmoke) {
+            final int var6 = par1World.getBlockMetadata(par2, par3, par4);
+            final double var7 = par2 + 0.5f;
+            final double var8 = par3 + 0.7f;
+            final double var9 = par4 + 0.5f;
+            final double var10 = 0.2199999988079071;
+            final double var11 = 0.27000001072883606;
+            if (var6 == 1) {
+                if (doSmoke) {
+                    par1World.spawnParticle("smoke", var7 - 0.27000001072883606, var8 + 0.2199999988079071, var9, 0.0, 0.0, 0.0);
+                }
+                if (this.lit) {
+                    par1World.spawnParticle("flame", var7 - 0.27000001072883606, var8 + 0.2199999988079071, var9, 0.0, 0.0, 0.0);
+                }
             }
-        } else
-        {
-            worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
-            if (this == GCBlocks.unlitTorchLit)
-            {
-                worldIn.spawnParticle(EnumParticleTypes.FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+            else if (var6 == 2) {
+                if (doSmoke) {
+                    par1World.spawnParticle("smoke", var7 + 0.27000001072883606, var8 + 0.2199999988079071, var9, 0.0, 0.0, 0.0);
+                }
+                if (this.lit) {
+                    par1World.spawnParticle("flame", var7 + 0.27000001072883606, var8 + 0.2199999988079071, var9, 0.0, 0.0, 0.0);
+                }
+            }
+            else if (var6 == 3) {
+                if (doSmoke) {
+                    par1World.spawnParticle("smoke", var7, var8 + 0.2199999988079071, var9 - 0.27000001072883606, 0.0, 0.0, 0.0);
+                }
+                if (this.lit) {
+                    par1World.spawnParticle("flame", var7, var8 + 0.2199999988079071, var9 - 0.27000001072883606, 0.0, 0.0, 0.0);
+                }
+            }
+            else if (var6 == 4) {
+                if (doSmoke) {
+                    par1World.spawnParticle("smoke", var7, var8 + 0.2199999988079071, var9 + 0.27000001072883606, 0.0, 0.0, 0.0);
+                }
+                if (this.lit) {
+                    par1World.spawnParticle("flame", var7, var8 + 0.2199999988079071, var9 + 0.27000001072883606, 0.0, 0.0, 0.0);
+                }
+            }
+            else {
+                if (doSmoke) {
+                    par1World.spawnParticle("smoke", var7, var8, var9, 0.0, 0.0, 0.0);
+                }
+                if (this.lit) {
+                    par1World.spawnParticle("flame", var7, var8, var9, 0.0, 0.0, 0.0);
+                }
             }
         }
     }
-
-    @Override
-    public void onOxygenRemoved(World world, BlockPos pos, IBlockState state)
-    {
-        if (world.provider instanceof IGalacticraftWorldProvider)
-        {
-            EnumFacing enumfacing = state.getValue(FACING);
-            world.setBlockState(pos, this.unlitVersion.getDefaultState().withProperty(FACING, enumfacing), 2);
+    
+    public void onOxygenRemoved(final World world, final int x, final int y, final int z) {
+        if (world.provider instanceof IGalacticraftWorldProvider) {
+            world.setBlock(x, y, z, this.unlitVersion, world.getBlockMetadata(x, y, z), 2);
         }
     }
-
-    @Override
-    public void onOxygenAdded(World world, BlockPos pos, IBlockState state)
-    {
-        if (world.provider instanceof IGalacticraftWorldProvider)
-        {
-            EnumFacing enumfacing = state.getValue(FACING);
-            world.setBlockState(pos, this.litVersion.getDefaultState().withProperty(FACING, enumfacing), 2);
+    
+    public void onOxygenAdded(final World world, final int x, final int y, final int z) {
+        if (world.provider instanceof IGalacticraftWorldProvider) {
+            world.setBlock(x, y, z, this.litVersion, world.getBlockMetadata(x, y, z), 2);
         }
     }
-
-    @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
-    {
-        ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+    
+    public ArrayList<ItemStack> getDrops(final World world, final int x, final int y, final int z, final int metadata, final int fortune) {
+        final ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
         ret.add(new ItemStack(this.litVersion));
         return ret;
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, new IProperty[]
-        {FACING});
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getRenderLayer()
-    {
-        return BlockRenderLayer.CUTOUT;
     }
 }

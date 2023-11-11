@@ -1,214 +1,191 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.client.gui.container.GuiCargoLoader;
-import micdoodle8.mods.galacticraft.core.client.gui.container.GuiContainerGC;
-import micdoodle8.mods.galacticraft.core.client.gui.element.GuiElementInfoRegion;
-import micdoodle8.mods.galacticraft.core.energy.EnergyDisplayHelper;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
-import micdoodle8.mods.galacticraft.planets.asteroids.inventory.ContainerAstroMinerDock;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import net.minecraft.client.gui.*;
+import micdoodle8.mods.galacticraft.core.client.gui.element.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.inventory.*;
+import net.minecraft.inventory.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.core.network.*;
+import net.minecraft.util.*;
+import org.lwjgl.opengl.*;
+import micdoodle8.mods.galacticraft.core.energy.*;
+import micdoodle8.mods.galacticraft.core.client.gui.container.*;
+import net.minecraft.client.renderer.*;
 
 public class GuiAstroMinerDock extends GuiContainerGC
 {
-
-    private static final ResourceLocation dockGui = new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "textures/gui/gui_astro_miner_dock.png");
-    private final TileEntityMinerBase tile;
+    private static final ResourceLocation dockGui;
+    private TileEntityMinerBase tile;
     private GuiButton recallButton;
-    private GuiElementInfoRegion electricInfoRegion =
-        new GuiElementInfoRegion((this.width - this.xSize) / 2 + 233, (this.height - this.ySize) / 2 + 31, 10, 68, new ArrayList<String>(), this.width, this.height, this);
+    private GuiElementInfoRegion electricInfoRegion;
     private boolean extraLines;
-
-    public GuiAstroMinerDock(InventoryPlayer playerInventory, TileEntityMinerBase dock)
-    {
-        super(new ContainerAstroMinerDock(playerInventory, dock));
+    
+    public GuiAstroMinerDock(final InventoryPlayer playerInventory, final TileEntityMinerBase dock) {
+        super((Container)new ContainerAstroMinerDock(playerInventory, (IInventory)dock));
+        this.electricInfoRegion = new GuiElementInfoRegion((this.width - this.xSize) / 2 + 233, (this.height - this.ySize) / 2 + 31, 10, 68, (List)new ArrayList(), this.width, this.height, (GuiContainerGC)this);
         this.xSize = 256;
         this.ySize = 221;
         this.tile = dock;
     }
-
-    @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
+    
+    public void drawScreen(final int par1, final int par2, final float par3) {
         this.recallButton.enabled = true;
-
-        if (this.tile.linkedMinerID == null)
-        {
+        if (this.tile.linkedMinerID == null) {
             this.recallButton.enabled = false;
-        } else
-        {
-            if (this.tile.linkedMinerDataAIState < EntityAstroMiner.AISTATE_TRAVELLING || this.tile.linkedMinerDataAIState == EntityAstroMiner.AISTATE_DOCKING)
-            {
+        }
+        else {
+            final EntityAstroMiner miner = this.tile.linkedMiner;
+            if (miner == null || miner.isDead || this.tile.linkCountDown == 0 || miner.AIstate < 2 || miner.AIstate == 5) {
                 this.recallButton.enabled = false;
             }
         }
         this.recallButton.displayString = GCCoreUtil.translate("gui.button.recall.name");
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.drawScreen(par1, par2, par3);
     }
-
-    @Override
-    public void initGui()
-    {
+    
+    public void initGui() {
         super.initGui();
-        int xPos = (this.width - this.xSize) / 2;
-        int yPos = (this.height - this.ySize) / 2;
-        List<String> electricityDesc = new ArrayList<>();
-        electricityDesc.add(GCCoreUtil.translate("gui.energy_storage.desc.0"));
-        electricityDesc
-            .add(EnumColor.YELLOW + GCCoreUtil.translate("gui.energy_storage.desc.1") + ((int) Math.floor(this.tile.getEnergyStoredGC()) + " / " + (int) Math.floor(this.tile.getMaxEnergyStoredGC())));
+        final int xPos = (this.width - this.xSize) / 2;
+        final int yPos = (this.height - this.ySize) / 2;
+        final List<String> electricityDesc = new ArrayList<String>();
+        electricityDesc.add(GCCoreUtil.translate("gui.energyStorage.desc.0"));
+        electricityDesc.add(EnumColor.YELLOW + GCCoreUtil.translate("gui.energyStorage.desc.1") + (int)Math.floor(this.tile.getEnergyStoredGC()) + " / " + (int)Math.floor(this.tile.getMaxEnergyStoredGC()));
         this.electricInfoRegion.tooltipStrings = electricityDesc;
         this.electricInfoRegion.xPosition = xPos + 233;
         this.electricInfoRegion.yPosition = yPos + 29;
         this.electricInfoRegion.parentWidth = this.width;
         this.electricInfoRegion.parentHeight = this.height;
         this.infoRegions.add(this.electricInfoRegion);
-        List<String> batterySlotDesc = new ArrayList<>();
-        batterySlotDesc.add(GCCoreUtil.translate("gui.battery_slot.desc.0"));
-        batterySlotDesc.add(GCCoreUtil.translate("gui.battery_slot.desc.1"));
-        this.infoRegions.add(new GuiElementInfoRegion(xPos + 230, yPos + 108, 18, 18, batterySlotDesc, this.width, this.height, this));
+        final List<String> batterySlotDesc = new ArrayList<String>();
+        batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.0"));
+        batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.1"));
+        this.infoRegions.add(new GuiElementInfoRegion(xPos + 230, yPos + 108, 18, 18, (List)batterySlotDesc, this.width, this.height, (GuiContainerGC)this));
         this.buttonList.add(this.recallButton = new GuiButton(0, xPos + 173, yPos + 195, 76, 20, GCCoreUtil.translate("gui.button.recall.name")));
     }
-
-    @Override
-    protected void actionPerformed(GuiButton button)
-    {
-        if (button.enabled)
-        {
-            switch (button.id)
-            {
-                case 0:
-                    GalacticraftCore.packetPipeline.sendToServer(new PacketSimple(EnumSimplePacket.S_UPDATE_DISABLEABLE_BUTTON, GCCoreUtil.getDimensionID(this.mc.world), new Object[]
-                    {this.tile.getPos(), 0}));
+    
+    protected void mouseClicked(final int px, final int py, final int par3) {
+        super.mouseClicked(px, py, par3);
+    }
+    
+    protected void actionPerformed(final GuiButton par1GuiButton) {
+        if (par1GuiButton.enabled) {
+            switch (par1GuiButton.id) {
+                case 0: {
+                    GalacticraftCore.packetPipeline.sendToServer((IPacket)new PacketSimple(PacketSimple.EnumSimplePacket.S_UPDATE_DISABLEABLE_BUTTON, new Object[] { this.tile.xCoord, this.tile.yCoord, this.tile.zCoord, 0 }));
                     break;
-                default:
-                    break;
+                }
             }
         }
     }
-
-    private String getDeltaString(int num)
-    {
-        return num > 0 ? "+" + num : "" + num;
+    
+    private String getDeltaString(final int num) {
+        return (num > 0) ? ("+" + num) : ("" + num);
     }
-
-    @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-    {
-        this.fontRenderer.drawString(this.tile.getName(), 7, 6, 4210752);
-        this.fontRenderer.drawString(this.getStatus(), 177, 141, 4210752);
-
-        if (this.extraLines)
-        {
-            this.fontRenderer.drawString("\u0394x: " + this.getDeltaString(this.tile.linkedMinerDataDX), 186, 152, 2536735);
+    
+    protected void drawGuiContainerForegroundLayer(final int par1, final int par2) {
+        this.fontRendererObj.drawString(this.tile.getInventoryName(), 7, 6, 4210752);
+        this.fontRendererObj.drawString(this.getStatus(), 177, 141, 4210752);
+        if (this.extraLines) {
+            this.fontRendererObj.drawString("\u0394x: " + this.getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posX) - this.tile.xCoord - 1), 186, 152, 2536735);
         }
-        if (this.extraLines)
-        {
-            this.fontRenderer.drawString("\u0394y: " + this.getDeltaString(this.tile.linkedMinerDataDY), 186, 162, 2536735);
+        if (this.extraLines) {
+            this.fontRendererObj.drawString("\u0394y: " + this.getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posY) - this.tile.yCoord), 186, 162, 2536735);
         }
-        if (this.extraLines)
-        {
-            this.fontRenderer.drawString("\u0394z: " + this.getDeltaString(this.tile.linkedMinerDataDZ), 186, 172, 2536735);
+        if (this.extraLines) {
+            this.fontRendererObj.drawString("\u0394z: " + this.getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posZ) - this.tile.zCoord - 1), 186, 172, 2536735);
         }
-        if (this.extraLines)
-        {
-            this.fontRenderer.drawString(GCCoreUtil.translate("gui.miner.mined") + ": " + this.tile.linkedMinerDataCount, 177, 183, 2536735);
+        if (this.extraLines) {
+            this.fontRendererObj.drawString(GCCoreUtil.translate("gui.miner.mined") + ": " + this.tile.linkedMiner.mineCount, 177, 183, 2536735);
         }
-        this.fontRenderer.drawString(GCCoreUtil.translate("container.inventory"), 7, this.ySize - 92, 4210752);
+        this.fontRendererObj.drawString(GCCoreUtil.translate("container.inventory"), 7, this.ySize - 92, 4210752);
     }
-
-    private String getStatus()
-    {
+    
+    private String getStatus() {
         this.extraLines = false;
-
-        switch (this.tile.linkedMinerDataAIState)
-        {
-            case -3: // no linked miner
-                return "";
-            case -2:
-                return EnumColor.ORANGE + GCCoreUtil.translate("gui.miner.out_of_range");
-            case EntityAstroMiner.AISTATE_OFFLINE:
+        if (this.tile.linkedMinerID == null) {
+            return "";
+        }
+        final EntityAstroMiner miner = this.tile.linkedMiner;
+        if (miner == null || miner.isDead) {
+            return "";
+        }
+        if (this.tile.linkCountDown == 0) {
+            return EnumColor.ORANGE + GCCoreUtil.translate("gui.miner.outOfRange");
+        }
+        switch (miner.AIstate) {
+            case -1: {
                 return EnumColor.ORANGE + GCCoreUtil.translate("gui.miner.offline");
-            case EntityAstroMiner.AISTATE_STUCK:
+            }
+            case 0: {
                 this.extraLines = true;
                 return EnumColor.RED + GCCoreUtil.translate("gui.miner.stuck");
-            case EntityAstroMiner.AISTATE_ATBASE:
+            }
+            case 1: {
                 return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.miner.docked");
-            case EntityAstroMiner.AISTATE_TRAVELLING:
+            }
+            case 2: {
                 this.extraLines = true;
                 return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.miner.travelling");
-            case EntityAstroMiner.AISTATE_MINING:
+            }
+            case 3: {
                 this.extraLines = true;
                 return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.miner.mining");
-            case EntityAstroMiner.AISTATE_RETURNING:
+            }
+            case 4: {
                 this.extraLines = true;
                 return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.miner.returning");
-            case EntityAstroMiner.AISTATE_DOCKING:
+            }
+            case 5: {
                 return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.miner.docking");
+            }
+            default: {
+                return "";
+            }
         }
-        return "";
     }
-
-    @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
-    {
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        int xPos = (this.width - this.xSize) / 2;
-        int yPos = (this.height - this.ySize) / 2;
+    
+    protected void drawGuiContainerBackgroundLayer(final float var1, final int var2, final int var3) {
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        final int xPos = (this.width - this.xSize) / 2;
+        final int yPos = (this.height - this.ySize) / 2;
         this.mc.getTextureManager().bindTexture(GuiAstroMinerDock.dockGui);
         this.drawTexturedModalRect(xPos, yPos, 0, 0, this.xSize, this.ySize);
-        List<String> electricityDesc = new ArrayList<>();
-        electricityDesc.add(GCCoreUtil.translate("gui.energy_storage.desc.0"));
-        EnergyDisplayHelper.getEnergyDisplayTooltip(this.tile.getEnergyStoredGC(), this.tile.getMaxEnergyStoredGC(), electricityDesc);
+        final List<String> electricityDesc = new ArrayList<String>();
+        electricityDesc.add(GCCoreUtil.translate("gui.energyStorage.desc.0"));
+        EnergyDisplayHelper.getEnergyDisplayTooltip(this.tile.getEnergyStoredGC(), this.tile.getMaxEnergyStoredGC(), (List)electricityDesc);
         this.electricInfoRegion.tooltipStrings = electricityDesc;
-
         this.mc.getTextureManager().bindTexture(GuiCargoLoader.loaderTexture);
-
-        if (this.tile.getEnergyStoredGC() > 0)
-        {
+        if (this.tile.getEnergyStoredGC() > 0.0f) {
             this.drawTexturedModalRect(xPos + 233, yPos + 17, 176, 0, 11, 10);
         }
-
-        int level = Math.min(this.tile.getScaledElecticalLevel(66), 66);
-        this.drawColorModalRect(xPos + 234, yPos + 29 + 66 - level, 8, level, 0xc1aa24);
+        final int level = Math.min(this.tile.getScaledElecticalLevel(66), 66);
+        this.drawColorModalRect(xPos + 234, yPos + 29 + 66 - level, 8, level, 12692004);
     }
-
-    private void drawColorModalRect(int x, int y, int width, int height, int color)
-    {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder worldRenderer = tessellator.getBuffer();
-        GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        worldRenderer.pos(x + 0, y + height, this.zLevel).color((color >> 16 & 255) / 255.0F, (color >> 8 & 255) / 255.0F, (color & 255) / 255.0F, 1.0F).endVertex();
-        worldRenderer.pos(x + width, y + height, this.zLevel).color((color >> 16 & 255) / 255.0F, (color >> 8 & 255) / 255.0F, (color & 255) / 255.0F, 1.0F).endVertex();
-        worldRenderer.pos(x + width, y + 0, this.zLevel).color((color >> 16 & 255) / 255.0F, (color >> 8 & 255) / 255.0F, (color & 255) / 255.0F, 1.0F).endVertex();
-        worldRenderer.pos(x + 0, y + 0, this.zLevel).color((color >> 16 & 255) / 255.0F, (color >> 8 & 255) / 255.0F, (color & 255) / 255.0F, 1.0F).endVertex();
+    
+    public void drawColorModalRect(final int p_73729_1_, final int p_73729_2_, final int p_73729_5_, final int p_73729_6_, final int color) {
+        final float f = 0.00390625f;
+        final float f2 = 0.00390625f;
+        final Tessellator tessellator = Tessellator.instance;
+        GL11.glEnable(3042);
+        GL11.glDisable(3553);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        tessellator.startDrawingQuads();
+        tessellator.setColorOpaque_I(color);
+        tessellator.addVertex((double)(p_73729_1_ + 0), (double)(p_73729_2_ + p_73729_6_), (double)this.zLevel);
+        tessellator.addVertex((double)(p_73729_1_ + p_73729_5_), (double)(p_73729_2_ + p_73729_6_), (double)this.zLevel);
+        tessellator.addVertex((double)(p_73729_1_ + p_73729_5_), (double)(p_73729_2_ + 0), (double)this.zLevel);
+        tessellator.addVertex((double)(p_73729_1_ + 0), (double)(p_73729_2_ + 0), (double)this.zLevel);
         tessellator.draw();
-        GlStateManager.enableTexture2D();
-        GlStateManager.disableBlend();
-        GlStateManager.blendFunc(770, 771);
+        GL11.glEnable(3553);
+        GL11.glDisable(3042);
+    }
+    
+    static {
+        dockGui = new ResourceLocation("galacticraftasteroids", "textures/gui/guiAstroMinerDock.png");
     }
 }

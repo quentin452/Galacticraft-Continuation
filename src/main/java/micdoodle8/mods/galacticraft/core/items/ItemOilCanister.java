@@ -1,93 +1,73 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import net.minecraft.entity.player.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.*;
 
-import javax.annotation.Nullable;
-
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class ItemOilCanister extends ItemCanisterGeneric implements ISortableItem
+public class ItemOilCanister extends ItemCanisterGeneric
 {
-
-    public ItemOilCanister(String assetName)
-    {
+    protected IIcon[] icons;
+    
+    public ItemOilCanister(final String assetName) {
         super(assetName);
+        this.icons = new IIcon[7];
         this.setAllowedFluid(ConfigManagerCore.useOldOilFluidID ? "oilgc" : "oil");
-        this.setContainerItem(this);
+        this.setContainerItem((Item)this);
+        this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemStack)
-    {
-        if (itemStack.getMaxDamage() - itemStack.getItemDamage() == 0)
-        {
-            return "item.empty_liquid_canister";
-        }
-
-        if (itemStack.getItemDamage() == 1)
-        {
-            return "item.oil_canister";
-        }
-
-        return "item.oil_canister_partial";
-    }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        if (par1ItemStack.getMaxDamage() - par1ItemStack.getItemDamage() > 0)
-        {
-            tooltip.add(GCCoreUtil.translate("gui.message.oil.name") + ": " + (par1ItemStack.getMaxDamage() - par1ItemStack.getItemDamage()));
+    public void registerIcons(final IIconRegister iconRegister) {
+        for (int i = 0; i < this.icons.length; ++i) {
+            this.icons[i] = iconRegister.registerIcon(this.getIconString() + "_" + i);
         }
     }
-
-    @Override
+    
+    public String getUnlocalizedName(final ItemStack itemStack) {
+        if (itemStack.getMaxDamage() - itemStack.getItemDamage() == 0) {
+            return "item.emptyLiquidCanister";
+        }
+        if (itemStack.getItemDamage() == 1) {
+            return "item.oilCanister";
+        }
+        return "item.oilCanisterPartial";
+    }
+    
+    public IIcon getIconFromDamage(final int par1) {
+        final int damage = 6 * par1 / this.getMaxDamage();
+        if (this.icons.length > damage) {
+            return this.icons[this.icons.length - damage - 1];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
     @SideOnly(Side.CLIENT)
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            list.add(new ItemStack(this, 1, this.getMaxDamage()));
-            list.add(new ItemStack(this, 1, 1));
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
+        if (par1ItemStack.getMaxDamage() - par1ItemStack.getItemDamage() > 0) {
+            par3List.add(GCCoreUtil.translate("gui.message.oil.name") + ": " + (par1ItemStack.getMaxDamage() - par1ItemStack.getItemDamage()));
         }
     }
-
-    @Override
-    public void onUpdate(ItemStack par1ItemStack, World par2World, Entity par3Entity, int par4, boolean par5)
-    {
-        if (ItemCanisterGeneric.EMPTY == par1ItemStack.getItemDamage())
-        {
-            par1ItemStack.setTagCompound(null);
-        } else if (par1ItemStack.getItemDamage() <= 0)
-        {
+    
+    @SideOnly(Side.CLIENT)
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        par3List.add(new ItemStack(par1, 1, 1));
+        par3List.add(new ItemStack(par1, 1, this.getMaxDamage()));
+    }
+    
+    public void onUpdate(final ItemStack par1ItemStack, final World par2World, final Entity par3Entity, final int par4, final boolean par5) {
+        if (1001 == par1ItemStack.getItemDamage()) {
+            par1ItemStack.stackTagCompound = null;
+        }
+        else if (par1ItemStack.getItemDamage() <= 0) {
             par1ItemStack.setItemDamage(1);
         }
-    }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.CANISTER;
     }
 }

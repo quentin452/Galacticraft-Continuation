@@ -1,131 +1,77 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMulti;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMulti.EnumBlockMultiType;
-import micdoodle8.mods.galacticraft.core.client.gui.GuiIdsCore;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.tileentity.*;
+import cpw.mods.fml.client.*;
+import net.minecraft.block.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
 
 public class TileEntityNasaWorkbench extends TileEntityMulti implements IMultiBlock
 {
-
-    private boolean initialised;
-
-    public TileEntityNasaWorkbench()
-    {
-        super(null);
-    }
-
-    @Override
-    public boolean onActivated(EntityPlayer entityPlayer)
-    {
-        entityPlayer.openGui(GalacticraftCore.instance, GuiIdsCore.NASA_WORKBENCH_ROCKET, this.world, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
+    public boolean onActivated(final EntityPlayer entityPlayer) {
+        entityPlayer.openGui((Object)GalacticraftCore.instance, 0, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
         return true;
     }
-
-    @Override
-    public void update()
-    {
-        if (!this.initialised)
-        {
-            this.initialised = this.initialiseMultiTiles(this.getPos(), this.world);
-        }
-    }
-
-    @Override
-    public void onCreate(World world, BlockPos placedPosition)
-    {
+    
+    public void onCreate(final BlockVec3 placedPosition) {
         this.mainBlockPosition = placedPosition;
         this.markDirty();
-        List<BlockPos> positions = new ArrayList<>();
-        this.getPositions(placedPosition, positions);
-        ((BlockMulti) GCBlocks.fakeBlock).makeFakeBlock(world, positions, placedPosition, this.getMultiType());
-    }
-
-    @Override
-    public BlockMulti.EnumBlockMultiType getMultiType()
-    {
-        return EnumBlockMultiType.NASA_WORKBENCH;
-    }
-
-    @Override
-    public void getPositions(BlockPos placedPosition, List<BlockPos> positions)
-    {
-        int buildHeight = this.world.getHeight() - 1;
-
-        for (int y = 1; y < 3; y++)
-        {
-            if (placedPosition.getY() + y > buildHeight)
-            {
+        final int buildHeight = this.worldObj.getHeight() - 1;
+        for (int y = 1; y < 3; ++y) {
+            if (placedPosition.y + y > buildHeight) {
                 return;
             }
-
-            for (int x = -1; x < 2; x++)
-            {
-                for (int z = -1; z < 2; z++)
-                {
-                    if (Math.abs(x) != 1 || Math.abs(z) != 1)
-                    {
-                        positions.add(new BlockPos(placedPosition.getX() + x, placedPosition.getY() + y, placedPosition.getZ() + z));
+            for (int x = -1; x < 2; ++x) {
+                for (int z = -1; z < 2; ++z) {
+                    final BlockVec3 vecToAdd = new BlockVec3(placedPosition.x + x, placedPosition.y + y, placedPosition.z + z);
+                    if (!vecToAdd.equals((Object)placedPosition) && (Math.abs(x) != 1 || Math.abs(z) != 1)) {
+                        ((BlockMulti)GCBlocks.fakeBlock).makeFakeBlock(this.worldObj, vecToAdd, placedPosition, 3);
                     }
                 }
             }
         }
-
-        if (placedPosition.getY() + 3 <= buildHeight)
-        {
-            positions.add(new BlockPos(placedPosition.getX(), placedPosition.getY() + 3, placedPosition.getZ()));
+        if (placedPosition.y + 3 > buildHeight) {
+            return;
         }
+        final BlockVec3 vecToAdd2 = new BlockVec3(placedPosition.x, placedPosition.y + 3, placedPosition.z);
+        ((BlockMulti)GCBlocks.fakeBlock).makeFakeBlock(this.worldObj, vecToAdd2, placedPosition, 3);
     }
-
-    @Override
-    public void onDestroy(TileEntity callingBlock)
-    {
-        final BlockPos thisBlock = getPos();
-        List<BlockPos> positions = new ArrayList<>();
-        this.getPositions(thisBlock, positions);
-
-        for (BlockPos pos : positions)
-        {
-            IBlockState stateAt = this.world.getBlockState(pos);
-
-            if (stateAt.getBlock() == GCBlocks.fakeBlock && stateAt.getValue(BlockMulti.MULTI_TYPE) == EnumBlockMultiType.NASA_WORKBENCH)
-            {
-                if (this.world.isRemote && this.world.rand.nextDouble() < 0.05D)
-                {
-                    FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(pos, this.world.getBlockState(thisBlock));
+    
+    public void onDestroy(final TileEntity callingBlock) {
+        final BlockVec3 thisBlock = new BlockVec3((TileEntity)this);
+        for (int x = -1; x < 2; ++x) {
+            for (int y = 0; y < 4; ++y) {
+                for (int z = -1; z < 2; ++z) {
+                    if (Math.abs(x) != 1 || Math.abs(z) != 1) {
+                        if ((y == 0 || y == 3) && x == 0 && z == 0) {
+                            if (this.worldObj.isRemote && this.worldObj.rand.nextDouble() < 0.05) {
+                                FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(thisBlock.x + x, thisBlock.y + y, thisBlock.z + z, GCBlocks.nasaWorkbench, Block.getIdFromBlock(GCBlocks.nasaWorkbench) >> 12 & 0xFF);
+                            }
+                            if (y == 0) {
+                                this.worldObj.func_147480_a(thisBlock.x, thisBlock.y, thisBlock.z, true);
+                            }
+                            else {
+                                this.worldObj.setBlockToAir(thisBlock.x + x, thisBlock.y + y, thisBlock.z + z);
+                            }
+                        }
+                        else if (y != 0 && y != 3) {
+                            if (this.worldObj.isRemote && this.worldObj.rand.nextDouble() < 0.05) {
+                                FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(thisBlock.x + x, thisBlock.y + y, thisBlock.z + z, GCBlocks.nasaWorkbench, Block.getIdFromBlock(GCBlocks.nasaWorkbench) >> 12 & 0xFF);
+                            }
+                            this.worldObj.setBlockToAir(thisBlock.x + x, thisBlock.y + y, thisBlock.z + z);
+                        }
+                    }
                 }
-                this.world.setBlockToAir(pos);
             }
         }
-        this.world.destroyBlock(thisBlock, true);
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getRenderBoundingBox()
-    {
-        return new AxisAlignedBB(getPos().getX() - 1, getPos().getY() - 1, getPos().getZ() - 1, getPos().getX() + 2, getPos().getY() + 5, getPos().getZ() + 2);
+    public AxisAlignedBB getRenderBoundingBox() {
+        return AxisAlignedBB.getBoundingBox((double)(this.xCoord - 1), (double)this.yCoord, (double)(this.zCoord - 1), (double)(this.xCoord + 2), (double)(this.yCoord + 4), (double)(this.zCoord + 2));
     }
 }

@@ -1,113 +1,71 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-
-import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.init.*;
+import net.minecraft.item.*;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.player.*;
 
 public class ContainerCoalGenerator extends Container
 {
-
     private TileEntityCoalGenerator tileEntity;
 
-    public ContainerCoalGenerator(InventoryPlayer inventoryPlayer, TileEntityCoalGenerator tileEntity)
-    {
+    public ContainerCoalGenerator(final InventoryPlayer par1InventoryPlayer, final TileEntityCoalGenerator tileEntity) {
         this.tileEntity = tileEntity;
-        this.addSlotToContainer(new SlotCoalGenerator(tileEntity, 0, 33, 34));
-        int i;
-
-        for (i = 0; i < 3; ++i)
-        {
-            for (int k = 0; k < 9; ++k)
-            {
-                this.addSlotToContainer(new Slot(inventoryPlayer, k + i * 9 + 9, 8 + k * 18, 84 + i * 18));
+        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)tileEntity, 0, 33, 34, new ItemStack[] { new ItemStack(Items.coal), new ItemStack(Item.getItemFromBlock(Blocks.coal_block)) }));
+        for (int var3 = 0; var3 < 3; ++var3) {
+            for (int var4 = 0; var4 < 9; ++var4) {
+                this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 84 + var3 * 18));
             }
         }
-
-        for (i = 0; i < 9; ++i)
-        {
-            this.addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 142));
+        for (int var3 = 0; var3 < 9; ++var3) {
+            this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var3, 8 + var3 * 18, 142));
         }
     }
 
-    @Override
-    public void onContainerClosed(EntityPlayer entityplayer)
-    {
+    public void onContainerClosed(final EntityPlayer entityplayer) {
         super.onContainerClosed(entityplayer);
     }
 
-    @Override
-    public boolean canInteractWith(EntityPlayer entityPlayer)
-    {
-        return this.tileEntity.isUsableByPlayer(entityPlayer);
+    public boolean canInteractWith(final EntityPlayer par1EntityPlayer) {
+        return this.tileEntity.isUseableByPlayer(par1EntityPlayer);
     }
 
-    /**
-     * Called to transfer a stack from one inventory to the other eg. when shift
-     * clicking.
-     */
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer entityPlayer, int index)
-    {
-        ItemStack stack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
-
-        if (slot != null && slot.getHasStack())
-        {
-            ItemStack var4 = slot.getStack();
-            stack = var4.copy();
-
-            if (index != 0)
-            {
-                if (var4.getItem() == Items.COAL)
-                {
-                    if (!this.mergeItemStack(var4, 0, 1, false))
-                    {
-                        return ItemStack.EMPTY;
+    public ItemStack transferStackInSlot(final EntityPlayer par1EntityPlayer, final int par1) {
+        ItemStack var2 = null;
+        final Slot var3 = (Slot) this.inventorySlots.get(par1);
+        if (var3 != null && var3.getHasStack()) {
+            final ItemStack var4 = var3.getStack();
+            var2 = var4.copy();
+            if (par1 != 0) {
+                if (var4.getItem() == Items.coal) {
+                    if (!this.mergeItemStack(var4, 0, 1, false)) {
+                        return null;
                     }
-                } else if (index >= 28)
-                {
-                    if (!this.mergeItemStack(var4, 1, 28, false))
-                    {
-                        return ItemStack.EMPTY;
-                    }
-                } else if (!this.mergeItemStack(var4, 28, 37, false))
-                {
-                    return ItemStack.EMPTY;
                 }
-
-            } else if (!this.mergeItemStack(var4, 1, 37, false))
-            {
-                return ItemStack.EMPTY;
+                else if (par1 >= 28) {
+                    if (!this.mergeItemStack(var4, 1, 28, false)) {
+                        return null;
+                    }
+                }
+                else if (!this.mergeItemStack(var4, 28, 37, false)) {
+                    return null;
+                }
             }
-
-            if (var4.getCount() == 0)
-            {
-                slot.putStack(ItemStack.EMPTY);
-            } else
-            {
-                slot.onSlotChanged();
+            else if (!this.mergeItemStack(var4, 1, 37, false)) {
+                return null;
             }
-
-            if (var4.getCount() == stack.getCount())
-            {
-                return ItemStack.EMPTY;
+            if (var4.stackSize == 0) {
+                var3.putStack((ItemStack)null);
             }
-
-            slot.onTake(entityPlayer, var4);
+            else {
+                var3.onSlotChanged();
+            }
+            if (var4.stackSize == var2.stackSize) {
+                return null;
+            }
+            var3.onPickupFromSlot(par1EntityPlayer, var4);
         }
-
-        return stack;
+        return var2;
     }
 }

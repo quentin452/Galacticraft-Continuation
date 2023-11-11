@@ -1,324 +1,281 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import com.google.common.base.Predicate;
-import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
-import micdoodle8.mods.galacticraft.api.block.IPlantableBlock;
-import micdoodle8.mods.galacticraft.api.block.ITerraformableBlock;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.ISortableBlock;
-import micdoodle8.mods.galacticraft.core.client.sounds.GCSounds;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.api.block.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.block.material.*;
+import net.minecraft.entity.*;
+import net.minecraft.client.renderer.texture.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.planets.mars.tile.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.planets.mars.items.*;
+import net.minecraft.init.*;
+import java.util.*;
+import net.minecraft.item.*;
+import net.minecraft.world.*;
+import net.minecraftforge.common.util.*;
+import net.minecraftforge.common.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.planets.*;
+import net.minecraft.util.*;
 
-import java.util.Random;
-
-public class BlockBasicMars extends Block implements IDetectableResource, IPlantableBlock, ITerraformableBlock, ISortableBlock
+public class BlockBasicMars extends Block implements IDetectableResource, IPlantableBlock, ITileEntityProvider, ITerraformableBlock
 {
-
-    public static final PropertyEnum<EnumBlockBasic> BASIC_TYPE = PropertyEnum.create("basictypemars", EnumBlockBasic.class);
-
-    public enum EnumBlockBasic implements IStringSerializable
-    {
-
-        ORE_COPPER(0, "ore_copper_mars"),
-        ORE_TIN(1, "ore_tin_mars"),
-        ORE_DESH(2, "ore_desh_mars"),
-        ORE_IRON(3, "ore_iron_mars"),
-        COBBLESTONE(4, "cobblestone"),
-        SURFACE(5, "mars_surface"),
-        MIDDLE(6, "mars_middle"),
-        DUNGEON_BRICK(7, "dungeon_brick"),
-        DESH_BLOCK(8, "desh_block"),
-        MARS_STONE(9, "mars_stone");
-
-        private final int meta;
-        private final String name;
-
-        private EnumBlockBasic(int meta, String name)
-        {
-            this.meta = meta;
-            this.name = name;
-        }
-
-        public int getMeta()
-        {
-            return this.meta;
-        }
-
-        private final static EnumBlockBasic[] values = values();
-
-        public static EnumBlockBasic byMetadata(int meta)
-        {
-            return values[meta % values.length];
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
-    }
-
-    public BlockBasicMars(String assetName)
-    {
-        super(Material.ROCK);
-        this.setTranslationKey(assetName);
-    }
-
-    @Override
-    public MapColor getMapColor(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        if (state.getValue(BASIC_TYPE) == EnumBlockBasic.DUNGEON_BRICK)
-        {
-            return MapColor.GREEN;
-        } else if (state.getValue(BASIC_TYPE) == EnumBlockBasic.SURFACE)
-        {
-            return MapColor.DIRT;
-        }
-
-        return MapColor.RED;
-    }
-
-    @Override
-    public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion)
-    {
-        EnumBlockBasic type = world.getBlockState(pos).getValue(BASIC_TYPE);
-
-        if (type == EnumBlockBasic.DUNGEON_BRICK)
-        {
-            return 40.0F;
-        } else if (type == EnumBlockBasic.DESH_BLOCK)
-        {
-            return 60.0F;
-        }
-
-        return super.getExplosionResistance(world, pos, exploder, explosion);
-    }
-
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    private IIcon[] marsBlockIcons;
+    
+    public MapColor getMapColor(final int meta) {
+        switch (meta) {
+            case 7: {
+                return MapColor.greenColor;
+            }
+            case 5: {
+                return MapColor.dirtColor;
+            }
+            default: {
+                return MapColor.redColor;
+            }
+        }
+    }
+    
+    public BlockBasicMars() {
+        super(Material.rock);
+    }
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        if (world.getBlockMetadata(x, y, z) == 10) {
+            return null;
+        }
+        return super.getCollisionBoundingBoxFromPool(world, x, y, z);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+        if (world.getBlockMetadata(x, y, z) == 10) {
+            return AxisAlignedBB.getBoundingBox(x + 0.0, y + 0.0, z + 0.0, x + 0.0, y + 0.0, z + 0.0);
+        }
+        return super.getSelectedBoundingBoxFromPool(world, x, y, z);
+    }
+    
+    public float getExplosionResistance(final Entity par1Entity, final World world, final int x, final int y, final int z, final double explosionX, final double explosionY, final double explosionZ) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        if (metadata == 10) {
+            return 10000.0f;
+        }
+        if (metadata == 7) {
+            return 40.0f;
+        }
+        return super.getExplosionResistance(par1Entity, world, x, y, z, explosionX, explosionY, explosionZ);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        (this.marsBlockIcons = new IIcon[11])[0] = par1IconRegister.registerIcon("galacticraftmars:cobblestone");
+        this.marsBlockIcons[1] = par1IconRegister.registerIcon("galacticraftmars:decoration_desh");
+        this.marsBlockIcons[2] = par1IconRegister.registerIcon("galacticraftmars:middle");
+        this.marsBlockIcons[3] = par1IconRegister.registerIcon("galacticraftmars:brick");
+        this.marsBlockIcons[4] = par1IconRegister.registerIcon("galacticraftmars:top");
+        this.marsBlockIcons[5] = par1IconRegister.registerIcon("galacticraftmars:copper");
+        this.marsBlockIcons[6] = par1IconRegister.registerIcon("galacticraftmars:desh");
+        this.marsBlockIcons[7] = par1IconRegister.registerIcon("galacticraftmars:tin");
+        this.marsBlockIcons[8] = par1IconRegister.registerIcon("galacticraftmars:bottom");
+        this.marsBlockIcons[9] = par1IconRegister.registerIcon("galacticraftmars:iron");
+        this.marsBlockIcons[10] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "blank");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos)
-    {
-		if (blockState.getValue(BASIC_TYPE) == EnumBlockBasic.DUNGEON_BRICK)
-        {
-            return 4.0F;
+    
+    public float getBlockHardness(final World par1World, final int par2, final int par3, final int par4) {
+        final int meta = par1World.getBlockMetadata(par2, par3, par4);
+        if (meta == 7) {
+            return 4.0f;
         }
-
+        if (meta == 10) {
+            return -1.0f;
+        }
         return this.blockHardness;
     }
-
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune)
-    {
-        if (state.getValue(BASIC_TYPE) == EnumBlockBasic.ORE_DESH)
-        {
+    
+    public TileEntity createTileEntity(final World world, final int metadata) {
+        if (metadata == 10) {
+            return (TileEntity)new TileEntityDungeonSpawnerMars();
+        }
+        return null;
+    }
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
+        return null;
+    }
+    
+    public boolean canHarvestBlock(final EntityPlayer player, final int meta) {
+        return meta != 10 && super.canHarvestBlock(player, meta);
+    }
+    
+    public IIcon getIcon(final int side, final int meta) {
+        switch (meta) {
+            case 0: {
+                return this.marsBlockIcons[5];
+            }
+            case 1: {
+                return this.marsBlockIcons[7];
+            }
+            case 2: {
+                return this.marsBlockIcons[6];
+            }
+            case 3: {
+                return this.marsBlockIcons[9];
+            }
+            case 4: {
+                return this.marsBlockIcons[0];
+            }
+            case 5: {
+                return this.marsBlockIcons[4];
+            }
+            case 6: {
+                return this.marsBlockIcons[2];
+            }
+            case 7: {
+                return this.marsBlockIcons[3];
+            }
+            case 8: {
+                return this.marsBlockIcons[1];
+            }
+            case 9: {
+                return this.marsBlockIcons[8];
+            }
+            case 10: {
+                return this.marsBlockIcons[10];
+            }
+            default: {
+                return this.marsBlockIcons[1];
+            }
+        }
+    }
+    
+    public Item getItemDropped(final int meta, final Random random, final int par3) {
+        if (meta == 2) {
             return MarsItems.marsItemBasic;
         }
-
-        return Item.getItemFromBlock(this);
+        if (meta == 10) {
+            return Item.getItemFromBlock(Blocks.air);
+        }
+        return Item.getItemFromBlock((Block)this);
     }
-
-    @Override
-    public int damageDropped(IBlockState state)
-    {
-        int meta = state.getBlock().getMetaFromState(state);
-        if (state.getValue(BASIC_TYPE) == EnumBlockBasic.MARS_STONE)
-        {
+    
+    public int damageDropped(final int meta) {
+        if (meta == 9) {
             return 4;
-        } else if (state.getValue(BASIC_TYPE) == EnumBlockBasic.ORE_DESH)
-        {
+        }
+        if (meta == 2) {
             return 0;
-        } else
-        {
-            return meta;
         }
+        return meta;
     }
-
-    @Override
-    public int quantityDropped(IBlockState state, int fortune, Random random)
-    {
-        if (state.getValue(BASIC_TYPE) == EnumBlockBasic.ORE_DESH && fortune >= 1)
-        {
-            return (random.nextFloat() < fortune * 0.29F - 0.25F) ? 2 : 1;
+    
+    public int getDamageValue(final World p_149643_1_, final int p_149643_2_, final int p_149643_3_, final int p_149643_4_) {
+        return p_149643_1_.getBlockMetadata(p_149643_2_, p_149643_3_, p_149643_4_);
+    }
+    
+    public int quantityDropped(final int meta, final int fortune, final Random random) {
+        if (meta == 10) {
+            return 0;
         }
-
+        if (meta == 2 && fortune >= 1) {
+            return (random.nextFloat() < fortune * 0.29f - 0.25f) ? 2 : 1;
+        }
         return 1;
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        for (EnumBlockBasic blockBasic : EnumBlockBasic.values())
-        {
-            list.add(new ItemStack(this, 1, blockBasic.getMeta()));
+    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int var4 = 0; var4 < 11; ++var4) {
+            if (var4 != 10) {
+                par3List.add(new ItemStack(par1, 1, var4));
+            }
         }
     }
-
-    @Override
-    public boolean isValueable(IBlockState state)
-    {
-        switch (this.getMetaFromState(state))
-        {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
+    
+    public boolean isValueable(final int metadata) {
+        switch (metadata) {
+            case 0: {
                 return true;
-            default:
+            }
+            case 1: {
+                return true;
+            }
+            case 2: {
+                return true;
+            }
+            case 3: {
+                return true;
+            }
+            default: {
                 return false;
+            }
         }
     }
-
-    @Override
-    public boolean canSustainPlant(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing direction, IPlantable plantable)
-    {
+    
+    public boolean canSustainPlant(final IBlockAccess world, final int x, final int y, final int z, final ForgeDirection direction, final IPlantable plantable) {
         return false;
     }
-
-    @Override
-    public int requiredLiquidBlocksNearby()
-    {
+    
+    public int requiredLiquidBlocksNearby() {
         return 4;
     }
-
-    @Override
-    public boolean isPlantable(IBlockState state)
-    {
+    
+    public boolean isPlantable(final int metadata) {
         return false;
     }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(IBlockState state, World worldIn, BlockPos pos, Random rand)
-    {
-        if (rand.nextInt(10) == 0)
-        {
-            if (state.getBlock() == this && state.getValue(BASIC_TYPE) == EnumBlockBasic.DUNGEON_BRICK)
-            {
-                GalacticraftPlanets.spawnParticle("sludgeDrip", new Vector3(pos.getX() + rand.nextDouble(), pos.getY(), pos.getZ() + rand.nextDouble()), new Vector3(0, 0, 0));
-
-                if (rand.nextInt(100) == 0)
-                {
-                    worldIn.playSound(null, pos.getX(), pos.getY(), pos.getZ(), GCSounds.singleDrip, SoundCategory.AMBIENT, 1, 0.8F + rand.nextFloat() / 5.0F);
+    
+    public void randomDisplayTick(final World world, final int x, final int y, final int z, final Random rand) {
+        if (rand.nextInt(10) == 0) {
+            final int metadata = world.getBlockMetadata(x, y, z);
+            if (metadata == 7) {
+                GalacticraftPlanets.spawnParticle("sludgeDrip", new Vector3(x + rand.nextDouble(), (double)y, z + rand.nextDouble()), new Vector3(0.0, 0.0, 0.0), new Object[0]);
+                if (rand.nextInt(100) == 0) {
+                    world.playSound((double)x, (double)y, (double)z, GalacticraftCore.TEXTURE_PREFIX + "ambience.singledrip", 1.0f, 0.8f + rand.nextFloat() / 5.0f, false);
                 }
             }
         }
     }
-
-    @Override
-    public boolean isTerraformable(World world, BlockPos pos)
-    {
-        IBlockState state = world.getBlockState(pos);
-        IBlockState stateAbove = world.getBlockState(pos.up());
-        return state.getValue(BASIC_TYPE) == EnumBlockBasic.SURFACE && !stateAbove.getBlock().isFullCube(stateAbove);
+    
+    public boolean isTerraformable(final World world, final int x, final int y, final int z) {
+        return world.getBlockMetadata(x, y, z) == 5 && !world.getBlock(x, y + 1, z).isOpaqueCube();
     }
-
-    @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
-    {
-        return new ItemStack(Item.getItemFromBlock(this), 1, this.getMetaFromState(state));
+    
+    public boolean canSilkHarvest(final World world, final EntityPlayer player, final int x, final int y, final int z, final int metadata) {
+        return metadata < 10;
     }
-
-    @Override
-    public boolean isReplaceableOreGen(IBlockState state, IBlockAccess world, BlockPos pos, Predicate<IBlockState> target)
-    {
-        return (state.getValue(BASIC_TYPE) == EnumBlockBasic.MIDDLE || state.getValue(BASIC_TYPE) == EnumBlockBasic.MARS_STONE);
-    }
-
-    @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
-        return state.getBlock().getMetaFromState(state) == 10;
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(BASIC_TYPE, EnumBlockBasic.byMetadata(meta));
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return ((EnumBlockBasic) state.getValue(BASIC_TYPE)).getMeta();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, BASIC_TYPE);
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        switch (meta)
-        {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                return EnumSortCategoryBlock.ORE;
-            case 7:
-                return EnumSortCategoryBlock.BRICKS;
-            case 8:
-                return EnumSortCategoryBlock.INGOT_BLOCK;
+    
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        if (metadata == 2) {
+            return new ItemStack(Item.getItemFromBlock((Block)this), 1, metadata);
         }
-        return EnumSortCategoryBlock.GENERAL;
-    }
-
-    @Override
-    public int getExpDrop(IBlockState state, IBlockAccess world, BlockPos pos, int fortune)
-    {
-        if (state.getBlock() != this)
-            return 0;
-
-        int meta = this.getMetaFromState(state);
-        if (meta == 2)
-        {
-            Random rand = world instanceof World ? ((World) world).rand : new Random();
-            return MathHelper.getInt(rand, 2, 5);
+        if (metadata == 9) {
+            return new ItemStack(Item.getItemFromBlock((Block)this), 1, metadata);
         }
-        return 0;
+        if (metadata == 10) {
+            return null;
+        }
+        return super.getPickBlock(target, world, x, y, z);
+    }
+    
+    public boolean isReplaceableOreGen(final World world, final int x, final int y, final int z, final Block target) {
+        if (target != Blocks.stone) {
+            return false;
+        }
+        final int meta = world.getBlockMetadata(x, y, z);
+        return meta == 6 || meta == 9;
+    }
+    
+    public boolean hasTileEntity(final int metadata) {
+        return metadata == 10;
     }
 }

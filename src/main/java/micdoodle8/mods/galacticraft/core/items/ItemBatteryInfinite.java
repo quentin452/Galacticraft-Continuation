@@ -1,116 +1,67 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
+import micdoodle8.mods.galacticraft.core.energy.item.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.entity.player.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.item.*;
 
-import javax.annotation.Nullable;
-
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class ItemBatteryInfinite extends ItemElectricBase implements ISortableItem, GCRarity
+public class ItemBatteryInfinite extends ItemElectricBase
 {
-
-    public ItemBatteryInfinite(String assetName)
-    {
-        super();
-        this.setTranslationKey(assetName);
+    public ItemBatteryInfinite(final String assetName) {
+        this.setUnlocalizedName(assetName);
+        this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-
-    @Override
-    public boolean hasEffect(ItemStack stack)
-    {
-        return true;
+    
+    protected void setMaxTransfer() {
+        this.transferMax = 1000.0f;
     }
-
-    @Override
-    protected void setMaxTransfer()
-    {
-        this.transferMax = 1000;
+    
+    public int getTierGC(final ItemStack itemStack) {
+        return 2;
     }
-
-    @Override
-    public int getTierGC(ItemStack itemStack)
-    {
-        return 3;
-    }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        tooltip.add(EnumColor.DARK_GREEN + GCCoreUtil.translate("gui.infinite_item.desc"));
-        tooltip.add(EnumColor.RED + GCCoreUtil.translate("gui.creative_only.desc"));
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public float getElectricityStored(ItemStack itemStack)
-    {
+    
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
+        par3List.add("�2" + GCCoreUtil.translate("gui.infiniteBattery.desc"));
+    }
+    
+    public float getElectricityStored(final ItemStack itemStack) {
         return this.getMaxElectricityStored(itemStack);
     }
-
-    @Override
-    public void setElectricity(ItemStack itemStack, float joules)
-    {
+    
+    public void setElectricity(final ItemStack itemStack, final float joules) {
     }
-
-    @Override
-    public float getMaxElectricityStored(ItemStack itemStack)
-    {
+    
+    public float getMaxElectricityStored(final ItemStack itemStack) {
         return Float.POSITIVE_INFINITY;
     }
-
-    @Override
-    public float getTransfer(ItemStack itemStack)
-    {
-        return 0.0F;
+    
+    public float getTransfer(final ItemStack itemStack) {
+        return 0.0f;
     }
-
-    @Override
-    public float recharge(ItemStack theItem, float energy, boolean doReceive)
-    {
-        return 0F;
+    
+    public float recharge(final ItemStack theItem, final float energy, final boolean doReceive) {
+        return 0.0f;
     }
-
-    @Override
-    public float discharge(ItemStack theItem, float energy, boolean doTransfer)
-    {
+    
+    public float discharge(final ItemStack theItem, final float energy, final boolean doTransfer) {
         return energy;
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            list.add(new ItemStack(this, 1, 0));
-        }
-    }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.GENERAL;
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        par3List.add(new ItemStack(par1, 1, 0));
     }
 }

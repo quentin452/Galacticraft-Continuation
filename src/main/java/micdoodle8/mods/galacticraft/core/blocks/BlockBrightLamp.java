@@ -1,265 +1,135 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.init.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityArclamp;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.RedstoneUtil;
-
-public class BlockBrightLamp extends BlockAdvanced implements IShiftDescription, ITileEntityProvider, ISortableBlock
+public class BlockBrightLamp extends BlockAdvanced implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    public static final PropertyDirection FACING = PropertyDirection.create("facing");
-//    public static final PropertyBool ACTIVE = PropertyBool.create("active");
-
-    protected static final AxisAlignedBB DOWN_AABB = new AxisAlignedBB(0.2F, 0.0F, 0.2F, 0.8F, 0.6F, 0.8F);
-    protected static final AxisAlignedBB UP_AABB = new AxisAlignedBB(0.2F, 0.4F, 0.2F, 0.8F, 1.0F, 0.8F);
-    protected static final AxisAlignedBB NORTH_AABB = new AxisAlignedBB(0.2F, 0.2F, 0.0F, 0.8F, 0.8F, 0.6F);
-    protected static final AxisAlignedBB SOUTH_AABB = new AxisAlignedBB(0.2F, 0.2F, 0.4F, 0.8F, 0.8F, 1.0F);
-    protected static final AxisAlignedBB WEST_AABB = new AxisAlignedBB(0.0F, 0.2F, 0.2F, 0.6F, 0.8F, 0.8F);
-    protected static final AxisAlignedBB EAST_AABB = new AxisAlignedBB(0.4F, 0.2F, 0.2F, 1.0F, 0.8F, 0.8F);
-
-    // Metadata: bits 0-2 are the side of the base plate using standard side
-    // convention (0-5)
-
-    public BlockBrightLamp(String assetName)
-    {
-        super(Material.GLASS);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.UP)); // .withProperty(ACTIVE,
-                                                                                                  // true));
-        this.setHardness(0.1F);
-        this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(assetName);
-        this.setLightLevel(0.9F);
+    public static IIcon icon;
+    
+    protected BlockBrightLamp(final String assetName) {
+        super(Material.glass);
+        this.setHardness(0.1f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName("stone");
+        this.setBlockName(assetName);
+        this.setLightLevel(1.0f);
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        switch (state.getValue(FACING))
-        {
-            case EAST:
-                return EAST_AABB;
-            case WEST:
-                return WEST_AABB;
-            case SOUTH:
-                return SOUTH_AABB;
-            case NORTH:
-                return NORTH_AABB;
-            case DOWN:
-                return DOWN_AABB;
-            case UP:
-            default:
-                return UP_AABB;
+    
+    public int getLightValue(final IBlockAccess world, final int x, final int y, final int z) {
+        final Block block = world.getBlock(x, y, z);
+        if (block != this) {
+            return block.getLightValue(world, x, y, z);
         }
+        final int redstone = 0;
+        final World w = VersionUtil.getWorld(world);
+        return RedstoneUtil.isBlockReceivingRedstone(w, x, y, z) ? 0 : this.getLightValue();
     }
-
-    @Override
-    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
-        Block block = state.getBlock();
-        if (block != this)
-        {
-            return block.getLightValue(state);
-        }
-        /**
-         * Gets the light value of the specified block coords. Args: x, y, z
-         */
-
-        if (world instanceof World)
-        {
-            return RedstoneUtil.isBlockReceivingRedstone((World) world, pos) ? 0 : this.lightValue;
-        }
-
-        return 0;
+    
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World par1World, final int x, final int y, final int z) {
+        final double boundsMin = 0.2;
+        final double boundsMax = 0.8;
+        return AxisAlignedBB.getBoundingBox(x + boundsMin, y + boundsMin, z + boundsMin, x + boundsMax, y + boundsMax, z + boundsMax);
     }
-
-    @Override
-    public int getLightOpacity(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
-        return 1;
-    }
-
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos)
-    {
-        double boundsMin = 0.2D;
-        double boundsMax = 0.8D;
-        return new AxisAlignedBB(pos.getX() + boundsMin, pos.getY() + boundsMin, pos.getZ() + boundsMin, pos.getX() + boundsMax, pos.getY() + boundsMax, pos.getZ() + boundsMax);
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
+    
+    public int getRenderType() {
+        return GalacticraftCore.proxy.getBlockRender((Block)this);
     }
-
-    @Override
-    public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
-    {
-        for (EnumFacing side : EnumFacing.VALUES)
-        {
-            BlockPos offsetPos = pos.offset(side);
-            IBlockState state = worldIn.getBlockState(offsetPos);
-            BlockFaceShape faceShape = state.getBlockFaceShape(worldIn, offsetPos, side.getOpposite());
-            if (faceShape.equals(BlockFaceShape.SOLID))
-            {
+    
+    public boolean canPlaceBlockAt(final World par1World, final int x, final int y, final int z) {
+        final BlockVec3 thisvec = new BlockVec3(x, y, z);
+        for (int i = 0; i < 6; ++i) {
+            if (thisvec.blockOnSideHasSolidFace(par1World, i)) {
                 return true;
             }
         }
         return false;
     }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
-    {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-    }
-
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand)
-    {
-        EnumFacing opposite = facing.getOpposite();
-        BlockPos offsetPos = pos.offset(opposite);
-        IBlockState state = world.getBlockState(offsetPos);
-        BlockFaceShape faceShape = state.getBlockFaceShape(world, offsetPos, facing);
-        if (faceShape.equals(BlockFaceShape.SOLID))
-        {
-            return this.getDefaultState().withProperty(FACING, opposite);
+    
+    public int onBlockPlaced(final World world, final int x, final int y, final int z, final int side, final float hitX, final float hitY, final float hitZ, final int metaOld) {
+        final BlockVec3 thisvec = new BlockVec3(x, y, z);
+        if (thisvec.blockOnSideHasSolidFace(world, side ^ 0x1)) {
+            return side ^ 0x1;
         }
-
-        return this.getDefaultState().withProperty(FACING, facing);
+        return metaOld;
     }
-
-    /**
-     * Lets the block know when one of its neighbor changes. Doesn't know which
-     * neighbor changed (coordinates passed are their own) Args: x, y, z,
-     * neighbor blockID
-     */
-    @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
-    {
-        EnumFacing side = state.getValue(FACING);
-
-        BlockPos offsetPos = pos.offset(side);
-        IBlockState state1 = worldIn.getBlockState(offsetPos);
-        BlockFaceShape faceShape = state1.getBlockFaceShape(worldIn, offsetPos, EnumFacing.byIndex(side.getIndex() ^ 1));
-        if (faceShape.equals(BlockFaceShape.SOLID))
-        {
+    
+    public void onNeighborBlockChange(final World par1World, final int x, final int y, final int z, final Block par5) {
+        final int side = par1World.getBlockMetadata(x, y, z);
+        final BlockVec3 thisvec = new BlockVec3(x, y, z);
+        if (thisvec.blockOnSideHasSolidFace(par1World, side)) {
             return;
         }
-
-        this.dropBlockAsItem(worldIn, pos, state, 0);
-        worldIn.setBlockToAir(pos);
+        this.dropBlockAsItem(par1World, x, y, z, 0, 0);
+        par1World.setBlock(x, y, z, Blocks.air);
     }
-
-    @Override
-    public boolean onUseWrench(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        if (!world.isRemote)
-        {
-            TileEntity tile = world.getTileEntity(pos);
-            if (tile instanceof TileEntityArclamp)
-            {
-                ((TileEntityArclamp) tile).facingChanged();
+    
+    public MovingObjectPosition collisionRayTrace(final World par1World, final int x, final int y, final int z, final Vec3 par5Vec3, final Vec3 par6Vec3) {
+        final int var7 = par1World.getBlockMetadata(x, y, z);
+        final float var8 = 0.3f;
+        if (var7 == 4) {
+            this.setBlockBounds(0.0f, 0.2f, 0.5f - var8, var8 * 2.0f, 0.8f, 0.5f + var8);
+        }
+        else if (var7 == 5) {
+            this.setBlockBounds(1.0f - var8 * 2.0f, 0.2f, 0.5f - var8, 1.0f, 0.8f, 0.5f + var8);
+        }
+        else if (var7 == 2) {
+            this.setBlockBounds(0.5f - var8, 0.2f, 0.0f, 0.5f + var8, 0.8f, var8 * 2.0f);
+        }
+        else if (var7 == 3) {
+            this.setBlockBounds(0.5f - var8, 0.2f, 1.0f - var8 * 2.0f, 0.5f + var8, 0.8f, 1.0f);
+        }
+        else if (var7 == 0) {
+            this.setBlockBounds(0.5f - var8, 0.0f, 0.5f - var8, 0.5f + var8, 0.6f, 0.5f + var8);
+        }
+        else {
+            this.setBlockBounds(0.5f - var8, 0.4f, 0.5f - var8, 0.5f + var8, 1.0f, 0.5f + var8);
+        }
+        return super.collisionRayTrace(par1World, x, y, z, par5Vec3, par6Vec3);
+    }
+    
+    public boolean onUseWrench(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        if (!world.isRemote) {
+            final TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof TileEntityArclamp) {
+                ((TileEntityArclamp)tile).facingChanged();
             }
         }
         return true;
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
         return new TileEntityArclamp();
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        EnumFacing enumfacing = EnumFacing.byIndex(meta);
-        return this.getDefaultState().withProperty(FACING, enumfacing);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return (state.getValue(FACING)).getIndex();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, FACING); // , ACTIVE });
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.MACHINE;
-    }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.MODEL;
     }
 }

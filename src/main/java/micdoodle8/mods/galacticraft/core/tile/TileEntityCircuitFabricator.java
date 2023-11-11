@@ -1,333 +1,181 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.miccore.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.api.recipe.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.entity.item.*;
+import net.minecraft.entity.*;
+import net.minecraft.nbt.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.energy.item.*;
+import java.util.*;
 
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-
-import net.minecraftforge.fml.relauncher.Side;
-
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-
-import micdoodle8.mods.galacticraft.annotations.ForRemoval;
-import micdoodle8.mods.galacticraft.annotations.ReplaceWith;
-import micdoodle8.mods.galacticraft.api.recipe.CircuitFabricatorRecipes;
-import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachine2;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachineBase;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlockWithInventory;
-import micdoodle8.mods.galacticraft.core.items.ItemBasic;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInventory implements ISidedInventory, IMachineSides
+public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInventory implements ISidedInventory
 {
-
     public static final int PROCESS_TIME_REQUIRED = 300;
-    @NetworkedField(targetSide = Side.CLIENT) public int processTicks = 0;
-    private ItemStack producingStack = ItemStack.EMPTY;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int processTicks;
+    private ItemStack producingStack;
     private long ticks;
-
-    public TileEntityCircuitFabricator()
-    {
-        super("tile.machine2.5.name");
-        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 40 : 20);
-        this.inventory = NonNullList.withSize(7, ItemStack.EMPTY);
+    private ItemStack[] containingItems;
+    
+    public TileEntityCircuitFabricator() {
+        this.processTicks = 0;
+        this.producingStack = null;
+        this.containingItems = new ItemStack[7];
+        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 40.0f : 20.0f);
     }
-
-    @Override
-    public void update()
-    {
-        super.update();
-
+    
+    public void updateEntity() {
+        super.updateEntity();
         this.updateInput();
-
-        if (!this.world.isRemote)
-        {
+        if (!this.worldObj.isRemote) {
             boolean updateInv = false;
-
-            if (this.hasEnoughEnergyToRun)
-            {
-                if (this.canCompress())
-                {
+            if (this.hasEnoughEnergyToRun) {
+                if (this.canCompress()) {
                     ++this.processTicks;
-
-                    if (this.processTicks >= this.getProcessTimeRequired())
-                    {
-                        this.world.playSound(null, this.getPos(), SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, 0.3F, this.world.rand.nextFloat() * 0.1F + 0.9F);
+                    if (this.processTicks == 300) {
+                        this.worldObj.playSoundEffect((double)this.xCoord, (double)this.yCoord, (double)this.zCoord, "random.anvil_land", 0.2f, 0.5f);
                         this.processTicks = 0;
                         this.compressItems();
                         updateInv = true;
                     }
-                } else
-                {
+                }
+                else {
                     this.processTicks = 0;
                 }
-            } else
-            {
+            }
+            else {
                 this.processTicks = 0;
             }
-
-            if (updateInv)
-            {
+            if (updateInv) {
                 this.markDirty();
             }
         }
-
-        this.ticks++;
+        if (this.ticks >= Long.MAX_VALUE) {
+            this.ticks = 0L;
+        }
+        ++this.ticks;
     }
-
-    public int getProcessTimeRequired()
-    {
-        return TileEntityCircuitFabricator.PROCESS_TIME_REQUIRED * 2 / (1 + this.poweredByTierGC);
+    
+    public void updateInput() {
+        this.producingStack = CircuitFabricatorRecipes.getOutputForInput((ItemStack[])Arrays.copyOfRange(this.containingItems, 1, 6));
     }
-
-    public void updateInput()
-    {
-        this.producingStack = CircuitFabricatorRecipes.getOutputForInput(this.getInventory().subList(1, 6));
-    }
-
-    private boolean canCompress()
-    {
-        if (this.producingStack.isEmpty())
-        {
+    
+    private boolean canCompress() {
+        final ItemStack itemstack = this.producingStack;
+        if (itemstack == null) {
             return false;
         }
-        if (this.getInventory().get(6).isEmpty())
-        {
+        if (this.containingItems[6] == null) {
             return true;
         }
-        if (!this.getInventory().get(6).isEmpty() && !this.getInventory().get(6).isItemEqual(this.producingStack))
-        {
+        if (this.containingItems[6] != null && !this.containingItems[6].isItemEqual(itemstack)) {
             return false;
         }
-        int result = this.getInventory().get(6).isEmpty() ? 0 : this.getInventory().get(6).getCount() + this.producingStack.getCount();
-        return result <= this.getInventoryStackLimit() && result <= this.producingStack.getMaxStackSize();
+        final int result = (this.containingItems[6] == null) ? 0 : (this.containingItems[6].stackSize + itemstack.stackSize);
+        return result <= this.getInventoryStackLimit() && result <= itemstack.getMaxStackSize();
     }
-
-    public void compressItems()
-    {
-        if (this.canCompress())
-        {
-            ItemStack resultItemStack = this.producingStack.copy();
-            if (this.world.provider instanceof IZeroGDimension)
-            {
-                if (resultItemStack.getItem() == GCItems.basicItem)
-                {
-                    if (resultItemStack.getItemDamage() == ItemBasic.WAFER_BASIC)
-                    {
-                        resultItemStack.setCount(5);
-                    } else if (resultItemStack.getItemDamage() == 12) // Solar
-                                                                      // panels
-                    {
-                        resultItemStack.setCount(15);
-                    } else
-                    {
-                        resultItemStack.setCount(resultItemStack.getCount() * 2);
+    
+    public void compressItems() {
+        if (this.canCompress()) {
+            final ItemStack resultItemStack = this.producingStack.copy();
+            if (ConfigManagerCore.quickMode && resultItemStack.getItem() == GCItems.basicItem) {
+                if (resultItemStack.getItemDamage() == 13) {
+                    resultItemStack.stackSize = 5;
+                }
+                else if (resultItemStack.getItemDamage() == 14) {
+                    resultItemStack.stackSize = 2;
+                }
+            }
+            if (this.containingItems[6] == null) {
+                this.containingItems[6] = resultItemStack;
+            }
+            else if (this.containingItems[6].isItemEqual(resultItemStack)) {
+                if (this.containingItems[6].stackSize + resultItemStack.stackSize > 64) {
+                    for (int i = 0; i < this.containingItems[6].stackSize + resultItemStack.stackSize - 64; ++i) {
+                        final float var = 0.7f;
+                        final double dx = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
+                        final double dy = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
+                        final double dz = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
+                        final EntityItem entityitem = new EntityItem(this.worldObj, this.xCoord + dx, this.yCoord + dy, this.zCoord + dz, new ItemStack(resultItemStack.getItem(), 1, resultItemStack.getItemDamage()));
+                        entityitem.delayBeforeCanPickup = 10;
+                        this.worldObj.spawnEntityInWorld((Entity)entityitem);
                     }
+                    this.containingItems[6].stackSize = 64;
                 }
-            }
-
-            if (this.getInventory().get(6).isEmpty())
-            {
-                this.getInventory().set(6, resultItemStack);
-            } else if (this.getInventory().get(6).isItemEqual(resultItemStack))
-            {
-                if (this.getInventory().get(6).getCount() + resultItemStack.getCount() > 64)
-                {
-                    resultItemStack.setCount(this.getInventory().get(6).getCount() + resultItemStack.getCount() - 64);
-                    GCCoreUtil.spawnItem(this.world, this.getPos(), resultItemStack);
-                    this.getInventory().get(6).setCount(64);
-                } else
-                {
-                    this.getInventory().get(6).grow(resultItemStack.getCount());
+                else {
+                    final ItemStack itemStack = this.containingItems[6];
+                    itemStack.stackSize += resultItemStack.stackSize;
                 }
             }
         }
-
-        for (int i = 1; i < 6; i++)
-        {
-            this.decrStackSize(i, 1);
+        for (int j = 1; j < 6; ++j) {
+            this.decrStackSize(j, 1);
         }
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
-        super.readFromNBT(nbt);
-        this.processTicks = nbt.getInteger("smeltingTicks");
-        this.readMachineSidesFromNBT(nbt); // Needed by IMachineSides
+    
+    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.readFromNBT(par1NBTTagCompound);
+        this.processTicks = par1NBTTagCompound.getInteger("smeltingTicks");
+        this.containingItems = this.readStandardItemsFromNBT(par1NBTTagCompound);
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
-        super.writeToNBT(nbt);
-        nbt.setInteger("smeltingTicks", this.processTicks);
-        this.addMachineSidesToNBT(nbt); // Needed by IMachineSides
-        return nbt;
+    
+    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.writeToNBT(par1NBTTagCompound);
+        par1NBTTagCompound.setInteger("smeltingTicks", this.processTicks);
+        this.writeStandardItemsToNBT(par1NBTTagCompound);
     }
-
-    @Override
-    public boolean hasCustomName()
-    {
-        return false;
+    
+    protected ItemStack[] getContainingItems() {
+        return this.containingItems;
     }
-
-    @Override
-    public boolean isItemValidForSlot(int slotID, ItemStack itemStack)
-    {
-        if (slotID == 0)
-        {
+    
+    public String getInventoryName() {
+        return GCCoreUtil.translate("tile.machine2.5.name");
+    }
+    
+    public boolean hasCustomInventoryName() {
+        return true;
+    }
+    
+    public boolean isItemValidForSlot(final int slotID, final ItemStack itemStack) {
+        if (slotID == 0) {
             return itemStack != null && ItemElectricBase.isElectricItem(itemStack.getItem());
         }
-
-        if (slotID > 5)
-        {
+        if (slotID > 5) {
             return false;
         }
-
-        ArrayList<ItemStack> list = CircuitFabricatorRecipes.slotValidItems.get(slotID - 1);
-
-        for (ItemStack test : list)
-        {
-            if (test.isItemEqual(itemStack))
-            {
+        final ArrayList<ItemStack> list = CircuitFabricatorRecipes.slotValidItems.get(slotID - 1);
+        for (final ItemStack test : list) {
+            if (test.isItemEqual(itemStack)) {
                 return true;
             }
         }
-
         return false;
     }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        if (side == EnumFacing.DOWN)
-        {
-            return new int[]
-            {6};
+    
+    public int[] getAccessibleSlotsFromSide(final int side) {
+        if (side == 0) {
+            return new int[] { 6 };
         }
-
-        // Offer whichever silicon slot has less silicon
-        boolean siliconFlag = !this.getInventory().get(2).isEmpty() && (this.getInventory().get(3).isEmpty() || this.getInventory().get(3).getCount() < this.getInventory().get(2).getCount());
-        return siliconFlag ? new int[]
-        {0, 1, 3, 4, 5} : new int[]
-        {0, 1, 2, 4, 5};
+        final boolean siliconFlag = this.containingItems[2] != null && (this.containingItems[3] == null || this.containingItems[3].stackSize < this.containingItems[2].stackSize);
+        return siliconFlag ? new int[] { 0, 1, 3, 4, 5 } : new int[] { 0, 1, 2, 4, 5 };
     }
-
-    @Override
-    public boolean canInsertItem(int slotID, ItemStack par2ItemStack, EnumFacing par3)
-    {
+    
+    public boolean canInsertItem(final int slotID, final ItemStack par2ItemStack, final int par3) {
         return slotID < 6 && this.isItemValidForSlot(slotID, par2ItemStack);
     }
-
-    @Override
-    public boolean canExtractItem(int slotID, ItemStack par2ItemStack, EnumFacing par3)
-    {
+    
+    public boolean canExtractItem(final int slotID, final ItemStack par2ItemStack, final int par3) {
         return slotID == 6;
     }
-
-    @Override
-    public boolean shouldUseEnergy()
-    {
-        return this.processTicks > 0;
-    }
-
-    @Override
-    public EnumFacing byIndex()
-    {
-        return BlockMachineBase.byIndex(this.world.getBlockState(getPos()));
-    }
-
-    @Override
-    public EnumFacing getElectricInputDirection()
-    {
-        switch (this.getSide(MachineSide.ELECTRIC_IN))
-        {
-            case RIGHT:
-                return byIndex().rotateYCCW();
-            case REAR:
-                return byIndex().getOpposite();
-            case TOP:
-                return EnumFacing.UP;
-            case BOTTOM:
-                return EnumFacing.DOWN;
-            case LEFT:
-            default:
-                return byIndex().rotateY();
-        }
-    }
-
-    // ------------------
-    // Added these methods and field to implement IMachineSides properly
-    // ------------------
-    @Override
-    public MachineSide[] listConfigurableSides()
-    {
-        return new MachineSide[]
-        {MachineSide.ELECTRIC_IN};
-    }
-
-    @Override
-    public Face[] listDefaultFaces()
-    {
-        return new Face[]
-        {Face.LEFT};
-    }
-
-    private MachineSidePack[] machineSides;
-
-    @Override
-    public synchronized MachineSidePack[] getAllMachineSides()
-    {
-        if (this.machineSides == null)
-        {
-            this.initialiseSides();
-        }
-
-        return this.machineSides;
-    }
-
-    @Override
-    public void setupMachineSides(int length)
-    {
-        this.machineSides = new MachineSidePack[length];
-    }
-
-    @Override
-    public void onLoad()
-    {
-        this.clientOnLoad();
-    }
-
-    @Override
-    public IMachineSidesProperties getConfigurationType()
-    {
-        return BlockMachine2.MACHINESIDES_RENDERTYPE;
-    }
-    // ------------------END OF IMachineSides implementation
     
-    @Override
-    @Deprecated
-    @ForRemoval(deadline = "4.1.0")
-    @ReplaceWith("byIndex()")
-    public EnumFacing getFront()
-    {
-        return this.byIndex();
+    public boolean shouldUseEnergy() {
+        return this.processTicks > 0;
     }
 }

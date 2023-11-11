@@ -1,44 +1,35 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockSlimelingEgg;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.*;
 
-public class ItemBlockEgg extends ItemBlockDesc implements GCRarity
+public class ItemBlockEgg extends ItemBlockDesc
 {
-
-    public ItemBlockEgg(Block block)
-    {
+    public ItemBlockEgg(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public int getMetadata(int meta)
-    {
+    
+    public int getMetadata(final int meta) {
         return meta;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemstack)
-    {
-        String name = BlockSlimelingEgg.EnumEggColor.values()[itemstack.getItemDamage() % 3].getName();
-        return this.getBlock().getTranslationKey() + "." + name;
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public String getTranslationKey()
-    {
-        return this.getBlock().getTranslationKey() + ".0";
+    
+    public String getUnlocalizedName(final ItemStack itemstack) {
+        final String name = BlockSlimelingEgg.names[itemstack.getItemDamage() % 3];
+        return this.field_150939_a.getUnlocalizedName() + "." + name;
+    }
+    
+    public String getUnlocalizedName() {
+        return this.field_150939_a.getUnlocalizedName() + ".0";
     }
 }

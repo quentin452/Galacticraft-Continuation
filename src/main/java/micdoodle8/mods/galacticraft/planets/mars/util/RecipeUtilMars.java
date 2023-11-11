@@ -1,77 +1,48 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.util;
 
-import javax.annotation.Nonnull;
-import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
-import micdoodle8.mods.galacticraft.api.recipe.INasaWorkbenchRecipe;
-import micdoodle8.mods.galacticraft.planets.asteroids.inventory.InventorySchematicAstroMiner;
-import micdoodle8.mods.galacticraft.planets.asteroids.inventory.InventorySchematicTier3Rocket;
-import micdoodle8.mods.galacticraft.planets.mars.inventory.InventorySchematicCargoRocket;
-import micdoodle8.mods.galacticraft.planets.mars.inventory.InventorySchematicTier2Rocket;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.api.*;
+import micdoodle8.mods.galacticraft.api.recipe.*;
+import net.minecraft.inventory.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.planets.mars.inventory.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.inventory.*;
 
 public class RecipeUtilMars
 {
-
-    @Nonnull
-    public static ItemStack findMatchingSpaceshipT2Recipe(InventorySchematicTier2Rocket inventoryRocketBench)
-    {
-        for (INasaWorkbenchRecipe recipe : GalacticraftRegistry.getRocketT2Recipes())
-        {
-            if (recipe.matches(inventoryRocketBench))
-            {
+    public static ItemStack findMatchingSpaceshipT2Recipe(final InventorySchematicTier2Rocket inventoryRocketBench) {
+        for (final INasaWorkbenchRecipe recipe : GalacticraftRegistry.getRocketT2Recipes()) {
+            if (recipe.matches((IInventory)inventoryRocketBench)) {
                 return recipe.getRecipeOutput();
             }
         }
-
-        return ItemStack.EMPTY;
+        return null;
     }
-
-    @Nonnull
-    public static ItemStack findMatchingCargoRocketRecipe(InventorySchematicCargoRocket inventoryRocketBench)
-    {
-        for (INasaWorkbenchRecipe recipe : GalacticraftRegistry.getCargoRocketRecipes())
-        {
-            if (recipe.matches(inventoryRocketBench))
-            {
+    
+    public static ItemStack findMatchingCargoRocketRecipe(final InventorySchematicCargoRocket inventoryRocketBench) {
+        for (final INasaWorkbenchRecipe recipe : GalacticraftRegistry.getCargoRocketRecipes()) {
+            if (recipe.matches((IInventory)inventoryRocketBench)) {
                 return recipe.getRecipeOutput();
             }
         }
-
-        return ItemStack.EMPTY;
+        return null;
     }
-
-    @Nonnull
-    public static ItemStack findMatchingSpaceshipT3Recipe(InventorySchematicTier3Rocket inventoryRocketBench)
-    {
-        for (INasaWorkbenchRecipe recipe : GalacticraftRegistry.getRocketT3Recipes())
-        {
-            if (recipe.matches(inventoryRocketBench))
-            {
+    
+    public static ItemStack findMatchingSpaceshipT3Recipe(final InventorySchematicTier3Rocket inventoryRocketBench) {
+        for (final INasaWorkbenchRecipe recipe : GalacticraftRegistry.getRocketT3Recipes()) {
+            if (recipe.matches((IInventory)inventoryRocketBench)) {
                 return recipe.getRecipeOutput();
             }
         }
-
-        return ItemStack.EMPTY;
+        return null;
     }
-
-    @Nonnull
-    public static ItemStack findMatchingAstroMinerRecipe(InventorySchematicAstroMiner craftMatrix)
-    {
-        for (INasaWorkbenchRecipe recipe : GalacticraftRegistry.getAstroMinerRecipes())
-        {
-            if (recipe.matches(craftMatrix))
-            {
+    
+    public static ItemStack findMatchingAstroMinerRecipe(final InventorySchematicAstroMiner craftMatrix) {
+        for (final INasaWorkbenchRecipe recipe : GalacticraftRegistry.getAstroMinerRecipes()) {
+            if (recipe.matches((IInventory)craftMatrix)) {
                 return recipe.getRecipeOutput();
             }
         }
-
-        return ItemStack.EMPTY;
+        return null;
     }
 }

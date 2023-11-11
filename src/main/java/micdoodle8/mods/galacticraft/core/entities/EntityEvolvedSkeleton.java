@@ -1,261 +1,135 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities;
 
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.entity.monster.*;
+import micdoodle8.mods.galacticraft.api.entity.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.entity.ai.*;
+import net.minecraft.entity.projectile.*;
+import net.minecraft.enchantment.*;
+import net.minecraft.entity.*;
+import net.minecraft.potion.*;
+import net.minecraft.util.*;
+import net.minecraftforge.common.*;
+import net.minecraft.init.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.item.*;
 
-import net.minecraftforge.common.ForgeHooks;
-
-import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
-
-public class EntityEvolvedSkeleton extends EntitySkeleton implements IEntityBreathable, ITumblable
+public class EntityEvolvedSkeleton extends EntitySkeleton implements IEntityBreathable
 {
-
-    private static final DataParameter<Float> SPIN_PITCH = EntityDataManager.createKey(EntityEvolvedSkeleton.class, DataSerializers.FLOAT);
-    private float tumbling = 0F;
-    private float tumbleAngle = 0F;
-
-    public EntityEvolvedSkeleton(World worldIn)
-    {
-        super(worldIn);
+    public EntityEvolvedSkeleton(final World par1World) {
+        super(par1World);
+        this.tasks.addTask(1, (EntityAIBase)new EntityAISwimming((EntityLiving)this));
+        this.tasks.addTask(2, (EntityAIBase)new EntityAIRestrictSun((EntityCreature)this));
+        this.tasks.addTask(3, (EntityAIBase)new EntityAIFleeSun((EntityCreature)this, 0.25));
+        this.tasks.addTask(4, (EntityAIBase)new EntityAIArrowAttack((IRangedAttackMob)this, 0.25, 25, 20.0f));
+        this.tasks.addTask(5, (EntityAIBase)new EntityAIWander((EntityCreature)this, 0.25));
+        this.tasks.addTask(6, (EntityAIBase)new EntityAIWatchClosest((EntityLiving)this, (Class)EntityPlayer.class, 8.0f));
+        this.tasks.addTask(6, (EntityAIBase)new EntityAILookIdle((EntityLiving)this));
+        this.targetTasks.addTask(1, (EntityAIBase)new EntityAIHurtByTarget((EntityCreature)this, false));
+        this.targetTasks.addTask(2, (EntityAIBase)new EntityAINearestAttackableTarget((EntityCreature)this, (Class)EntityPlayer.class, 0, true));
+        this.setSize(0.7f, 2.5f);
     }
-
-    @Override
-    protected void applyEntityAttributes()
-    {
+    
+    protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(25);
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.35F);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(25.0);
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.3499999940395355);
     }
-
-    @Override
-    public boolean canBreath()
-    {
+    
+    public boolean canBreath() {
         return true;
     }
-
-    @Override
-    protected void jump()
-    {
-        this.motionY = 0.45D / WorldUtil.getGravityFactor(this);
-        if (this.motionY < 0.24D)
-        {
-            this.motionY = 0.24D;
+    
+    public void attackEntityWithRangedAttack(final EntityLivingBase par1EntityLivingBase, final float par2) {
+        final EntityArrow entityarrow = new EntityArrow(this.worldObj, (EntityLivingBase)this, par1EntityLivingBase, 0.4f, (float)(17 - this.worldObj.difficultySetting.getDifficultyId() * 4));
+        final int i = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, this.getHeldItem());
+        final int j = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, this.getHeldItem());
+        entityarrow.setDamage(par2 * 2.0f + this.rand.nextGaussian() * 0.25 + this.worldObj.difficultySetting.getDifficultyId() * 0.11f);
+        if (i > 0) {
+            entityarrow.setDamage(entityarrow.getDamage() + i * 0.5 + 0.5);
         }
-
-        if (this.isPotionActive(MobEffects.JUMP_BOOST))
-        {
-            this.motionY += (this.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1F;
+        if (j > 0) {
+            entityarrow.setKnockbackStrength(j);
         }
-
-        if (this.isSprinting())
-        {
-            float f = this.rotationYaw / Constants.RADIANS_TO_DEGREES;
-            this.motionX -= MathHelper.sin(f) * 0.2F;
-            this.motionZ += MathHelper.cos(f) * 0.2F;
+        if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, this.getHeldItem()) > 0 || this.getSkeletonType() == 1) {
+            entityarrow.setFire(100);
         }
-
-        this.isAirBorne = true;
-        ForgeHooks.onLivingJump(this);
+        this.playSound("random.bow", 1.0f, 1.0f / (this.getRNG().nextFloat() * 0.4f + 0.8f));
+        this.worldObj.spawnEntityInWorld((Entity)entityarrow);
     }
-
-    protected void addRandomDrop()
-    {
-        int r = this.rand.nextInt(12);
-        switch (r)
-        {
+    
+    protected void jump() {
+        this.motionY = 0.45 / WorldUtil.getGravityFactor((Entity)this);
+        if (this.motionY < 0.24) {
+            this.motionY = 0.24;
+        }
+        if (this.isPotionActive(Potion.jump)) {
+            this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1f;
+        }
+        if (this.isSprinting()) {
+            final float f = this.rotationYaw * 0.017453292f;
+            this.motionX -= MathHelper.sin(f) * 0.2f;
+            this.motionZ += MathHelper.cos(f) * 0.2f;
+        }
+        this.isAirBorne = true;
+        ForgeHooks.onLivingJump((EntityLivingBase)this);
+    }
+    
+    protected void dropRareDrop(final int p_70600_1_) {
+        if (this.getSkeletonType() == 1) {
+            this.entityDropItem(new ItemStack(Items.skull, 1, 1), 0.0f);
+            return;
+        }
+        final int r = this.rand.nextInt(12);
+        switch (r) {
             case 0:
             case 1:
             case 2:
             case 3:
             case 4:
-            case 5:
-                this.entityDropItem(new ItemStack(GCBlocks.oxygenPipe), 0.0F);
+            case 5: {
+                this.entityDropItem(new ItemStack(GCBlocks.oxygenPipe), 0.0f);
                 break;
-            case 6:
-                // Oxygen tank half empty or less
-                this.entityDropItem(new ItemStack(GCItems.oxTankMedium, 1, 901 + this.rand.nextInt(900)), 0.0F);
+            }
+            case 6: {
+                this.entityDropItem(new ItemStack(GCItems.oxTankMedium, 1, 901 + this.rand.nextInt(900)), 0.0f);
                 break;
+            }
             case 7:
-            case 8:
+            case 8: {
                 this.dropItem(GCItems.canister, 1);
                 break;
-            default:
-                if (ConfigManagerCore.challengeMobDropsAndSpawning)
-                    this.dropItem(Items.PUMPKIN_SEEDS, 1);
+            }
+            default: {
+                if (ConfigManagerCore.challengeMobDropsAndSpawning) {
+                    this.dropItem(Items.pumpkin_seeds, 1);
+                    break;
+                }
                 break;
+            }
         }
     }
-
-    @Override
-    protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source)
-    {
-        // No loot table
-        this.dropFewItems(wasRecentlyHit, lootingModifier);
-        this.dropEquipment(wasRecentlyHit, lootingModifier);
-    }
-
-    @Override
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier)
-    {
-        Item item = Items.BONE;
-
+    
+    protected void dropFewItems(final boolean p_70628_1_, final int p_70628_2_) {
+        final Item item = this.getDropItem();
         int j = this.rand.nextInt(3);
-
-        if (item != null)
-        {
-            if (lootingModifier > 0)
-            {
-                j += this.rand.nextInt(lootingModifier + 1);
+        if (item != null) {
+            if (p_70628_2_ > 0) {
+                j += this.rand.nextInt(p_70628_2_ + 1);
             }
-
-            for (int k = 1; k < j; ++k)
-            {
+            for (int k = 1; k < j; ++k) {
                 this.dropItem(item, 1);
             }
         }
-
-        j = this.rand.nextInt(3 + lootingModifier);
-        if (j > 1)
-            this.dropItem(Items.BONE, 1);
-
-        // Drop lapis as semi-rare drop if player hit and if dropping bones
-        if (wasRecentlyHit && (ConfigManagerCore.challengeMobDropsAndSpawning) && j > 1 && this.rand.nextInt(12) <= lootingModifier)
-            this.entityDropItem(new ItemStack(Items.DYE, 1, 4), 0.0F);
-
-        if (wasRecentlyHit && this.rand.nextFloat() < 0.025F + (float) lootingModifier * 0.02F)
-        {
-            this.addRandomDrop();
+        j = this.rand.nextInt(3 + p_70628_2_);
+        if (j > 1) {
+            this.dropItem(Items.bone, 1);
         }
-    }
-
-    @Override
-    public void setTumbling(float value)
-    {
-        if (value != 0F)
-        {
-            if (this.tumbling == 0F)
-                this.tumbling = (this.world.rand.nextFloat() + 0.5F) * value;
-        } else
-            this.tumbling = 0F;
-    }
-
-    @Override
-    public void onEntityUpdate()
-    {
-        super.onEntityUpdate();
-        if (!this.isDead)
-        {
-            if (this.tumbling != 0F)
-            {
-                if (this.onGround)
-                {
-                    this.tumbling = 0F;
-                }
-            }
-
-            if (!this.world.isRemote)
-            {
-                this.setSpinPitch(this.tumbling);
-            } else
-            {
-                this.tumbling = this.getSpinPitch();
-                this.tumbleAngle -= this.tumbling;
-                if (this.tumbling == 0F && this.tumbleAngle != 0F)
-                {
-                    this.tumbleAngle *= 0.8F;
-                    if (Math.abs(this.tumbleAngle) < 1F)
-                        this.tumbleAngle = 0F;
-                }
-            }
+        if (p_70628_1_ && ConfigManagerCore.challengeMobDropsAndSpawning && j > 1 && this.rand.nextInt(12) == 0) {
+            this.entityDropItem(new ItemStack(Items.dye, 1, 4), 0.0f);
         }
-    }
-
-    @Override
-    protected void entityInit()
-    {
-        super.entityInit();
-        this.getDataManager().register(SPIN_PITCH, 0.0F);
-    }
-
-    @Override
-    public void readEntityFromNBT(NBTTagCompound nbt)
-    {
-        super.readEntityFromNBT(nbt);
-        this.tumbling = nbt.getFloat("tumbling");
-    }
-
-    @Override
-    public void writeEntityToNBT(NBTTagCompound nbt)
-    {
-        super.writeEntityToNBT(nbt);
-        nbt.setFloat("tumbling", this.tumbling);
-    }
-
-    public float getSpinPitch()
-    {
-        return this.getDataManager().get(SPIN_PITCH);
-    }
-
-    public void setSpinPitch(float pitch)
-    {
-        this.getDataManager().set(SPIN_PITCH, pitch);
-    }
-
-    @Override
-    public float getTumbleAngle(float partial)
-    {
-        float angle = this.tumbleAngle - partial * this.tumbling;
-        if (angle > 360F)
-        {
-            this.tumbleAngle -= 360F;
-            angle -= 360F;
-        }
-        if (angle < 0F)
-        {
-            this.tumbleAngle += 360F;
-            angle += 360F;
-        }
-        return angle;
-    }
-
-    @Override
-    public float getTumbleAxisX()
-    {
-        double velocity2 = this.motionX * this.motionX + this.motionZ * this.motionZ;
-        if (velocity2 == 0D)
-            return 1F;
-        return (float) (this.motionZ / MathHelper.sqrt(velocity2));
-    }
-
-    @Override
-    public float getTumbleAxisZ()
-    {
-        double velocity2 = this.motionX * this.motionX + this.motionZ * this.motionZ;
-        if (velocity2 == 0D)
-            return 0F;
-        return (float) (this.motionX / MathHelper.sqrt(velocity2));
     }
 }

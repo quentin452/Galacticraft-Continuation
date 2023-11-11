@@ -1,54 +1,35 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.entity;
 
-import static micdoodle8.mods.galacticraft.planets.asteroids.blocks.BlockBasicAsteroids.EnumBlockBasic.ASTEROID_0;
+import net.minecraft.client.renderer.entity.*;
+import net.minecraft.client.renderer.*;
+import net.minecraft.entity.*;
+import org.lwjgl.opengl.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.*;
+import net.minecraft.util.*;
+import net.minecraft.client.renderer.texture.*;
 
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.BlockBasicAsteroids;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntitySmallAsteroid;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-public class RenderSmallAsteroid extends Render<EntitySmallAsteroid>
+public class RenderSmallAsteroid extends Render
 {
-
-    public RenderSmallAsteroid(RenderManager manager)
-    {
-        super(manager);
+    private RenderBlocks blockRenderer;
+    
+    public RenderSmallAsteroid() {
+        this.blockRenderer = new RenderBlocks();
     }
-
-    @Override
-    public void doRender(EntitySmallAsteroid asteroid, double x, double y, double z, float f, float partialTickTime)
-    {
-        BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-
+    
+    public void doRender(final Entity entity, final double x, final double y, final double z, final float f, final float partialTickTime) {
+        GL11.glDisable(32826);
+        final EntitySmallAsteroid asteroid = (EntitySmallAsteroid)entity;
         GL11.glPushMatrix();
-        GL11.glTranslatef((float) x, (float) y + 0.5F, (float) z);
-        GL11.glRotatef(asteroid.rotationPitch, 1, 0, 0);
-        GL11.glRotatef(asteroid.rotationYaw, 0, 1, 0);
-
-        this.bindEntityTexture(asteroid);
-        dispatcher.renderBlockBrightness(AsteroidBlocks.blockBasic.getDefaultState().withProperty(BlockBasicAsteroids.BASIC_TYPE, ASTEROID_0), 1.0F);
-
+        GL11.glTranslatef((float)x, (float)y + 0.5f, (float)z);
+        GL11.glRotatef(asteroid.rotationPitch, 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef(asteroid.rotationYaw, 0.0f, 1.0f, 0.0f);
+        this.bindEntityTexture((Entity)asteroid);
+        this.blockRenderer.renderBlockAsItem(AsteroidBlocks.blockBasic, 0, 1.0f);
         GL11.glPopMatrix();
     }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntitySmallAsteroid entity)
-    {
-        return TextureMap.LOCATION_BLOCKS_TEXTURE;
+    
+    protected ResourceLocation getEntityTexture(final Entity entity) {
+        return TextureMap.locationBlocksTexture;
     }
 }

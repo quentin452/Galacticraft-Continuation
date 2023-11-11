@@ -1,94 +1,51 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import micdoodle8.mods.galacticraft.core.client.model.OBJLoaderGC;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityBeamReflector;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.obj.OBJModel;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.tileentity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import net.minecraftforge.client.model.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import cpw.mods.fml.client.*;
+import org.lwjgl.opengl.*;
+import net.minecraft.tileentity.*;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityBeamReflectorRenderer extends TileEntitySpecialRenderer<TileEntityBeamReflector>
+public class TileEntityBeamReflectorRenderer extends TileEntitySpecialRenderer
 {
-
-    private static OBJModel.OBJBakedModel reflectorModelBase;
-    private static OBJModel.OBJBakedModel reflectorModelAxle;
-    private static OBJModel.OBJBakedModel reflectorModelEnergyBlaster;
-    private static OBJModel.OBJBakedModel reflectorModelRing;
-
-    private void updateModels()
-    {
-        if (reflectorModelBase == null)
-        {
-            try
-            {
-                IModel model = OBJLoaderGC.instance.loadModel(new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "block/reflector.obj"));
-                Function<ResourceLocation, TextureAtlasSprite> spriteFunction = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
-
-                reflectorModelBase = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Base"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                reflectorModelAxle = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Axle"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                reflectorModelEnergyBlaster = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("EnergyBlaster"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                reflectorModelRing = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Ring"), false), DefaultVertexFormats.ITEM, spriteFunction);
-            } catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
+    public static final ResourceLocation reflectorTexture;
+    public static IModelCustom reflectorModel;
+    
+    public TileEntityBeamReflectorRenderer() {
+        TileEntityBeamReflectorRenderer.reflectorModel = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/reflector.obj"));
     }
-
-    @Override
-    public void render(TileEntityBeamReflector tile, double d, double d1, double d2, float f, int i, float alpha)
-    {
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) d + 0.5F, (float) d1, (float) d2 + 0.5F);
-        GlStateManager.scale(0.5F, 0.5F, 0.5F);
-        this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-        if (Minecraft.isAmbientOcclusionEnabled())
-        {
-            GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        } else
-        {
-            GlStateManager.shadeModel(GL11.GL_FLAT);
-        }
-
-        this.updateModels();
-        ClientUtil.drawBakedModel(reflectorModelBase);
-        GlStateManager.rotate(tile.yaw, 0, 1, 0);
-        ClientUtil.drawBakedModel(reflectorModelAxle);
-        float dX = 0.0F;
-        float dY = 1.13228F;
-        float dZ = 0.0F;
-        GlStateManager.translate(dX, dY, dZ);
-        GlStateManager.rotate(tile.pitch, 1, 0, 0);
-        GlStateManager.translate(-dX, -dY, -dZ);
-        ClientUtil.drawBakedModel(reflectorModelEnergyBlaster);
-        GlStateManager.translate(dX, dY, dZ);
-        GlStateManager.rotate(tile.ticks * 5, 0, 0, 1);
-        GlStateManager.translate(-dX, -dY, -dZ);
-        ClientUtil.drawBakedModel(reflectorModelRing);
-        GlStateManager.popMatrix();
-        RenderHelper.enableStandardItemLighting();
+    
+    public void renderModelAt(final TileEntityBeamReflector tileEntity, final double d, final double d1, final double d2, final float f) {
+        FMLClientHandler.instance().getClient().renderEngine.bindTexture(TileEntityBeamReflectorRenderer.reflectorTexture);
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)d + 0.5f, (float)d1, (float)d2 + 0.5f);
+        GL11.glScalef(0.5f, 0.5f, 0.5f);
+        TileEntityBeamReflectorRenderer.reflectorModel.renderPart("Base");
+        GL11.glRotatef(tileEntity.yaw, 0.0f, 1.0f, 0.0f);
+        TileEntityBeamReflectorRenderer.reflectorModel.renderPart("Axle");
+        final float dX = 0.0f;
+        final float dY = 1.13228f;
+        final float dZ = 0.0f;
+        GL11.glTranslatef(dX, dY, dZ);
+        GL11.glRotatef(tileEntity.pitch, 1.0f, 0.0f, 0.0f);
+        GL11.glTranslatef(-dX, -dY, -dZ);
+        TileEntityBeamReflectorRenderer.reflectorModel.renderPart("EnergyBlaster");
+        GL11.glTranslatef(dX, dY, dZ);
+        GL11.glRotatef((float)(tileEntity.ticks * 500), 0.0f, 0.0f, 1.0f);
+        GL11.glTranslatef(-dX, -dY, -dZ);
+        TileEntityBeamReflectorRenderer.reflectorModel.renderPart("Ring");
+        GL11.glPopMatrix();
+    }
+    
+    public void renderTileEntityAt(final TileEntity tileEntity, final double var2, final double var4, final double var6, final float var8) {
+        this.renderModelAt((TileEntityBeamReflector)tileEntity, var2, var4, var6, var8);
+    }
+    
+    static {
+        reflectorTexture = new ResourceLocation("galacticraftasteroids", "textures/model/beamReflector.png");
     }
 }

@@ -1,312 +1,178 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
+import net.minecraft.block.*;
+import net.minecraft.block.material.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.client.renderer.texture.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.entity.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.init.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityFallenMeteor;
-import micdoodle8.mods.galacticraft.core.util.ColorUtil;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class BlockFallenMeteor extends Block implements ITileEntityProvider, IShiftDescription, ISortableBlock
+public class BlockFallenMeteor extends Block implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc
 {
-
-    private static final AxisAlignedBB BOUNDS = new AxisAlignedBB(0.15, 0.05, 0.15, 0.85, 0.75, 0.85);
-
-    public BlockFallenMeteor(String assetName)
-    {
-        super(Material.ROCK);
-        this.setHardness(40.0F);
-        this.setSoundType(SoundType.STONE);
-        this.setTranslationKey(assetName);
+    public BlockFallenMeteor(final String assetName) {
+        super(Material.rock);
+        this.setBlockBounds(0.2f, 0.2f, 0.2f, 0.8f, 0.8f, 0.8f);
+        this.setHardness(40.0f);
+        this.setStepSound(Block.soundTypeStone);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        return BOUNDS;
-    }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.blockIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "fallen_meteor");
+    }
+    
+    public int getRenderType() {
+        return GalacticraftCore.proxy.getBlockRender(this);
+    }
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
+    
+    public int quantityDroppedWithBonus(final int par1, final Random par2Random) {
+        return 1 + (int)(par2Random.nextFloat() + 0.75f);
     }
-
-    @Override
-    public int quantityDroppedWithBonus(int par1, Random par2Random)
-    {
-        return 1 + (int) (par2Random.nextFloat() + 0.75F);
-    }
-
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune)
-    {
+    
+    public Item getItemDropped(final int par1, final Random par2Random, final int par3) {
         return GCItems.meteoricIronRaw;
     }
-
-    @Override
-    public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
-    {
-        TileEntity tile = worldIn.getTileEntity(pos);
-
-        if (tile instanceof TileEntityFallenMeteor)
-        {
-            TileEntityFallenMeteor meteor = (TileEntityFallenMeteor) tile;
-
-            if (meteor.getHeatLevel() <= 0)
-            {
+    
+    public void onEntityCollidedWithBlock(final World par1World, final int par2, final int par3, final int par4, final Entity par5Entity) {
+        final TileEntity tile = par1World.getTileEntity(par2, par3, par4);
+        if (tile instanceof TileEntityFallenMeteor) {
+            final TileEntityFallenMeteor meteor = (TileEntityFallenMeteor)tile;
+            if (meteor.getHeatLevel() <= 0) {
                 return;
             }
-
-            if (entityIn instanceof EntityLivingBase)
-            {
-                final EntityLivingBase livingEntity = (EntityLivingBase) entityIn;
-
-                worldIn.playSound(null, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, SoundEvents.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.NEUTRAL, 0.5F,
-                    2.6F + (worldIn.rand.nextFloat() - worldIn.rand.nextFloat()) * 0.8F);
-
-                for (int var5 = 0; var5 < 8; ++var5)
-                {
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX() + Math.random(), pos.getY() + 0.2D + Math.random(), pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D);
+            if (par5Entity instanceof EntityLivingBase) {
+                final EntityLivingBase livingEntity = (EntityLivingBase)par5Entity;
+                par1World.playSoundEffect((double)(par2 + 0.5f), (double)(par3 + 0.5f), (double)(par4 + 0.5f), "random.fizz", 0.5f, 2.6f + (par1World.rand.nextFloat() - par1World.rand.nextFloat()) * 0.8f);
+                for (int var5 = 0; var5 < 8; ++var5) {
+                    par1World.spawnParticle("largesmoke", par2 + Math.random(), par3 + 0.2 + Math.random(), par4 + Math.random(), 0.0, 0.0, 0.0);
                 }
-
-                if (!livingEntity.isBurning())
-                {
+                if (!livingEntity.isBurning()) {
                     livingEntity.setFire(2);
                 }
-
-                double var9 = pos.getX() + 0.5F - livingEntity.posX;
+                double var6;
                 double var7;
-
-                for (var7 = livingEntity.posZ - pos.getZ(); var9 * var9 + var7 * var7 < 1.0E-4D; var7 = (Math.random() - Math.random()) * 0.01D)
-                {
-                    var9 = (Math.random() - Math.random()) * 0.01D;
-                }
-
-                livingEntity.knockBack(livingEntity, 1, var9, var7);
+                for (var6 = par2 + 0.5f - livingEntity.posX, var7 = livingEntity.posZ - par4; var6 * var6 + var7 * var7 < 1.0E-4; var6 = (Math.random() - Math.random()) * 0.01, var7 = (Math.random() - Math.random()) * 0.01) {}
+                livingEntity.knockBack((Entity)livingEntity, 1.0f, var6, var7);
             }
         }
     }
-
-    @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack itemStack)
-    {
-        world.setBlockState(pos, this.getDefaultState(), 3);
-        TileEntity tile = world.getTileEntity(pos);
-
-        if (tile instanceof TileEntityFallenMeteor)
-        {
-            ((TileEntityFallenMeteor) tile).setHeatLevel(0);
+    
+    public void onBlockAdded(final World par1World, final int par2, final int par3, final int par4) {
+        par1World.scheduleBlockUpdate(par2, par3, par4, (Block)this, this.tickRate(par1World));
+    }
+    
+    public void onNeighborBlockChange(final World par1World, final int par2, final int par3, final int par4, final Block par5) {
+        par1World.scheduleBlockUpdate(par2, par3, par4, (Block)this, this.tickRate(par1World));
+    }
+    
+    public void updateTick(final World par1World, final int par2, final int par3, final int par4, final Random par5Random) {
+        if (!par1World.isRemote) {
+            this.tryToFall(par1World, par2, par3, par4);
         }
     }
-
-    @Override
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
-    {
-        worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
-    }
-
-    @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
-    {
-        worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
-    }
-
-    @Override
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
-    {
-        if (!worldIn.isRemote)
-        {
-            this.tryToFall(worldIn, pos, state);
-        }
-    }
-
-    private void tryToFall(World world, BlockPos pos, IBlockState state)
-    {
-        if (this.canFallBelow(world, pos.down()) && pos.getY() >= 0)
-        {
-            int prevHeatLevel = ((TileEntityFallenMeteor) world.getTileEntity(pos)).getHeatLevel();
-            world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-            BlockPos blockpos1;
-
-            for (blockpos1 = pos.down(); this.canFallBelow(world, blockpos1) && blockpos1.getY() > 0; blockpos1 = blockpos1.down())
-            {
+    
+    private void tryToFall(final World par1World, final int par2, int par3, final int par4) {
+        if (canFallBelow(par1World, par2, par3 - 1, par4) && par3 >= 0) {
+            final int prevHeatLevel = ((TileEntityFallenMeteor)par1World.getTileEntity(par2, par3, par4)).getHeatLevel();
+            par1World.setBlock(par2, par3, par4, Blocks.air, 0, 3);
+            while (canFallBelow(par1World, par2, par3 - 1, par4) && par3 > 0) {
+                --par3;
             }
-
-            if (blockpos1.getY() >= 0)
-            {
-                world.setBlockState(blockpos1.up(), state, 3);
-                ((TileEntityFallenMeteor) world.getTileEntity(blockpos1.up())).setHeatLevel(prevHeatLevel);
+            if (par3 > 0) {
+                par1World.setBlock(par2, par3, par4, (Block)this, 0, 3);
+                ((TileEntityFallenMeteor)par1World.getTileEntity(par2, par3, par4)).setHeatLevel(prevHeatLevel);
             }
         }
     }
-
-    private boolean canFallBelow(World world, BlockPos pos)
-    {
-        IBlockState state = world.getBlockState(pos);
-
-        if (state.getMaterial() == Material.AIR)
-        {
+    
+    public static boolean canFallBelow(final World par0World, final int par1, final int par2, final int par3) {
+        final Block var4 = par0World.getBlock(par1, par2, par3);
+        if (var4.getMaterial() == Material.air) {
             return true;
-        } else if (state.getBlock() == Blocks.FIRE)
-        {
+        }
+        if (var4 == Blocks.fire) {
             return true;
-        } else
-        {
-            return state.getMaterial() == Material.WATER ? true : state.getMaterial() == Material.LAVA;
         }
+        final Material var5 = var4.getMaterial();
+        return var5 == Material.water || var5 == Material.lava;
     }
-
-    public static int colorMultiplier(IBlockAccess worldIn, BlockPos pos)
-    {
-        if (worldIn != null && pos != null)
-        {
-            TileEntity tile = worldIn.getTileEntity(pos);
-
-            if (tile instanceof TileEntityFallenMeteor)
-            {
-                TileEntityFallenMeteor meteor = (TileEntityFallenMeteor) tile;
-
-                Vector3 col = new Vector3(198, 108, 58);
-                col.translate(200 - meteor.getScaledHeatLevel() * 200);
-                col.x = Math.min(255, col.x);
-                col.y = Math.min(255, col.y);
-                col.z = Math.min(255, col.z);
-
-                return ColorUtil.to32BitColor(255, (byte) col.x, (byte) col.y, (byte) col.z);
-            }
+    
+    public int colorMultiplier(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4) {
+        final TileEntity tile = par1IBlockAccess.getTileEntity(par2, par3, par4);
+        if (tile instanceof TileEntityFallenMeteor) {
+            final TileEntityFallenMeteor meteor = (TileEntityFallenMeteor)tile;
+            final Vector3 col = new Vector3(198.0, 108.0, 58.0);
+            col.translate((double)(200.0f - meteor.getScaledHeatLevel() * 200.0f));
+            col.x = Math.min(255.0, col.x);
+            col.y = Math.min(255.0, col.y);
+            col.z = Math.min(255.0, col.z);
+            return ColorUtil.to32BitColor(255, (byte)col.x, (byte)col.y, (byte)col.z);
         }
-
-        return 16777215;
+        return super.colorMultiplier(par1IBlockAccess, par2, par3, par4);
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
         return new TileEntityFallenMeteor();
     }
-
-    @Override
-    public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player)
-    {
+    
+    public boolean canSilkHarvest() {
         return true;
     }
-
-    @Override
-    public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos)
-    {
-        float hardness = this.getBlockHardness(state, world, pos);
-        if (hardness < 0.0F)
-        {
-            return 0.0F;
+    
+    public float getPlayerRelativeBlockHardness(final EntityPlayer player, final World world, final int x, final int y, final int z) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        final float hardness = this.getBlockHardness(world, x, y, z);
+        if (hardness < 0.0f) {
+            return 0.0f;
         }
-
-        int power = canHarvestBlock(this, player, state);
-        if (power > 0)
-        {
-            return power * player.getDigSpeed(state, pos) / hardness / 30F;
-        } else
-        {
-            return player.getDigSpeed(state, pos) / hardness / 30F;
+        final int power = this.canHarvestBlock(this, player, metadata);
+        if (power > 0) {
+            return power * player.getBreakSpeed((Block)this, true, metadata, x, y, z) / hardness / 30.0f;
         }
+        return player.getBreakSpeed((Block)this, false, metadata, x, y, z) / hardness / 30.0f;
     }
-
-    public int canHarvestBlock(Block block, EntityPlayer player, IBlockState state)
-    {
-        ItemStack stack = player.inventory.getCurrentItem();
-        String tool = block.getHarvestTool(state);
-        if (stack.isEmpty() || tool == null)
-        {
-            return player.canHarvestBlock(state) ? 1 : 0;
+    
+    public int canHarvestBlock(final Block block, final EntityPlayer player, final int metadata) {
+        final ItemStack stack = player.inventory.getCurrentItem();
+        final String tool = block.getHarvestTool(metadata);
+        if (stack == null || tool == null) {
+            return player.canHarvestBlock(block) ? 1 : 0;
         }
-
-        int toolLevel = stack.getItem().getHarvestLevel(stack, tool, player, state) - block.getHarvestLevel(state) + 1;
-        if (toolLevel < 1)
-        {
-            return player.canHarvestBlock(state) ? 1 : 0;
+        final int toolLevel = stack.getItem().getHarvestLevel(stack, tool) - block.getHarvestLevel(metadata) + 1;
+        if (toolLevel < 1) {
+            return player.canHarvestBlock(block) ? 1 : 0;
         }
-
         return toolLevel;
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.GENERAL;
-    }
-
-    @Override
-    public int getExpDrop(IBlockState state, IBlockAccess world, BlockPos pos, int fortune)
-    {
-        if (state.getBlock() != this)
-            return 0;
-
-        Random rand = world instanceof World ? ((World) world).rand : new Random();
-        return MathHelper.getInt(rand, 3, 7);
     }
 }

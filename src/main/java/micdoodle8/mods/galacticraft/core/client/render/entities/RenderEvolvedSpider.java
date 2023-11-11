@@ -1,68 +1,112 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlaySensorGlasses;
-import micdoodle8.mods.galacticraft.core.client.model.ModelEvolvedSpider;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSpider;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import net.minecraft.client.model.*;
+import micdoodle8.mods.galacticraft.core.client.model.*;
+import net.minecraft.entity.monster.*;
+import net.minecraft.entity.*;
+import org.lwjgl.opengl.*;
+import cpw.mods.fml.client.*;
+import net.minecraft.client.renderer.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.client.*;
+import net.minecraft.client.entity.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderEvolvedSpider extends RenderLiving<EntityEvolvedSpider>
+public class RenderEvolvedSpider extends RenderLiving
 {
-
-    private static final ResourceLocation spiderTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/model/spider.png");
-    private boolean texSwitch;
-
-    public RenderEvolvedSpider(RenderManager manager)
-    {
-        super(manager, new ModelEvolvedSpider(), 1.0F);
+    private static final ResourceLocation spiderEyesTextures;
+    private static final ResourceLocation spiderTexture;
+    private static final ResourceLocation powerTexture;
+    private final ModelBase model;
+    
+    public RenderEvolvedSpider() {
+        super((ModelBase)new ModelEvolvedSpider(), 1.0f);
+        this.model = (ModelBase)new ModelEvolvedSpider(0.2f);
+        this.setRenderPassModel((ModelBase)new ModelEvolvedSpider());
     }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityEvolvedSpider par1Entity)
-    {
-        return texSwitch ? OverlaySensorGlasses.altTexture : RenderEvolvedSpider.spiderTexture;
+    
+    protected ResourceLocation func_110779_a(final EntitySpider par1EntityArrow) {
+        return RenderEvolvedSpider.spiderTexture;
     }
-
-    @Override
-    protected void preRenderCallback(EntityEvolvedSpider par1EntityLiving, float par2)
-    {
-        GL11.glScalef(1.2F, 1.2F, 1.2F);
-        if (texSwitch)
-        {
-            GL11.glTranslatef(0.0F, -0.03F, 0.0F);
-            OverlaySensorGlasses.preRenderMobs();
+    
+    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+        return this.func_110779_a((EntitySpider)par1Entity);
+    }
+    
+    protected float setSpiderDeathMaxRotation(final EntitySpider par1EntitySpider) {
+        return 180.0f;
+    }
+    
+    protected void preRenderCallback(final EntityLivingBase par1EntityLiving, final float par2) {
+        GL11.glScalef(1.2f, 1.2f, 1.2f);
+    }
+    
+    protected int shouldRenderPass(final EntityLivingBase par1EntityLiving, final int par2, final float par3) {
+        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final EntityPlayerSP player = (EntityPlayerSP)minecraft.thePlayer;
+        ItemStack helmetSlot = null;
+        if (player != null && player.inventory.armorItemInSlot(3) != null) {
+            helmetSlot = player.inventory.armorItemInSlot(3);
         }
-    }
-
-    @Override
-    public void doRender(EntityEvolvedSpider entity, double par2, double par4, double par6, float par8, float par9)
-    {
-        super.doRender(entity, par2, par4, par6, par8, par9);
-        if (OverlaySensorGlasses.overrideMobTexture())
-        {
-            texSwitch = true;
-            super.doRender(entity, par2, par4, par6, par8, par9);
-            texSwitch = false;
-            OverlaySensorGlasses.postRenderMobs();
+        if (par2 == 3) {
+            this.bindTexture(RenderEvolvedSpider.spiderEyesTextures);
+            GL11.glEnable(3042);
+            GL11.glDisable(3008);
+            GL11.glBlendFunc(770, 771);
+            if (par1EntityLiving.isInvisible()) {
+                GL11.glDepthMask(false);
+            }
+            else {
+                GL11.glDepthMask(true);
+            }
+            final char c0 = '\uf0f0';
+            final int j = c0 % 65536;
+            final int k = c0 / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j / 1.0f, k / 1.0f);
+            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            return 1;
         }
+        if (helmetSlot != null && helmetSlot.getItem() instanceof ItemSensorGlasses && minecraft.currentScreen == null) {
+            if (par2 == 1) {
+                final float var4 = par1EntityLiving.ticksExisted * 2 + par3;
+                this.bindTexture(RenderEvolvedSpider.powerTexture);
+                GL11.glMatrixMode(5890);
+                GL11.glLoadIdentity();
+                final float var5 = var4 * 0.01f;
+                final float var6 = var4 * 0.01f;
+                GL11.glTranslatef(var5, var6, 0.0f);
+                this.setRenderPassModel(this.model);
+                GL11.glMatrixMode(5888);
+                GL11.glEnable(3042);
+                final float var7 = 0.5f;
+                GL11.glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+                GL11.glDisable(2896);
+                GL11.glBlendFunc(1, 1);
+                return 1;
+            }
+            if (par2 == 2) {
+                GL11.glMatrixMode(5890);
+                GL11.glLoadIdentity();
+                GL11.glMatrixMode(5888);
+                GL11.glEnable(2896);
+                GL11.glDisable(3042);
+            }
+        }
+        return -1;
     }
-
-    @Override
-    protected float getDeathMaxRotation(EntityEvolvedSpider par1EntityLiving)
-    {
-        return 180.0F;
+    
+    protected float getDeathMaxRotation(final EntityLivingBase par1EntityLiving) {
+        return this.setSpiderDeathMaxRotation((EntitySpider)par1EntityLiving);
+    }
+    
+    static {
+        spiderEyesTextures = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/spider_eyes.png");
+        spiderTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/spider.png");
+        powerTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/power.png");
     }
 }

@@ -1,125 +1,79 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import java.util.Random;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
-import micdoodle8.mods.galacticraft.core.blocks.ISortableBlock;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBaseSingle;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.material.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.util.*;
+import java.util.*;
+import net.minecraft.item.*;
+import net.minecraft.world.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-public class BlockMinerBase extends BlockTileGC implements IShiftDescription, ISortableBlock
+public class BlockMinerBase extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    public BlockMinerBase(String assetName)
-    {
-        super(Material.ROCK);
-        this.blockHardness = 3.0F;
-        this.setTranslationKey(assetName);
-        this.setSoundType(SoundType.METAL);
+    public BlockMinerBase(final String assetName) {
+        super(Material.rock);
+        this.blockHardness = 3.0f;
+        this.setBlockName(assetName);
+        this.setBlockTextureName("galacticraftasteroids:machineframe");
+        this.setCreativeTab(CreativeTabs.tabBlock);
+        this.setStepSound(BlockMinerBase.soundTypeMetal);
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.blockIcon = par1IconRegister.registerIcon("galacticraftasteroids:machineframe");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public Item getItemDropped(IBlockState state, Random random, int par3)
-    {
-        return super.getItemDropped(state, random, par3);
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(final int side, final int meta) {
+        return this.blockIcon;
     }
-
-    @Override
-    public int damageDropped(IBlockState state)
-    {
+    
+    public Item getItemDropped(final int meta, final Random random, final int par3) {
+        return super.getItemDropped(0, random, par3);
+    }
+    
+    public int damageDropped(final int meta) {
         return 0;
     }
-
-    @Override
-    public int quantityDropped(IBlockState state, int fortune, Random random)
-    {
+    
+    public int quantityDropped(final int meta, final int fortune, final Random random) {
         return 1;
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState metadata)
-    {
+    
+    public TileEntity createTileEntity(final World world, final int metadata) {
         return new TileEntityMinerBaseSingle();
     }
-
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand)
-    {
-        return getStateFromMeta(0);
+    
+    public int onBlockPlaced(final World world, final int x, final int y, final int z, final int side, final float hitX, final float hitY, final float hitZ, final int meta) {
+        return 0;
     }
-
-    @Override
-    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side)
-    {
+    
+    public boolean canPlaceBlockOnSide(final World world, final int x, final int y, final int z, final int side) {
         return true;
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getRenderLayer()
-    {
-        return BlockRenderLayer.CUTOUT;
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.GENERAL;
     }
 }

@@ -1,141 +1,76 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityGrapple;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Enchantments;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBow;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.enchantment.*;
+import net.minecraft.init.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.util.*;
+import net.minecraft.item.*;
+import net.minecraft.client.renderer.texture.*;
 
-public class ItemGrappleHook extends ItemBow implements ISortableItem, GCRarity
+public class ItemGrappleHook extends ItemBow
 {
-
-    private static NonNullList<ItemStack> stringEntries = null;
-
-    public ItemGrappleHook(String assetName)
-    {
-        super();
-        this.setTranslationKey(assetName);
+    public ItemGrappleHook(final String assetName) {
+        this.setUnlocalizedName(assetName);
         this.setMaxStackSize(1);
+        this.setTextureName("arrow");
     }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack)
-    {
-        return false;
-    }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entity, int timeLeft)
-    {
-        if (!(entity instanceof EntityPlayer))
-        {
-            return;
-        }
-
-        EntityPlayer player = (EntityPlayer) entity;
-
-        boolean canShoot = player.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, stack) > 0;
-        ItemStack string = ItemStack.EMPTY;
-
-        if (stringEntries == null)
-            stringEntries = OreDictionary.getOres("string");
-
-        for (ItemStack itemstack : player.inventory.mainInventory)
-        {
-            if (!canShoot && OreDictionary.containsMatch(false, stringEntries, itemstack))
-            {
-                string = itemstack;
-                canShoot = true;
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public void onPlayerStoppedUsing(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer, final int par4) {
+        final boolean flag = par3EntityPlayer.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, par1ItemStack) > 0;
+        if (flag || par3EntityPlayer.inventory.hasItem(Items.string)) {
+            final EntityGrapple grapple = new EntityGrapple(par2World, par3EntityPlayer, 2.0f);
+            par2World.playSoundAtEntity((Entity)par3EntityPlayer, "random.bow", 1.0f, 1.0f / (Item.itemRand.nextFloat() * 0.4f + 1.2f) + 0.5f);
+            if (!par2World.isRemote) {
+                par2World.spawnEntityInWorld((Entity)grapple);
+            }
+            par1ItemStack.damageItem(1, (EntityLivingBase)par3EntityPlayer);
+            grapple.canBePickedUp = (par3EntityPlayer.capabilities.isCreativeMode ? 2 : 1);
+            if (!par3EntityPlayer.capabilities.isCreativeMode) {
+                par3EntityPlayer.inventory.consumeInventoryItem(Items.string);
             }
         }
-
-        if (canShoot)
-        {
-            ItemStack pickupString = string == ItemStack.EMPTY ? ItemStack.EMPTY : new ItemStack(string.getItem(), 1, string.getItemDamage(), string.getTagCompound());
-            EntityGrapple grapple = new EntityGrapple(worldIn, player, 2.0F, pickupString);
-
-            worldIn.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.NEUTRAL, 1.0F, 1.0F / (Item.itemRand.nextFloat() * 0.4F + 1.2F) + 0.5F);
-
-            if (!worldIn.isRemote)
-            {
-                worldIn.spawnEntity(grapple);
-            }
-
-            stack.damageItem(1, player);
-            grapple.canBePickedUp = player.capabilities.isCreativeMode ? 2 : 1;
-
-            if (!player.capabilities.isCreativeMode)
-            {
-                string.shrink(1);
-
-                if (string.isEmpty())
-                {
-                    player.inventory.deleteStack(string);
-                }
-            }
-        } else if (worldIn.isRemote)
-        {
-            player.sendMessage(new TextComponentString(GCCoreUtil.translate("gui.message.grapple.fail")));
+        else if (par2World.isRemote) {
+            par3EntityPlayer.addChatMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.message.grapple.fail")));
         }
     }
-
-    @Override
-    public int getMaxItemUseDuration(ItemStack par1ItemStack)
-    {
+    
+    public ItemStack onEaten(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer) {
+        return par1ItemStack;
+    }
+    
+    public int getMaxItemUseDuration(final ItemStack par1ItemStack) {
         return 72000;
     }
-
-    @Override
-    public EnumAction getItemUseAction(ItemStack par1ItemStack)
-    {
-        return EnumAction.BOW;
+    
+    public EnumAction getItemUseAction(final ItemStack par1ItemStack) {
+        return EnumAction.bow;
     }
-
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand)
-    {
-        playerIn.setActiveHand(hand);
-        return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));
+    
+    public ItemStack onItemRightClick(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer) {
+        par3EntityPlayer.setItemInUse(par1ItemStack, this.getMaxItemUseDuration(par1ItemStack));
+        return par1ItemStack;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.GENERAL;
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        this.itemIcon = iconRegister.registerIcon("arrow");
     }
 }

@@ -1,28 +1,21 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.event;
 
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerHandler.ThermalArmorEvent;
-import micdoodle8.mods.galacticraft.planets.asteroids.items.AsteroidsItems;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.items.*;
+import cpw.mods.fml.common.eventhandler.*;
 
 public class AsteroidsEventHandler
 {
-
     @SubscribeEvent
-    public void onThermalArmorEvent(ThermalArmorEvent event)
-    {
-        if (event.armorStack.isEmpty())
-        {
-            event.setArmorAddResult(ThermalArmorEvent.ArmorAddResult.REMOVE);
-        } else if (event.armorStack.getItem() == AsteroidsItems.thermalPadding && event.armorStack.getItemDamage() == event.armorIndex)
-        {
-            event.setArmorAddResult(ThermalArmorEvent.ArmorAddResult.ADD);
+    public void onThermalArmorEvent(final GCPlayerHandler.ThermalArmorEvent event) {
+        if (event.armorStack == null) {
+            event.setArmorAddResult(GCPlayerHandler.ThermalArmorEvent.ArmorAddResult.REMOVE);
+            return;
         }
+        if (event.armorStack.getItem() == AsteroidsItems.thermalPadding && event.armorStack.getItemDamage() == event.armorIndex) {
+            event.setArmorAddResult(GCPlayerHandler.ThermalArmorEvent.ArmorAddResult.ADD);
+            return;
+        }
+        event.setArmorAddResult(GCPlayerHandler.ThermalArmorEvent.ArmorAddResult.NOTHING);
     }
 }

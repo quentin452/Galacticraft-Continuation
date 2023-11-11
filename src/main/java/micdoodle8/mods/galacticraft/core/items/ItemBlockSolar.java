@@ -1,41 +1,31 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.blocks.BlockSolar;
-
-public class ItemBlockSolar extends ItemBlockDesc implements GCRarity
+public class ItemBlockSolar extends ItemBlockDesc
 {
-
-    public ItemBlockSolar(Block block)
-    {
+    public ItemBlockSolar(final Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-
-    @Override
-    public String getTranslationKey(ItemStack par1ItemStack)
-    {
-        int index = Math.min(Math.max(par1ItemStack.getItemDamage() / 4, 0), BlockSolar.EnumSolarType.values().length);
-
-        String name = BlockSolar.EnumSolarType.values()[index].getName();
-
-        return this.getBlock().getTranslationKey() + "." + name;
+    
+    public String getUnlocalizedName(final ItemStack par1ItemStack) {
+        final int index = Math.min(Math.max(par1ItemStack.getItemDamage() / 4, 0), BlockSolar.names.length);
+        final String name = BlockSolar.names[index];
+        return this.field_150939_a.getUnlocalizedName() + "." + name;
     }
-
-    @Override
-    public int getMetadata(int damage)
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public int getMetadata(final int damage) {
         return damage;
     }
 }

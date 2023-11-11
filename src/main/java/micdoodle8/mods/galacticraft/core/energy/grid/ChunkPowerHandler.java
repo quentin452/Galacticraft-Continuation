@@ -1,68 +1,52 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.energy.grid;
 
-import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkConnection;
-import micdoodle8.mods.galacticraft.core.event.EventHandlerGC;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.ChunkEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.common.*;
+import net.minecraftforge.event.world.*;
+import com.google.common.collect.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.api.transmission.tile.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.event.*;
+import java.util.*;
+import cpw.mods.fml.common.eventhandler.*;
 
 public class ChunkPowerHandler
 {
-
-    private static boolean initiated = false;
-
-    public static void initiate()
-    {
-        if (!ChunkPowerHandler.initiated)
-        {
+    private static boolean initiated;
+    
+    public static void initiate() {
+        if (!ChunkPowerHandler.initiated) {
             ChunkPowerHandler.initiated = true;
-            MinecraftForge.EVENT_BUS.register(new ChunkPowerHandler());
+            MinecraftForge.EVENT_BUS.register((Object)new ChunkPowerHandler());
         }
     }
-
+    
     @SubscribeEvent
-    public void onChunkLoad(ChunkEvent.Load event)
-    {
-        if (!event.getWorld().isRemote && event.getChunk() != null)
-        {
-            try
-            {
-                ArrayList<Object> tileList = Lists.newArrayList();
-                tileList.addAll(event.getChunk().getTileEntityMap().values());
-
-                for (Object o : tileList)
-                {
-                    if (o instanceof TileEntity)
-                    {
-                        TileEntity tile = (TileEntity) o;
-
-                        if (tile instanceof INetworkConnection)
-                        {
-                            ((INetworkConnection) tile).refresh();
+    public void onChunkLoad(final ChunkEvent.Load event) {
+        if (!event.world.isRemote && event.getChunk() != null) {
+            try {
+                final ArrayList<Object> tileList = (ArrayList<Object>)Lists.newArrayList();
+                tileList.addAll(event.getChunk().chunkTileEntityMap.values());
+                for (final Object o : tileList) {
+                    if (o instanceof TileEntity) {
+                        final TileEntity tile = (TileEntity)o;
+                        if (!(tile instanceof INetworkConnection)) {
+                            continue;
                         }
+                        ((INetworkConnection)tile).refresh();
                     }
                 }
-            } catch (Exception e)
-            {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
-
-            if (ConfigManagerCore.retrogenOil && GCCoreUtil.getDimensionID(event.getWorld()) == 0)
-            {
-                EventHandlerGC.retrogenOil(event.getWorld(), event.getChunk());
+            if (ConfigManagerCore.retrogenOil && event.world.provider.dimensionId == 0) {
+                EventHandlerGC.retrogenOil(event.world, event.getChunk());
             }
         }
+    }
+    
+    static {
+        ChunkPowerHandler.initiated = false;
     }
 }

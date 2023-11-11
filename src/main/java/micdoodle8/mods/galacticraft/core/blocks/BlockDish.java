@@ -1,188 +1,175 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.core.items.*;
+import micdoodle8.mods.galacticraft.api.block.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.creativetab.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.entity.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraftforge.common.util.*;
 
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityDish;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class BlockDish extends BlockTileGC implements IShiftDescription, IPartialSealableBlock, ISortableBlock
+public class BlockDish extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc, IPartialSealableBlock
 {
-
-    public BlockDish(String assetName)
-    {
-        super(Material.IRON);
-        this.setHardness(1.0F);
-        this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(assetName);
+    private IIcon[] icons;
+    
+    public BlockDish(final String assetName) {
+        super(Material.iron);
+        this.icons = new IIcon[6];
+        this.setHardness(1.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.icons[0] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_blank");
+        this.icons[1] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_blank");
+        this.icons[2] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_blank");
+        this.icons[3] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_blank");
+        this.icons[4] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_blank");
+        this.icons[5] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_output");
+        this.blockIcon = this.icons[0];
+    }
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public boolean canPlaceBlockOnSide(World world, BlockPos pos, EnumFacing side)
-    {
-        for (int y = 1; y <= 2; y++)
-        {
-            for (int x = -1; x <= 1; x++)
-            {
-                for (int z = -1; z <= 1; z++)
-                {
-                    BlockPos pos1 = pos.add((y == 2 ? x : 0), y, (y == 2 ? z : 0));
-                    Block block = world.getBlockState(pos1).getBlock();
-
-                    if (block.getMaterial(world.getBlockState(pos)) != Material.AIR && !block.isReplaceable(world, pos1))
-                    {
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(final int side, final int meta) {
+        return this.blockIcon;
+    }
+    
+    public boolean canPlaceBlockOnSide(final World world, final int x1, final int y1, final int z1, final int side) {
+        for (int y2 = 1; y2 <= 2; ++y2) {
+            for (int x2 = -1; x2 <= 1; ++x2) {
+                for (int z2 = -1; z2 <= 1; ++z2) {
+                    final Block block = world.getBlock(x1 + ((y2 == 2) ? x2 : 0), y1 + y2, z1 + ((y2 == 2) ? z2 : 0));
+                    if (block.getMaterial() != Material.air && !block.isReplaceable((IBlockAccess)world, x1 + x2, y1 + y2, z1 + z2)) {
                         return false;
                     }
                 }
             }
         }
-
-        EnumFacing facing = EnumFacing.byIndex(side.getIndex() ^ 1);
-        return world.getBlockState(pos.add(facing.getXOffset(), facing.getYOffset(), facing.getZOffset())).getBlock() != GCBlocks.fakeBlock;
+        return new BlockVec3(x1, y1, z1).newVecSide(side ^ 0x1).getBlock((IBlockAccess)world) != GCBlocks.fakeBlock;
     }
-
-    @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
-    {
-        int metadata = state.getBlock().getMetaFromState(state);
-
-        int angle = MathHelper.floor(placer.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
+    
+    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
         int change = 0;
-
-        switch (angle)
-        {
-            case 0:
+        switch (angle) {
+            case 0: {
                 change = 1;
                 break;
-            case 1:
+            }
+            case 1: {
                 change = 2;
                 break;
-            case 2:
+            }
+            case 2: {
                 change = 0;
                 break;
-            case 3:
+            }
+            case 3: {
                 change = 3;
                 break;
+            }
         }
-
-        worldIn.setBlockState(pos, state.getBlock().getStateFromMeta(change), 3);
-
-        BlockMulti.onPlacement(worldIn, pos, placer, this);
-    }
-
-    @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-    {
-        final TileEntity tile = worldIn.getTileEntity(pos);
-
-        if (tile instanceof TileEntityDish)
-        {
-            ((TileEntityDish) tile).onDestroy(tile);
+        world.setBlockMetadataWithNotify(x, y, z, change, 3);
+        final TileEntity tile = world.getTileEntity(x, y, z);
+        if (tile instanceof TileEntityDish) {
+            ((TileEntityDish)tile).onCreate(new BlockVec3(x, y, z));
         }
-
-        super.breakBlock(worldIn, pos, state);
     }
-
+    
     @Override
-    public boolean onUseWrench(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-//        IBlockState state = world.getBlockState(pos);
-//        int original = state.getBlock().getMetaFromState(state);
-//        int change = world.getBlockState(pos).getValue(FACING).rotateY().getHorizontalIndex();
-
-//        TileEntity te = world.getTileEntity(pos);
-//        if (te instanceof TileBaseUniversalElectrical)
-//        {
-//            ((TileBaseUniversalElectrical) te).updateFacing();
-//        }
-//
-//        world.setBlockState(pos, state.getBlock().getStateFromMeta(change), 3);
+    public void breakBlock(final World var1, final int var2, final int var3, final int var4, final Block var5, final int var6) {
+        final TileEntity var7 = var1.getTileEntity(var2, var3, var4);
+        if (var7 instanceof TileEntityDish) {
+            ((TileEntityDish)var7).onDestroy(var7);
+        }
+        super.breakBlock(var1, var2, var3, var4, var5, var6);
+    }
+    
+    public boolean onUseWrench(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        final int original;
+        final int metadata = original = par1World.getBlockMetadata(x, y, z);
+        int change = 0;
+        switch (original) {
+            case 0: {
+                change = 3;
+                break;
+            }
+            case 3: {
+                change = 1;
+                break;
+            }
+            case 1: {
+                change = 2;
+                break;
+            }
+            case 2: {
+                change = 0;
+                break;
+            }
+        }
+        final TileEntity te = par1World.getTileEntity(x, y, z);
+        if (te instanceof TileBaseUniversalElectrical) {
+            ((TileBaseUniversalElectrical)te).updateFacing();
+        }
+        par1World.setBlockMetadataWithNotify(x, y, z, change, 3);
         return true;
     }
-
-    @Override
-    public boolean onSneakMachineActivated(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        // entityPlayer.openGui(GalacticraftCore.instance, -1, world, x, y, z);
+    
+    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
         return true;
     }
-
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState metadata)
-    {
+    
+    public int damageDropped(final int metadata) {
+        return 0;
+    }
+    
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        final int metadata = this.getDamageValue(world, x, y, z);
+        return new ItemStack((Block)this, 1, metadata);
+    }
+    
+    public TileEntity createTileEntity(final World world, final int metadata) {
         return new TileEntityDish();
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
+    
     @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate("tile.radio_telescope.description");
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate("tile.radioTelescope.description");
     }
-
+    
     @Override
-    public boolean showDescription(int meta)
-    {
+    public boolean showDescription(final int meta) {
         return true;
     }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isSealed(World world, BlockPos pos, EnumFacing direction)
-    {
+    
+    public boolean isSealed(final World world, final int x, final int y, final int z, final ForgeDirection direction) {
         return true;
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.GENERAL;
-    }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.MODEL;
     }
 }

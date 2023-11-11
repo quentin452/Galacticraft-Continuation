@@ -1,22 +1,14 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities.player;
 
 public enum EnumGravity
 {
-
-    down(0, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F),
-    up(1, 1.0F, 0.0F, 0.0F, -1.0F, 0.0F, -1.0F, 0.0F, 0.0F, -1.0F, 0.0F, 0.0F, 1.0F, 0.0F),
-    west(2, 0.0F, -1.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.5F, 1.0F, 0.0F, 0.0F, -1.0F, 1.0F, 0.0F),
-    east(3, 0.0F, 1.0F, -1.0F, 0.0F, 0.0F, 0.0F, -0.5F, -1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.0F),
-    south(4, 1.0F, 0.0F, 0.0F, 0.0F, -1.0F, 0.5F, 0.0F, 0.0F, 0.0F, -1.0F, 0.0F, 1.0F, 1.0F),
-    north(5, 1.0F, 0.0F, 0.0F, 0.0F, 1.0F, -0.5F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, -1.0F);
-
+    down(0, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f), 
+    up(1, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f), 
+    west(2, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f), 
+    east(3, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0.0f, -0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f), 
+    south(4, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f), 
+    north(5, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f);
+    
     private final int intValue;
     private final float pitchGravityX;
     private final float pitchGravityY;
@@ -31,11 +23,9 @@ public enum EnumGravity
     private final float eyeVecX;
     private final float eyeVecY;
     private final float eyeVecZ;
-    private final static EnumGravity[] GDirections =
-    {down, up, west, east, south, north};
-
-    EnumGravity(int value, float pitchX, float pitchY, float yawX, float yawY, float yawZ, float thetaX, float thetaZ, float sneakX, float sneakY, float sneakZ, float eyeX, float eyeY, float eyeZ)
-    {
+    private static final EnumGravity[] GDirections;
+    
+    private EnumGravity(final int value, final float pitchX, final float pitchY, final float yawX, final float yawY, final float yawZ, final float thetaX, final float thetaZ, final float sneakX, final float sneakY, final float sneakZ, final float eyeX, final float eyeY, final float eyeZ) {
         this.intValue = value;
         this.pitchGravityX = pitchX;
         this.pitchGravityY = pitchY;
@@ -51,79 +41,68 @@ public enum EnumGravity
         this.eyeVecY = eyeY;
         this.eyeVecZ = eyeZ;
     }
-
-    public int getIntValue()
-    {
-        return intValue;
+    
+    public int getIntValue() {
+        return this.intValue;
     }
-
-    public float getPitchGravityX()
-    {
-        return pitchGravityX;
+    
+    public float getPitchGravityX() {
+        return this.pitchGravityX;
     }
-
-    public float getPitchGravityY()
-    {
-        return pitchGravityY;
+    
+    public float getPitchGravityY() {
+        return this.pitchGravityY;
     }
-
-    public float getYawGravityX()
-    {
-        return yawGravityX;
+    
+    public float getYawGravityX() {
+        return this.yawGravityX;
     }
-
-    public float getYawGravityY()
-    {
-        return yawGravityY;
+    
+    public float getYawGravityY() {
+        return this.yawGravityY;
     }
-
-    public float getYawGravityZ()
-    {
-        return yawGravityZ;
+    
+    public float getYawGravityZ() {
+        return this.yawGravityZ;
     }
-
-    public float getThetaX()
-    {
-        return thetaX;
+    
+    public float getThetaX() {
+        return this.thetaX;
     }
-
-    public float getThetaZ()
-    {
-        return thetaZ;
+    
+    public float getThetaZ() {
+        return this.thetaZ;
     }
-
-    public float getSneakVecX()
-    {
-        return sneakVecX;
+    
+    public float getSneakVecX() {
+        return this.sneakVecX;
     }
-
-    public float getSneakVecY()
-    {
-        return sneakVecY;
+    
+    public float getSneakVecY() {
+        return this.sneakVecY;
     }
-
-    public float getSneakVecZ()
-    {
-        return sneakVecZ;
+    
+    public float getSneakVecZ() {
+        return this.sneakVecZ;
     }
-
-    public float getEyeVecX()
-    {
-        return eyeVecX;
+    
+    public float getEyeVecX() {
+        return this.eyeVecX;
     }
-
-    public float getEyeVecY()
-    {
-        return eyeVecY;
+    
+    public float getEyeVecY() {
+        return this.eyeVecY;
     }
-
-    public float getEyeVecZ()
-    {
-        return eyeVecZ;
+    
+    public float getEyeVecZ() {
+        return this.eyeVecZ;
     }
-
-    public static EnumGravity[] getGDirections()
-    {
-        return GDirections;
+    
+    public static EnumGravity[] getGDirections() {
+        return EnumGravity.GDirections;
+    }
+    
+    static {
+        GDirections = new EnumGravity[] { EnumGravity.down, EnumGravity.up, EnumGravity.west, EnumGravity.east, EnumGravity.south, EnumGravity.north };
     }
 }

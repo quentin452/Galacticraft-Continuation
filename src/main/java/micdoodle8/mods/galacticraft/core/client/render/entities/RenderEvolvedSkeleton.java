@@ -1,90 +1,134 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlaySensorGlasses;
-import micdoodle8.mods.galacticraft.core.client.model.ModelEvolvedSkeleton;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSkeleton;
-import net.minecraft.client.model.ModelSkeleton;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderBiped;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
-import net.minecraft.client.renderer.entity.layers.LayerHeldItem;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.client.model.*;
+import net.minecraft.entity.monster.*;
+import org.lwjgl.opengl.*;
+import net.minecraft.init.*;
+import net.minecraft.item.*;
+import net.minecraft.entity.*;
+import cpw.mods.fml.client.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.client.model.*;
+import net.minecraft.client.*;
+import net.minecraft.client.entity.*;
+import micdoodle8.mods.galacticraft.core.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderEvolvedSkeleton extends RenderBiped<EntityEvolvedSkeleton>
+public class RenderEvolvedSkeleton extends RenderBiped
 {
-
-    private static final ResourceLocation skeletonTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/model/skeleton.png");
-    private static final ResourceLocation powerTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/model/power.png");
-
-    private final ModelEvolvedSkeleton model = new ModelEvolvedSkeleton(0.2F);
-    private boolean texSwitch;
-
-    public RenderEvolvedSkeleton(RenderManager manager)
-    {
-        super(manager, new ModelEvolvedSkeleton(), 0.6F);
-        this.addLayer(new LayerHeldItem(this));
-        this.addLayer(new LayerBipedArmor(this)
-        {
-
-            @Override
-            protected void initArmor()
-            {
-                this.modelLeggings = new ModelSkeleton(0.5F, true);
-                this.modelArmor = new ModelSkeleton(1.0F, true);
+    private static final ResourceLocation skeletonTexture;
+    private static final ResourceLocation powerTexture;
+    private final ModelEvolvedSkeleton model;
+    private static int isBG2Loaded;
+    
+    public RenderEvolvedSkeleton() {
+        super((ModelBiped)new ModelEvolvedSkeleton(), 1.0f);
+        this.model = new ModelEvolvedSkeleton(0.2f);
+        try {
+            final Class<?> clazz = Class.forName("mods.battlegear2.MobHookContainerClass");
+            RenderEvolvedSkeleton.isBG2Loaded = clazz.getField("Skell_Arrow_Datawatcher").getInt(null);
+        }
+        catch (Exception ex) {}
+    }
+    
+    protected ResourceLocation func_110779_a(final EntitySkeleton par1EntityArrow) {
+        return RenderEvolvedSkeleton.skeletonTexture;
+    }
+    
+    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+        return this.func_110779_a((EntitySkeleton)par1Entity);
+    }
+    
+    protected void preRenderCallback(final EntityLivingBase par1EntityLiving, final float par2) {
+        GL11.glScalef(1.2f, 1.2f, 1.2f);
+    }
+    
+    protected void renderEquippedItems(final EntityLivingBase par1EntityLiving, final float par2) {
+        if (RenderEvolvedSkeleton.isBG2Loaded > 0 && par1EntityLiving.getDataWatcher().getWatchedObject(RenderEvolvedSkeleton.isBG2Loaded) == null) {
+            par1EntityLiving.getDataWatcher().addObject(RenderEvolvedSkeleton.isBG2Loaded, (Object)(-1));
+        }
+        GL11.glPushMatrix();
+        GL11.glTranslatef(-0.3f, -0.3f, -0.6f);
+        GL11.glTranslatef(0.1f, 0.0f, 0.0f);
+        GL11.glRotatef(41.0f, 0.0f, 1.0f, 0.0f);
+        GL11.glRotatef(-20.0f, 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+        GL11.glScalef(0.5f, 0.5f, 0.5f);
+        this.renderManager.itemRenderer.renderItem(par1EntityLiving, new ItemStack((Item)Items.bow), 0);
+        GL11.glPopMatrix();
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0.11f, -0.3f, -0.6f);
+        GL11.glTranslatef(0.1f, 0.0f, 0.0f);
+        GL11.glRotatef(46.0f, 0.0f, 1.0f, 0.0f);
+        GL11.glRotatef(-20.0f, 1.0f, 0.0f, 0.0f);
+        GL11.glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+        GL11.glScalef(0.5f, 0.5f, 0.5f);
+        this.renderManager.itemRenderer.renderItem(par1EntityLiving, new ItemStack((Item)Items.bow), 0);
+        GL11.glPopMatrix();
+        super.renderEquippedItems(par1EntityLiving, par2);
+    }
+    
+    public void doRender(final EntityLiving par1EntityLiving, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        super.doRender(par1EntityLiving, par2, par4, par6, par8, par9);
+        final ModelBiped field_82423_g = this.field_82423_g;
+        final ModelBiped field_82425_h = this.field_82425_h;
+        final ModelBiped modelBipedMain = this.modelBipedMain;
+        final boolean aimedBow = true;
+        modelBipedMain.aimedBow = aimedBow;
+        field_82425_h.aimedBow = aimedBow;
+        field_82423_g.aimedBow = aimedBow;
+    }
+    
+    protected int shouldRenderPass(final EntityLivingBase par1EntityLiving, final int par2, final float par3) {
+        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final EntityPlayerSP player = (EntityPlayerSP)minecraft.thePlayer;
+        ItemStack helmetSlot = null;
+        if (player != null && player.inventory.armorItemInSlot(3) != null) {
+            helmetSlot = player.inventory.armorItemInSlot(3);
+        }
+        if (helmetSlot != null && helmetSlot.getItem() instanceof ItemSensorGlasses && minecraft.currentScreen == null) {
+            if (par2 == 1) {
+                final float var4 = par1EntityLiving.ticksExisted * 2 + par3;
+                this.bindTexture(RenderEvolvedSkeleton.powerTexture);
+                GL11.glMatrixMode(5890);
+                GL11.glLoadIdentity();
+                final float var5 = var4 * 0.01f;
+                final float var6 = var4 * 0.01f;
+                GL11.glTranslatef(var5, var6, 0.0f);
+                this.model.aimedBow = true;
+                this.setRenderPassModel((ModelBase)this.model);
+                GL11.glMatrixMode(5888);
+                GL11.glEnable(3042);
+                final float var7 = 0.5f;
+                GL11.glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+                GL11.glDisable(2896);
+                GL11.glBlendFunc(1, 1);
+                return 1;
             }
-        });
-    }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityEvolvedSkeleton par1Entity)
-    {
-        return texSwitch ? OverlaySensorGlasses.altTexture : RenderEvolvedSkeleton.skeletonTexture;
-    }
-
-    @Override
-    protected void preRenderCallback(EntityEvolvedSkeleton par1EntityLiving, float par2)
-    {
-        GL11.glScalef(1.2F, 1.2F, 1.2F);
-        if (texSwitch)
-        {
-            OverlaySensorGlasses.preRenderMobs();
+            if (par2 == 2) {
+                GL11.glMatrixMode(5890);
+                GL11.glLoadIdentity();
+                GL11.glMatrixMode(5888);
+                GL11.glEnable(2896);
+                GL11.glDisable(3042);
+            }
         }
+        return super.shouldRenderPass(par1EntityLiving, par2, par3);
     }
-
-    @Override
-    public void doRender(EntityEvolvedSkeleton entity, double par2, double par4, double par6, float par8, float par9)
-    {
-        super.doRender(entity, par2, par4, par6, par8, par9);
-        if (OverlaySensorGlasses.overrideMobTexture())
-        {
-            texSwitch = true;
-            super.doRender(entity, par2, par4, par6, par8, par9);
-            texSwitch = false;
-            OverlaySensorGlasses.postRenderMobs();
-        }
+    
+    protected void renderEquippedItems(final EntityLiving par1EntityLiving, final float par2) {
+        final ItemStack stack = par1EntityLiving.getLastActiveItems()[0];
+        par1EntityLiving.getLastActiveItems()[0] = null;
+        super.renderEquippedItems(par1EntityLiving, par2);
+        par1EntityLiving.getLastActiveItems()[0] = stack;
     }
-
-    @Override
-    protected void applyRotations(EntityEvolvedSkeleton skellie, float pitch, float yaw, float partialTicks)
-    {
-        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-        GL11.glTranslatef(0F, -skellie.height * 0.55F, 0F);
-        GL11.glRotatef(skellie.getTumbleAngle(partialTicks), skellie.getTumbleAxisX(), 0F, skellie.getTumbleAxisZ());
-        GL11.glTranslatef(0F, skellie.height * 0.55F, 0F);
-        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-        super.applyRotations(skellie, pitch, yaw, partialTicks);
+    
+    static {
+        skeletonTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/skeleton.png");
+        powerTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/power.png");
+        RenderEvolvedSkeleton.isBG2Loaded = 0;
     }
 }

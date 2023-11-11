@@ -1,59 +1,46 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.ArrayList;
-import java.util.Random;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.gen.structure.template.TemplateManager;
+import net.minecraft.world.biome.*;
+import java.util.*;
+import net.minecraft.nbt.*;
 
 public class StructureComponentVillageStartPiece extends StructureComponentVillageWell
 {
-
-    public BiomeProvider biomeProvider;
+    public WorldChunkManager worldChunkMngr;
     public int terrainType;
     public StructureVillagePieceWeightMoon structVillagePieceWeight;
     public ArrayList<StructureVillagePieceWeightMoon> structureVillageWeightedPieceList;
-    public ArrayList<Object> pendingHouses = new ArrayList<Object>();
-    public ArrayList<Object> pendingRoads = new ArrayList<Object>();
-
-    public StructureComponentVillageStartPiece()
-    {
+    public ArrayList<Object> field_74932_i;
+    public ArrayList<Object> field_74930_j;
+    
+    public StructureComponentVillageStartPiece() {
+        this.field_74932_i = new ArrayList<Object>();
+        this.field_74930_j = new ArrayList<Object>();
     }
-
-    public StructureComponentVillageStartPiece(BiomeProvider biomeProvider, int par2, Random par3Random, int par4, int par5, ArrayList<StructureVillagePieceWeightMoon> par6ArrayList, int par7)
-    {
+    
+    public StructureComponentVillageStartPiece(final WorldChunkManager par1WorldChunkManager, final int par2, final Random par3Random, final int par4, final int par5, final ArrayList<StructureVillagePieceWeightMoon> par6ArrayList, final int par7) {
         super(null, 0, par3Random, par4, par5);
-        this.biomeProvider = biomeProvider;
+        this.field_74932_i = new ArrayList<Object>();
+        this.field_74930_j = new ArrayList<Object>();
+        this.worldChunkMngr = par1WorldChunkManager;
         this.structureVillageWeightedPieceList = par6ArrayList;
         this.terrainType = par7;
         this.startPiece = this;
     }
-
+    
     @Override
-    protected void writeStructureToNBT(NBTTagCompound nbt)
-    {
-        super.writeStructureToNBT(nbt);
-
+    protected void func_143012_a(final NBTTagCompound nbt) {
+        super.func_143012_a(nbt);
         nbt.setInteger("TerrainType", this.terrainType);
     }
-
+    
     @Override
-    protected void readStructureFromNBT(NBTTagCompound nbt, TemplateManager manager)
-    {
-        super.readStructureFromNBT(nbt, manager);
-
+    protected void func_143011_b(final NBTTagCompound nbt) {
+        super.func_143011_b(nbt);
         this.terrainType = nbt.getInteger("TerrainType");
     }
-
-    public BiomeProvider getBiomeProvider()
-    {
-        return this.biomeProvider;
+    
+    public WorldChunkManager getWorldChunkManager() {
+        return this.worldChunkMngr;
     }
 }

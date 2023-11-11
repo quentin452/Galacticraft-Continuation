@@ -1,68 +1,50 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.client.model.ModelFlag;
-import micdoodle8.mods.galacticraft.core.entities.EntityFlag;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.client.model.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import org.lwjgl.opengl.*;
+import micdoodle8.mods.galacticraft.core.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderFlag extends Render<EntityFlag>
+public class RenderFlag extends Render
 {
-
-    public static ResourceLocation flagTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/model/flag.png");
-
+    public static ResourceLocation flagTexture;
     protected ModelFlag modelFlag;
-
-    public RenderFlag(RenderManager manager)
-    {
-        super(manager);
-        this.shadowSize = 1F;
+    
+    public RenderFlag() {
+        this.shadowSize = 1.0f;
         this.modelFlag = new ModelFlag();
     }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityFlag entity)
-    {
+    
+    protected ResourceLocation getEntityTexture(final Entity entity) {
         return RenderFlag.flagTexture;
     }
-
-    @Override
-    public void doRender(EntityFlag entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.pushMatrix();
-        long seed = entity.getEntityId() * 493286711L;
-        seed = seed * seed * 4392167121L + seed * 98761L;
-        float seedX = (((seed >> 16 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
-        float seedY = (((seed >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
-        float seedZ = (((seed >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
-        GlStateManager.translate(seedX, seedY + 1.5F, seedZ);
-        GlStateManager.translate((float) x, (float) y, (float) z);
-        GlStateManager.rotate(180.0F - entity.getFacingAngle(), 0.0F, 1.0F, 0.0F);
-        this.bindEntityTexture(entity);
-        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-        this.modelFlag.render(entity, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
-        GlStateManager.popMatrix();
+    
+    public void renderFlag(final EntityFlag entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        GL11.glPushMatrix();
+        long var10 = entity.getEntityId() * 493286711L;
+        var10 = var10 * var10 * 4392167121L + var10 * 98761L;
+        final float var11 = (((var10 >> 16 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
+        final float var12 = (((var10 >> 20 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
+        final float var13 = (((var10 >> 24 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
+        GL11.glTranslatef(var11, var12, var13);
+        GL11.glTranslatef((float)par2, (float)par4, (float)par6);
+        GL11.glRotatef(180.0f - entity.getFacingAngle(), 0.0f, 1.0f, 0.0f);
+        this.bindEntityTexture((Entity)entity);
+        GL11.glScalef(-1.0f, -1.0f, 1.0f);
+        this.modelFlag.render((Entity)entity, 0.0f, 0.0f, -0.1f, 0.0f, 0.0f, 0.0625f);
+        GL11.glPopMatrix();
     }
-
-    @Override
-    public boolean shouldRender(EntityFlag lander, ICamera camera, double camX, double camY, double camZ)
-    {
-        AxisAlignedBB axisalignedbb = lander.getEntityBoundingBox().grow(1D, 2D, 1D);
-        return lander.isInRangeToRender3d(camX, camY, camZ) && camera.isBoundingBoxInFrustum(axisalignedbb);
+    
+    public void doRender(final Entity par1Entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        this.renderFlag((EntityFlag)par1Entity, par2, par4, par6, par8, par9);
+    }
+    
+    static {
+        RenderFlag.flagTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/flag.png");
     }
 }

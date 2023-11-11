@@ -1,106 +1,77 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.blocks.BlockAdvancedTile;
-import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
-import micdoodle8.mods.galacticraft.core.energy.EnergyDisplayHelper;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlock;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.block.*;
+import net.minecraft.item.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.client.entity.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import org.lwjgl.input.*;
+import cpw.mods.fml.client.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.energy.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.client.settings.*;
+import net.minecraft.tileentity.*;
+import cpw.mods.fml.relauncher.*;
 
 public class ItemBlockDesc extends ItemBlockGC
 {
-
-    public ItemBlockDesc(Block block)
-    {
+    public ItemBlockDesc(final Block block) {
         super(block);
     }
-
-    @Override
-    public void onCreated(ItemStack stack, World world, EntityPlayer player)
-    {
-        if (!world.isRemote)
-        {
+    
+    public void onCreated(final ItemStack stack, final World world, final EntityPlayer player) {
+        if (!world.isRemote) {
             return;
         }
-
-        // The player could be a FakePlayer made by another mod e.g.
-        // LogisticsPipes
-        if (player instanceof EntityPlayerSP)
-        {
-            if (this.getBlock() == GCBlocks.fuelLoader)
-            {
-                ClientProxyCore.playerClientHandler.onBuild(4, (EntityPlayerSP) player);
-            } else if (this.getBlock() == GCBlocks.fuelLoader)
-            {
-                ClientProxyCore.playerClientHandler.onBuild(6, (EntityPlayerSP) player);
+        if (player instanceof EntityPlayerSP) {
+            if (this.field_150939_a == GCBlocks.fuelLoader) {
+                ClientProxyCore.playerClientHandler.onBuild(4, (EntityPlayerSP)player);
+            }
+            else if (this.field_150939_a == GCBlocks.fuelLoader) {
+                ClientProxyCore.playerClientHandler.onBuild(6, (EntityPlayerSP)player);
             }
         }
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> info, ITooltipFlag flagIn)
-    {
-        if (this.getBlock() instanceof IShiftDescription && ((IShiftDescription) this.getBlock()).showDescription(stack.getItemDamage()))
-        {
-            if (ClientUtil.isKeyPressed(Minecraft.getMinecraft().gameSettings.keyBindSneak))
-            {
-                info.addAll(FMLClientHandler.instance().getClient().fontRenderer.listFormattedStringToWidth(((IShiftDescription) this.getBlock()).getShiftDescription(stack.getItemDamage()), 150));
-            } else
-            {
-                if (this.getBlock() instanceof BlockTileGC)
-                {
-                    TileEntity te = ((BlockTileGC) this.getBlock()).createTileEntity(null, getBlock().getStateFromMeta(stack.getItemDamage() & 12));
-                    if (te instanceof TileBaseElectricBlock)
-                    {
-                        float powerDrawn = ((TileBaseElectricBlock) te).storage.getMaxExtract();
-                        if (powerDrawn > 0)
-                        {
-                            info.add(TextFormatting.GREEN + GCCoreUtil.translateWithFormat("item_desc.powerdraw.name", EnergyDisplayHelper.getEnergyDisplayS(powerDrawn * 20)));
-                        }
-                    }
-                } else if (this.getBlock() instanceof BlockAdvancedTile)
-                {
-                    TileEntity te = ((BlockAdvancedTile) this.getBlock()).createTileEntity(worldIn, getBlock().getStateFromMeta(stack.getItemDamage() & 12));
-                    if (te instanceof TileBaseElectricBlock)
-                    {
-                        float powerDrawn = ((TileBaseElectricBlock) te).storage.getMaxExtract();
-                        if (powerDrawn > 0)
-                        {
-                            info.add(TextFormatting.GREEN + GCCoreUtil.translateWithFormat("item_desc.powerdraw.name", EnergyDisplayHelper.getEnergyDisplayS(powerDrawn * 20)));
+    public void addInformation(final ItemStack stack, final EntityPlayer player, final List info, final boolean advanced) {
+        if (this.field_150939_a instanceof IBlockShiftDesc && ((IBlockShiftDesc)this.field_150939_a).showDescription(stack.getItemDamage())) {
+            if (Keyboard.isKeyDown(42)) {
+                info.addAll(FMLClientHandler.instance().getClient().fontRenderer.listFormattedStringToWidth(((IBlockShiftDesc)this.field_150939_a).getShiftDescription(stack.getItemDamage()), 150));
+            }
+            else {
+                if (this.field_150939_a instanceof BlockTileGC) {
+                    final TileEntity te = ((BlockTileGC)this.field_150939_a).createTileEntity((World)null, stack.getItemDamage() & 0xC);
+                    if (te instanceof TileBaseElectricBlock) {
+                        final float powerDrawn = ((TileBaseElectricBlock)te).storage.getMaxExtract();
+                        if (powerDrawn > 0.0f) {
+                            info.add(EnumChatFormatting.GREEN + GCCoreUtil.translateWithFormat("itemDesc.powerdraw.name", EnergyDisplayHelper.getEnergyDisplayS(powerDrawn * 20.0f)));
                         }
                     }
                 }
-                info.add(GCCoreUtil.translateWithFormat("item_desc.shift.name", GameSettings.getKeyDisplayString(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode())));
+                else if (this.field_150939_a instanceof BlockAdvancedTile) {
+                    final TileEntity te = ((BlockAdvancedTile)this.field_150939_a).createTileEntity(player.worldObj, stack.getItemDamage() & 0xC);
+                    if (te instanceof TileBaseElectricBlock) {
+                        final float powerDrawn = ((TileBaseElectricBlock)te).storage.getMaxExtract();
+                        if (powerDrawn > 0.0f) {
+                            info.add(EnumChatFormatting.GREEN + GCCoreUtil.translateWithFormat("itemDesc.powerdraw.name", EnergyDisplayHelper.getEnergyDisplayS(powerDrawn * 20.0f)));
+                        }
+                    }
+                }
+                info.add(GCCoreUtil.translateWithFormat("itemDesc.shift.name", GameSettings.getKeyDisplayString(FMLClientHandler.instance().getClient().gameSettings.keyBindSneak.getKeyCode())));
             }
         }
+    }
+    
+    public interface IBlockShiftDesc
+    {
+        String getShiftDescription(final int p0);
+        
+        boolean showDescription(final int p0);
     }
 }

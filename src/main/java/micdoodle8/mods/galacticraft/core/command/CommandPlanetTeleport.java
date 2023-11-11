@@ -1,103 +1,68 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
-
-import micdoodle8.mods.galacticraft.api.entity.IRocketType;
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import net.minecraft.server.*;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.api.entity.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.command.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.world.*;
+import net.minecraft.util.*;
 
 public class CommandPlanetTeleport extends CommandBase
 {
-
-    @Override
-    public String getUsage(ICommandSender var1)
-    {
-        return "/" + this.getName() + " [<player>]";
+    public String getCommandUsage(final ICommandSender var1) {
+        return "/" + this.getCommandName() + " [<player>]";
     }
 
-    @Override
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 2;
     }
 
-    @Override
-    public String getName()
-    {
+    public String getCommandName() {
         return "dimensiontp";
     }
 
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-    {
+    public void processCommand(final ICommandSender icommandsender, final String[] astring) {
         EntityPlayerMP playerBase = null;
-
-        if (args.length < 2)
-        {
-            try
-            {
-                if (args.length == 1)
-                {
-                    playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(args[0], true);
-                } else
-                {
-                    playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(sender.getName(), true);
+        if (astring.length < 2) {
+            try {
+                if (astring.length == 1) {
+                    playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(astring[0], true);
                 }
-
-                if (playerBase != null)
-                {
-                    WorldServer worldserver = server.getWorld(GCCoreUtil.getDimensionID(server.worlds[0]));
-                    BlockPos spawnPoint = worldserver.getSpawnPoint();
-                    GCPlayerStats stats = GCPlayerStats.get(playerBase);
-                    stats.setRocketStacks(NonNullList.withSize(2, ItemStack.EMPTY));
-                    stats.setRocketType(IRocketType.EnumRocketType.DEFAULT.ordinal());
-                    stats.setRocketItem(GCItems.rocketTier1);
-                    stats.setFuelLevel(1000);
-                    stats.setCoordsTeleportedFromX(spawnPoint.getX());
-                    stats.setCoordsTeleportedFromZ(spawnPoint.getZ());
-
-                    try
-                    {
+                else {
+                    playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
+                }
+                if (playerBase != null) {
+                    final MinecraftServer server = MinecraftServer.getServer();
+                    final WorldServer worldserver = server.worldServerForDimension(server.worldServers[0].provider.dimensionId);
+                    final ChunkCoordinates chunkcoordinates = worldserver.getSpawnPoint();
+                    final GCPlayerStats stats = GCPlayerStats.get(playerBase);
+                    stats.rocketStacks = new ItemStack[2];
+                    stats.rocketType = IRocketType.EnumRocketType.DEFAULT.ordinal();
+                    stats.rocketItem = GCItems.rocketTier1;
+                    stats.fuelLevel = 1000;
+                    stats.coordsTeleportedFromX = chunkcoordinates.posX;
+                    stats.coordsTeleportedFromZ = chunkcoordinates.posZ;
+                    try {
                         WorldUtil.toCelestialSelection(playerBase, stats, Integer.MAX_VALUE);
-                    } catch (Exception e)
-                    {
+                    }
+                    catch (Exception e) {
                         e.printStackTrace();
                         throw e;
                     }
-
-                    CommandBase.notifyCommandListener(sender, this, "commands.dimensionteleport", new Object[]
-                    {String.valueOf(EnumColor.GREY + "[" + playerBase.getName()), "]"});
-                } else
-                {
-                    throw new Exception("Could not find player with name: " + args[0]);
+                    VersionUtil.notifyAdmins(icommandsender, (ICommand)this, "commands.dimensionteleport", String.valueOf(EnumColor.GREY + "[" + playerBase.getCommandSenderName()), "]");
+                    return;
                 }
-            } catch (final Exception var6)
-            {
-                throw new CommandException(var6.getMessage(), new Object[0]);
+                throw new Exception("Could not find player with name: " + astring[0]);
             }
-        } else
-        {
-            throw new WrongUsageException(GCCoreUtil.translateWithFormat("commands.dimensiontp.too_many", this.getUsage(sender)), new Object[0]);
+            catch (Exception var6) {
+                throw new CommandException(var6.getMessage());
+            }
+          //  throw new WrongUsageException(GCCoreUtil.translateWithFormat("commands.dimensiontp.tooMany", this.getCommandUsage(icommandsender)), new Object[0]);
         }
+        throw new WrongUsageException(GCCoreUtil.translateWithFormat("commands.dimensiontp.tooMany", this.getCommandUsage(icommandsender)));
     }
 }

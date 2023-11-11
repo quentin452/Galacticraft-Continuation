@@ -1,106 +1,67 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
-import com.google.common.collect.ImmutableList;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.entities.IBubbleProvider;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.core.util.ColorUtil;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
+import net.minecraft.client.renderer.tileentity.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraftforge.client.model.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import org.lwjgl.opengl.*;
+import net.minecraft.client.renderer.*;
 
-@Deprecated
-public class TileEntityBubbleProviderRenderer<E extends TileEntity & IBubbleProvider> extends TileEntitySpecialRenderer<E>
+public class TileEntityBubbleProviderRenderer extends TileEntitySpecialRenderer
 {
-
-    private static IBakedModel sphere;
-
+    private static final ResourceLocation oxygenBubbleTexture;
+    private static IModelCustom sphere;
     private final float colorRed;
     private final float colorGreen;
     private final float colorBlue;
-
-    public TileEntityBubbleProviderRenderer(float colorRed, float colorGreen, float colorBlue)
-    {
+    
+    public TileEntityBubbleProviderRenderer(final float colorRed, final float colorGreen, final float colorBlue) {
+        TileEntityBubbleProviderRenderer.sphere = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/sphere.obj"));
         this.colorRed = colorRed;
         this.colorGreen = colorGreen;
         this.colorBlue = colorBlue;
     }
-
-    private static void updateModels()
-    {
-        if (sphere == null)
-        {
-            try
-            {
-                sphere = ClientUtil.modelFromOBJ(new ResourceLocation(Constants.ASSET_PREFIX, "sphere.obj"), ImmutableList.of("Sphere"));
-            } catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    @Override
-    public void render(E provider, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
-    {
-        if (!provider.getBubbleVisible())
-        {
+    
+    public void renderTileEntityAt(final TileEntity tileEntity, final double x, final double y, final double z, final float var8) {
+        final IBubbleProvider provider = (IBubbleProvider)tileEntity;
+        if (!provider.getBubbleVisible()) {
             return;
         }
-
-        updateModels();
-
         GL11.glPushMatrix();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glTranslatef((float) x + 0.5F, (float) y + 1.0F, (float) z + 0.5F);
-
-        this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_CULL_FACE);
-
-        GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(this.colorRed / 2.0F, this.colorGreen / 2.0F, this.colorBlue / 2.0F, 1.0F);
-        GL11.glMatrixMode(GL11.GL_TEXTURE);
+        GL11.glEnable(32826);
+        GL11.glTranslatef((float)x + 0.5f, (float)y + 1.0f, (float)z + 0.5f);
+        this.bindTexture(TileEntityBubbleProviderRenderer.oxygenBubbleTexture);
+        GL11.glEnable(3042);
+        GL11.glDisable(2896);
+        GL11.glAlphaFunc(516, 0.1f);
+        GL11.glBlendFunc(770, 771);
+        GL11.glColor4f(this.colorRed / 2.0f, this.colorGreen / 2.0f, this.colorBlue / 2.0f, 1.0f);
+        GL11.glMatrixMode(5890);
         GL11.glLoadIdentity();
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glMatrixMode(5888);
         GL11.glDepthMask(false);
-        float lightMapSaveX = OpenGlHelper.lastBrightnessX;
-        float lightMapSaveY = OpenGlHelper.lastBrightnessY;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
+        final float lightMapSaveX = OpenGlHelper.lastBrightnessX;
+        final float lightMapSaveY = OpenGlHelper.lastBrightnessY;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0f, 240.0f);
         GL11.glScalef(provider.getBubbleSize(), provider.getBubbleSize(), provider.getBubbleSize());
-
-        int color = ColorUtil.to32BitColor(30, (int) (this.colorBlue / 2.0F * 255), (int) (this.colorGreen / 2.0F * 255), (int) (this.colorRed / 2.0F * 255));
-        ClientUtil.drawBakedModelColored(sphere, color);
-
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glMatrixMode(GL11.GL_TEXTURE);
+        TileEntityBubbleProviderRenderer.sphere.renderAll();
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glMatrixMode(5890);
         GL11.glDepthMask(true);
         GL11.glLoadIdentity();
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-
+        GL11.glMatrixMode(5888);
+        GL11.glEnable(2896);
+        GL11.glDisable(3042);
+        GL11.glDepthFunc(515);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightMapSaveX, lightMapSaveY);
-
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GL11.glDisable(32826);
         GL11.glPopMatrix();
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    
+    static {
+        oxygenBubbleTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/bubble.png");
     }
 }

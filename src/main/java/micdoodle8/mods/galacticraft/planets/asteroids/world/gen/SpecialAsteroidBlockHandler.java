@@ -1,56 +1,37 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.world.gen;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class SpecialAsteroidBlockHandler
 {
-
     ArrayList<SpecialAsteroidBlock> asteroidBlocks;
-
-    public SpecialAsteroidBlockHandler(SpecialAsteroidBlock... asteroidBlocks)
-    {
+    
+    public SpecialAsteroidBlockHandler(final SpecialAsteroidBlock... asteroidBlocks) {
         this.asteroidBlocks = new ArrayList<SpecialAsteroidBlock>();
-        for (SpecialAsteroidBlock asteroidBlock : this.asteroidBlocks)
-        {
-            for (int i = 0; i < asteroidBlock.probability; i++)
-            {
+        for (final SpecialAsteroidBlock asteroidBlock : this.asteroidBlocks) {
+            for (int i = 0; i < asteroidBlock.probability; ++i) {
                 this.asteroidBlocks.add(asteroidBlock);
             }
         }
     }
-
-    public SpecialAsteroidBlockHandler()
-    {
+    
+    public SpecialAsteroidBlockHandler() {
         this.asteroidBlocks = new ArrayList<SpecialAsteroidBlock>();
     }
-
-    public void addBlock(SpecialAsteroidBlock asteroidBlock)
-    {
-        for (int i = 0; i < asteroidBlock.probability; i++)
-        {
+    
+    public void addBlock(final SpecialAsteroidBlock asteroidBlock) {
+        for (int i = 0; i < asteroidBlock.probability; ++i) {
             this.asteroidBlocks.add(asteroidBlock);
         }
     }
-
-    public SpecialAsteroidBlock getBlock(Random rand, int size)
-    {
-        int s = this.asteroidBlocks.size();
-        if (s < 10)
-        {
+    
+    public SpecialAsteroidBlock getBlock(final Random rand, final int size) {
+        final int s = this.asteroidBlocks.size();
+        if (s < 10) {
             return this.asteroidBlocks.get(rand.nextInt(s));
         }
-
-        Double r = rand.nextDouble();
-        int index = (int) (s * Math.pow(r, (size + 5) * 0.05D));
+        final Double r = rand.nextDouble();
+        final int index = (int)(s * Math.pow(r, (size + 5) * 0.05));
         return this.asteroidBlocks.get(index);
     }
-
 }

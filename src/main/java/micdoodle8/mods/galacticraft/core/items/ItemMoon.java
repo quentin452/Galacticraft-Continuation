@@ -1,109 +1,68 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class ItemMoon extends ItemDesc implements ISortableItem, GCRarity
+public class ItemMoon extends Item
 {
-
-    public static String[] names =
-    {"meteoric_iron_ingot", "compressed_meteoric_iron", "lunar_sapphire"};
-
-    public ItemMoon(String str)
-    {
-        super();
+    public static String[] names;
+    protected IIcon[] icons;
+    
+    public ItemMoon(final String str) {
+        this.icons = new IIcon[ItemMoon.names.length];
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
-        this.setTranslationKey(str);
+        this.setUnlocalizedName(str);
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            for (int i = 0; i < ItemMoon.names.length; i++)
-            {
-                list.add(new ItemStack(this, 1, i));
-            }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        int i = 0;
+        for (final String name : ItemMoon.names) {
+            this.icons[i++] = iconRegister.registerIcon("galacticraftmoon:" + name);
         }
     }
-
-    @Override
-    public String getTranslationKey(ItemStack par1ItemStack)
-    {
-        if (names.length > par1ItemStack.getItemDamage())
-        {
+    
+    public IIcon getIconFromDamage(final int damage) {
+        if (this.icons.length > damage) {
+            return this.icons[damage];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < ItemMoon.names.length; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
+        }
+    }
+    
+    public String getUnlocalizedName(final ItemStack par1ItemStack) {
+        if (this.icons.length > par1ItemStack.getItemDamage()) {
             return "item." + ItemMoon.names[par1ItemStack.getItemDamage()];
         }
-
         return "unnamed";
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
+    
+    public int getMetadata(final int par1) {
         return par1;
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        switch (meta)
-        {
-            case 0:
-                return EnumSortCategoryItem.INGOT;
-            case 2:
-                return EnumSortCategoryItem.GENERAL;
-            default:
-                return EnumSortCategoryItem.PLATE;
-        }
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        if (meta == 2)
-        {
-            return GCCoreUtil.translate("item.lunar_sapphire.description");
-        }
-
-        return "";
-    }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
-        return meta == 2;
-    }
-
-    @Override
-    public float getSmeltingExperience(ItemStack item)
-    {
-        switch (item.getItemDamage())
-        {
-            case 1:
-                return 1F;
-        }
-        return -1F;
+    
+    static {
+        ItemMoon.names = new String[] { "meteoricIronIngot", "compressedMeteoricIron" };
     }
 }

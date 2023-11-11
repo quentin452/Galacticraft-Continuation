@@ -1,59 +1,36 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.schematic;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.recipe.SchematicPage;
-import micdoodle8.mods.galacticraft.core.GCItems;
-import micdoodle8.mods.galacticraft.core.client.gui.GuiIdsCore;
-import micdoodle8.mods.galacticraft.core.client.gui.container.GuiSchematicBuggy;
-import micdoodle8.mods.galacticraft.core.inventory.ContainerBuggyBench;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.api.recipe.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.client.gui.*;
+import micdoodle8.mods.galacticraft.core.client.gui.container.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.galacticraft.core.inventory.*;
 
 public class SchematicMoonBuggy extends SchematicPage
 {
-
-    @Override
-    public int getPageID()
-    {
+    public int getPageID() {
         return ConfigManagerCore.idSchematicMoonBuggy;
     }
-
-    @Override
-    public int getGuiID()
-    {
-        return GuiIdsCore.NASA_WORKBENCH_BUGGY;
+    
+    public int getGuiID() {
+        return 1;
     }
-
-    @Override
-    public ItemStack getRequiredItem()
-    {
+    
+    public ItemStack getRequiredItem() {
         return new ItemStack(GCItems.schematic, 1, 0);
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public GuiScreen getResultScreen(EntityPlayer player, BlockPos pos)
-    {
-        return new GuiSchematicBuggy(player.inventory, pos);
+    public GuiScreen getResultScreen(final EntityPlayer player, final int x, final int y, final int z) {
+        return (GuiScreen)new GuiSchematicBuggy(player.inventory);
     }
-
-    @Override
-    public Container getResultContainer(EntityPlayer player, BlockPos pos)
-    {
-        return new ContainerBuggyBench(player.inventory, pos, player);
+    
+    public Container getResultContainer(final EntityPlayer player, final int x, final int y, final int z) {
+        return (Container)new ContainerBuggyBench(player.inventory, x, y, z);
     }
 }

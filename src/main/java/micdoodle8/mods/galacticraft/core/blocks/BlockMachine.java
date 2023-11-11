@@ -1,180 +1,235 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.item.*;
+import java.util.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityIngotCompressor;
-
-public class BlockMachine extends BlockMachineBase
+public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    public static final PropertyEnum<EnumMachineType> TYPE = PropertyEnum.create("type", EnumMachineType.class);
-
-    public enum EnumMachineType implements EnumMachineBase, IStringSerializable
-    {
-
-        COAL_GENERATOR(0, "coal_generator", TileEntityCoalGenerator::new, "tile.coal_generator.description", "tile.machine.0"),
-        COMPRESSOR(12, "ingot_compressor", TileEntityIngotCompressor::new, "tile.compressor.description", "tile.machine.3"); // 3
-                                                                                                                             // for
-                                                                                                                             // backwards
-                                                                                                                             // compatibility
-
-        private final int meta;
-        private final String name;
-        private final TileConstructor tile;
-        private final String shiftDescriptionKey;
-        private final String blockName;
-
-        EnumMachineType(int meta, String name, TileConstructor tile, String key, String blockName)
-        {
-            this.meta = meta;
-            this.name = name;
-            this.tile = tile;
-            this.shiftDescriptionKey = key;
-            this.blockName = blockName;
-        }
-
-        @Override
-        public int getMetadata()
-        {
-            return this.meta;
-        }
-
-        private final static EnumMachineType[] values = values();
-
-        @Override
-        public EnumMachineType fromMetadata(int meta)
-        {
-            switch (meta / 4)
-            {
-                case 3:
-                    return COMPRESSOR;
-                default:
-                    return COAL_GENERATOR;
-            }
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
-
-        @Override
-        public TileEntity tileConstructor()
-        {
-            return this.tile.create();
-        }
-
-        @FunctionalInterface
-        private static interface TileConstructor
-        {
-
-            TileEntity create();
-        }
-
-        @Override
-        public String getShiftDescriptionKey()
-        {
-            return this.shiftDescriptionKey;
-        }
-
-        @Override
-        public String getTranslationKey()
-        {
-            return this.blockName;
-        }
+    public static final int COAL_GENERATOR_METADATA = 0;
+    public static final int COMPRESSOR_METADATA = 12;
+    private IIcon iconMachineSide;
+    private IIcon iconOutput;
+    private IIcon iconCoalGenerator;
+    private IIcon iconCompressor;
+    
+    public BlockMachine(final String assetName) {
+        super(GCBlocks.machine);
+        this.setBlockName("basicMachine");
+        this.setHardness(1.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    public BlockMachine(String assetName)
-    {
-        super(assetName);
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
+        return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    protected void initialiseTypes()
-    {
-        this.types = EnumMachineType.values;
-        this.typeBase = EnumMachineType.values[0];
+    
+    public int getRenderType() {
+        return GalacticraftCore.proxy.getBlockRender((Block)this);
     }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand)
-    {
-        TileEntity tile = worldIn.getTileEntity(pos);
-
-        if (tile instanceof TileEntityCoalGenerator)
-        {
-            TileEntityCoalGenerator tileEntity = (TileEntityCoalGenerator) tile;
-            if (tileEntity.heatGJperTick > 0)
-            {
-                float particlePosX = pos.getX() + 0.5F;
-                float particlePosY = pos.getY() + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
-                float particlePosZ = pos.getZ() + 0.5F;
-                float particleSize0 = 0.52F;
-                float particleSize1 = rand.nextFloat() * 0.6F - 0.3F;
-
-                switch (stateIn.getValue(FACING))
-                {
-                    case NORTH:
-                        worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, particlePosX + particleSize1, particlePosY, particlePosZ - particleSize0, 0.0D, 0.0D, 0.0D);
-                        worldIn.spawnParticle(EnumParticleTypes.FLAME, particlePosX + particleSize1, particlePosY, particlePosZ - particleSize0, 0.0D, 0.0D, 0.0D);
-                        break;
-                    case EAST:
-                        worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, particlePosX + particleSize0, particlePosY, particlePosZ + particleSize1, 0.0D, 0.0D, 0.0D);
-                        worldIn.spawnParticle(EnumParticleTypes.FLAME, particlePosX + particleSize0, particlePosY, particlePosZ + particleSize1, 0.0D, 0.0D, 0.0D);
-                        break;
-                    case SOUTH:
-                        worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, particlePosX + particleSize1, particlePosY, particlePosZ + particleSize0, 0.0D, 0.0D, 0.0D);
-                        worldIn.spawnParticle(EnumParticleTypes.FLAME, particlePosX + particleSize1, particlePosY, particlePosZ + particleSize0, 0.0D, 0.0D, 0.0D);
-                        break;
-                    case WEST:
-                        worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, particlePosX - particleSize0, particlePosY, particlePosZ + particleSize1, 0.0D, 0.0D, 0.0D);
-                        worldIn.spawnParticle(EnumParticleTypes.FLAME, particlePosX - particleSize0, particlePosY, particlePosZ + particleSize1, 0.0D, 0.0D, 0.0D);
-                        break;
+    
+    public void registerBlockIcons(final IIconRegister iconRegister) {
+        this.blockIcon = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine");
+        this.iconOutput = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_output");
+        this.iconMachineSide = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_side");
+        this.iconCoalGenerator = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "coalGenerator");
+        this.iconCompressor = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "compressor");
+    }
+    
+    public void randomDisplayTick(final World par1World, final int x, final int y, final int z, final Random par5Random) {
+        final TileEntity tile = par1World.getTileEntity(x, y, z);
+        if (tile instanceof TileEntityCoalGenerator) {
+            final TileEntityCoalGenerator tileEntity = (TileEntityCoalGenerator)tile;
+            if (tileEntity.heatGJperTick > 0.0f) {
+                final int metadata = par1World.getBlockMetadata(x, y, z);
+                final float var7 = x + 0.5f;
+                final float var8 = y + 0.0f + par5Random.nextFloat() * 6.0f / 16.0f;
+                final float var9 = z + 0.5f;
+                final float var10 = 0.52f;
+                final float var11 = par5Random.nextFloat() * 0.6f - 0.3f;
+                if (metadata == 0) {
+                    par1World.spawnParticle("smoke", (double)(var7 - var10), (double)var8, (double)(var9 + var11), 0.0, 0.0, 0.0);
+                    par1World.spawnParticle("flame", (double)(var7 - var10), (double)var8, (double)(var9 + var11), 0.0, 0.0, 0.0);
+                }
+                else if (metadata == 1) {
+                    par1World.spawnParticle("smoke", (double)(var7 + var10), (double)var8, (double)(var9 + var11), 0.0, 0.0, 0.0);
+                    par1World.spawnParticle("flame", (double)(var7 + var10), (double)var8, (double)(var9 + var11), 0.0, 0.0, 0.0);
+                }
+                else if (metadata == 2) {
+                    par1World.spawnParticle("smoke", (double)(var7 + var11), (double)var8, (double)(var9 + var10), 0.0, 0.0, 0.0);
+                    par1World.spawnParticle("flame", (double)(var7 + var11), (double)var8, (double)(var9 + var10), 0.0, 0.0, 0.0);
+                }
+                else if (metadata == 3) {
+                    par1World.spawnParticle("smoke", (double)(var7 + var11), (double)var8, (double)(var9 - var10), 0.0, 0.0, 0.0);
+                    par1World.spawnParticle("flame", (double)(var7 + var11), (double)var8, (double)(var9 - var10), 0.0, 0.0, 0.0);
                 }
             }
         }
     }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        EnumFacing enumfacing = EnumFacing.byHorizontalIndex(meta % 4);
-        EnumMachineType type = (EnumMachineType) typeBase.fromMetadata(meta);
-        return this.getDefaultState().withProperty(FACING, enumfacing).withProperty(TYPE, type);
+    
+    public IIcon getIcon(final IBlockAccess world, final int x, final int y, final int z, final int side) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        return this.getIcon(side, world.getBlockMetadata(x, y, z));
     }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return (state.getValue(FACING)).getHorizontalIndex() + ((EnumMachineType) state.getValue(TYPE)).getMetadata();
+    
+    public IIcon getIcon(final int side, int metadata) {
+        if (side == 0 || side == 1) {
+            return this.blockIcon;
+        }
+        if (metadata >= 12) {
+            metadata -= 12;
+            if ((metadata == 0 && side == 4) || (metadata == 1 && side == 5) || (metadata == 2 && side == 3) || (metadata == 3 && side == 2)) {
+                return this.iconCompressor;
+            }
+        }
+        else {
+            if (side == metadata + 2) {
+                return this.iconOutput;
+            }
+            if ((metadata == 0 && side == 4) || (metadata == 1 && side == 5) || (metadata == 2 && side == 3) || (metadata == 3 && side == 2)) {
+                return this.iconCoalGenerator;
+            }
+        }
+        return this.iconMachineSide;
     }
-
+    
+    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
+        int change = 0;
+        switch (angle) {
+            case 0: {
+                change = 3;
+                break;
+            }
+            case 1: {
+                change = 1;
+                break;
+            }
+            case 2: {
+                change = 2;
+                break;
+            }
+            case 3: {
+                change = 0;
+                break;
+            }
+        }
+        world.setBlockMetadataWithNotify(x, y, z, (metadata & 0xC) + change, 3);
+    }
+    
+    public boolean onUseWrench(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        final int metadata = par1World.getBlockMetadata(x, y, z);
+        final int original = metadata & 0x3;
+        int change = 0;
+        switch (original) {
+            case 0: {
+                change = 3;
+                break;
+            }
+            case 3: {
+                change = 1;
+                break;
+            }
+            case 1: {
+                change = 2;
+                break;
+            }
+            case 2: {
+                change = 0;
+                break;
+            }
+        }
+        if (metadata < 12) {
+            final TileEntity te = par1World.getTileEntity(x, y, z);
+            if (te instanceof TileBaseUniversalElectrical) {
+                ((TileBaseUniversalElectrical)te).updateFacing();
+            }
+        }
+        par1World.setBlockMetadataWithNotify(x, y, z, (metadata & 0xC) + change, 3);
+        return true;
+    }
+    
+    public boolean onMachineActivated(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        final int metadata = par1World.getBlockMetadata(x, y, z);
+        if (par1World.isRemote) {
+            return true;
+        }
+        if (metadata >= 12) {
+            par5EntityPlayer.openGui((Object)GalacticraftCore.instance, -1, par1World, x, y, z);
+            return true;
+        }
+        par5EntityPlayer.openGui((Object)GalacticraftCore.instance, -1, par1World, x, y, z);
+        return true;
+    }
+    
+    public TileEntity createTileEntity(final World world, int metadata) {
+        metadata &= 0xC;
+        if (metadata == 12) {
+            return new TileEntityIngotCompressor();
+        }
+        if (metadata == 4) {
+            return new TileEntityEnergyStorageModule();
+        }
+        if (metadata == 8) {
+            return new TileEntityElectricFurnace();
+        }
+        return new TileEntityCoalGenerator();
+    }
+    
+    public ItemStack getCompressor() {
+        return new ItemStack((Block)this, 1, 12);
+    }
+    
+    public ItemStack getCoalGenerator() {
+        return new ItemStack((Block)this, 1, 0);
+    }
+    
+    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        par3List.add(this.getCoalGenerator());
+        par3List.add(this.getCompressor());
+    }
+    
+    public int damageDropped(final int metadata) {
+        return metadata & 0xC;
+    }
+    
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        final int metadata = this.getDamageValue(world, x, y, z);
+        return new ItemStack((Block)this, 1, metadata);
+    }
+    
     @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, FACING, TYPE);
+    public String getShiftDescription(final int meta) {
+        switch (meta) {
+            case 0: {
+                return GCCoreUtil.translate("tile.coalGenerator.description");
+            }
+            case 12: {
+                return GCCoreUtil.translate("tile.compressor.description");
+            }
+            default: {
+                return "";
+            }
+        }
+    }
+    
+    @Override
+    public boolean showDescription(final int meta) {
+        return true;
     }
 }

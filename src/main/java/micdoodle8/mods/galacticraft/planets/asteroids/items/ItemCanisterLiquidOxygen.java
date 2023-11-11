@@ -1,125 +1,88 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import java.util.HashMap;
-import java.util.List;
-import javax.annotation.Nullable;
-import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.items.ItemCanisterGeneric;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.items.*;
+import micdoodle8.mods.galacticraft.api.item.*;
+import net.minecraft.util.*;
+import net.minecraft.item.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.entity.player.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-public class ItemCanisterLiquidOxygen extends ItemCanisterGeneric implements IItemOxygenSupply, ISortableItem
+public class ItemCanisterLiquidOxygen extends ItemCanisterGeneric implements IItemOxygenSupply
 {
-
-    // protected IIcon[] icons = new IIcon[7];
-    private static HashMap<ItemStack, Integer> craftingvalues = new HashMap<>();
-
-    public ItemCanisterLiquidOxygen(String assetName)
-    {
+    protected IIcon[] icons;
+    private static HashMap<ItemStack, Integer> craftingvalues;
+    
+    public ItemCanisterLiquidOxygen(final String assetName) {
         super(assetName);
+        this.icons = new IIcon[7];
         this.setAllowedFluid("liquidoxygen");
-        // this.setTextureName(GalacticraftPlanets.TEXTURE_PREFIX + assetName);
+        this.setTextureName("galacticraftasteroids:" + assetName);
     }
-
-    /*
-     * @Override
-     * @SideOnly(Side.CLIENT) public void registerIcons(IIconRegister
-     * iconRegister) { for (int i = 0; i < this.icons.length; i++) {
-     * this.icons[i] = iconRegister.registerIcon(this.getIconString() + "_" +
-     * i); } }
-     */
-
-    @Override
-    public String getTranslationKey(ItemStack itemStack)
-    {
-        if (ItemCanisterGeneric.EMPTY - itemStack.getItemDamage() == 0)
-        {
-            return "item.empty_gas_canister";
-        }
-
-        if (itemStack.getItemDamage() == 1)
-        {
-            return "item.canister.lox.full";
-        }
-
-        return "item.canister.lox.partial";
-    }
-
-    /*
-     * @Override public IIcon getIconFromDamage(int par1) { final int damage = 6
-     * * par1 / ItemCanisterGeneric.EMPTY; if (this.icons.length > damage) {
-     * return this.icons[this.icons.length - damage - 1]; } return
-     * super.getIconFromDamage(damage); }
-     */
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        if (ItemCanisterGeneric.EMPTY - par1ItemStack.getItemDamage() > 0)
-        {
-            tooltip.add(GCCoreUtil.translate("item.canister.lox.name") + ": " + (ItemCanisterGeneric.EMPTY - par1ItemStack.getItemDamage()));
+    public void registerIcons(final IIconRegister iconRegister) {
+        for (int i = 0; i < this.icons.length; ++i) {
+            this.icons[i] = iconRegister.registerIcon(this.getIconString() + "_" + i);
         }
     }
-
-    public static void saveDamage(ItemStack itemstack, int damage)
-    {
-        ItemCanisterLiquidOxygen.craftingvalues.put(itemstack, Integer.valueOf(damage));
-    }
-
-    @Override
-    public ItemStack getContainerItem(ItemStack itemstack)
-    {
-        Integer saved = ItemCanisterLiquidOxygen.craftingvalues.get(itemstack);
-        if (saved != null)
-        {
-            if (saved < ItemCanisterGeneric.EMPTY)
-            {
-                ItemCanisterLiquidOxygen.craftingvalues.remove(itemstack);
-                itemstack.setItemDamage(saved);
-                return itemstack.copy();
-            }
-            return new ItemStack(this.getContainerItem(), 1, ItemCanisterGeneric.EMPTY);
+    
+    public String getUnlocalizedName(final ItemStack itemStack) {
+        if (1001 - itemStack.getItemDamage() == 0) {
+            return "item.emptyGasCanister";
         }
-        if (GCCoreUtil.getEffectiveSide() == Side.CLIENT)
-        {
-            return itemstack.copy();
+        if (itemStack.getItemDamage() == 1) {
+            return "item.canister.LOX.full";
         }
-        return super.getContainerItem(itemstack);
+        return "item.canister.LOX.partial";
     }
-
-    @Override
-    public int discharge(ItemStack itemStack, int amount)
-    {
-        int damage = itemStack.getItemDamage();
-        int used = Math.min((int) (amount * Constants.LOX_GAS_RATIO), ItemCanisterGeneric.EMPTY - damage);
+    
+    public IIcon getIconFromDamage(final int par1) {
+        final int damage = 6 * par1 / 1001;
+        if (this.icons.length > damage) {
+            return this.icons[this.icons.length - damage - 1];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
+        if (1001 - par1ItemStack.getItemDamage() > 0) {
+            par3List.add(GCCoreUtil.translate("item.canister.LOX.name") + ": " + (1001 - par1ItemStack.getItemDamage()));
+        }
+    }
+    
+    public static void saveDamage(final ItemStack itemstack, final int damage) {
+        ItemCanisterLiquidOxygen.craftingvalues.put(itemstack, damage);
+    }
+    
+    public ItemStack getContainerItem(final ItemStack itemstack) {
+        final Integer saved = ItemCanisterLiquidOxygen.craftingvalues.get(itemstack);
+        if (saved == null) {
+            return super.getContainerItem(itemstack);
+        }
+        if (saved < 1001) {
+            ItemCanisterLiquidOxygen.craftingvalues.remove(itemstack);
+            itemstack.setItemDamage((int)saved);
+            return itemstack;
+        }
+        return new ItemStack(this.getContainerItem(), 1, 1001);
+    }
+    
+    public float discharge(final ItemStack itemStack, final float amount) {
+        final int damage = itemStack.getItemDamage();
+        final int used = Math.min((int)(amount * 0.09259259f), 1001 - damage);
         this.setNewDamage(itemStack, damage + used);
-        return (int) Math.floor(used / Constants.LOX_GAS_RATIO);
+        return used / 0.09259259f;
     }
-
-    @Override
-    public int getOxygenStored(ItemStack par1ItemStack)
-    {
-        return ItemCanisterGeneric.EMPTY - par1ItemStack.getItemDamage();
+    
+    public int getOxygenStored(final ItemStack par1ItemStack) {
+        return 1001 - par1ItemStack.getItemDamage();
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.CANISTER;
+    
+    static {
+        ItemCanisterLiquidOxygen.craftingvalues = new HashMap<ItemStack, Integer>();
     }
 }

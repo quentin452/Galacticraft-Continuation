@@ -1,85 +1,67 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.client.gui;
 
-import micdoodle8.mods.galacticraft.api.recipe.ISchematicResultPage;
-import micdoodle8.mods.galacticraft.api.recipe.SchematicRegistry;
-import micdoodle8.mods.galacticraft.core.client.gui.container.GuiPositionedContainer;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.inventory.ContainerSchematicTier2Rocket;
-import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.gui.inventory.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.planets.mars.inventory.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.client.gui.*;
+import micdoodle8.mods.galacticraft.api.recipe.*;
+import micdoodle8.mods.galacticraft.planets.mars.items.*;
+import net.minecraft.item.*;
+import org.lwjgl.opengl.*;
 
-public class GuiSchematicTier2Rocket extends GuiPositionedContainer implements ISchematicResultPage
+public class GuiSchematicTier2Rocket extends GuiContainer implements ISchematicResultPage
 {
-
-    private static final ResourceLocation tier2SchematicTexture = new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "textures/gui/schematic_rocket_t2.png");
-
+    private static final ResourceLocation tier2SchematicTexture;
     private int pageIndex;
-
-    public GuiSchematicTier2Rocket(InventoryPlayer par1InventoryPlayer, BlockPos pos)
-    {
-        super(new ContainerSchematicTier2Rocket(par1InventoryPlayer, pos), pos);
+    
+    public GuiSchematicTier2Rocket(final InventoryPlayer par1InventoryPlayer, final int x, final int y, final int z) {
+        super((Container)new ContainerSchematicTier2Rocket(par1InventoryPlayer, x, y, z));
         this.ySize = 238;
     }
-
-    @Override
-    public void initGui()
-    {
+    
+    public void initGui() {
         super.initGui();
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 130, this.height / 2 - 110, 40, 20, GCCoreUtil.translate("gui.button.back.name")));
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 130, this.height / 2 - 110 + 25, 40, 20, GCCoreUtil.translate("gui.button.next.name")));
+        this.buttonList.add(new GuiButton(0, this.width / 2 - 130, this.height / 2 - 30 + 27 - 12, 40, 20, GCCoreUtil.translate("gui.button.back.name")));
+        this.buttonList.add(new GuiButton(1, this.width / 2 - 130, this.height / 2 - 30 + 27 + 12, 40, 20, GCCoreUtil.translate("gui.button.next.name")));
     }
-
-    @Override
-    protected void actionPerformed(GuiButton par1GuiButton)
-    {
-        if (par1GuiButton.enabled)
-        {
-            switch (par1GuiButton.id)
-            {
-                case 0:
-                    SchematicRegistry.flipToLastPage(this, this.pageIndex);
+    
+    protected void actionPerformed(final GuiButton par1GuiButton) {
+        if (par1GuiButton.enabled) {
+            switch (par1GuiButton.id) {
+                case 0: {
+                    SchematicRegistry.flipToLastPage(this.pageIndex);
                     break;
-                case 1:
-                    SchematicRegistry.flipToNextPage(this, this.pageIndex);
+                }
+                case 1: {
+                    SchematicRegistry.flipToNextPage(this.pageIndex);
                     break;
+                }
             }
         }
     }
-
-    @Override
-    protected void drawGuiContainerForegroundLayer(int par1, int par2)
-    {
-        this.fontRenderer.drawString(MarsItems.rocketMars.getItemStackDisplayName(new ItemStack(MarsItems.rocketMars, 1, 0)), 7, -20 + 27, 4210752);
-        this.fontRenderer.drawString(GCCoreUtil.translate("container.inventory"), 8, 220 - 104 + 2 + 27, 4210752);
+    
+    protected void drawGuiContainerForegroundLayer(final int par1, final int par2) {
+        this.fontRendererObj.drawString(MarsItems.spaceship.getItemStackDisplayName(new ItemStack(MarsItems.spaceship, 1, 0)), 7, 7, 4210752);
+        this.fontRendererObj.drawString(GCCoreUtil.translate("container.inventory"), 8, 145, 4210752);
     }
-
-    @Override
-    protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
-    {
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    
+    protected void drawGuiContainerBackgroundLayer(final float par1, final int par2, final int par3) {
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.mc.renderEngine.bindTexture(GuiSchematicTier2Rocket.tier2SchematicTexture);
         final int var5 = (this.width - this.xSize) / 2;
         final int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
     }
-
-    @Override
-    public void setPageIndex(int index)
-    {
+    
+    public void setPageIndex(final int index) {
         this.pageIndex = index;
+    }
+    
+    static {
+        tier2SchematicTexture = new ResourceLocation("galacticraftmars", "textures/gui/schematic_rocket_T2.png");
     }
 }

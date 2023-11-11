@@ -1,113 +1,307 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.*;
+import net.minecraft.block.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.texture.*;
+import java.util.*;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-
-public class BlockStairsGC extends BlockStairs implements ISortableBlock
+public class BlockStairsGC extends BlockStairs
 {
-
-    public BlockStairsGC(String name, IBlockState state)
-    {
-        super(state);
-        this.setTranslationKey(name);
+    private IIcon[] tinSideIcon;
+    private final StairsCategoryGC category;
+    
+    public BlockStairsGC(final String name, final Block model, final StairsCategoryGC cat) {
+        super(model, 0);
+        this.category = cat;
+        this.setBlockName(name);
         this.useNeighborBrightness = true;
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
-        return GalacticraftCore.galacticraftBlocksTab;
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
+        if (this.category == StairsCategoryGC.TIN1 || this.category == StairsCategoryGC.TIN2 || this.category == StairsCategoryGC.MOON_STONE || this.category == StairsCategoryGC.MARS_COBBLESTONE || this.category == StairsCategoryGC.MOON_BRICKS || this.category == StairsCategoryGC.MARS_BRICKS) {
+            return GalacticraftCore.galacticraftBlocksTab;
+        }
+        return null;
     }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.STAIRS;
-    }
-
-    // Override the interaction with StructuredComponent to do nothing here,
-    // otherwise messes up our Abandoned Base generation code merged from 1.8.9
-    @Override
-    public IBlockState withRotation(IBlockState state, Rotation rot)
-    {
-        return state;
-    }
-
-    // Override the interaction with StructuredComponent to do nothing here,
-    // otherwise messes up our Abandoned Base generation code merged from 1.8.9
-    @Override
-    public IBlockState withMirror(IBlockState state, Mirror mirrorIn)
-    {
-        return state;
-    }
-
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        return state.withProperty(SHAPE, getStairsShape(state, worldIn, pos));
-    }
-
-    // Correct bugged version in vanilla Minecraft
-    private static BlockStairs.EnumShape getStairsShape(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        EnumFacing enumfacing = (EnumFacing) state.getValue(FACING);
-        IBlockState iblockstate = worldIn.getBlockState(pos.offset(enumfacing));
-        boolean top = state.getValue(HALF) == EnumHalf.TOP;
-
-        if (isBlockStairs(iblockstate) && state.getValue(HALF) == iblockstate.getValue(HALF))
-        {
-            EnumFacing enumfacing1 = (EnumFacing) iblockstate.getValue(FACING);
-
-            if (enumfacing1.getAxis() != ((EnumFacing) state.getValue(FACING)).getAxis() && isDifferentStairs(state, worldIn, pos, enumfacing1.getOpposite()))
-            {
-                if (enumfacing1 == (top ? enumfacing.rotateY() : enumfacing.rotateYCCW()))
-                {
-                    return BlockStairs.EnumShape.OUTER_LEFT;
-                }
-
-                return BlockStairs.EnumShape.OUTER_RIGHT;
+    
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        if (this.category == StairsCategoryGC.TIN1) {
+            this.blockIcon = par1IconRegister.registerIcon("galacticraftcore:deco_aluminium_4");
+        }
+        else if (this.category == StairsCategoryGC.TIN2) {
+            this.blockIcon = par1IconRegister.registerIcon("galacticraftcore:deco_aluminium_2");
+        }
+        else if (this.category == StairsCategoryGC.MOON_STONE) {
+            this.blockIcon = par1IconRegister.registerIcon("galacticraftmoon:bottom");
+        }
+        else if (this.category == StairsCategoryGC.MOON_BRICKS) {
+            this.blockIcon = par1IconRegister.registerIcon("galacticraftmoon:brick");
+        }
+        if (GalacticraftCore.isPlanetsLoaded) {
+            if (this.category == StairsCategoryGC.MARS_COBBLESTONE) {
+                this.blockIcon = par1IconRegister.registerIcon("galacticraftmars:cobblestone");
+            }
+            else if (this.category == StairsCategoryGC.MARS_BRICKS) {
+                this.blockIcon = par1IconRegister.registerIcon("galacticraftmars:brick");
             }
         }
-
-        IBlockState iblockstate1 = worldIn.getBlockState(pos.offset(enumfacing.getOpposite()));
-
-        if (isBlockStairs(iblockstate1) && state.getValue(HALF) == iblockstate1.getValue(HALF))
-        {
-            EnumFacing enumfacing2 = (EnumFacing) iblockstate1.getValue(FACING);
-
-            if (enumfacing2.getAxis() != ((EnumFacing) state.getValue(FACING)).getAxis() && isDifferentStairs(state, worldIn, pos, enumfacing2))
-            {
-                if (enumfacing2 == (top ? enumfacing.rotateY() : enumfacing.rotateYCCW()))
-                {
-                    return BlockStairs.EnumShape.INNER_LEFT;
-                }
-
-                return BlockStairs.EnumShape.INNER_RIGHT;
+        (this.tinSideIcon = new IIcon[2])[0] = par1IconRegister.registerIcon("galacticraftcore:deco_aluminium_1");
+        this.tinSideIcon[1] = par1IconRegister.registerIcon("galacticraftcore:deco_aluminium_4");
+    }
+    
+    public boolean isWoodCategory(final String block) {
+        final String type = StairsCategoryGC.valueOf(block).type;
+        return type.equals("wood");
+    }
+    
+    public boolean isStoneCategory(final String block) {
+        final String type = StairsCategoryGC.valueOf(block).type;
+        return type.equals("stone");
+    }
+    
+    public static int getWoodCategoryAmount() {
+        int woodCatNo = 0;
+        for (final StairsCategoryGC cat : StairsCategoryGC.values()) {
+            if (cat.values.contains("wood")) {
+                ++woodCatNo;
             }
         }
-
-        return BlockStairs.EnumShape.STRAIGHT;
+        return woodCatNo;
     }
-
-    private static boolean isDifferentStairs(IBlockState state, IBlockAccess worldIn, BlockPos pos, EnumFacing side)
+    
+    public static int getStoneCategoryAmount() {
+        int woodCatNo = 0;
+        for (final StairsCategoryGC cat : StairsCategoryGC.values()) {
+            if (cat.values.contains("stone")) {
+                ++woodCatNo;
+            }
+        }
+        return woodCatNo;
+    }
+    
+    public IIcon getIcon(final int side, final int meta) {
+        if (this.category == StairsCategoryGC.TIN2) {
+            if (meta == 0 || meta == 8) {
+                switch (side) {
+                    case 0: {
+                        return this.tinSideIcon[1];
+                    }
+                    case 1: {
+                        return this.blockIcon;
+                    }
+                    case 2: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 3: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 4: {
+                        return this.blockIcon;
+                    }
+                    case 5: {
+                        return this.tinSideIcon[0];
+                    }
+                    default: {
+                        return this.blockIcon;
+                    }
+                }
+            }
+            else if (meta == 1 || meta == 9) {
+                switch (side) {
+                    case 0: {
+                        return this.tinSideIcon[1];
+                    }
+                    case 1: {
+                        return this.blockIcon;
+                    }
+                    case 2: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 3: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 4: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 5: {
+                        return this.blockIcon;
+                    }
+                    default: {
+                        return this.blockIcon;
+                    }
+                }
+            }
+            else if (meta == 2 || meta == 10) {
+                switch (side) {
+                    case 0: {
+                        return this.tinSideIcon[1];
+                    }
+                    case 1: {
+                        return this.blockIcon;
+                    }
+                    case 2: {
+                        return this.blockIcon;
+                    }
+                    case 3: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 4: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 5: {
+                        return this.tinSideIcon[0];
+                    }
+                    default: {
+                        return this.blockIcon;
+                    }
+                }
+            }
+            else if (meta == 3 || meta == 11) {
+                switch (side) {
+                    case 0: {
+                        return this.tinSideIcon[1];
+                    }
+                    case 1: {
+                        return this.blockIcon;
+                    }
+                    case 2: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 3: {
+                        return this.blockIcon;
+                    }
+                    case 4: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 5: {
+                        return this.tinSideIcon[0];
+                    }
+                    default: {
+                        return this.blockIcon;
+                    }
+                }
+            }
+            else if (meta == 4 || meta == 12) {
+                switch (side) {
+                    case 0: {
+                        return this.blockIcon;
+                    }
+                    case 1: {
+                        return this.tinSideIcon[1];
+                    }
+                    case 2: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 3: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 4: {
+                        return this.blockIcon;
+                    }
+                    case 5: {
+                        return this.tinSideIcon[0];
+                    }
+                    default: {
+                        return this.blockIcon;
+                    }
+                }
+            }
+            else if (meta == 5 || meta == 13) {
+                switch (side) {
+                    case 0: {
+                        return this.blockIcon;
+                    }
+                    case 1: {
+                        return this.tinSideIcon[1];
+                    }
+                    case 2: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 3: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 4: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 5: {
+                        return this.blockIcon;
+                    }
+                    default: {
+                        return this.blockIcon;
+                    }
+                }
+            }
+            else if (meta == 6 || meta == 14) {
+                switch (side) {
+                    case 0: {
+                        return this.blockIcon;
+                    }
+                    case 1: {
+                        return this.tinSideIcon[1];
+                    }
+                    case 2: {
+                        return this.blockIcon;
+                    }
+                    case 3: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 4: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 5: {
+                        return this.tinSideIcon[0];
+                    }
+                    default: {
+                        return this.blockIcon;
+                    }
+                }
+            }
+            else if (meta == 7 || meta == 15) {
+                switch (side) {
+                    case 0: {
+                        return this.blockIcon;
+                    }
+                    case 1: {
+                        return this.tinSideIcon[1];
+                    }
+                    case 2: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 3: {
+                        return this.blockIcon;
+                    }
+                    case 4: {
+                        return this.tinSideIcon[0];
+                    }
+                    case 5: {
+                        return this.tinSideIcon[0];
+                    }
+                    default: {
+                        return this.blockIcon;
+                    }
+                }
+            }
+        }
+        return this.blockIcon;
+    }
+    
+    public enum StairsCategoryGC
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos.offset(side));
-        return !isBlockStairs(iblockstate) || iblockstate.getValue(FACING) != state.getValue(FACING) || iblockstate.getValue(HALF) != state.getValue(HALF);
+        TIN1("stone"), 
+        TIN2("stone"), 
+        MOON_STONE("stone"), 
+        MOON_BRICKS("stone"), 
+        MARS_COBBLESTONE("stone"), 
+        MARS_BRICKS("stone");
+        
+        private final List<String> values;
+        private String type;
+        
+        private StairsCategoryGC(final String type) {
+            this.type = type;
+            this.values = Arrays.asList(type);
+        }
     }
 }

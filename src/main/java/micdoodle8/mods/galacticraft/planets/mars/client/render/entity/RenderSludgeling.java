@@ -1,66 +1,51 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.client.render.entity;
 
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlaySensorGlasses;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.client.model.ModelSludgeling;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySludgeling;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.planets.mars.client.model.*;
+import net.minecraft.client.model.*;
+import micdoodle8.mods.galacticraft.planets.mars.entities.*;
+import net.minecraft.entity.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderSludgeling extends RenderLiving<EntitySludgeling>
+public class RenderSludgeling extends RenderLiving
 {
-
-    private static final ResourceLocation sludgelingTexture = new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "textures/model/sludgeling.png");
-    private boolean texSwitch;
-
-    public RenderSludgeling(RenderManager renderManager)
-    {
-        super(renderManager, new ModelSludgeling(), 0.3F);
+    private static final ResourceLocation sludgelingTexture;
+    
+    public RenderSludgeling() {
+        super((ModelBase)new ModelSludgeling(), 0.3f);
     }
-
-    @Override
-    protected float getDeathMaxRotation(EntitySludgeling par1EntityLiving)
-    {
-        return 180.0F;
+    
+    protected ResourceLocation func_110779_a(final EntitySludgeling par1EntityArrow) {
+        return RenderSludgeling.sludgelingTexture;
     }
-
-    @Override
-    public void doRender(EntitySludgeling entity, double par2, double par4, double par6, float par8, float par9)
-    {
-        super.doRender(entity, par2, par4, par6, par8, par9);
-        if (OverlaySensorGlasses.overrideMobTexture())
-        {
-            texSwitch = true;
-            super.doRender(entity, par2, par4, par6, par8, par9);
-            texSwitch = false;
-            OverlaySensorGlasses.postRenderMobs();
-        }
+    
+    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+        return this.func_110779_a((EntitySludgeling)par1Entity);
     }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntitySludgeling entity)
-    {
-        return texSwitch ? OverlaySensorGlasses.altTexture : sludgelingTexture;
+    
+    public void renderSludgeling(final EntitySludgeling sludgeling, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        super.doRender((EntityLiving)sludgeling, par2, par4, par6, par8, par9);
     }
-
-    @Override
-    protected void preRenderCallback(EntitySludgeling entity, float par2)
-    {
-        super.preRenderCallback(entity, par2);
-        if (texSwitch)
-        {
-            OverlaySensorGlasses.preRenderMobs();
-        }
+    
+    protected float getDeathMaxRotation(final EntityLivingBase par1EntityLiving) {
+        return 180.0f;
+    }
+    
+    protected int shouldRenderPass(final EntityLivingBase par1EntityLiving, final int par2, final float par3) {
+        return -1;
+    }
+    
+    public void doRender(final EntityLiving par1EntityLiving, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        this.renderSludgeling((EntitySludgeling)par1EntityLiving, par2, par4, par6, par8, par9);
+    }
+    
+    public void doRender(final Entity par1Entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
+        this.renderSludgeling((EntitySludgeling)par1Entity, par2, par4, par6, par8, par9);
+    }
+    
+    static {
+        sludgelingTexture = new ResourceLocation("galacticraftmars", "textures/model/sludgeling.png");
     }
 }

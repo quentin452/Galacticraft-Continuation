@@ -1,185 +1,120 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.SoundType;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.api.item.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import net.minecraft.entity.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.api.item.IHoldableItemCustom;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.EntityFlag;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
-
-public class ItemFlag extends Item implements IHoldableItemCustom, ISortableItem, GCRarity
+public class ItemFlag extends Item implements IHoldableItem
 {
-
     public int placeProgress;
-
-    public ItemFlag(String assetName)
-    {
-        super();
+    
+    public ItemFlag(final String assetName) {
         this.setMaxDamage(0);
         this.setMaxStackSize(1);
-        this.setTranslationKey(assetName);
+        this.setUnlocalizedName(assetName);
+        this.setTextureName("arrow");
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityLivingBase entity, int timeLeft)
-    {
-        final int useTime = this.getMaxItemUseDuration(stack) - timeLeft;
-
+    
+    public void onPlayerStoppedUsing(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer, final int par4) {
+        final int useTime = this.getMaxItemUseDuration(par1ItemStack) - par4;
         boolean placed = false;
-
-        if (!(entity instanceof EntityPlayer))
-        {
-            return;
+        final MovingObjectPosition var12 = this.getMovingObjectPositionFromPlayer(par2World, par3EntityPlayer, true);
+        float var13 = useTime / 20.0f;
+        var13 = (var13 * var13 + var13 * 2.0f) / 3.0f;
+        if (var13 > 1.0f) {
+            var13 = 1.0f;
         }
-
-        EntityPlayer player = (EntityPlayer) entity;
-
-        final RayTraceResult var12 = this.rayTrace(worldIn, player, true);
-
-        float var7 = useTime / 20.0F;
-        var7 = (var7 * var7 + var7 * 2.0F) / 3.0F;
-
-        if (var7 > 1.0F)
-        {
-            var7 = 1.0F;
-        }
-
-        if (var7 == 1.0F && var12 != null && var12.typeOfHit == RayTraceResult.Type.BLOCK)
-        {
-            final BlockPos pos = var12.getBlockPos();
-
-            if (!worldIn.isRemote)
-            {
-                final EntityFlag flag = new EntityFlag(worldIn, pos.getX() + 0.5F, pos.getY() + 1.0F, pos.getZ() + 0.5F, (int) (entity.rotationYaw - 90));
-
-                if (worldIn.getEntitiesWithinAABB(EntityFlag.class, new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 3, pos.getZ() + 1)).isEmpty())
-                {
-                    worldIn.spawnEntity(flag);
-                    flag.setType(stack.getItemDamage());
-                    flag.setOwner(PlayerUtil.getName(player));
-                    worldIn.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundType.METAL.getBreakSound(), SoundCategory.BLOCKS, SoundType.METAL.getVolume(), SoundType.METAL.getPitch() + 2.0F);
+        if (var13 == 1.0f && var12 != null && var12.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            final int x = var12.blockX;
+            final int y = var12.blockY;
+            final int z = var12.blockZ;
+            if (!par2World.isRemote) {
+                final EntityFlag flag = new EntityFlag(par2World, (double)(x + 0.5f), (double)(y + 1.0f), (double)(z + 0.5f), (int)(par3EntityPlayer.rotationYaw - 90.0f));
+                if (par2World.getEntitiesWithinAABB((Class)EntityFlag.class, AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)(x + 1), (double)(y + 3), (double)(z + 1))).isEmpty()) {
+                    par2World.spawnEntityInWorld((Entity)flag);
+                    flag.setType(par1ItemStack.getItemDamage());
+                    flag.setOwner(par3EntityPlayer.getGameProfile().getName());
+                    par2World.playSoundEffect((double)x, (double)y, (double)z, Block.soundTypeMetal.getBreakSound(), Block.soundTypeMetal.getVolume(), Block.soundTypeMetal.getPitch() + 2.0f);
                     placed = true;
-                } else
-                {
-                    entity.sendMessage(new TextComponentString(GCCoreUtil.translate("gui.flag.already_placed")));
+                }
+                else {
+                    par3EntityPlayer.addChatMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.flag.alreadyPlaced")));
                 }
             }
-
-            if (placed)
-            {
-                final int var2 = this.getInventorySlotContainItem(player, stack);
-
-                if (var2 >= 0 && !player.capabilities.isCreativeMode)
-                {
-                    player.inventory.mainInventory.get(var2).shrink(1);
+            if (placed) {
+                final int var14 = this.getInventorySlotContainItem(par3EntityPlayer, par1ItemStack);
+                if (var14 >= 0 && !par3EntityPlayer.capabilities.isCreativeMode) {
+                    final ItemStack itemStack = par3EntityPlayer.inventory.mainInventory[var14];
+                    if (--itemStack.stackSize <= 0) {
+                        par3EntityPlayer.inventory.mainInventory[var14] = null;
+                    }
                 }
             }
         }
     }
-
-    private int getInventorySlotContainItem(EntityPlayer player, ItemStack stack)
-    {
-        for (int var2 = 0; var2 < player.inventory.mainInventory.size(); ++var2)
-        {
-            if (!player.inventory.mainInventory.get(var2).isEmpty() && player.inventory.mainInventory.get(var2).isItemEqual(stack))
-            {
+    
+    private int getInventorySlotContainItem(final EntityPlayer player, final ItemStack stack) {
+        for (int var2 = 0; var2 < player.inventory.mainInventory.length; ++var2) {
+            if (player.inventory.mainInventory[var2] != null && player.inventory.mainInventory[var2].isItemEqual(stack)) {
                 return var2;
             }
         }
-
         return -1;
     }
-
-    @Override
-    public int getMaxItemUseDuration(ItemStack par1ItemStack)
-    {
+    
+    public ItemStack onEaten(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer) {
+        return par1ItemStack;
+    }
+    
+    public int getMaxItemUseDuration(final ItemStack par1ItemStack) {
         return 72000;
     }
-
-    @Override
-    public EnumAction getItemUseAction(ItemStack par1ItemStack)
-    {
-        return EnumAction.NONE;
+    
+    public EnumAction getItemUseAction(final ItemStack par1ItemStack) {
+        return EnumAction.none;
     }
-
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand)
-    {
-        playerIn.setActiveHand(hand);
-        return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));
+    
+    public ItemStack onItemRightClick(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer) {
+        par3EntityPlayer.setItemInUse(par1ItemStack, this.getMaxItemUseDuration(par1ItemStack));
+        return par1ItemStack;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemStack)
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public String getUnlocalizedName(final ItemStack itemStack) {
         return "item.flag";
     }
-
-    @Override
-    public boolean shouldHoldLeftHandUp(EntityPlayer player)
-    {
-        return true;
+    
+    public IIcon getIconFromDamage(final int damage) {
+        return super.getIconFromDamage(damage);
     }
-
-    @Override
-    public boolean shouldHoldRightHandUp(EntityPlayer player)
-    {
-        return true;
-    }
-
-    @Override
-    public Vector3 getLeftHandRotation(EntityPlayer player)
-    {
-        return new Vector3((float) Math.PI + 1.3F, 0.5F, (float) Math.PI / 5.0F);
-    }
-
-    @Override
-    public Vector3 getRightHandRotation(EntityPlayer player)
-    {
-        return new Vector3((float) Math.PI + 1.3F, -0.5F, (float) Math.PI / 5.0F);
-    }
-
-    @Override
-    public boolean shouldCrouch(EntityPlayer player)
-    {
+    
+    public boolean shouldHoldLeftHandUp(final EntityPlayer player) {
         return false;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.GENERAL;
+    
+    public boolean shouldHoldRightHandUp(final EntityPlayer player) {
+        return true;
+    }
+    
+    public boolean shouldCrouch(final EntityPlayer player) {
+        return false;
     }
 }

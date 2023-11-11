@@ -1,59 +1,37 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldSavedData;
-
-import micdoodle8.mods.galacticraft.core.Constants;
+import net.minecraft.nbt.*;
+import net.minecraft.world.*;
 
 public class WorldDataSpaceRaces extends WorldSavedData
 {
-
-    public static final String saveDataID = Constants.GCDATAFOLDER + "GCSpaceRaceData";
+    public static final String saveDataID = "GCSpaceRaceData";
     private NBTTagCompound dataCompound;
-
-    public WorldDataSpaceRaces(String id)
-    {
+    
+    public WorldDataSpaceRaces(final String id) {
         super(id);
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readFromNBT(final NBTTagCompound nbt) {
         SpaceRaceManager.loadSpaceRaces(nbt);
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
-        return SpaceRaceManager.saveSpaceRaces(nbt);
+    
+    public void writeToNBT(final NBTTagCompound nbt) {
+        SpaceRaceManager.saveSpaceRaces(nbt);
     }
-
-    public static WorldDataSpaceRaces initWorldData(World world)
-    {
-        WorldDataSpaceRaces worldData = (WorldDataSpaceRaces) world.loadData(WorldDataSpaceRaces.class, WorldDataSpaceRaces.saveDataID);
-
-        if (worldData == null)
-        {
-            worldData = new WorldDataSpaceRaces(WorldDataSpaceRaces.saveDataID);
-            world.setData(WorldDataSpaceRaces.saveDataID, worldData);
+    
+    public static WorldDataSpaceRaces initWorldData(final World world) {
+        WorldDataSpaceRaces worldData = (WorldDataSpaceRaces)world.loadItemData((Class)WorldDataSpaceRaces.class, "GCSpaceRaceData");
+        if (worldData == null) {
+            worldData = new WorldDataSpaceRaces("GCSpaceRaceData");
+            world.setItemData("GCSpaceRaceData", (WorldSavedData)worldData);
             worldData.dataCompound = new NBTTagCompound();
             worldData.markDirty();
         }
-
         return worldData;
     }
-
-    @Override
-    public boolean isDirty()
-    {
+    
+    public boolean isDirty() {
         return true;
     }
 }

@@ -1,675 +1,483 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.tile;
 
-import io.netty.buffer.ByteBuf;
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import micdoodle8.mods.galacticraft.annotations.ForRemoval;
-import micdoodle8.mods.galacticraft.annotations.ReplaceWith;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMulti;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMulti.EnumBlockMultiType;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlock;
-import micdoodle8.mods.galacticraft.core.inventory.IInventoryDefaults;
-import micdoodle8.mods.galacticraft.core.tile.IMultiBlock;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.GuiIdsPlanets;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.BlockTelepadFake;
-import micdoodle8.mods.galacticraft.planets.asteroids.dimension.ShortRangeTelepadHandler;
-import micdoodle8.mods.galacticraft.planets.asteroids.network.PacketSimpleAsteroids;
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.miccore.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.dimension.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.network.*;
+import micdoodle8.mods.galacticraft.core.network.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.util.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.nbt.*;
+import io.netty.buffer.*;
+import micdoodle8.mods.galacticraft.planets.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.core.energy.item.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
 
-public class TileEntityShortRangeTelepad extends TileBaseElectricBlock implements IMultiBlock, IInventoryDefaults, ISidedInventory
+public class TileEntityShortRangeTelepad extends TileBaseElectricBlock implements IMultiBlock, IInventory, ISidedInventory
 {
-
-    public enum EnumTelepadSearchResult
-    {
-        VALID, NOT_FOUND, TOO_FAR, WRONG_DIM, TARGET_DISABLED
-    }
-
     public static final int MAX_TELEPORT_TIME = 150;
     public static final int TELEPORTER_RANGE = 256;
     public static final int ENERGY_USE_ON_TELEPORT = 2500;
-
-    @NetworkedField(targetSide = Side.CLIENT) public int address = -1;
-    @NetworkedField(targetSide = Side.CLIENT) public boolean addressValid = false;
-    @NetworkedField(targetSide = Side.CLIENT) public int targetAddress = -1;
-    public EnumTelepadSearchResult targetAddressResult = EnumTelepadSearchResult.NOT_FOUND;
-    @NetworkedField(targetSide = Side.CLIENT) public int teleportTime = 0;
-    @NetworkedField(targetSide = Side.CLIENT) public String owner = "";
-    @NetworkedField(targetSide = Side.CLIENT) public boolean teleporting;
-    private AxisAlignedBB renderAABB;
-
-    public TileEntityShortRangeTelepad()
-    {
-        super("container.short_range_telepad.name");
-        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 115 : 50);
-        this.inventory = NonNullList.withSize(1, ItemStack.EMPTY);
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int address;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public boolean addressValid;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int targetAddress;
+    public EnumTelepadSearchResult targetAddressResult;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int teleportTime;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public String owner;
+    private ItemStack[] containingItems;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public boolean teleporting;
+    
+    public TileEntityShortRangeTelepad() {
+        this.address = -1;
+        this.addressValid = false;
+        this.targetAddress = -1;
+        this.targetAddressResult = EnumTelepadSearchResult.NOT_FOUND;
+        this.teleportTime = 0;
+        this.owner = "";
+        this.containingItems = new ItemStack[1];
+        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 115.0f : 50.0f);
     }
-
-    public int canTeleportHere()
-    {
-        if (this.world.isRemote)
-        {
+    
+    public int canTeleportHere() {
+        if (this.worldObj.isRemote) {
             return -1;
         }
-
         this.setAddress(this.address);
         this.setTargetAddress(this.targetAddress);
-
-        if (!this.addressValid)
-        {
+        if (!this.addressValid) {
             return 1;
         }
-
-        if (this.getEnergyStoredGC() < ENERGY_USE_ON_TELEPORT)
-        {
+        if (this.getEnergyStoredGC() < 2500.0f) {
             return 2;
         }
-
-        return 0; // GOOD
+        return 0;
     }
-
-    @Override
-    public void update()
-    {
-        if (this.ticks % 40 == 0 && !this.world.isRemote)
-        {
+    
+    public void updateEntity() {
+        if (this.ticks % 40 == 0 && !this.worldObj.isRemote) {
             this.setAddress(this.address);
             this.setTargetAddress(this.targetAddress);
         }
-
-        if (!this.world.isRemote)
-        {
-            if (!this.getDisabled(0) && this.targetAddressResult == EnumTelepadSearchResult.VALID && (this.ticks % 5 == 0 || teleporting))
-            {
-                List containedEntities = this.world.getEntitiesWithinAABB(EntityLivingBase.class,
-                    new AxisAlignedBB(this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), this.getPos().getX() + 1, this.getPos().getY() + 2, this.getPos().getZ() + 1));
-
-                if (containedEntities.size() > 0 && this.getEnergyStoredGC() >= ENERGY_USE_ON_TELEPORT)
-                {
-                    ShortRangeTelepadHandler.TelepadEntry entry = ShortRangeTelepadHandler.getLocationFromAddress(this.targetAddress);
-
-                    if (entry != null)
-                    {
-                        teleporting = true;
+        if (!this.worldObj.isRemote) {
+            if (this.targetAddressResult == EnumTelepadSearchResult.VALID && (this.ticks % 5 == 0 || this.teleporting)) {
+                final List<EntityLivingBase> containedEntities = (List<EntityLivingBase>)this.worldObj.getEntitiesWithinAABB((Class)EntityLivingBase.class, AxisAlignedBB.getBoundingBox((double)this.xCoord, (double)this.yCoord, (double)this.zCoord, (double)(this.xCoord + 1), (double)(this.yCoord + 2), (double)(this.zCoord + 1)));
+                if (containedEntities.size() > 0 && this.getEnergyStoredGC() >= 2500.0f) {
+                    final ShortRangeTelepadHandler.TelepadEntry entry = ShortRangeTelepadHandler.getLocationFromAddress(this.targetAddress);
+                    if (entry != null) {
+                        this.teleporting = true;
                     }
-                } else
-                {
-                    teleporting = false;
+                }
+                else {
+                    this.teleporting = false;
                 }
             }
-
-            if (this.teleporting)
-            {
-                this.teleportTime++;
-
-                if (teleportTime >= MAX_TELEPORT_TIME)
-                {
-                    ShortRangeTelepadHandler.TelepadEntry entry = ShortRangeTelepadHandler.getLocationFromAddress(this.targetAddress);
-
-                    BlockVec3 finalPos = (entry == null) ? null : entry.position;
-
-                    if (finalPos != null)
-                    {
-                        TileEntity tileAt = finalPos.getTileEntity(this.world);
-                        List<EntityLivingBase> containedEntities = this.world.getEntitiesWithinAABB(EntityLivingBase.class,
-                            new AxisAlignedBB(this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), this.getPos().getX() + 1, this.getPos().getY() + 2, this.getPos().getZ() + 1));
-
-                        if (tileAt instanceof TileEntityShortRangeTelepad)
-                        {
-                            TileEntityShortRangeTelepad destTelepad = (TileEntityShortRangeTelepad) tileAt;
-                            int teleportResult = destTelepad.canTeleportHere();
-                            if (teleportResult == 0)
-                            {
-                                for (EntityLivingBase e : containedEntities)
-                                {
-                                    e.setPosition(finalPos.x + 0.5F, finalPos.y + 0.08F, finalPos.z + 0.5F);
-                                    this.world.updateEntityWithOptionalForce(e, true);
-                                    if (e instanceof EntityPlayerMP)
-                                    {
-                                        ((EntityPlayerMP) e).connection.setPlayerLocation(finalPos.x, finalPos.y, finalPos.z, e.rotationYaw, e.rotationPitch);
+            if (this.teleporting) {
+                ++this.teleportTime;
+                if (this.teleportTime >= 150) {
+                    final ShortRangeTelepadHandler.TelepadEntry entry2 = ShortRangeTelepadHandler.getLocationFromAddress(this.targetAddress);
+                    final BlockVec3 finalPos = (entry2 == null) ? null : entry2.position;
+                    if (finalPos != null) {
+                        final TileEntity tileAt = finalPos.getTileEntityForce(this.worldObj);
+                        final List<EntityLivingBase> containedEntities2 = (List<EntityLivingBase>)this.worldObj.getEntitiesWithinAABB((Class)EntityLivingBase.class, AxisAlignedBB.getBoundingBox((double)this.xCoord, (double)this.yCoord, (double)this.zCoord, (double)(this.xCoord + 1), (double)(this.yCoord + 2), (double)(this.zCoord + 1)));
+                        if (tileAt != null && tileAt instanceof TileEntityShortRangeTelepad) {
+                            final TileEntityShortRangeTelepad destTelepad = (TileEntityShortRangeTelepad)tileAt;
+                            final int teleportResult = destTelepad.canTeleportHere();
+                            if (teleportResult == 0) {
+                                for (final EntityLivingBase e : containedEntities2) {
+                                    e.setPosition((double)(finalPos.x + 0.5f), (double)(finalPos.y + 1.0f), (double)(finalPos.z + 0.5f));
+                                    this.worldObj.updateEntityWithOptionalForce((Entity)e, true);
+                                    if (e instanceof EntityPlayerMP) {
+                                        ((EntityPlayerMP)e).playerNetServerHandler.setPlayerLocation((double)finalPos.x, (double)finalPos.y, (double)finalPos.z, e.rotationYaw, e.rotationPitch);
                                     }
-                                    GalacticraftCore.packetPipeline
-                                        .sendToDimension(new PacketSimpleAsteroids(PacketSimpleAsteroids.EnumSimplePacketAsteroids.C_TELEPAD_SEND, GCCoreUtil.getDimensionID(this.world), new Object[]
-                                        {finalPos, e.getEntityId()}), GCCoreUtil.getDimensionID(this.world));
+                                    GalacticraftCore.packetPipeline.sendToDimension((IPacket)new PacketSimpleAsteroids(PacketSimpleAsteroids.EnumSimplePacketAsteroids.C_TELEPAD_SEND, new Object[] { finalPos, e.getEntityId() }), this.worldObj.provider.dimensionId);
                                 }
-
-                                if (containedEntities.size() > 0)
-                                {
-                                    this.storage.setEnergyStored(this.storage.getEnergyStoredGC() - ENERGY_USE_ON_TELEPORT);
-                                    destTelepad.storage.setEnergyStored(this.storage.getEnergyStoredGC() - ENERGY_USE_ON_TELEPORT);
+                                if (containedEntities2.size() > 0) {
+                                    this.storage.setEnergyStored(this.storage.getEnergyStoredGC() - 2500.0f);
+                                    destTelepad.storage.setEnergyStored(this.storage.getEnergyStoredGC() - 2500.0f);
                                 }
-                            } else
-                            {
-                                switch (teleportResult)
-                                {
-                                    case -1:
-                                        for (EntityLivingBase e : containedEntities)
-                                        {
-                                            if (e instanceof EntityPlayer)
-                                            {
-                                                e.sendMessage(new TextComponentString("Cannot Send client-side")); // No
-                                                                                                                   // need
-                                                                                                                   // for
-                                                                                                                   // translation,
-                                                                                                                   // since
-                                                                                                                   // this
-                                                                                                                   // should
-                                                                                                                   // never
-                                                                                                                   // happen
+                            }
+                            else {
+                                switch (teleportResult) {
+                                    case -1: {
+                                        for (final EntityLivingBase e : containedEntities2) {
+                                            if (e instanceof EntityPlayer) {
+                                                ((EntityPlayer)e).addChatComponentMessage((IChatComponent)new ChatComponentText("Cannot Send client-side"));
                                             }
                                         }
                                         break;
-                                    case 1:
-                                        for (EntityLivingBase e : containedEntities)
-                                        {
-                                            if (e instanceof EntityPlayer)
-                                            {
-                                                e.sendMessage(new TextComponentString("Target address invalid")); // No
-                                                                                                                  // need
-                                                                                                                  // for
-                                                                                                                  // translation,
-                                                                                                                  // since
-                                                                                                                  // this
-                                                                                                                  // should
-                                                                                                                  // never
-                                                                                                                  // happen
+                                    }
+                                    case 1: {
+                                        for (final EntityLivingBase e : containedEntities2) {
+                                            if (e instanceof EntityPlayer) {
+                                                ((EntityPlayer)e).addChatComponentMessage((IChatComponent)new ChatComponentText("Target address invalid"));
                                             }
                                         }
                                         break;
-                                    case 2:
-                                        for (EntityLivingBase e : containedEntities)
-                                        {
-                                            if (e instanceof EntityPlayer)
-                                            {
-                                                e.sendMessage(new TextComponentString(GCCoreUtil.translate("gui.message.target_no_energy.name")));
+                                    }
+                                    case 2: {
+                                        for (final EntityLivingBase e : containedEntities2) {
+                                            if (e instanceof EntityPlayer) {
+                                                ((EntityPlayer)e).addChatComponentMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.message.targetNoEnergy.name")));
                                             }
                                         }
                                         break;
+                                    }
                                 }
                             }
                         }
                     }
-
                     this.teleportTime = 0;
                     this.teleporting = false;
                 }
-            } else
-            {
-                this.teleportTime = Math.max(--this.teleportTime, 0);
+            }
+            else {
+                final int teleportTime = this.teleportTime - 1;
+                this.teleportTime = teleportTime;
+                this.teleportTime = Math.max(teleportTime, 0);
             }
         }
-
-        super.update();
+        super.updateEntity();
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readFromNBT(final NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-
-        this.inventory = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
-        ItemStackHelper.loadAllItems(nbt, this.getInventory());
-
-        if (GCCoreUtil.getEffectiveSide() == Side.SERVER)
-        {
-            this.setAddress(nbt.getInteger("Address"));
+        final NBTTagList var2 = nbt.getTagList("Items", 10);
+        this.containingItems = new ItemStack[this.getSizeInventory()];
+        for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
+            final NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+            final int var5 = var4.getByte("Slot") & 0xFF;
+            if (var5 < this.containingItems.length) {
+                this.containingItems[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
         }
+        this.setAddress(nbt.getInteger("Address"));
         this.targetAddress = nbt.getInteger("TargetAddress");
         this.owner = nbt.getString("Owner");
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    
+    public void writeToNBT(final NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        ItemStackHelper.saveAllItems(nbt, this.getInventory());
-
+        final NBTTagList var2 = new NBTTagList();
+        for (int var3 = 0; var3 < this.containingItems.length; ++var3) {
+            if (this.containingItems[var3] != null) {
+                final NBTTagCompound var4 = new NBTTagCompound();
+                var4.setByte("Slot", (byte)var3);
+                this.containingItems[var3].writeToNBT(var4);
+                var2.appendTag((NBTBase)var4);
+            }
+        }
+        nbt.setTag("Items", (NBTBase)var2);
         nbt.setInteger("TargetAddress", this.targetAddress);
         nbt.setInteger("Address", this.address);
         nbt.setString("Owner", this.owner);
-        return nbt;
     }
-
-    @Override
-    public void addExtraNetworkedData(List<Object> networkedList)
-    {
-        super.addExtraNetworkedData(networkedList);
-        networkedList.add(targetAddressResult.ordinal());
+    
+    public void addExtraNetworkedData(final List<Object> networkedList) {
+        super.addExtraNetworkedData((List)networkedList);
+        networkedList.add(this.targetAddressResult.ordinal());
     }
-
-    @Override
-    public void readExtraNetworkedData(ByteBuf dataStream)
-    {
+    
+    public void readExtraNetworkedData(final ByteBuf dataStream) {
         super.readExtraNetworkedData(dataStream);
-        targetAddressResult = EnumTelepadSearchResult.values()[dataStream.readInt()];
+        this.targetAddressResult = EnumTelepadSearchResult.values()[dataStream.readInt()];
     }
-
-    @Override
-    public double getPacketRange()
-    {
-        return 24.0D;
+    
+    public double getPacketRange() {
+        return 24.0;
     }
-
-    @Override
-    public boolean onActivated(EntityPlayer entityPlayer)
-    {
-        entityPlayer.openGui(GalacticraftPlanets.instance, GuiIdsPlanets.MACHINE_ASTEROIDS, this.world, this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
+    
+    public boolean onActivated(final EntityPlayer entityPlayer) {
+        entityPlayer.openGui((Object)GalacticraftPlanets.instance, 3, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
         return true;
     }
-
-    @Override
-    public void onCreate(World world, BlockPos placedPosition)
-    {
-        List<BlockPos> positions = new LinkedList<>();
-        this.getPositions(placedPosition, positions);
-        for (BlockPos vecToAdd : positions)
-            ((BlockTelepadFake) AsteroidBlocks.fakeTelepad).makeFakeBlock(world, vecToAdd, placedPosition,
-                AsteroidBlocks.fakeTelepad.getDefaultState().withProperty(BlockTelepadFake.TOP, vecToAdd.getY() == placedPosition.getY() + 2));
-    }
-
-    @Override
-    public BlockMulti.EnumBlockMultiType getMultiType()
-    {
-        // Not actually used - maybe this shouldn't be an IMultiBlock at all?
-        return EnumBlockMultiType.MINER_BASE;
-    }
-
-    @Override
-    public void getPositions(BlockPos placedPosition, List<BlockPos> positions)
-    {
-        int buildHeight = this.world.getHeight() - 1;
-        for (int y = 0; y < 3; y += 2)
-        {
-            if (placedPosition.getY() + y > buildHeight)
-            {
+    
+    public void onCreate(final BlockVec3 placedPosition) {
+        final int buildHeight = this.worldObj.getHeight() - 1;
+        for (int y = 0; y < 3; y += 2) {
+            if (placedPosition.y + y > buildHeight) {
                 return;
             }
-            for (int x = -1; x <= 1; x++)
-            {
-                for (int z = -1; z <= 1; z++)
-                {
-                    if (x == 0 && y == 0 && z == 0)
-                        continue;
-                    positions.add(placedPosition.add(x, y, z));
+            for (int x = -1; x <= 1; ++x) {
+                for (int z = -1; z <= 1; ++z) {
+                    final BlockVec3 vecToAdd = new BlockVec3(placedPosition.x + x, placedPosition.y + y, placedPosition.z + z);
+                    if (!vecToAdd.equals((Object)placedPosition)) {
+                        ((BlockTelepadFake)AsteroidBlocks.fakeTelepad).makeFakeBlock(this.worldObj, vecToAdd, placedPosition, (int)((y == 0) ? 1 : 0));
+                    }
                 }
             }
         }
     }
-
-    @Override
-    public void onDestroy(TileEntity callingBlock)
-    {
-        final BlockPos thisBlock = getPos();
-        List<BlockPos> positions = new LinkedList<>();
-        this.getPositions(thisBlock, positions);
-
-        for (BlockPos pos : positions)
-        {
-            IBlockState stateAt = this.world.getBlockState(pos);
-
-            if (stateAt.getBlock() == AsteroidBlocks.fakeTelepad)
-            {
-                this.world.destroyBlock(pos, false);
+    
+    public void onDestroy(final TileEntity callingBlock) {
+        for (int y = 0; y < 3; y += 2) {
+            for (int x = -1; x <= 1; ++x) {
+                for (int z = -1; z <= 1; ++z) {
+                    this.worldObj.func_147480_a(this.xCoord + x, this.yCoord + y, this.zCoord + z, y == 0 && x == 0 && z == 0);
+                }
             }
         }
-        this.world.destroyBlock(thisBlock, true);
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getRenderBoundingBox()
-    {
-        if (this.renderAABB == null)
-        {
-            this.renderAABB = new AxisAlignedBB(getPos().getX() - 1, getPos().getY(), getPos().getZ() - 1, getPos().getX() + 2, getPos().getY() + 4, getPos().getZ() + 2);
-        }
-        return this.renderAABB;
+    public AxisAlignedBB getRenderBoundingBox() {
+        return AxisAlignedBB.getBoundingBox((double)(this.xCoord - 1), (double)this.yCoord, (double)(this.zCoord - 1), (double)(this.xCoord + 2), (double)(this.yCoord + 4), (double)(this.zCoord + 2));
     }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public double getMaxRenderDistanceSquared()
-    {
-        return Constants.RENDERDISTANCE_MEDIUM;
+    
+    public String getInventoryName() {
+        return GCCoreUtil.translate("container.shortRangeTelepad.name");
     }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[]
-        {0};
-    }
-
-    @Override
-    public boolean hasCustomName()
-    {
-        return true;
-    }
-
-    @Override
-    public int getInventoryStackLimit()
-    {
+    
+    public int getInventoryStackLimit() {
         return 64;
     }
-
-    @Override
-    public boolean isUsableByPlayer(EntityPlayer entityPlayer)
-    {
-        return this.world.getTileEntity(getPos()) == this && entityPlayer.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
+    
+    public boolean isUseableByPlayer(final EntityPlayer par1EntityPlayer) {
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
     }
-
-    @Override
-    public boolean isItemValidForSlot(int slotID, ItemStack itemStack)
-    {
+    
+    public boolean hasCustomInventoryName() {
+        return true;
+    }
+    
+    public boolean isItemValidForSlot(final int slotID, final ItemStack itemStack) {
         return slotID == 0 && ItemElectricBase.isElectricItem(itemStack.getItem());
     }
-
-    @Override
-    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction)
-    {
-        return index == 0;
+    
+    public int[] getAccessibleSlotsFromSide(final int side) {
+        return new int[] { 0 };
     }
-
-    @Override
-    public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction)
-    {
-        return this.isItemValidForSlot(index, itemStackIn);
+    
+    public boolean canInsertItem(final int slotID, final ItemStack par2ItemStack, final int par3) {
+        return this.isItemValidForSlot(slotID, par2ItemStack);
     }
-
-    @Override
-    public EnumSet<EnumFacing> getElectricalOutputDirections()
-    {
-        return EnumSet.noneOf(EnumFacing.class);
+    
+    public boolean canExtractItem(final int slotID, final ItemStack par2ItemStack, final int par3) {
+        return slotID == 0;
     }
-
-    @Override
-    public boolean shouldUseEnergy()
-    {
+    
+    public EnumSet<ForgeDirection> getElectricalOutputDirections() {
+        return EnumSet.noneOf(ForgeDirection.class);
+    }
+    
+    public boolean shouldUseEnergy() {
         return !this.getDisabled(0);
     }
-
-    @Override
-    public EnumFacing getElectricInputDirection()
-    {
-        return EnumFacing.byIndex((this.getBlockMetadata() & 3) + 2);
+    
+    public ForgeDirection getElectricInputDirection() {
+        return ForgeDirection.getOrientation((this.getBlockMetadata() & 0x3) + 2);
     }
-
-    @Override
-    public ItemStack getBatteryInSlot()
-    {
+    
+    public ItemStack getBatteryInSlot() {
         return this.getStackInSlot(0);
     }
-
-    @Override
-    public void setDisabled(int index, boolean disabled)
-    {
-        if (this.disableCooldown == 0)
-        {
-            switch (index)
-            {
-                case 0:
+    
+    public void setDisabled(final int index, final boolean disabled) {
+        if (this.disableCooldown == 0) {
+            switch (index) {
+                case 0: {
                     this.disabled = disabled;
                     this.disableCooldown = 10;
-                    if (world != null && !world.isRemote)
-                    {
-                        ShortRangeTelepadHandler.addShortRangeTelepad(this);
-                    }
                     break;
-                default:
-                    break;
+                }
             }
         }
     }
-
-    @Override
-    public boolean getDisabled(int index)
-    {
-        switch (index)
-        {
-            case 0:
+    
+    public boolean getDisabled(final int index) {
+        switch (index) {
+            case 0: {
                 return this.disabled;
-            default:
-                break;
+            }
+            default: {
+                return true;
+            }
         }
-
-        return true;
     }
-
-    public void setAddress(int address)
-    {
-        if (this.world != null && address != this.address)
-        {
+    
+    public void setAddress(final int address) {
+        if (this.worldObj != null && address != this.address) {
             ShortRangeTelepadHandler.removeShortRangeTeleporter(this);
         }
-
         this.address = address;
-
-        if (this.address >= 0)
-        {
-            ShortRangeTelepadHandler.TelepadEntry entry = ShortRangeTelepadHandler.getLocationFromAddress(this.address);
-            this.addressValid = entry == null || (this.world != null && (entry.dimensionID == GCCoreUtil.getDimensionID(this.world) && entry.position.x == this.getPos().getX()
-                && entry.position.y == this.getPos().getY() && entry.position.z == this.getPos().getZ()));
-        } else
-        {
+        if (this.address >= 0) {
+            final ShortRangeTelepadHandler.TelepadEntry entry = ShortRangeTelepadHandler.getLocationFromAddress(this.address);
+            this.addressValid = (entry == null || (this.worldObj != null && entry.dimensionID == this.worldObj.provider.dimensionId && entry.position.x == this.xCoord && entry.position.y == this.yCoord && entry.position.z == this.zCoord));
+        }
+        else {
             this.addressValid = false;
         }
-
-        if (this.world != null && !this.world.isRemote)
-        {
+        if (this.worldObj != null && !this.worldObj.isRemote) {
             ShortRangeTelepadHandler.addShortRangeTelepad(this);
         }
     }
-
-    public boolean updateTarget()
-    {
-        if (this.targetAddress >= 0 && !this.world.isRemote)
-        {
-            this.targetAddressResult = EnumTelepadSearchResult.NOT_FOUND;
-
-            ShortRangeTelepadHandler.TelepadEntry addressResult = ShortRangeTelepadHandler.getLocationFromAddress(this.targetAddress);
-
-            if (addressResult != null)
-            {
-                if (GCCoreUtil.getDimensionID(this.world) == addressResult.dimensionID)
-                {
-                    double distance = this.getDistanceSq(addressResult.position.x + 0.5F, addressResult.position.y + 0.5F, addressResult.position.z + 0.5F);
-
-                    if (distance < Math.pow(TELEPORTER_RANGE, 2))
-                    {
-                        if (!addressResult.enabled)
-                        {
-                            this.targetAddressResult = EnumTelepadSearchResult.TARGET_DISABLED;
-                            return false;
-                        }
-
-                        this.targetAddressResult = EnumTelepadSearchResult.VALID;
-                        return true;
-                    } else
-                    {
-                        this.targetAddressResult = EnumTelepadSearchResult.TOO_FAR;
-                        return false;
-                    }
-                } else
-                {
-                    this.targetAddressResult = EnumTelepadSearchResult.WRONG_DIM;
-                    return false;
-                }
-            } else
-            {
-                this.targetAddressResult = EnumTelepadSearchResult.NOT_FOUND;
-                return false;
-            }
-        } else
-        {
+    
+    public boolean updateTarget() {
+        if (this.targetAddress < 0 || this.worldObj.isRemote) {
             this.targetAddressResult = EnumTelepadSearchResult.NOT_FOUND;
             return false;
         }
+        this.targetAddressResult = EnumTelepadSearchResult.NOT_FOUND;
+        final ShortRangeTelepadHandler.TelepadEntry addressResult = ShortRangeTelepadHandler.getLocationFromAddress(this.targetAddress);
+        if (addressResult == null) {
+            this.targetAddressResult = EnumTelepadSearchResult.NOT_FOUND;
+            return false;
+        }
+        if (this.worldObj.provider.dimensionId != addressResult.dimensionID) {
+            this.targetAddressResult = EnumTelepadSearchResult.WRONG_DIM;
+            return false;
+        }
+        final double distance = this.getDistanceFrom((double)(addressResult.position.x + 0.5f), (double)(addressResult.position.y + 0.5f), (double)(addressResult.position.z + 0.5f));
+        if (distance < 65536.0) {
+            this.targetAddressResult = EnumTelepadSearchResult.VALID;
+            return true;
+        }
+        this.targetAddressResult = EnumTelepadSearchResult.TOO_FAR;
+        return false;
     }
-
-    public void setTargetAddress(int address)
-    {
+    
+    public void setTargetAddress(final int address) {
         this.targetAddress = address;
         this.updateTarget();
     }
-
-    public void setOwner(String owner)
-    {
-        this.owner = owner;
-    }
-
-    public String getOwner()
-    {
-        return this.owner;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public String getReceivingStatus()
-    {
-        if (!this.addressValid)
-        {
-            return EnumColor.RED + GCCoreUtil.translate("gui.message.invalid_address.name");
-        }
-
-        if (this.getEnergyStoredGC() <= 0.0F)
-        {
-            return EnumColor.RED + GCCoreUtil.translate("gui.message.no_energy.name");
-        }
-
-        if (this.getEnergyStoredGC() <= ENERGY_USE_ON_TELEPORT)
-        {
-            return EnumColor.RED + GCCoreUtil.translate("gui.message.not_enough_energy.name");
-        }
-
-        if (this.getDisabled(0))
-        {
-            return EnumColor.ORANGE + GCCoreUtil.translate("gui.status.disabled.name");
-        }
-
-        return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.message.receiving_active.name");
-    }
-
-    @SideOnly(Side.CLIENT)
-    public String getSendingStatus()
-    {
-        if (!this.addressValid)
-        {
-            return EnumColor.RED + GCCoreUtil.translate("gui.message.invalid_target_address.name");
-        }
-
-        if (this.targetAddressResult == EnumTelepadSearchResult.TOO_FAR)
-        {
-            return EnumColor.RED + GCCoreUtil.translateWithFormat("gui.message.telepad_too_far.name", TELEPORTER_RANGE);
-        }
-
-        if (this.targetAddressResult == EnumTelepadSearchResult.WRONG_DIM)
-        {
-            return EnumColor.RED + GCCoreUtil.translate("gui.message.telepad_wrong_dim.name");
-        }
-
-        if (this.targetAddressResult == EnumTelepadSearchResult.NOT_FOUND)
-        {
-            return EnumColor.RED + GCCoreUtil.translate("gui.message.telepad_not_found.name");
-        }
-
-        if (this.targetAddressResult == EnumTelepadSearchResult.TARGET_DISABLED)
-        {
-            return EnumColor.ORANGE + GCCoreUtil.translate("gui.message.telepad_target_disabled.name");
-        }
-
-        if (this.getEnergyStoredGC() <= 0.0F)
-        {
-            return EnumColor.RED + GCCoreUtil.translate("gui.message.no_energy.name");
-        }
-
-        if (this.getEnergyStoredGC() <= ENERGY_USE_ON_TELEPORT)
-        {
-            return EnumColor.RED + GCCoreUtil.translate("gui.message.not_enough_energy.name");
-        }
-
-        if (this.getDisabled(0))
-        {
-            return EnumColor.ORANGE + GCCoreUtil.translate("gui.status.disabled.name");
-        }
-
-        return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.message.sending_active.name");
-    }
-
-    @SideOnly(Side.CLIENT)
-    public Vector3 getParticleColor(Random rand, boolean sending)
-    {
-        float teleportTimeScaled = Math.min(1.0F, this.teleportTime / (float) TileEntityShortRangeTelepad.MAX_TELEPORT_TIME);
-        float f;
-        f = rand.nextFloat() * 0.6F + 0.4F;
-
-        if (sending && this.targetAddressResult != EnumTelepadSearchResult.VALID)
-        {
-            return new Vector3(f, f * 0.3F, f * 0.3F);
-        }
-
-        if (!sending && !this.addressValid)
-        {
-            return new Vector3(f, f * 0.3F, f * 0.3F);
-        }
-
-        if (this.getEnergyStoredGC() < ENERGY_USE_ON_TELEPORT)
-        {
-            return new Vector3(f, f * 0.6F, f * 0.3F);
-        }
-
-        float r = f * 0.3F;
-        float g = f * (0.3F + (teleportTimeScaled * 0.7F));
-        float b = f * (1.0F - (teleportTimeScaled * 0.7F));
-
-        return new Vector3(r, g, b);
-    }
-
-    @Override
-    public EnumFacing byIndex()
-    {
-        return EnumFacing.NORTH;
+    
+    public void openInventory() {
     }
     
-    @Override
-    @Deprecated
-    @ForRemoval(deadline = "4.1.0")
-    @ReplaceWith("byIndex()")
-    public EnumFacing getFront()
+    public void closeInventory() {
+    }
+    
+    public int getSizeInventory() {
+        return this.containingItems.length;
+    }
+    
+    public ItemStack getStackInSlot(final int par1) {
+        return this.containingItems[par1];
+    }
+    
+    public ItemStack decrStackSize(final int par1, final int par2) {
+        if (this.containingItems[par1] == null) {
+            return null;
+        }
+        if (this.containingItems[par1].stackSize <= par2) {
+            final ItemStack var3 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var3;
+        }
+        final ItemStack var3 = this.containingItems[par1].splitStack(par2);
+        if (this.containingItems[par1].stackSize == 0) {
+            this.containingItems[par1] = null;
+        }
+        return var3;
+    }
+    
+    public ItemStack getStackInSlotOnClosing(final int par1) {
+        if (this.containingItems[par1] != null) {
+            final ItemStack var2 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var2;
+        }
+        return null;
+    }
+    
+    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+        this.containingItems[par1] = par2ItemStack;
+        if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit()) {
+            par2ItemStack.stackSize = this.getInventoryStackLimit();
+        }
+    }
+    
+    public void setOwner(final String owner) {
+        this.owner = owner;
+    }
+    
+    public String getOwner() {
+        return this.owner;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public String getReceivingStatus() {
+        if (!this.addressValid) {
+            return EnumColor.RED + GCCoreUtil.translate("gui.message.invalidAddress.name");
+        }
+        if (this.getEnergyStoredGC() <= 0.0f) {
+            return EnumColor.RED + GCCoreUtil.translate("gui.message.noEnergy.name");
+        }
+        if (this.getEnergyStoredGC() <= 2500.0f) {
+            return EnumColor.RED + GCCoreUtil.translate("gui.message.notEnoughEnergy.name");
+        }
+        if (this.getDisabled(0)) {
+            return EnumColor.ORANGE + GCCoreUtil.translate("gui.status.disabled.name");
+        }
+        return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.message.receivingActive.name");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public String getSendingStatus() {
+        if (!this.addressValid) {
+            return EnumColor.RED + GCCoreUtil.translate("gui.message.invalidTargetAddress.name");
+        }
+        if (this.targetAddressResult == EnumTelepadSearchResult.TOO_FAR) {
+            return EnumColor.RED + GCCoreUtil.translateWithFormat("gui.message.telepadTooFar.name", 256);
+        }
+        if (this.targetAddressResult == EnumTelepadSearchResult.WRONG_DIM) {
+            return EnumColor.RED + GCCoreUtil.translate("gui.message.telepadWrongDim.name");
+        }
+        if (this.targetAddressResult == EnumTelepadSearchResult.NOT_FOUND) {
+            return EnumColor.RED + GCCoreUtil.translate("gui.message.telepadNotFound.name");
+        }
+        if (this.getEnergyStoredGC() <= 0.0f) {
+            return EnumColor.RED + GCCoreUtil.translate("gui.message.noEnergy.name");
+        }
+        if (this.getEnergyStoredGC() <= 2500.0f) {
+            return EnumColor.RED + GCCoreUtil.translate("gui.message.notEnoughEnergy.name");
+        }
+        if (this.getDisabled(0)) {
+            return EnumColor.ORANGE + GCCoreUtil.translate("gui.status.disabled.name");
+        }
+        return EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.message.sendingActive.name");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public Vector3 getParticleColor(final Random rand, final boolean sending) {
+        final float teleportTimeScaled = Math.min(1.0f, this.teleportTime / 150.0f);
+        final float f = rand.nextFloat() * 0.6f + 0.4f;
+        if (sending && this.targetAddressResult != EnumTelepadSearchResult.VALID) {
+            return new Vector3((double)f, (double)(f * 0.3f), (double)(f * 0.3f));
+        }
+        if (!sending && !this.addressValid) {
+            return new Vector3((double)f, (double)(f * 0.3f), (double)(f * 0.3f));
+        }
+        if (this.getEnergyStoredGC() < 2500.0f) {
+            return new Vector3((double)f, (double)(f * 0.6f), (double)(f * 0.3f));
+        }
+        final float r = f * 0.3f;
+        final float g = f * (0.3f + teleportTimeScaled * 0.7f);
+        final float b = f * (1.0f - teleportTimeScaled * 0.7f);
+        return new Vector3((double)r, (double)g, (double)b);
+    }
+    
+    public enum EnumTelepadSearchResult
     {
-        return this.byIndex();
+        VALID, 
+        NOT_FOUND, 
+        TOO_FAR, 
+        WRONG_DIM;
     }
 }

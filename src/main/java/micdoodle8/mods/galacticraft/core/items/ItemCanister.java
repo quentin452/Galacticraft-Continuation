@@ -1,69 +1,66 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.client.renderer.texture.*;
+import java.util.*;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-
-public class ItemCanister extends Item implements ISortableItem, GCRarity
+public class ItemCanister extends Item
 {
-
-    public static final String[] names =
-    {"tin", // 0
-            "copper"}; // 1
-
-    public ItemCanister(String assetName)
-    {
-        super();
+    public static final String[] names;
+    protected IIcon[] icons;
+    
+    public ItemCanister(final String assetName) {
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
-        this.setTranslationKey(assetName);
+        this.setUnlocalizedName(assetName);
+        this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public String getTranslationKey(ItemStack itemStack)
-    {
-        return this.getTranslationKey() + "." + ItemCanister.names[itemStack.getItemDamage()];
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                list.add(new ItemStack(this, 1, i));
-            }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        int i = 0;
+        this.icons = new IIcon[ItemCanister.names.length];
+        for (final String name : ItemCanister.names) {
+            this.icons[i++] = iconRegister.registerIcon(this.getIconString() + "." + name);
         }
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
+    
+    public String getUnlocalizedName(final ItemStack itemStack) {
+        return this.getUnlocalizedName() + "." + ItemCanister.names[itemStack.getItemDamage()];
+    }
+    
+    public IIcon getIconFromDamage(final int damage) {
+        if (this.icons.length > damage) {
+            return this.icons[damage];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < 2; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
+        }
+    }
+    
+    public int getMetadata(final int par1) {
         return par1;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.CANISTER;
+    
+    static {
+        names = new String[] { "tin", "copper" };
     }
 }

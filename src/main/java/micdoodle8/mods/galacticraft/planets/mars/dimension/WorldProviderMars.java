@@ -1,191 +1,147 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.dimension;
 
-import java.util.LinkedList;
-import java.util.List;
-import micdoodle8.mods.galacticraft.api.galaxies.CelestialBody;
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.WorldProviderSpace;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.api.world.ISolarLevel;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.event.EventHandlerGC;
-import micdoodle8.mods.galacticraft.planets.GCPlanetDimensions;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
-import micdoodle8.mods.galacticraft.planets.mars.world.gen.ChunkProviderMars;
-import micdoodle8.mods.galacticraft.planets.mars.world.gen.RoomTreasureMars;
-import net.minecraft.block.Block;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.prefab.world.gen.*;
+import micdoodle8.mods.galacticraft.api.world.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.world.chunk.*;
+import net.minecraft.world.biome.*;
+import micdoodle8.mods.galacticraft.planets.mars.world.gen.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
+import micdoodle8.mods.galacticraft.core.event.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.api.galaxies.*;
+import micdoodle8.mods.galacticraft.planets.mars.*;
 
 public class WorldProviderMars extends WorldProviderSpace implements IGalacticraftWorldProvider, ISolarLevel
 {
-
-    private double solarMultiplier = -1D;
-
-    @Override
-    public Vector3 getFogColor()
-    {
-        float f = 1.0F - this.getStarBrightness(1.0F);
-        return new Vector3(210F / 255F * f, 120F / 255F * f, 59F / 255F * f);
+    private double solarMultiplier;
+    
+    public WorldProviderMars() {
+        this.solarMultiplier = -1.0;
     }
-
-    @Override
-    public Vector3 getSkyColor()
-    {
-        float f = 1.0F - this.getStarBrightness(1.0F);
-        return new Vector3(154 / 255.0F * f, 114 / 255.0F * f, 66 / 255.0F * f);
+    
+    public Vector3 getFogColor() {
+        final float f = 1.0f - this.getStarBrightness(1.0f);
+        return new Vector3((double)(0.8235294f * f), (double)(0.47058824f * f), (double)(0.23137255f * f));
     }
-
-    @Override
-    public boolean hasSunset()
-    {
+    
+    public Vector3 getSkyColor() {
+        final float f = 1.0f - this.getStarBrightness(1.0f);
+        return new Vector3((double)(0.6039216f * f), (double)(0.44705883f * f), (double)(0.25882354f * f));
+    }
+    
+    public boolean canRainOrSnow() {
         return false;
     }
-
-    @Override
-    public long getDayLength()
-    {
+    
+    public boolean hasSunset() {
+        return false;
+    }
+    
+    public long getDayLength() {
         return 24660L;
     }
-
-    @Override
-    public Class<? extends IChunkGenerator> getChunkProviderClass()
-    {
-        return ChunkProviderMars.class;
+    
+    public boolean shouldForceRespawn() {
+        return !ConfigManagerCore.forceOverworldRespawn;
     }
-
-    @Override
+    
+    public Class<? extends IChunkProvider> getChunkProviderClass() {
+        return (Class<? extends IChunkProvider>)ChunkProviderMars.class;
+    }
+    
+    public Class<? extends WorldChunkManager> getWorldChunkManagerClass() {
+        return (Class<? extends WorldChunkManager>)WorldChunkManagerMars.class;
+    }
+    
     @SideOnly(Side.CLIENT)
-    public float getStarBrightness(float par1)
-    {
-        float f1 = this.world.getCelestialAngle(par1);
-        float f2 = 1.0F - (MathHelper.cos(f1 * Constants.twoPI) * 2.0F + 0.25F);
-
-        if (f2 < 0.0F)
-        {
-            f2 = 0.0F;
+    public float getStarBrightness(final float par1) {
+        final float f1 = this.worldObj.getCelestialAngle(par1);
+        float f2 = 1.0f - (MathHelper.cos(f1 * 3.1415927f * 2.0f) * 2.0f + 0.25f);
+        if (f2 < 0.0f) {
+            f2 = 0.0f;
         }
-
-        if (f2 > 1.0F)
-        {
-            f2 = 1.0F;
+        if (f2 > 1.0f) {
+            f2 = 1.0f;
         }
-
-        return f2 * f2 * 0.75F;
+        return f2 * f2 * 0.75f;
     }
-
-    @Override
-    public double getHorizon()
-    {
-        return 44.0D;
+    
+    public double getHorizon() {
+        return 44.0;
     }
-
-    @Override
-    public int getAverageGroundLevel()
-    {
+    
+    public int getAverageGroundLevel() {
         return 76;
     }
-
-    @Override
-    public boolean canCoordinateBeSpawn(int var1, int var2)
-    {
+    
+    public boolean canCoordinateBeSpawn(final int var1, final int var2) {
         return true;
     }
-
-    // Overriding so that beds do not explode on Mars
-    @Override
-    public boolean canRespawnHere()
-    {
-        if (EventHandlerGC.bedActivated)
-        {
+    
+    public boolean isSurfaceWorld() {
+        return this.worldObj != null && this.worldObj.isRemote;
+    }
+    
+    public boolean canRespawnHere() {
+        if (EventHandlerGC.bedActivated) {
             EventHandlerGC.bedActivated = false;
             return true;
         }
         return false;
     }
-
-    @Override
-    public float getGravity()
-    {
-        return 0.058F;
+    
+    public int getRespawnDimension(final EntityPlayerMP player) {
+        return this.shouldForceRespawn() ? this.dimensionId : 0;
     }
-
-    @Override
-    public double getFuelUsageMultiplier()
-    {
-        return 0.9D;
+    
+    public float getGravity() {
+        return 0.058f;
     }
-
-    @Override
-    public boolean canSpaceshipTierPass(int tier)
-    {
+    
+    public double getMeteorFrequency() {
+        return 10.0;
+    }
+    
+    public double getFuelUsageMultiplier() {
+        return 0.9;
+    }
+    
+    public boolean canSpaceshipTierPass(final int tier) {
         return tier >= 2;
     }
-
-    @Override
-    public float getFallDamageModifier()
-    {
-        return 0.38F;
+    
+    public float getFallDamageModifier() {
+        return 0.38f;
     }
-
-    @Override
-    public CelestialBody getCelestialBody()
-    {
-        return MarsModule.planetMars;
+    
+    public float getSoundVolReductionAmount() {
+        return 10.0f;
     }
-
-    @Override
-    public double getSolarEnergyMultiplier()
-    {
-        if (this.solarMultiplier < 0D)
-        {
-            double s = this.getSolarSize();
+    
+    public CelestialBody getCelestialBody() {
+        return (CelestialBody)MarsModule.planetMars;
+    }
+    
+    public boolean hasBreathableAtmosphere() {
+        return false;
+    }
+    
+    public float getThermalLevelModifier() {
+        return -1.0f;
+    }
+    
+    public float getWindLevel() {
+        return 0.3f;
+    }
+    
+    public double getSolarEnergyMultiplier() {
+        if (this.solarMultiplier < 0.0) {
+            final double s = this.getSolarSize();
             this.solarMultiplier = s * s * s;
         }
         return this.solarMultiplier;
-    }
-
-    @Override
-    public int getDungeonSpacing()
-    {
-        return 704;
-    }
-
-    @Override
-    public DimensionType getDimensionType()
-    {
-        return GCPlanetDimensions.MARS;
-    }
-
-    @Override
-    public float getArrowGravity()
-    {
-        return 0.015F;
-    }
-
-    @Override
-    public ResourceLocation getDungeonChestType()
-    {
-        return RoomTreasureMars.MARSCHEST;
-    }
-
-    @Override
-    public List<Block> getSurfaceBlocks()
-    {
-        List<Block> list = new LinkedList<>();
-        list.add(MarsBlocks.marsBlock);
-        return list;
     }
 }

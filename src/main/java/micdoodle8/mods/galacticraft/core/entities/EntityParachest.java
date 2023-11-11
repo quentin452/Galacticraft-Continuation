@@ -1,235 +1,121 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import net.minecraft.entity.*;
+import net.minecraft.item.*;
+import net.minecraft.world.*;
+import net.minecraft.nbt.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.item.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraftforge.fluids.*;
+import net.minecraft.tileentity.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.GCFluids;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.network.IPacketReceiver;
-import micdoodle8.mods.galacticraft.core.network.PacketDynamic;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-import io.netty.buffer.ByteBuf;
-
-public class EntityParachest extends Entity implements IPacketReceiver
+public class EntityParachest extends Entity
 {
-
-    public NonNullList<ItemStack> cargo;
+    public ItemStack[] cargo;
     public int fuelLevel;
     private boolean placedChest;
-    public EnumDyeColor color = EnumDyeColor.WHITE;
-
-    public EntityParachest(World world, NonNullList<ItemStack> cargo, int fuelLevel)
-    {
+    
+    public EntityParachest(final World world, final ItemStack[] cargo, final int fuelLevel) {
         this(world);
-        this.cargo = NonNullList.withSize(cargo.size(), ItemStack.EMPTY);
-        Collections.copy(this.cargo, cargo);
+        this.cargo = cargo.clone();
         this.placedChest = false;
         this.fuelLevel = fuelLevel;
     }
-
-    public EntityParachest(World world)
-    {
+    
+    public EntityParachest(final World world) {
         super(world);
-        this.setSize(1.0F, 1.0F);
+        this.setSize(1.0f, 1.0f);
     }
-
-    @Override
-    protected void entityInit()
-    {
+    
+    protected void entityInit() {
     }
-
-    @Override
-    protected void readEntityFromNBT(NBTTagCompound nbt)
-    {
+    
+    protected void readEntityFromNBT(final NBTTagCompound nbt) {
+        final NBTTagList var2 = nbt.getTagList("Items", 10);
         int size = 56;
-        if (nbt.hasKey("CargoLength"))
-        {
+        if (nbt.hasKey("CargoLength")) {
             size = nbt.getInteger("CargoLength");
         }
-        this.cargo = NonNullList.withSize(size, ItemStack.EMPTY);
-
-        ItemStackHelper.loadAllItems(nbt, this.cargo);
-
+        this.cargo = new ItemStack[size];
+        for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
+            final NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+            final int var5 = var4.getByte("Slot") & 0xFF;
+            if (var5 < this.cargo.length) {
+                this.cargo[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
+        }
         this.placedChest = nbt.getBoolean("placedChest");
         this.fuelLevel = nbt.getInteger("FuelLevel");
-
-        if (nbt.hasKey("color"))
-        {
-            this.color = EnumDyeColor.byDyeDamage(nbt.getInteger("color"));
-        }
     }
-
-    @Override
-    protected void writeEntityToNBT(NBTTagCompound nbt)
-    {
-        if (world.isRemote)
-            return;
-        nbt.setInteger("CargoLength", this.cargo.size());
-        ItemStackHelper.saveAllItems(nbt, this.cargo);
-
+    
+    protected void writeEntityToNBT(final NBTTagCompound nbt) {
+        nbt.setInteger("CargoLength", this.cargo.length);
+        final NBTTagList var2 = new NBTTagList();
+        for (int var3 = 0; var3 < this.cargo.length; ++var3) {
+            if (this.cargo[var3] != null) {
+                final NBTTagCompound var4 = new NBTTagCompound();
+                var4.setByte("Slot", (byte)var3);
+                this.cargo[var3].writeToNBT(var4);
+                var2.appendTag((NBTBase)var4);
+            }
+        }
+        nbt.setTag("Items", (NBTBase)var2);
         nbt.setBoolean("placedChest", this.placedChest);
         nbt.setInteger("FuelLevel", this.fuelLevel);
-        nbt.setInteger("color", this.color.getDyeDamage());
     }
-
-    @Override
-    public void onUpdate()
-    {
-        if (!this.placedChest)
-        {
-            if (this.onGround && !this.world.isRemote)
-            {
-                for (int i = 0; i < 100; i++)
-                {
-                    final int x = MathHelper.floor(this.posX);
-                    final int y = MathHelper.floor(this.posY);
-                    final int z = MathHelper.floor(this.posZ);
-
-                    if (tryPlaceAtPos(new BlockPos(x, y + i, z)))
-                    {
-                        return;
-                    }
-                }
-
-                for (int size = 1; size < 5; ++size)
-                {
-                    for (int xOff = -size; xOff <= size; xOff++)
-                    {
-                        for (int yOff = -size; yOff <= size; yOff++)
-                        {
-                            for (int zOff = -size; zOff <= size; zOff++)
-                            {
-                                final int x = MathHelper.floor(this.posX) + xOff;
-                                final int y = MathHelper.floor(this.posY) + yOff;
-                                final int z = MathHelper.floor(this.posZ) + zOff;
-
-                                if (tryPlaceAtPos(new BlockPos(x, y, z)))
-                                {
-                                    return;
-                                }
+    
+    public void onUpdate() {
+        if (!this.placedChest) {
+            if (this.onGround && !this.worldObj.isRemote) {
+                for (int i = 0; i < 100; ++i) {
+                    final int x = MathHelper.floor_double(this.posX);
+                    final int y = MathHelper.floor_double(this.posY);
+                    final int z = MathHelper.floor_double(this.posZ);
+                    final Block block = this.worldObj.getBlock(x, y + i, z);
+                    if (block.getMaterial().isReplaceable()) {
+                        if (this.placeChest(x, y + i, z)) {
+                            this.setDead();
+                            return;
+                        }
+                        if (this.cargo != null) {
+                            for (final ItemStack stack : this.cargo) {
+                                final EntityItem e = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, stack);
+                                this.worldObj.spawnEntityInWorld((Entity)e);
                             }
+                            return;
                         }
                     }
                 }
-
-                if (this.cargo != null)
-                {
-                    for (final ItemStack stack : this.cargo)
-                    {
-                        final EntityItem e = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
-                        this.world.spawnEntity(e);
-                    }
-                }
-
-                this.placedChest = true;
-                this.setDead();
-            } else
-            {
-                this.motionY = -0.35;
-            }
-
-            this.move(MoverType.SELF, 0, this.motionY, 0);
-        }
-
-        if (!this.world.isRemote && this.ticksExisted % 5 == 0)
-        {
-            GalacticraftCore.packetPipeline.sendToAllAround(new PacketDynamic(this), new NetworkRegistry.TargetPoint(GCCoreUtil.getDimensionID(this.world), this.posX, this.posY, this.posZ, 64.0));
-        }
-    }
-
-    private boolean tryPlaceAtPos(BlockPos pos)
-    {
-        IBlockState state = this.world.getBlockState(pos);
-        Block block = state.getBlock();
-
-        if (block.getMaterial(state).isReplaceable())
-        {
-            if (this.placeChest(pos))
-            {
-                this.placedChest = true;
-                this.setDead();
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean placeChest(BlockPos pos)
-    {
-        if (this.world.setBlockState(pos, GCBlocks.parachest.getDefaultState(), 3))
-        {
-            if (this.cargo != null)
-            {
-                final TileEntity te = this.world.getTileEntity(pos);
-
-                if (te instanceof TileEntityParaChest)
-                {
-                    final TileEntityParaChest chest = (TileEntityParaChest) te;
-
-                    chest.inventory = NonNullList.withSize(this.cargo.size() + 1, ItemStack.EMPTY);
-                    chest.color = this.color;
-
-                    Collections.copy(chest.getInventory(), this.cargo);
-
-                    chest.fuelTank.fill(FluidRegistry.getFluidStack(GCFluids.fluidFuel.getName().toLowerCase(), this.fuelLevel), true);
-                } else
-                {
-                    for (ItemStack stack : this.cargo)
-                    {
-                        final EntityItem e = new EntityItem(this.world, this.posX, this.posY, this.posZ, stack);
-                        this.world.spawnEntity(e);
+                if (this.cargo != null) {
+                    for (final ItemStack stack2 : this.cargo) {
+                        final EntityItem e2 = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, stack2);
+                        this.worldObj.spawnEntityInWorld((Entity)e2);
                     }
                 }
             }
+            else {
+                this.motionY = -0.25;
+            }
+            this.moveEntity(0.0, this.motionY, 0.0);
+        }
+    }
+    
+    private boolean placeChest(final int x, final int y, final int z) {
+        this.worldObj.setBlock(x, y, z, GCBlocks.parachest, 0, 3);
+        final TileEntity te = this.worldObj.getTileEntity(x, y, z);
+        if (te instanceof TileEntityParaChest && this.cargo != null) {
+            final TileEntityParaChest chest = (TileEntityParaChest)te;
+            chest.chestContents = new ItemStack[this.cargo.length + 1];
+            for (int i = 0; i < this.cargo.length; ++i) {
+                chest.chestContents[i] = this.cargo[i];
+            }
+            chest.fuelTank.fill(FluidRegistry.getFluidStack(GalacticraftCore.fluidFuel.getName().toLowerCase(), this.fuelLevel), true);
             return true;
         }
-
-        return false;
-    }
-
-    @Override
-    public void getNetworkedData(ArrayList<Object> sendData)
-    {
-        if (!this.world.isRemote)
-        {
-            sendData.add(this.color.getDyeDamage());
-        }
-    }
-
-    @Override
-    public void decodePacketdata(ByteBuf buffer)
-    {
-        if (this.world.isRemote)
-        {
-            this.color = EnumDyeColor.byDyeDamage(buffer.readInt());
-        }
+        return this.placedChest = true;
     }
 }

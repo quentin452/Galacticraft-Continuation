@@ -1,205 +1,119 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.monster.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.entity.*;
+import java.lang.reflect.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import net.minecraft.nbt.*;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedCreeper;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSkeleton;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSpider;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedZombie;
-import micdoodle8.mods.galacticraft.core.entities.IBoss;
-
-public class TileEntityDungeonSpawner<E extends Entity> extends TileEntityAdvanced
+public class TileEntityDungeonSpawner extends TileEntityAdvanced
 {
-
-    public Class<E> bossClass;
+    public Class<? extends IBoss> bossClass;
     public IBoss boss;
     public boolean spawned;
     public boolean isBossDefeated;
     public boolean playerInRange;
     public boolean lastPlayerInRange;
+    public boolean playerCheated;
     private Vector3 roomCoords;
     private Vector3 roomSize;
-    public long lastKillTime;
-    private BlockPos chestPos;
-    private AxisAlignedBB range15 = null;
-    private AxisAlignedBB rangeBounds = null;
-    private AxisAlignedBB rangeBoundsPlus3 = null;
-    private AxisAlignedBB rangeBoundsPlus11 = null;
-
-    public TileEntityDungeonSpawner()
-    {
-        this(null);
+    
+    public TileEntityDungeonSpawner() {
+        this((Class<? extends IBoss>)EntitySkeletonBoss.class);
     }
-
-    public TileEntityDungeonSpawner(Class<E> bossClass)
-    {
-        super("tile.gcdungeonspawner.name");
+    
+    public TileEntityDungeonSpawner(final Class<? extends IBoss> bossClass) {
         this.bossClass = bossClass;
     }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[0];
-    }
-
-    @Override
-    public void update()
-    {
-        super.update();
-
-        if (this.roomCoords == null)
-        {
+    
+    public void updateEntity() {
+        super.updateEntity();
+        if (this.roomCoords == null) {
             return;
         }
-
-        if (!this.world.isRemote)
-        {
-            if (this.range15 == null)
-            {
-                final Vector3 thisVec = new Vector3(this);
-                this.range15 = new AxisAlignedBB(thisVec.x - 15, thisVec.y - 15, thisVec.z - 15, thisVec.x + 15, thisVec.y + 15, thisVec.z + 15);
-                this.rangeBounds = new AxisAlignedBB(this.roomCoords.intX(), this.roomCoords.intY(), this.roomCoords.intZ(), this.roomCoords.intX() + this.roomSize.intX(),
-                    this.roomCoords.intY() + this.roomSize.intY(), this.roomCoords.intZ() + this.roomSize.intZ());
-                this.rangeBoundsPlus3 = this.rangeBounds.grow(3, 3, 3);
-            }
-
-            if (this.lastKillTime > 0 && MinecraftServer.getCurrentTimeMillis() - lastKillTime > 900000) // 15
-                                                                                                         // minutes
-            {
-                this.lastKillTime = 0;
-                this.isBossDefeated = false;
-                // After 15 minutes a new boss is able to be spawned
-            }
-
-            final List<E> l = this.world.getEntitiesWithinAABB(bossClass, this.range15);
-
-            for (final Entity e : l)
-            {
-                if (!e.isDead)
-                {
-                    this.boss = (IBoss) e;
+        if (!this.worldObj.isRemote) {
+            final Vector3 thisVec = new Vector3((TileEntity)this);
+            final List<Entity> l = (List<Entity>)this.worldObj.getEntitiesWithinAABB((Class)this.bossClass, AxisAlignedBB.getBoundingBox(thisVec.x - 15.0, thisVec.y - 15.0, thisVec.z - 15.0, thisVec.x + 15.0, thisVec.y + 15.0, thisVec.z + 15.0));
+            for (final Entity e : l) {
+                if (!e.isDead) {
+                    (this.boss = (IBoss)e).setRoom(this.roomCoords, this.roomSize);
                     this.spawned = true;
                     this.isBossDefeated = false;
-                    this.boss.onBossSpawned(this);
                 }
             }
-
-            List<EntityMob> entitiesWithin = this.world.getEntitiesWithinAABB(EntityMob.class, this.rangeBoundsPlus3);
-
-            for (Entity mob : entitiesWithin)
-            {
-                if (this.getDisabledCreatures().contains(mob.getClass()))
-                {
+            List<Entity> entitiesWithin = (List<Entity>)this.worldObj.getEntitiesWithinAABB((Class)EntityMob.class, AxisAlignedBB.getBoundingBox((double)(this.roomCoords.intX() - 4), (double)(this.roomCoords.intY() - 4), (double)(this.roomCoords.intZ() - 4), (double)(this.roomCoords.intX() + this.roomSize.intX() + 3), (double)(this.roomCoords.intY() + this.roomSize.intY() + 3), (double)(this.roomCoords.intZ() + this.roomSize.intZ() + 3)));
+            for (final Entity mob : entitiesWithin) {
+                if (this.getDisabledCreatures().contains(mob.getClass())) {
                     mob.setDead();
                 }
             }
-
-            List<EntityPlayer> playersWithin = this.world.getEntitiesWithinAABB(EntityPlayer.class, this.rangeBounds);
-
-            this.playerInRange = !playersWithin.isEmpty();
-
-            if (this.playerInRange)
-            {
-                if (!this.lastPlayerInRange && !this.spawned)
-                {
-                    // Try to create a boss entity
-                    if (this.boss == null && !this.isBossDefeated)
-                    {
-                        try
-                        {
-                            Constructor<?> c = this.bossClass.getConstructor(World.class);
-                            this.boss = (IBoss) c.newInstance(this.world);
-                            ((Entity) this.boss).setPosition(this.getPos().getX() + 0.5, this.getPos().getY() + 1.0, this.getPos().getZ() + 0.5);
-                        } catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    // Now spawn the boss
-                    if (this.boss != null)
-                    {
-                        if (this.boss instanceof EntityLiving)
-                        {
-                            EntityLiving bossLiving = (EntityLiving) this.boss;
-                            bossLiving.onInitialSpawn(this.world.getDifficultyForLocation(new BlockPos(bossLiving)), null);
-                            this.world.spawnEntity(bossLiving);
-                            this.playSpawnSound(bossLiving);
-                            this.spawned = true;
-                        }
-                    }
+            if (this.boss == null && !this.isBossDefeated) {
+                try {
+                    final Constructor<?> c = this.bossClass.getConstructor(World.class);
+                    this.boss = (IBoss)c.newInstance(this.worldObj);
+                    ((Entity)this.boss).setPosition(this.xCoord + 0.5, this.yCoord + 1.0, this.zCoord + 0.5);
+                    this.boss.setRoom(this.roomCoords, this.roomSize);
+                }
+                catch (Exception e2) {
+                    e2.printStackTrace();
                 }
             }
-
+            entitiesWithin = (List<Entity>)this.worldObj.getEntitiesWithinAABB((Class)EntityPlayer.class, AxisAlignedBB.getBoundingBox((double)(this.roomCoords.intX() - 1), (double)(this.roomCoords.intY() - 1), (double)(this.roomCoords.intZ() - 1), (double)(this.roomCoords.intX() + this.roomSize.intX()), (double)(this.roomCoords.intY() + this.roomSize.intY()), (double)(this.roomCoords.intZ() + this.roomSize.intZ())));
+            if (this.playerCheated && !entitiesWithin.isEmpty()) {
+                this.isBossDefeated = false;
+                this.spawned = false;
+                this.lastPlayerInRange = false;
+                this.playerCheated = false;
+            }
+            this.playerInRange = !entitiesWithin.isEmpty();
+            if (this.playerInRange && !this.lastPlayerInRange && this.boss != null && !this.spawned && this.boss instanceof Entity) {
+                this.worldObj.spawnEntityInWorld((Entity)this.boss);
+                this.playSpawnSound((Entity)this.boss);
+                this.spawned = true;
+                this.boss.onBossSpawned(this);
+                this.boss.setRoom(this.roomCoords, this.roomSize);
+            }
             this.lastPlayerInRange = this.playerInRange;
         }
     }
-
-    public void playSpawnSound(Entity entity)
-    {
-
+    
+    public void playSpawnSound(final Entity entity) {
     }
-
-    public List<Class<? extends EntityLiving>> getDisabledCreatures()
-    {
-        List<Class<? extends EntityLiving>> list = new ArrayList<Class<? extends EntityLiving>>();
-        list.add(EntityEvolvedSkeleton.class);
-        list.add(EntityEvolvedCreeper.class);
-        list.add(EntityEvolvedZombie.class);
-        list.add(EntityEvolvedSpider.class);
+    
+    public List<Class<? extends EntityLiving>> getDisabledCreatures() {
+        final List<Class<? extends EntityLiving>> list = new ArrayList<Class<? extends EntityLiving>>();
+        list.add((Class<? extends EntityLiving>)EntityEvolvedSkeleton.class);
+        list.add((Class<? extends EntityLiving>)EntityEvolvedCreeper.class);
+        list.add((Class<? extends EntityLiving>)EntityEvolvedZombie.class);
+        list.add((Class<? extends EntityLiving>)EntityEvolvedSpider.class);
         return list;
     }
-
-    public void setRoom(Vector3 coords, Vector3 size)
-    {
+    
+    public void setRoom(final Vector3 coords, final Vector3 size) {
         this.roomCoords = coords;
         this.roomSize = size;
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readFromNBT(final NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-
-        this.playerInRange = this.lastPlayerInRange = nbt.getBoolean("playerInRange");
+        this.spawned = nbt.getBoolean("spawned");
+        final boolean getBoolean = nbt.getBoolean("playerInRange");
+        this.lastPlayerInRange = getBoolean;
+        this.playerInRange = getBoolean;
         this.isBossDefeated = nbt.getBoolean("defeated");
-
-        try
-        {
-            this.bossClass = (Class<E>) Class.forName(nbt.getString("bossClass"));
-        } catch (Exception e)
-        {
-            // This exception will be thrown when read is called from
-            // TileEntity.handleUpdateTag
-            // but we only care if an exception is thrown on server side read
-            if (!this.world.isRemote)
-            {
-                e.printStackTrace();
-            }
+        this.playerCheated = nbt.getBoolean("playerCheated");
+        try {
+            this.bossClass = (Class<? extends IBoss>)Class.forName(nbt.getString("bossClass"));
         }
-
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         this.roomCoords = new Vector3();
         this.roomCoords.x = nbt.getDouble("roomCoordsX");
         this.roomCoords.y = nbt.getDouble("roomCoordsY");
@@ -208,33 +122,16 @@ public class TileEntityDungeonSpawner<E extends Entity> extends TileEntityAdvanc
         this.roomSize.x = nbt.getDouble("roomSizeX");
         this.roomSize.y = nbt.getDouble("roomSizeY");
         this.roomSize.z = nbt.getDouble("roomSizeZ");
-
-        if (nbt.hasKey("lastKillTime"))
-        {
-            this.lastKillTime = nbt.getLong("lastKillTime");
-        } else if (nbt.hasKey("lastKillTimeNew"))
-        {
-            long savedTime = nbt.getLong("lastKillTimeNew");
-            this.lastKillTime = savedTime == 0 ? 0 : savedTime + MinecraftServer.getCurrentTimeMillis();
-        }
-
-        if (nbt.hasKey("chestPosNull") && !nbt.getBoolean("chestPosNull"))
-        {
-            this.chestPos = new BlockPos(nbt.getInteger("chestX"), nbt.getInteger("chestY"), nbt.getInteger("chestZ"));
-        }
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    
+    public void writeToNBT(final NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-
+        nbt.setBoolean("spawned", this.spawned);
         nbt.setBoolean("playerInRange", this.playerInRange);
         nbt.setBoolean("defeated", this.isBossDefeated);
+        nbt.setBoolean("playerCheated", this.playerCheated);
         nbt.setString("bossClass", this.bossClass.getCanonicalName());
-
-        if (this.roomCoords != null)
-        {
+        if (this.roomCoords != null) {
             nbt.setDouble("roomCoordsX", this.roomCoords.x);
             nbt.setDouble("roomCoordsY", this.roomCoords.y);
             nbt.setDouble("roomCoordsZ", this.roomCoords.z);
@@ -242,67 +139,17 @@ public class TileEntityDungeonSpawner<E extends Entity> extends TileEntityAdvanc
             nbt.setDouble("roomSizeY", this.roomSize.y);
             nbt.setDouble("roomSizeZ", this.roomSize.z);
         }
-
-        nbt.setLong("lastKillTimeNew", this.lastKillTime == 0 ? 0 : this.lastKillTime - MinecraftServer.getCurrentTimeMillis());
-
-        nbt.setBoolean("chestPosNull", this.chestPos == null);
-        if (this.chestPos != null)
-        {
-            nbt.setInteger("chestX", this.chestPos.getX());
-            nbt.setInteger("chestY", this.chestPos.getY());
-            nbt.setInteger("chestZ", this.chestPos.getZ());
-        }
-        return nbt;
     }
-
-    @Override
-    protected boolean handleInventory()
-    {
-        return false;
+    
+    public double getPacketRange() {
+        return 0.0;
     }
-
-    @Override
-    public double getPacketRange()
-    {
+    
+    public int getPacketCooldown() {
         return 0;
     }
-
-    @Override
-    public int getPacketCooldown()
-    {
-        return 0;
-    }
-
-    @Override
-    public boolean isNetworkedTile()
-    {
+    
+    public boolean isNetworkedTile() {
         return false;
-    }
-
-    public BlockPos getChestPos()
-    {
-        return chestPos;
-    }
-
-    public void setChestPos(BlockPos chestPos)
-    {
-        this.chestPos = chestPos;
-    }
-
-    public AxisAlignedBB getRangeBounds()
-    {
-        if (this.rangeBounds == null)
-            this.rangeBounds = new AxisAlignedBB(this.roomCoords.intX(), this.roomCoords.intY(), this.roomCoords.intZ(), this.roomCoords.intX() + this.roomSize.intX(),
-                this.roomCoords.intY() + this.roomSize.intY(), this.roomCoords.intZ() + this.roomSize.intZ());
-
-        return this.rangeBounds;
-    }
-
-    public AxisAlignedBB getRangeBoundsPlus11()
-    {
-        if (this.rangeBoundsPlus11 == null)
-            this.rangeBoundsPlus11 = this.getRangeBounds().grow(11, 11, 11);
-
-        return this.rangeBoundsPlus11;
     }
 }

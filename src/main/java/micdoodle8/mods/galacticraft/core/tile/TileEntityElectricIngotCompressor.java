@@ -1,699 +1,425 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.miccore.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.inventory.*;
+import micdoodle8.mods.galacticraft.api.recipe.*;
+import net.minecraft.entity.item.*;
+import net.minecraft.entity.*;
+import net.minecraft.init.*;
+import net.minecraft.nbt.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.energy.item.*;
+import net.minecraft.item.crafting.*;
+import net.minecraftforge.oredict.*;
+import java.util.*;
+import net.minecraftforge.common.util.*;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.oredict.OreDictionary;
-
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-
-import micdoodle8.mods.galacticraft.annotations.ForRemoval;
-import micdoodle8.mods.galacticraft.annotations.ReplaceWith;
-import micdoodle8.mods.galacticraft.api.recipe.CompressorRecipes;
-import micdoodle8.mods.galacticraft.api.recipe.ShapedRecipesGC;
-import micdoodle8.mods.galacticraft.api.recipe.ShapelessOreRecipeGC;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachine2;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachine4;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachineBase;
-import micdoodle8.mods.galacticraft.core.client.sounds.GCSounds;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlock;
-import micdoodle8.mods.galacticraft.core.inventory.IInventoryDefaults;
-import micdoodle8.mods.galacticraft.core.inventory.PersistantInventoryCrafting;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class TileEntityElectricIngotCompressor extends TileBaseElectricBlock implements IInventoryDefaults, ISidedInventory, IMachineSides
+public class TileEntityElectricIngotCompressor extends TileBaseElectricBlock implements IInventory, ISidedInventory
 {
-
-    private static final int PROCESS_TIME_REQUIRED_BASE = 200;
-    private int processTimeRequiredBase;
-    @NetworkedField(targetSide = Side.CLIENT) public int processTimeRequired = PROCESS_TIME_REQUIRED_BASE;
-    @NetworkedField(targetSide = Side.CLIENT) public int processTicks = 0;
-    private ItemStack producingStack = ItemStack.EMPTY;
+    public static final int PROCESS_TIME_REQUIRED_BASE = 200;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int processTimeRequired;
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int processTicks;
+    private ItemStack producingStack;
     private long ticks;
-    private static final int[] allSlots = new int[]
-    {0, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    private boolean advanced;
-
-    public PersistantInventoryCrafting compressingCraftMatrix = new PersistantInventoryCrafting();
-    private static Random randnum = new Random();
-
-    public TileEntityElectricIngotCompressor()
-    {
-        super("tile.machine2.4.name");
-        this.processTimeRequiredBase = PROCESS_TIME_REQUIRED_BASE;
-        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 90 : 75);
+    private ItemStack[] containingItems;
+    public PersistantInventoryCrafting compressingCraftMatrix;
+    private static Random randnum;
+    
+    public TileEntityElectricIngotCompressor() {
+        this.processTimeRequired = 200;
+        this.processTicks = 0;
+        this.producingStack = null;
+        this.containingItems = new ItemStack[3];
+        this.compressingCraftMatrix = new PersistantInventoryCrafting();
+        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 90.0f : 75.0f);
         this.setTierGC(2);
-        inventory = NonNullList.withSize(3, ItemStack.EMPTY);
     }
-
-    public TileEntityElectricIngotCompressor(boolean advanced)
-    {
-        super("tile.machine4.11.name");
-        this.processTimeRequiredBase = PROCESS_TIME_REQUIRED_BASE * 3 / 5;
-        this.processTimeRequired = processTimeRequiredBase;
-        this.advanced = true;
-        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 90 : 75);
-        this.setTierGC(3);
-        inventory = NonNullList.withSize(3, ItemStack.EMPTY);
-    }
-
-    @Override
-    public void update()
-    {
-        super.update();
-
-        if (!this.world.isRemote)
-        {
+    
+    public void updateEntity() {
+        super.updateEntity();
+        if (!this.worldObj.isRemote) {
             boolean updateInv = false;
-
-            if (this.hasEnoughEnergyToRun)
-            {
-                if (this.canCompress())
-                {
+            if (this.hasEnoughEnergyToRun) {
+                if (this.canCompress()) {
                     ++this.processTicks;
-
-                    this.processTimeRequired = this.processTimeRequiredBase / (1 + this.poweredByTierGC * 2);
-
-                    if (this.processTicks >= this.processTimeRequired)
-                    {
-                        if (this.advanced)
-                            this.world.playSound(null, this.getPos(), GCSounds.advanced_compressor, SoundCategory.BLOCKS, 0.23F, this.world.rand.nextFloat() * 0.1F + 9.5F);
-                        else
-                            this.world.playSound(null, this.getPos(), SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, 0.12F, this.world.rand.nextFloat() * 0.1F - 9.5F);
+                    this.processTimeRequired = 400 / (1 + this.poweredByTierGC);
+                    if (this.processTicks >= this.processTimeRequired) {
+                        this.worldObj.playSoundEffect((double)this.xCoord, (double)this.yCoord, (double)this.zCoord, "random.anvil_land", 0.2f, 0.5f);
                         this.processTicks = 0;
                         this.compressItems();
                         updateInv = true;
                     }
-                } else
-                {
+                }
+                else {
                     this.processTicks = 0;
                 }
-            } else
-            {
+            }
+            else {
                 this.processTicks = 0;
             }
-
-            if (updateInv)
-            {
+            if (updateInv) {
                 this.markDirty();
             }
         }
-
-        this.ticks++;
+        if (this.ticks >= Long.MAX_VALUE) {
+            this.ticks = 0L;
+        }
+        ++this.ticks;
     }
-
-    private boolean canCompress()
-    {
-        ItemStack itemstack = this.producingStack;
-        if (itemstack.isEmpty())
-        {
+    
+    public void openInventory() {
+    }
+    
+    public void closeInventory() {
+    }
+    
+    private boolean canCompress() {
+        final ItemStack itemstack = this.producingStack;
+        if (itemstack == null) {
             return false;
         }
-        if (this.getInventory().get(1).isEmpty() && this.getInventory().get(2).isEmpty())
-        {
+        if (this.containingItems[1] == null && this.containingItems[2] == null) {
             return true;
         }
-        if (!this.getInventory().get(1).isEmpty() && !this.getInventory().get(1).isItemEqual(itemstack) || !this.getInventory().get(2).isEmpty() && !this.getInventory().get(2).isItemEqual(itemstack))
-        {
+        if ((this.containingItems[1] != null && !this.containingItems[1].isItemEqual(itemstack)) || (this.containingItems[2] != null && !this.containingItems[2].isItemEqual(itemstack))) {
             return false;
         }
-        int contents1 = this.getInventory().get(1).getCount();
-        int contents2 = this.getInventory().get(2).getCount();
-        int result = itemstack.getCount();
-        if (ConfigManagerCore.quickMode && itemstack.getItem().getTranslationKey(itemstack).contains("compressed"))
-        {
-            result += result;
-        }
-        result += (contents2 < contents1) ? contents2 : contents1;
-        return result <= this.getInventoryStackLimit() && result <= itemstack.getMaxStackSize();
+        final int result = (this.containingItems[1] == null) ? 0 : (this.containingItems[1].stackSize + itemstack.stackSize);
+        final int result2 = (this.containingItems[2] == null) ? 0 : (this.containingItems[2].stackSize + itemstack.stackSize);
+        return result <= this.getInventoryStackLimit() && result <= itemstack.getMaxStackSize() && result2 <= this.getInventoryStackLimit() && result2 <= itemstack.getMaxStackSize();
     }
-
-    public void updateInput()
-    {
-        this.producingStack = CompressorRecipes.findMatchingRecipe(this.compressingCraftMatrix, this.world);
+    
+    public void updateInput() {
+        this.producingStack = CompressorRecipes.findMatchingRecipe((IInventory)this.compressingCraftMatrix, this.worldObj);
     }
-
-    public void compressItems()
-    {
-        int stackSize1 = this.getInventory().get(1).isEmpty() ? 0 : this.getInventory().get(1).getCount();
-        int stackSize2 = this.getInventory().get(2).isEmpty() ? 0 : this.getInventory().get(2).getCount();
-
-        if (stackSize1 <= stackSize2)
-        {
+    
+    public void compressItems() {
+        final int stackSize1 = (this.containingItems[1] == null) ? 0 : this.containingItems[1].stackSize;
+        final int stackSize2 = (this.containingItems[2] == null) ? 0 : this.containingItems[2].stackSize;
+        if (stackSize1 <= stackSize2) {
             this.compressIntoSlot(1);
             this.compressIntoSlot(2);
-        } else
-        {
+        }
+        else {
             this.compressIntoSlot(2);
             this.compressIntoSlot(1);
         }
     }
-
-    private void compressIntoSlot(int slot)
-    {
-        if (this.canCompress())
-        {
-            ItemStack resultItemStack = this.producingStack.copy();
-            if (ConfigManagerCore.quickMode)
-            {
-                if (resultItemStack.getItem().getTranslationKey(resultItemStack).contains("compressed"))
-                {
-                    resultItemStack.grow(resultItemStack.getCount());
+    
+    private void compressIntoSlot(final int slot) {
+        if (this.canCompress()) {
+            final ItemStack resultItemStack = this.producingStack.copy();
+            if (ConfigManagerCore.quickMode && resultItemStack.getItem().getUnlocalizedName(resultItemStack).contains("compressed")) {
+                final ItemStack itemStack = resultItemStack;
+                itemStack.stackSize *= 2;
+            }
+            if (this.containingItems[slot] == null) {
+                this.containingItems[slot] = resultItemStack;
+            }
+            else if (this.containingItems[slot].isItemEqual(resultItemStack)) {
+                if (this.containingItems[slot].stackSize + resultItemStack.stackSize > 64) {
+                    for (int i = 0; i < this.containingItems[slot].stackSize + resultItemStack.stackSize - 64; ++i) {
+                        final float var = 0.7f;
+                        final double dx = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
+                        final double dy = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
+                        final double dz = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
+                        final EntityItem entityitem = new EntityItem(this.worldObj, this.xCoord + dx, this.yCoord + dy, this.zCoord + dz, new ItemStack(resultItemStack.getItem(), 1, resultItemStack.getItemDamage()));
+                        entityitem.delayBeforeCanPickup = 10;
+                        this.worldObj.spawnEntityInWorld((Entity)entityitem);
+                    }
+                    this.containingItems[slot].stackSize = 64;
+                }
+                else {
+                    final ItemStack itemStack2 = this.containingItems[slot];
+                    itemStack2.stackSize += resultItemStack.stackSize;
                 }
             }
-
-            if (this.getInventory().get(slot).isEmpty())
-            {
-                this.getInventory().set(slot, resultItemStack);
-            } else if (this.getInventory().get(slot).isItemEqual(resultItemStack))
-            {
-                if (this.getInventory().get(slot).getCount() + resultItemStack.getCount() > resultItemStack.getMaxStackSize())
-                {
-                    resultItemStack.grow(this.getInventory().get(slot).getCount() - resultItemStack.getMaxStackSize());
-                    GCCoreUtil.spawnItem(this.world, this.getPos(), resultItemStack);
-                    this.getInventory().get(slot).setCount(resultItemStack.getMaxStackSize());
-                } else
-                {
-                    this.getInventory().get(slot).grow(resultItemStack.getCount());
+            for (int i = 0; i < this.compressingCraftMatrix.getSizeInventory(); ++i) {
+                if (this.compressingCraftMatrix.getStackInSlot(i) != null && this.compressingCraftMatrix.getStackInSlot(i).getItem() == Items.water_bucket) {
+                    this.compressingCraftMatrix.setInventorySlotContentsNoUpdate(i, new ItemStack(Items.bucket));
                 }
-            }
-
-            for (int i = 0; i < this.compressingCraftMatrix.getSizeInventory(); i++)
-            {
-                if (!this.compressingCraftMatrix.getStackInSlot(i).isEmpty() && this.compressingCraftMatrix.getStackInSlot(i).getItem() == Items.WATER_BUCKET)
-                {
-                    this.compressingCraftMatrix.setInventorySlotContentsNoUpdate(i, new ItemStack(Items.BUCKET));
-                } else
-                {
+                else {
                     this.compressingCraftMatrix.decrStackSize(i, 1);
                 }
             }
-
             this.updateInput();
         }
     }
-
-    @Override
-    protected boolean handleInventory()
-    {
-        return false;
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
-        super.readFromNBT(nbt);
-        this.advanced = nbt.getBoolean("adv");
-        if (this.advanced)
-        {
-            this.processTimeRequiredBase = PROCESS_TIME_REQUIRED_BASE * 3 / 5;
-            this.processTimeRequired = processTimeRequiredBase;
-            this.setTierGC(3);
-        }
-        this.processTicks = nbt.getInteger("smeltingTicks");
-
-        this.inventory = NonNullList.withSize(this.getSizeInventory() - this.compressingCraftMatrix.getSizeInventory(), ItemStack.EMPTY);
-        NBTTagList nbttaglist = nbt.getTagList("Items", 10);
-
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
-        {
-            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
-            int j = nbttagcompound.getByte("Slot") & 255;
-
-            if (j >= 0 && j < this.inventory.size())
-            {
-                this.inventory.set(j, new ItemStack(nbttagcompound));
-            } else if (j < this.inventory.size() + this.compressingCraftMatrix.getSizeInventory())
-            {
-                this.compressingCraftMatrix.setInventorySlotContents(j - this.inventory.size(), new ItemStack(nbttagcompound));
+    
+    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.readFromNBT(par1NBTTagCompound);
+        this.processTicks = par1NBTTagCompound.getInteger("smeltingTicks");
+        final NBTTagList var2 = par1NBTTagCompound.getTagList("Items", 10);
+        this.containingItems = new ItemStack[this.getSizeInventory() - this.compressingCraftMatrix.getSizeInventory()];
+        for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
+            final NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+            final int var5 = var4.getByte("Slot") & 0xFF;
+            if (var5 < this.containingItems.length) {
+                this.containingItems[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
+            else if (var5 < this.containingItems.length + this.compressingCraftMatrix.getSizeInventory()) {
+                this.compressingCraftMatrix.setInventorySlotContents(var5 - this.containingItems.length, ItemStack.loadItemStackFromNBT(var4));
             }
         }
-        this.readMachineSidesFromNBT(nbt); // Needed by IMachineSides
         this.updateInput();
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
-        super.writeToNBT(nbt);
-        nbt.setBoolean("adv", this.advanced);
-        nbt.setInteger("smeltingTicks", this.processTicks);
-        NBTTagList items = new NBTTagList();
-        int i;
-
-        for (i = 0; i < this.inventory.size(); ++i)
-        {
-            if (!this.inventory.get(i).isEmpty())
-            {
-                NBTTagCompound var4 = new NBTTagCompound();
-                var4.setByte("Slot", (byte) i);
-                this.inventory.get(i).writeToNBT(var4);
-                items.appendTag(var4);
+    
+    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.writeToNBT(par1NBTTagCompound);
+        par1NBTTagCompound.setInteger("smeltingTicks", this.processTicks);
+        final NBTTagList var2 = new NBTTagList();
+        for (int var3 = 0; var3 < this.containingItems.length; ++var3) {
+            if (this.containingItems[var3] != null) {
+                final NBTTagCompound var4 = new NBTTagCompound();
+                var4.setByte("Slot", (byte)var3);
+                this.containingItems[var3].writeToNBT(var4);
+                var2.appendTag((NBTBase)var4);
             }
         }
-
-        for (i = 0; i < this.compressingCraftMatrix.getSizeInventory(); ++i)
-        {
-            if (!this.compressingCraftMatrix.getStackInSlot(i).isEmpty())
-            {
-                NBTTagCompound var4 = new NBTTagCompound();
-                var4.setByte("Slot", (byte) (i + this.inventory.size()));
-                this.compressingCraftMatrix.getStackInSlot(i).writeToNBT(var4);
-                items.appendTag(var4);
+        for (int var3 = 0; var3 < this.compressingCraftMatrix.getSizeInventory(); ++var3) {
+            if (this.compressingCraftMatrix.getStackInSlot(var3) != null) {
+                final NBTTagCompound var4 = new NBTTagCompound();
+                var4.setByte("Slot", (byte)(var3 + this.containingItems.length));
+                this.compressingCraftMatrix.getStackInSlot(var3).writeToNBT(var4);
+                var2.appendTag((NBTBase)var4);
             }
         }
-        nbt.setTag("Items", items);
-
-        this.addMachineSidesToNBT(nbt); // Needed by IMachineSides
-        return nbt;
+        par1NBTTagCompound.setTag("Items", (NBTBase)var2);
     }
-
-    @Override
-    public int getSizeInventory()
-    {
-        return super.getSizeInventory() + this.compressingCraftMatrix.getSizeInventory();
+    
+    public int getSizeInventory() {
+        return this.containingItems.length + this.compressingCraftMatrix.getSizeInventory();
     }
-
-    @Override
-    public ItemStack getStackInSlot(int par1)
-    {
-        if (par1 >= this.getInventory().size())
-        {
-            return this.compressingCraftMatrix.getStackInSlot(par1 - this.inventory.size());
+    
+    public ItemStack getStackInSlot(final int par1) {
+        if (par1 >= this.containingItems.length) {
+            return this.compressingCraftMatrix.getStackInSlot(par1 - this.containingItems.length);
         }
-
-        return this.inventory.get(par1);
+        return this.containingItems[par1];
     }
-
-    @Override
-    public ItemStack decrStackSize(int par1, int par2)
-    {
-        if (par1 >= this.inventory.size())
-        {
-            ItemStack result = this.compressingCraftMatrix.decrStackSize(par1 - this.inventory.size(), par2);
-            if (!result.isEmpty())
-            {
+    
+    public ItemStack decrStackSize(final int par1, final int par2) {
+        if (par1 >= this.containingItems.length) {
+            final ItemStack result = this.compressingCraftMatrix.decrStackSize(par1 - this.containingItems.length, par2);
+            if (result != null) {
                 this.updateInput();
             }
-            this.markDirty();
             return result;
         }
-
-        if (!this.inventory.get(par1).isEmpty())
-        {
-            ItemStack var3;
-
-            if (this.inventory.get(par1).getCount() <= par2)
-            {
-                var3 = this.inventory.get(par1);
-                this.inventory.set(par1, ItemStack.EMPTY);
-                this.markDirty();
-                return var3;
-            } else
-            {
-                var3 = this.inventory.get(par1).splitStack(par2);
-
-                if (this.inventory.get(par1).isEmpty())
-                {
-                    this.inventory.set(par1, ItemStack.EMPTY);
-                }
-
-                this.markDirty();
-                return var3;
-            }
-        } else
-        {
-            return ItemStack.EMPTY;
+        if (this.containingItems[par1] == null) {
+            return null;
         }
+        if (this.containingItems[par1].stackSize <= par2) {
+            final ItemStack var3 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var3;
+        }
+        final ItemStack var3 = this.containingItems[par1].splitStack(par2);
+        if (this.containingItems[par1].stackSize == 0) {
+            this.containingItems[par1] = null;
+        }
+        return var3;
     }
-
-    @Override
-    public ItemStack removeStackFromSlot(int par1)
-    {
-        if (par1 >= this.inventory.size())
-        {
-            this.markDirty();
-            return this.compressingCraftMatrix.removeStackFromSlot(par1 - this.inventory.size());
+    
+    public ItemStack getStackInSlotOnClosing(final int par1) {
+        if (par1 >= this.containingItems.length) {
+            return this.compressingCraftMatrix.getStackInSlotOnClosing(par1 - this.containingItems.length);
         }
-
-        if (!this.inventory.get(par1).isEmpty())
-        {
-            ItemStack var2 = this.inventory.get(par1);
-            this.inventory.set(par1, ItemStack.EMPTY);
-            this.markDirty();
+        if (this.containingItems[par1] != null) {
+            final ItemStack var2 = this.containingItems[par1];
+            this.containingItems[par1] = null;
             return var2;
-        } else
-        {
-            return ItemStack.EMPTY;
         }
+        return null;
     }
-
-    @Override
-    public void setInventorySlotContents(int par1, ItemStack stack)
-    {
-        if (par1 >= this.inventory.size())
-        {
-            this.compressingCraftMatrix.setInventorySlotContents(par1 - this.inventory.size(), stack);
+    
+    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+        if (par1 >= this.containingItems.length) {
+            this.compressingCraftMatrix.setInventorySlotContents(par1 - this.containingItems.length, par2ItemStack);
             this.updateInput();
-        } else
-        {
-            this.inventory.set(par1, stack);
-
-            if (!stack.isEmpty() && stack.getCount() > this.getInventoryStackLimit())
-            {
-                stack.setCount(this.getInventoryStackLimit());
+        }
+        else {
+            this.containingItems[par1] = par2ItemStack;
+            if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit()) {
+                par2ItemStack.stackSize = this.getInventoryStackLimit();
             }
         }
-        this.markDirty();
     }
-
-    @Override
-    public int getInventoryStackLimit()
-    {
+    
+    public String getInventoryName() {
+        return GCCoreUtil.translate("tile.machine2.4.name");
+    }
+    
+    public int getInventoryStackLimit() {
         return 64;
     }
-
-    @Override
-    public boolean isUsableByPlayer(EntityPlayer entityplayer)
-    {
-        return this.world.getTileEntity(this.getPos()) == this && entityplayer.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
+    
+    public boolean isUseableByPlayer(final EntityPlayer entityplayer) {
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && entityplayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
     }
-
-//    @Override
-//    public boolean hasCustomName()
-//    {
-//        return true;
-//    }
-
-    @Override
-    public boolean isItemValidForSlot(int slotID, ItemStack itemStack)
-    {
-        if (slotID == 0)
-        {
-            return itemStack != null && !itemStack.isEmpty() && ItemElectricBase.isElectricItem(itemStack.getItem());
-        } else if (slotID >= 3)
-        {
-            if (!this.producingStack.isEmpty())
-            {
-                ItemStack stackInSlot = this.getStackInSlot(slotID);
-                return !stackInSlot.isEmpty() && stackInSlot.isItemEqual(itemStack);
-            }
-            return this.isItemCompressorInput(itemStack, slotID - 3);
+    
+    public boolean hasCustomInventoryName() {
+        return true;
+    }
+    
+    public boolean isItemValidForSlot(final int slotID, final ItemStack itemStack) {
+        if (slotID == 0) {
+            return itemStack != null && ItemElectricBase.isElectricItem(itemStack.getItem());
         }
-
-        return false;
+        if (slotID < 3) {
+            return false;
+        }
+        if (this.producingStack != null) {
+            final ItemStack stackInSlot = this.getStackInSlot(slotID);
+            return stackInSlot != null && stackInSlot.isItemEqual(itemStack);
+        }
+        return this.isItemCompressorInput(itemStack, slotID - 3);
     }
-
-    public boolean isItemCompressorInput(ItemStack stack, int id)
-    {
-        for (IRecipe recipe : CompressorRecipes.getRecipeList())
-        {
-            if (recipe instanceof ShapedRecipesGC)
-            {
-                if (id >= ((ShapedRecipesGC) recipe).recipeItems.length)
+    
+    public boolean isItemCompressorInput(final ItemStack stack, final int id) {
+        for (final IRecipe recipe : CompressorRecipes.getRecipeList()) {
+            if (recipe instanceof ShapedRecipes) {
+                if (id >= ((ShapedRecipes)recipe).recipeItems.length) {
                     continue;
-                ItemStack itemstack1 = ((ShapedRecipesGC) recipe).recipeItems[id];
-                if (stack.getItem() == itemstack1.getItem() && (itemstack1.getItemDamage() == 32767 || stack.getItemDamage() == itemstack1.getItemDamage()))
-                {
-                    for (int i = 0; i < ((ShapedRecipesGC) recipe).recipeItems.length; i++)
-                    {
-                        if (i == id)
-                            continue;
-                        ItemStack itemstack2 = ((ShapedRecipesGC) recipe).recipeItems[i];
-                        if (stack.getItem() == itemstack2.getItem() && (itemstack2.getItemDamage() == 32767 || stack.getItemDamage() == itemstack2.getItemDamage()))
-                        {
-                            ItemStack is3 = this.getStackInSlot(id + 3);
-                            ItemStack is4 = this.getStackInSlot(i + 3);
-                            return is3.isEmpty() || !is4.isEmpty() && is3.getCount() < is4.getCount();
+                }
+                final ItemStack itemstack1 = ((ShapedRecipes)recipe).recipeItems[id];
+                if (stack.getItem() == itemstack1.getItem() && (itemstack1.getItemDamage() == 32767 || stack.getItemDamage() == itemstack1.getItemDamage())) {
+                    for (int i = 0; i < ((ShapedRecipes)recipe).recipeItems.length; ++i) {
+                        if (i != id) {
+                            final ItemStack itemstack2 = ((ShapedRecipes)recipe).recipeItems[i];
+                            if (stack.getItem() == itemstack2.getItem() && (itemstack2.getItemDamage() == 32767 || stack.getItemDamage() == itemstack2.getItemDamage())) {
+                                final ItemStack is3 = this.getStackInSlot(id + 3);
+                                final ItemStack is4 = this.getStackInSlot(i + 3);
+                                return is3 == null || (is4 != null && is3.stackSize < is4.stackSize);
+                            }
                         }
                     }
                     return true;
                 }
-            } else if (recipe instanceof ShapelessOreRecipeGC)
-            {
-                ArrayList<Object> required = new ArrayList<Object>(((ShapelessOreRecipeGC) recipe).getInput());
-
-                Iterator<Object> req = required.iterator();
-
+                continue;
+            }
+            else {
+                if (!(recipe instanceof ShapelessOreRecipe)) {
+                    continue;
+                }
+                final ArrayList<Object> required = new ArrayList<Object>(((ShapelessOreRecipe)recipe).getInput());
+                final Iterator<Object> req = required.iterator();
                 int match = 0;
-
-                while (req.hasNext())
-                {
-                    Object next = req.next();
-
-                    if (next instanceof ItemStack)
-                    {
-                        if (OreDictionary.itemMatches((ItemStack) next, stack, false))
-                            match++;
-                    } else if (next instanceof List)
-                    {
-                        Iterator<ItemStack> itr = ((List<ItemStack>) next).iterator();
-                        while (itr.hasNext())
-                        {
-                            if (OreDictionary.itemMatches(itr.next(), stack, false))
-                            {
-                                match++;
+                while (req.hasNext()) {
+                    final Object next = req.next();
+                    if (next instanceof ItemStack) {
+                        if (!OreDictionary.itemMatches((ItemStack)next, stack, false)) {
+                            continue;
+                        }
+                        ++match;
+                    }
+                    else {
+                        if (!(next instanceof ArrayList)) {
+                            continue;
+                        }
+                        final Iterator<ItemStack> itr = ((ArrayList)next).iterator();
+                        while (itr.hasNext()) {
+                            if (OreDictionary.itemMatches((ItemStack)itr.next(), stack, false)) {
+                                ++match;
                                 break;
                             }
                         }
                     }
                 }
-
-                if (match == 0)
+                if (match == 0) {
                     continue;
-
-                if (match == 1)
+                }
+                if (match == 1) {
                     return true;
-
-                // Shapeless recipe can go into (match) number of slots
+                }
                 int slotsFilled = 0;
-                for (int i = 3; i < 12; i++)
-                {
-                    ItemStack inMatrix = this.getStackInSlot(i);
-                    if (!inMatrix.isEmpty() && inMatrix.isItemEqual(stack))
-                        slotsFilled++;
+                for (int j = 3; j < 12; ++j) {
+                    final ItemStack inMatrix = this.getStackInSlot(j);
+                    if (inMatrix != null && inMatrix.isItemEqual(stack)) {
+                        ++slotsFilled;
+                    }
                 }
-                if (slotsFilled < match)
-                {
-                    return this.getStackInSlot(id + 3).isEmpty();
+                if (slotsFilled < match) {
+                    return this.getStackInSlot(id + 3) == null;
                 }
-
-                return randnum.nextInt(match) == 0;
+                return TileEntityElectricIngotCompressor.randnum.nextInt(match) == 0;
             }
         }
-
         return false;
     }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        if (side == EnumFacing.DOWN)
-        {
-            return new int[]
-            {1, 2};
+    
+    public int[] getAccessibleSlotsFromSide(final int side) {
+        if (side == 0) {
+            return new int[] { 1, 2 };
         }
-        ArrayList<Integer> removeSlots = new ArrayList<>();
-        ArrayList<Integer> doneSlots = new ArrayList<>();
-
-        for (int i = 3; i < 12; i++)
-        {
-            if (doneSlots.contains(i))
-            {
-                continue;
-            }
-            ItemStack stack1 = this.getStackInSlot(i);
-            if (stack1.isEmpty())
-            {
-                continue;
-            }
-
-            int lowestCount = stack1.getCount();
-            int lowestSlot = i;
-            ArrayList<Integer> slotsWithSameItem = new ArrayList<>();
-            for (int j = i + 1; j < 12; j++)
-            {
-                if (doneSlots.contains(j))
-                {
-                    continue;
-                }
-                ItemStack stack2 = this.getStackInSlot(j);
-                if (stack2.isEmpty())
-                {
-                    continue;
-                }
-
-                if (stack1.isItemEqual(stack2))
-                {
-                    slotsWithSameItem.add(j);
-                    if (stack2.getCount() < lowestCount)
-                    {
-                        lowestCount = stack2.getCount();
-                        lowestSlot = j;
+        final int[] slots = { 0, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+        final ArrayList<Integer> removeSlots = new ArrayList<Integer>();
+        for (int i = 3; i < 12; ++i) {
+            if (!removeSlots.contains(i)) {
+                final ItemStack stack1 = this.getStackInSlot(i);
+                if (stack1 != null) {
+                    if (stack1.stackSize > 0) {
+                        for (int j = i + 1; j < 12; ++j) {
+                            if (!removeSlots.contains(j)) {
+                                final ItemStack stack2 = this.getStackInSlot(j);
+                                if (stack2 != null) {
+                                    if (stack1.isItemEqual(stack2)) {
+                                        if (stack2.stackSize >= stack1.stackSize) {
+                                            removeSlots.add(j);
+                                            break;
+                                        }
+                                        removeSlots.add(i);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-            if (!slotsWithSameItem.isEmpty())
-            {
-                if (lowestSlot != i)
-                    removeSlots.add(i);
-                for (Integer k : slotsWithSameItem)
-                {
-                    doneSlots.add(k);
-                    if (k.intValue() != lowestSlot)
-                        removeSlots.add(k);
-                }
-            }
         }
-
-        if (removeSlots.size() > 0)
-        {
-            int[] returnSlots = new int[10 - removeSlots.size()];
-            returnSlots[0] = 0;
-            int j = 1;
-            for (int i = 3; i < 12; i++)
-            {
-                if (removeSlots.contains(i))
-                {
-                    continue;
+        if (removeSlots.size() > 0) {
+            final int[] returnSlots = new int[slots.length - removeSlots.size()];
+            int k = 0;
+            for (int l = 0; l < slots.length; ++l) {
+                if (l <= 0 || !removeSlots.contains(slots[l])) {
+                    returnSlots[k] = slots[l];
+                    ++k;
                 }
-                returnSlots[j++] = i;
             }
-
             return returnSlots;
         }
-
-        return allSlots;
+        return slots;
     }
-
-    @Override
-    public boolean canInsertItem(int slotID, ItemStack par2ItemStack, EnumFacing par3)
-    {
+    
+    public boolean canInsertItem(final int slotID, final ItemStack par2ItemStack, final int par3) {
         return this.isItemValidForSlot(slotID, par2ItemStack);
     }
-
-    @Override
-    public boolean canExtractItem(int slotID, ItemStack par2ItemStack, EnumFacing par3)
-    {
+    
+    public boolean canExtractItem(final int slotID, final ItemStack par2ItemStack, final int par3) {
         return slotID == 1 || slotID == 2;
     }
-
-    @Override
-    public boolean shouldUseEnergy()
-    {
+    
+    public boolean shouldUseEnergy() {
         return this.processTicks > 0;
     }
-
-    @Override
-    public EnumFacing byIndex()
-    {
-        return BlockMachineBase.byIndex(this.world.getBlockState(getPos()));
+    
+    public ForgeDirection getElectricInputDirection() {
+        return ForgeDirection.getOrientation((this.getBlockMetadata() & 0x3) + 2);
     }
-
-    @Override
-    public EnumFacing getElectricInputDirection()
-    {
-        switch (this.getSide(MachineSide.ELECTRIC_IN))
-        {
-            case RIGHT:
-                return byIndex().rotateYCCW();
-            case REAR:
-                return byIndex().getOpposite();
-            case TOP:
-                return EnumFacing.UP;
-            case BOTTOM:
-                return EnumFacing.DOWN;
-            case LEFT:
-            default:
-                return byIndex().rotateY();
-        }
-    }
-
-    @Override
-    public ItemStack getBatteryInSlot()
-    {
+    
+    public ItemStack getBatteryInSlot() {
         return this.getStackInSlot(0);
     }
-
-    // ------------------
-    // Added these methods and field to implement IMachineSides properly
-    // ------------------
-    @Override
-    public MachineSide[] listConfigurableSides()
-    {
-        return new MachineSide[]
-        {MachineSide.ELECTRIC_IN};
-    }
-
-    @Override
-    public Face[] listDefaultFaces()
-    {
-        return new Face[]
-        {Face.LEFT};
-    }
-
-    private MachineSidePack[] machineSides;
-
-    @Override
-    public synchronized MachineSidePack[] getAllMachineSides()
-    {
-        if (this.machineSides == null)
-        {
-            this.initialiseSides();
-        }
-
-        return this.machineSides;
-    }
-
-    @Override
-    public void setupMachineSides(int length)
-    {
-        this.machineSides = new MachineSidePack[length];
-    }
-
-    @Override
-    public void onLoad()
-    {
-        this.clientOnLoad();
-    }
-
-    @Override
-    public IMachineSidesProperties getConfigurationType()
-    {
-        return this.advanced ? BlockMachine4.MACHINESIDES_RENDERTYPE : BlockMachine2.MACHINESIDES_RENDERTYPE;
-    }
-    // ------------------END OF IMachineSides implementation
     
-    @Override
-    @Deprecated
-    @ForRemoval(deadline = "4.1.0")
-    @ReplaceWith("byIndex()")
-    public EnumFacing getFront()
-    {
-        return this.byIndex();
+    static {
+        TileEntityElectricIngotCompressor.randnum = new Random();
     }
 }

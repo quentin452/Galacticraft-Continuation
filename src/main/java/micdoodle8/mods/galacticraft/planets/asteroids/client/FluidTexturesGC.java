@@ -1,21 +1,34 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import cpw.mods.fml.relauncher.*;
+import net.minecraftforge.common.*;
+import net.minecraftforge.client.event.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.*;
+import net.minecraftforge.fluids.*;
+import cpw.mods.fml.common.eventhandler.*;
 
 @SideOnly(Side.CLIENT)
 public class FluidTexturesGC
 {
-    public static void init()
-    {
-        MinecraftForge.EVENT_BUS.register(new FluidTexturesGC());
+    public static void init() {
+        MinecraftForge.EVENT_BUS.register((Object)new FluidTexturesGC());
+    }
+    
+    @SubscribeEvent
+    public void onStitch(final TextureStitchEvent.Pre event) {
+        if (event.map.getTextureType() == 0) {
+            AsteroidsModule.fluidMethaneGas.setIcons(event.map.registerIcon("galacticraftasteroids:fluids/MethaneGas"));
+            AsteroidsModule.fluidAtmosphericGases.setIcons(event.map.registerIcon("galacticraftasteroids:fluids/AtmosphericGases"));
+            AsteroidsModule.fluidLiquidMethane.setIcons(event.map.registerIcon("galacticraftasteroids:fluids/LiquidMethane"));
+            AsteroidsModule.fluidLiquidOxygen.setIcons(event.map.registerIcon("galacticraftasteroids:fluids/LiquidOxygen"));
+            AsteroidsModule.fluidOxygenGas.setIcons(event.map.registerIcon("galacticraftasteroids:fluids/OxygenGas"));
+            AsteroidsModule.fluidLiquidNitrogen.setIcons(event.map.registerIcon("galacticraftasteroids:fluids/LiquidNitrogen"));
+            AsteroidsModule.fluidLiquidArgon.setIcons(event.map.registerIcon("galacticraftasteroids:fluids/LiquidArgon"));
+            AsteroidsModule.fluidNitrogenGas.setIcons(event.map.registerIcon("galacticraftasteroids:fluids/NitrogenGas"));
+            FluidRegistry.getFluid("hydrogen").setIcons(event.map.registerIcon("galacticraftasteroids:fluids/HydrogenGas"));
+            FluidRegistry.getFluid("helium").setIcons(event.map.registerIcon("galacticraftasteroids:fluids/HeliumGas"));
+            FluidRegistry.getFluid("argon").setIcons(event.map.registerIcon("galacticraftasteroids:fluids/ArgonGas"));
+            FluidRegistry.getFluid("carbondioxide").setIcons(event.map.registerIcon("galacticraftasteroids:fluids/CarbonDioxideGas"));
+        }
     }
 }

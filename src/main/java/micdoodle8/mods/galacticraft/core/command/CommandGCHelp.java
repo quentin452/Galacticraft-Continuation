@@ -1,62 +1,34 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.ITextComponent;
-
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+import net.minecraft.command.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.util.*;
+import net.minecraft.entity.player.*;
 
 public class CommandGCHelp extends CommandBase
 {
-
-    @Override
-    public String getUsage(ICommandSender var1)
-    {
-        return "/" + this.getName();
+    public String getCommandUsage(final ICommandSender var1) {
+        return "/" + this.getCommandName();
     }
-
-    @Override
-    public int getRequiredPermissionLevel()
-    {
+    
+    public int getRequiredPermissionLevel() {
         return 0;
     }
-
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender)
-    {
+    
+    public boolean canCommandSenderUseCommand(final ICommandSender par1ICommandSender) {
         return true;
     }
-
-    @Override
-    public String getName()
-    {
+    
+    public String getCommandName() {
         return "gchelp";
     }
-
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-    {
-        EntityPlayerMP playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(sender.getName(), true);
-        if (playerBase == null)
-        {
+    
+    public void processCommand(final ICommandSender icommandsender, final String[] astring) {
+        final EntityPlayerMP playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
+        if (playerBase == null) {
             return;
         }
-        playerBase.sendMessage(
-            ITextComponent.Serializer.jsonToComponent("[{\"text\":\"" + GCCoreUtil.translate("gui.message.help1") + ": \",\"color\":\"white\"}," + "{\"text\":\" " + EnumColor.BRIGHT_GREEN + "wiki."
-                + Constants.PREFIX + "com" + "\"," + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":" + "{\"text\":\"" + GCCoreUtil.translate("gui.message.clicklink")
-                + "\",\"color\":\"yellow\"}}," + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + "http://wiki." + Constants.PREFIX + "com/wiki" + "\"}}]"));
+        playerBase.addChatMessage(IChatComponent.Serializer.func_150699_a("[{\"text\":\"" + GCCoreUtil.translate("gui.message.help1") + ": \",\"color\":\"white\"},{\"text\":\" " + EnumColor.BRIGHT_GREEN + "wiki." + GalacticraftCore.PREFIX + "com/wiki\",\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + GCCoreUtil.translate("gui.message.clicklink") + "\",\"color\":\"yellow\"}},\"clickEvent\":{\"action\":\"open_url\",\"value\":\"http://wiki." + GalacticraftCore.PREFIX + "com/wiki\"}}]"));
     }
 }

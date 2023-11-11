@@ -1,21 +1,10 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.item;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 
 public interface IItemOxygenSupply
 {
-
-    /*
-     * Returns the amount of gas that this oxygen item is able to supply
-     */
-    int discharge(ItemStack itemStack, int amount);
-
-    int getOxygenStored(ItemStack theItem);
+    float discharge(final ItemStack p0, final float p1);
+    
+    int getOxygenStored(final ItemStack p0);
 }

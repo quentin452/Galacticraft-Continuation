@@ -1,82 +1,56 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import micdoodle8.mods.galacticraft.core.client.model.OBJLoaderGC;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityShortRangeTelepad;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.obj.OBJModel;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.tileentity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import net.minecraftforge.client.model.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import cpw.mods.fml.client.*;
+import org.lwjgl.opengl.*;
+import net.minecraft.tileentity.*;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityShortRangeTelepadRenderer extends TileEntitySpecialRenderer<TileEntityShortRangeTelepad>
+public class TileEntityShortRangeTelepadRenderer extends TileEntitySpecialRenderer
 {
-
-    private static OBJModel.OBJBakedModel teleporterTop;
-    private static OBJModel.OBJBakedModel teleporterBottom;
-
-    private void updateModels()
-    {
-        if (teleporterTop == null)
-        {
-            try
-            {
-                IModel model = OBJLoaderGC.instance.loadModel(new ResourceLocation(GalacticraftPlanets.ASSET_PREFIX, "block/telepad_short.obj"));
-                Function<ResourceLocation, TextureAtlasSprite> spriteFunction = location -> Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(location.toString());
-
-                teleporterTop = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Top", "Connector"), false), DefaultVertexFormats.ITEM, spriteFunction);
-                teleporterBottom = (OBJModel.OBJBakedModel) model.bake(new OBJModel.OBJState(ImmutableList.of("Bottom"), false), DefaultVertexFormats.ITEM, spriteFunction);
-            } catch (Exception e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
+    public static final ResourceLocation telepadTexture;
+    public static final ResourceLocation telepadTexture0;
+    public static IModelCustom telepadModel;
+    
+    public TileEntityShortRangeTelepadRenderer() {
+        TileEntityShortRangeTelepadRenderer.telepadModel = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/teleporter.obj"));
     }
-
-    @Override
-    public void render(TileEntityShortRangeTelepad te, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
-    {
+    
+    public void renderModelAt(final TileEntityShortRangeTelepad tileEntity, final double d, final double d1, final double d2, final float f) {
+        FMLClientHandler.instance().getClient().renderEngine.bindTexture(TileEntityShortRangeTelepadRenderer.telepadTexture);
         GL11.glPushMatrix();
-
-        RenderHelper.disableStandardItemLighting();
-        this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        if (Minecraft.isAmbientOcclusionEnabled())
-        {
-            GlStateManager.shadeModel(GL11.GL_SMOOTH);
-        } else
-        {
-            GlStateManager.shadeModel(GL11.GL_FLAT);
-        }
-
-        updateModels();
-
-        GL11.glTranslatef((float) x + 0.5F, (float) y, (float) z + 0.5F);
-
-        GL11.glScalef(0.745F, 1.0F, 0.745F);
-
-        ClientUtil.drawBakedModel(teleporterBottom);
-        GL11.glTranslatef(0.0F, -0.7F, 0.0F);
-        ClientUtil.drawBakedModel(teleporterTop);
-
+        GL11.glTranslatef((float)d + 0.5f, (float)d1, (float)d2 + 0.5f);
+        GL11.glScalef(1.0f, 0.65f, 1.0f);
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("Base");
+        GL11.glTranslatef(0.0f, (float)Math.sin(tileEntity.ticks / 10.0f) / 15.0f - 0.25f, 0.0f);
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("Top");
         GL11.glPopMatrix();
+        GL11.glPushMatrix();
+        GL11.glTranslatef((float)d + 0.5f, (float)d1 - 0.18f, (float)d2 + 0.5f);
+        GL11.glScalef(1.0f, 0.65f, 1.0f);
+        FMLClientHandler.instance().getClient().renderEngine.bindTexture(TileEntityShortRangeTelepadRenderer.telepadTexture0);
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopMidxNegz");
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopPosxNegz");
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopNegxNegz");
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopMidxMidz");
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopPosxMidz");
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopNegxMidz");
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopMidxPosz");
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopPosxPosz");
+        TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopNegxPosz");
+        GL11.glPopMatrix();
+    }
+    
+    public void renderTileEntityAt(final TileEntity tileEntity, final double var2, final double var4, final double var6, final float var8) {
+        this.renderModelAt((TileEntityShortRangeTelepad)tileEntity, var2, var4, var6, var8);
+    }
+    
+    static {
+        telepadTexture = new ResourceLocation("galacticraftasteroids", "textures/model/teleporter.png");
+        telepadTexture0 = new ResourceLocation("galacticraftasteroids", "textures/model/teleporter0.png");
     }
 }

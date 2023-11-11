@@ -1,124 +1,71 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.List;
-
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-
-import net.minecraftforge.fml.relauncher.Side;
-
-import micdoodle8.mods.miccore.Annotations.NetworkedField;
-
-import io.netty.buffer.ByteBuf;
+import micdoodle8.mods.miccore.*;
+import cpw.mods.fml.relauncher.*;
+import io.netty.buffer.*;
+import java.util.*;
+import net.minecraft.nbt.*;
 
 public class TileEntityFallenMeteor extends TileEntityAdvanced
 {
-
     public static final int MAX_HEAT_LEVEL = 5000;
-    @NetworkedField(targetSide = Side.CLIENT) public int heatLevel = TileEntityFallenMeteor.MAX_HEAT_LEVEL;
-    private boolean sentOnePacket = false;
-
-    public TileEntityFallenMeteor()
-    {
-        super("tile.fallenmeteor.name");
+    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+    public int heatLevel;
+    private boolean sentOnePacket;
+    
+    public TileEntityFallenMeteor() {
+        this.heatLevel = 5000;
+        this.sentOnePacket = false;
     }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[0];
-    }
-
-    @Override
-    public void update()
-    {
-        super.update();
-
-        if (!this.world.isRemote && this.heatLevel > 0)
-        {
-            this.heatLevel--;
+    
+    public void updateEntity() {
+        super.updateEntity();
+        if (!this.worldObj.isRemote && this.heatLevel > 0) {
+            --this.heatLevel;
         }
     }
-
-    public int getHeatLevel()
-    {
+    
+    public int getHeatLevel() {
         return this.heatLevel;
     }
-
-    public void setHeatLevel(int heatLevel)
-    {
+    
+    public void setHeatLevel(final int heatLevel) {
         this.heatLevel = heatLevel;
     }
-
-    public float getScaledHeatLevel()
-    {
-        return (float) this.heatLevel / TileEntityFallenMeteor.MAX_HEAT_LEVEL;
+    
+    public float getScaledHeatLevel() {
+        return this.heatLevel / 5000.0f;
     }
-
-    @Override
-    public void readExtraNetworkedData(ByteBuf dataStream)
-    {
-        if (this.world.isRemote)
-        {
-            this.world.notifyLightSet(this.getPos());
+    
+    public void readExtraNetworkedData(final ByteBuf dataStream) {
+        if (this.worldObj.isRemote) {
+            this.worldObj.func_147479_m(this.xCoord, this.yCoord, this.zCoord);
         }
     }
-
-    @Override
-    public void addExtraNetworkedData(List<Object> networkedList)
-    {
+    
+    public void addExtraNetworkedData(final List<Object> networkedList) {
         this.sentOnePacket = true;
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    
+    public void readFromNBT(final NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         this.heatLevel = nbt.getInteger("MeteorHeatLevel");
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    
+    public void writeToNBT(final NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setInteger("MeteorHeatLevel", this.heatLevel);
-        return nbt;
     }
-
-    @Override
-    protected boolean handleInventory()
-    {
-        return false;
+    
+    public double getPacketRange() {
+        return 50.0;
     }
-
-    @Override
-    public NBTTagCompound getUpdateTag()
-    {
-        return this.writeToNBT(new NBTTagCompound());
-    }
-
-    @Override
-    public double getPacketRange()
-    {
-        return 50;
-    }
-
-    @Override
-    public int getPacketCooldown()
-    {
+    
+    public int getPacketCooldown() {
         return this.sentOnePacket ? 100 : 1;
     }
-
-    @Override
-    public boolean isNetworkedTile()
-    {
+    
+    public boolean isNetworkedTile() {
         return true;
     }
 }

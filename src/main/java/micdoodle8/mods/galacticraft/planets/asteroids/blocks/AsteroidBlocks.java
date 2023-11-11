@@ -1,100 +1,78 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockGC;
-import micdoodle8.mods.galacticraft.planets.asteroids.items.ItemBlockAsteroids;
-import micdoodle8.mods.galacticraft.planets.asteroids.items.ItemBlockShortRangeTelepad;
-import micdoodle8.mods.galacticraft.planets.asteroids.items.ItemBlockWalkway;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import cpw.mods.fml.common.registry.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.items.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.item.*;
+import net.minecraftforge.oredict.*;
 
 public class AsteroidBlocks
 {
-
     public static Block blockWalkway;
+    public static Block blockWalkwayWire;
+    public static Block blockWalkwayOxygenPipe;
     public static Block blockBasic;
-    // public static Block machineFrame;
     public static Block beamReflector;
     public static Block beamReceiver;
     public static Block shortRangeTelepad;
     public static Block fakeTelepad;
+    public static Block treasureChestTier2;
+    public static Block treasureChestTier3;
     public static Block blockDenseIce;
     public static Block blockMinerBase;
     public static Block minerBaseFull;
-    public static Block spaceWart;
-
-    public static void initBlocks()
-    {
-        AsteroidBlocks.blockWalkway = new BlockWalkway("walkway");
-        AsteroidBlocks.blockBasic = new BlockBasicAsteroids("asteroids_block");
-        AsteroidBlocks.beamReflector = new BlockBeamReflector("beam_reflector");
-        AsteroidBlocks.beamReceiver = new BlockBeamReceiver("beam_receiver");
-        AsteroidBlocks.shortRangeTelepad = new BlockShortRangeTelepad("telepad_short");
-        AsteroidBlocks.fakeTelepad = new BlockTelepadFake("telepad_fake");
-        AsteroidBlocks.blockDenseIce = new BlockIceAsteroids("dense_ice");
-        AsteroidBlocks.blockMinerBase = new BlockMinerBase("miner_base");
-        AsteroidBlocks.minerBaseFull = new BlockMinerBaseFull("miner_base_full");
-        AsteroidBlocks.spaceWart = new BlockSpaceWart("spacewart");
+    
+    public static void initBlocks() {
+        AsteroidBlocks.treasureChestTier2 = (Block)new BlockTier2TreasureChest("treasureT2");
+        AsteroidBlocks.treasureChestTier3 = (Block)new BlockTier3TreasureChest("treasureT3");
+        AsteroidBlocks.blockWalkway = (Block)new BlockWalkway("walkway");
+        AsteroidBlocks.blockWalkwayWire = (Block)new BlockWalkway("walkwayWire");
+        AsteroidBlocks.blockWalkwayOxygenPipe = (Block)new BlockWalkway("walkwayOxygenPipe");
+        AsteroidBlocks.blockBasic = new BlockBasicAsteroids("asteroidsBlock");
+        AsteroidBlocks.beamReflector = (Block)new BlockBeamReflector("beamReflector");
+        AsteroidBlocks.beamReceiver = (Block)new BlockBeamReceiver("beamReceiver");
+        AsteroidBlocks.shortRangeTelepad = (Block)new BlockShortRangeTelepad("telepadShort");
+        AsteroidBlocks.fakeTelepad = (Block)new BlockTelepadFake("telepadFake");
+        AsteroidBlocks.blockDenseIce = (Block)new BlockIceAsteroids("denseIce");
+        AsteroidBlocks.blockMinerBase = (Block)new BlockMinerBase("minerBase");
+        AsteroidBlocks.minerBaseFull = (Block)new BlockMinerBaseFull("minerBaseFull");
+        GCBlocks.hiddenBlocks.add(AsteroidBlocks.fakeTelepad);
+        GCBlocks.hiddenBlocks.add(AsteroidBlocks.minerBaseFull);
     }
-
-    public static void registerBlock(Block block, Class<? extends ItemBlock> itemClass)
-    {
-        GCBlocks.register(Constants.MOD_ID_PLANETS, block, itemClass);
+    
+    public static void registerBlocks() {
+        GameRegistry.registerBlock(AsteroidBlocks.treasureChestTier2, (Class)ItemBlockDesc.class, AsteroidBlocks.treasureChestTier2.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.treasureChestTier3, (Class)ItemBlockDesc.class, AsteroidBlocks.treasureChestTier3.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.blockBasic, (Class)ItemBlockAsteroids.class, AsteroidBlocks.blockBasic.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.blockWalkway, (Class)ItemBlockWalkway.class, AsteroidBlocks.blockWalkway.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.blockWalkwayWire, (Class)ItemBlockWalkway.class, AsteroidBlocks.blockWalkwayWire.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.blockWalkwayOxygenPipe, (Class)ItemBlockWalkway.class, AsteroidBlocks.blockWalkwayOxygenPipe.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.beamReflector, (Class)ItemBlockDesc.class, AsteroidBlocks.beamReflector.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.beamReceiver, (Class)ItemBlockDesc.class, AsteroidBlocks.beamReceiver.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.shortRangeTelepad, (Class)ItemBlockShortRangeTelepad.class, AsteroidBlocks.shortRangeTelepad.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.fakeTelepad, (Class)ItemBlockGC.class, AsteroidBlocks.fakeTelepad.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.blockDenseIce, (Class)ItemBlockGC.class, AsteroidBlocks.blockDenseIce.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.blockMinerBase, (Class)ItemBlockDesc.class, AsteroidBlocks.blockMinerBase.getUnlocalizedName());
+        GameRegistry.registerBlock(AsteroidBlocks.minerBaseFull, (Class)ItemBlockDesc.class, AsteroidBlocks.minerBaseFull.getUnlocalizedName());
     }
-
-    public static void registerBlocks()
-    {
-        registerBlock(AsteroidBlocks.blockBasic, ItemBlockAsteroids.class);
-        registerBlock(AsteroidBlocks.blockWalkway, ItemBlockWalkway.class);
-        registerBlock(AsteroidBlocks.beamReflector, ItemBlockDesc.class);
-        registerBlock(AsteroidBlocks.beamReceiver, ItemBlockDesc.class);
-        registerBlock(AsteroidBlocks.shortRangeTelepad, ItemBlockShortRangeTelepad.class);
-        registerBlock(AsteroidBlocks.fakeTelepad, null);
-        registerBlock(AsteroidBlocks.blockDenseIce, ItemBlockGC.class);
-        registerBlock(AsteroidBlocks.blockMinerBase, ItemBlockDesc.class);
-        registerBlock(AsteroidBlocks.minerBaseFull, null);
-        registerBlock(AsteroidBlocks.spaceWart, null);
+    
+    public static void setHarvestLevels() {
+        AsteroidBlocks.blockBasic.setHarvestLevel("pickaxe", 0, 0);
+        AsteroidBlocks.blockBasic.setHarvestLevel("pickaxe", 0, 1);
+        AsteroidBlocks.blockBasic.setHarvestLevel("pickaxe", 0, 2);
+        AsteroidBlocks.blockBasic.setHarvestLevel("pickaxe", 2, 3);
+        AsteroidBlocks.blockBasic.setHarvestLevel("pickaxe", 2, 4);
+        AsteroidBlocks.blockBasic.setHarvestLevel("pickaxe", 1, 5);
     }
-
-    private static void setHarvestLevel(Block block, String toolClass, int level, int meta)
-    {
-        block.setHarvestLevel(toolClass, level, block.getStateFromMeta(meta));
-    }
-
-    private static void setHarvestLevel(Block block, String toolClass, int level)
-    {
-        block.setHarvestLevel(toolClass, level);
-    }
-
-    public static void setHarvestLevels()
-    {
-        setHarvestLevel(AsteroidBlocks.blockBasic, "pickaxe", 0, 0); // Rock
-        setHarvestLevel(AsteroidBlocks.blockBasic, "pickaxe", 0, 1); // Rock
-        setHarvestLevel(AsteroidBlocks.blockBasic, "pickaxe", 0, 2); // Rock
-        setHarvestLevel(AsteroidBlocks.blockBasic, "pickaxe", 2, 3); // Aluminium
-        setHarvestLevel(AsteroidBlocks.blockBasic, "pickaxe", 3, 4); // Ilmenite
-        setHarvestLevel(AsteroidBlocks.blockBasic, "pickaxe", 2, 5); // Iron
-    }
-
-    public static void oreDictRegistration()
-    {
+    
+    public static void oreDictRegistration() {
         OreDictionary.registerOre("oreAluminum", new ItemStack(AsteroidBlocks.blockBasic, 1, 3));
         OreDictionary.registerOre("oreAluminium", new ItemStack(AsteroidBlocks.blockBasic, 1, 3));
         OreDictionary.registerOre("oreNaturalAluminum", new ItemStack(AsteroidBlocks.blockBasic, 1, 3));
         OreDictionary.registerOre("oreIlmenite", new ItemStack(AsteroidBlocks.blockBasic, 1, 4));
         OreDictionary.registerOre("oreIron", new ItemStack(AsteroidBlocks.blockBasic, 1, 5));
-
-        OreDictionary.registerOre("blockTitanium", new ItemStack(AsteroidBlocks.blockBasic, 1, 7));
     }
 }

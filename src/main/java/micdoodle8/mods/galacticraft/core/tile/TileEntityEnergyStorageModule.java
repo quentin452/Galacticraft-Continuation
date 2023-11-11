@@ -1,334 +1,235 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import net.minecraft.inventory.*;
+import micdoodle8.mods.galacticraft.api.transmission.tile.*;
+import net.minecraft.item.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.blocks.*;
+import net.minecraft.block.*;
+import net.minecraft.nbt.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.energy.item.*;
+import micdoodle8.mods.galacticraft.api.item.*;
+import java.util.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.api.transmission.*;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-
-import micdoodle8.mods.galacticraft.api.item.IItemElectricBase;
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachineBase;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachineTiered;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectricalSource;
-import micdoodle8.mods.galacticraft.core.inventory.IInventoryDefaults;
-
-public class TileEntityEnergyStorageModule extends TileBaseUniversalElectricalSource implements ISidedInventory, IInventoryDefaults, IConnector, IMachineSides
+public class TileEntityEnergyStorageModule extends TileBaseUniversalElectricalSource implements ISidedInventory, IConnector
 {
-
-    private final static float BASE_CAPACITY = 500000;
-    private final static float TIER2_CAPACITY = 2500000;
-
-    public final Set<EntityPlayer> playersUsing = new HashSet<EntityPlayer>();
+    private static final float BASE_CAPACITY = 500000.0f;
+    private static final float TIER2_CAPACITY = 2500000.0f;
+    private ItemStack[] containingItems;
+    public final Set<EntityPlayer> playersUsing;
     public int scaledEnergyLevel;
     public int lastScaledEnergyLevel;
-    private float lastEnergy = 0;
-
-    private boolean initialised = false;
-
-    public TileEntityEnergyStorageModule()
-    {
+    private float lastEnergy;
+    private boolean initialised;
+    
+    public TileEntityEnergyStorageModule() {
         this(1);
     }
-
-    /*
-     * @param tier: 1 = Electric Furnace 2 = Electric Arc Furnace
-     */
-    public TileEntityEnergyStorageModule(int tier)
-    {
-        super(tier == 1 ? "tile.machine.1.name" : "tile.machine.8.name");
+    
+    public TileEntityEnergyStorageModule(final int tier) {
+        this.containingItems = new ItemStack[2];
+        this.playersUsing = new HashSet<EntityPlayer>();
+        this.lastEnergy = 0.0f;
+        this.initialised = false;
         this.initialised = true;
-        this.inventory = NonNullList.withSize(2, ItemStack.EMPTY);
-        if (tier == 1)
-        {
-            // Designed so that Tier 1 Energy Storage can power up to 10 Tier 1
-            // machines
-            this.storage.setCapacity(BASE_CAPACITY);
-            this.storage.setMaxExtract(300);
+        if (tier == 1) {
+            this.storage.setCapacity(500000.0f);
+            this.storage.setMaxExtract(300.0f);
             return;
         }
-
         this.setTier2();
     }
-
-    private void setTier2()
-    {
-        this.storage.setCapacity(TIER2_CAPACITY);
-        this.storage.setMaxExtract(1800);
+    
+    private void setTier2() {
+        this.storage.setCapacity(2500000.0f);
+        this.storage.setMaxExtract(1800.0f);
         this.setTierGC(2);
     }
-
-    @Override
-    public void update()
-    {
-        if (!this.initialised)
-        {
-            int metadata = this.getBlockMetadata();
-
-            // for version update compatibility
-            Block b = this.world.getBlockState(this.getPos()).getBlock();
-            if (b == GCBlocks.machineBase)
-            {
-                this.world.setBlockState(this.getPos(), GCBlocks.machineTiered.getDefaultState(), 2);
-            } else if (metadata >= 8)
-            {
+    
+    public void updateEntity() {
+        if (!this.initialised) {
+            final int metadata = this.getBlockMetadata();
+            final Block b = this.worldObj.getBlock(this.xCoord, this.yCoord, this.zCoord);
+            if (b == GCBlocks.machineBase) {
+                this.worldObj.setBlock(this.xCoord, this.yCoord, this.zCoord, GCBlocks.machineTiered, 0, 2);
+            }
+            else if (metadata >= 8) {
                 this.setTier2();
             }
             this.initialised = true;
         }
-
-        float energy = this.storage.getEnergyStoredGC();
-        if (this.getTierGC() == 1 && !this.world.isRemote)
-        {
-            if (this.lastEnergy - energy > this.storage.getMaxExtract() - 1)
-            {
-                // Deplete faster if being drained at maximum output
-                this.storage.extractEnergyGC(25, false);
-            }
+        final float energy = this.storage.getEnergyStoredGC();
+        if (this.getTierGC() == 1 && !this.worldObj.isRemote && this.lastEnergy - energy > this.storage.getMaxExtract() - 1.0f) {
+            this.storage.extractEnergyGC(25.0f, false);
         }
         this.lastEnergy = energy;
-
-        super.update();
-
-        this.scaledEnergyLevel = (int) Math.floor((this.getEnergyStoredGC() + 49) * 16 / this.getMaxEnergyStoredGC());
-
-        if (this.scaledEnergyLevel != this.lastScaledEnergyLevel)
-        {
-            this.world.notifyLightSet(this.getPos());
+        super.updateEntity();
+        this.scaledEnergyLevel = (int)Math.floor((this.getEnergyStoredGC() + 49.0f) * 16.0f / this.getMaxEnergyStoredGC());
+        if (this.scaledEnergyLevel != this.lastScaledEnergyLevel) {
+            this.worldObj.func_147479_m(this.xCoord, this.yCoord, this.zCoord);
         }
-
-        if (!this.world.isRemote)
-        {
-            this.recharge(this.getInventory().get(0));
-            this.discharge(this.getInventory().get(1));
+        if (!this.worldObj.isRemote) {
+            this.recharge(this.containingItems[0]);
+            this.discharge(this.containingItems[1]);
         }
-
-        if (!this.world.isRemote)
-        {
+        if (!this.worldObj.isRemote) {
             this.produce();
         }
-
         this.lastScaledEnergyLevel = this.scaledEnergyLevel;
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
-        super.readFromNBT(nbt);
-        if (this.storage.getEnergyStoredGC() > BASE_CAPACITY)
-        {
+    
+    public void openInventory() {
+    }
+    
+    public void closeInventory() {
+    }
+    
+    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.readFromNBT(par1NBTTagCompound);
+        if (this.storage.getEnergyStoredGC() > 500000.0f) {
             this.setTier2();
             this.initialised = true;
-        } else
-        {
+        }
+        else {
             this.initialised = false;
         }
-
-        this.readMachineSidesFromNBT(nbt); // Needed by IMachineSides
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
-        if (this.tierGC == 1 && this.storage.getEnergyStoredGC() > BASE_CAPACITY)
-        {
-            this.storage.setEnergyStored(BASE_CAPACITY);
+        final NBTTagList var2 = par1NBTTagCompound.getTagList("Items", 10);
+        this.containingItems = new ItemStack[this.getSizeInventory()];
+        for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
+            final NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+            final int var5 = var4.getByte("Slot") & 0xFF;
+            if (var5 < this.containingItems.length) {
+                this.containingItems[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
         }
-
-        super.writeToNBT(nbt);
-
-        this.addMachineSidesToNBT(nbt); // Needed by IMachineSides
-
-        return nbt;
     }
-
-    @Override
-    public int getInventoryStackLimit()
-    {
+    
+    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+        if (this.tierGC == 1 && this.storage.getEnergyStoredGC() > 500000.0f) {
+            this.storage.setEnergyStored(500000.0f);
+        }
+        super.writeToNBT(par1NBTTagCompound);
+        final NBTTagList var2 = new NBTTagList();
+        for (int var3 = 0; var3 < this.containingItems.length; ++var3) {
+            if (this.containingItems[var3] != null) {
+                final NBTTagCompound var4 = new NBTTagCompound();
+                var4.setByte("Slot", (byte)var3);
+                this.containingItems[var3].writeToNBT(var4);
+                var2.appendTag((NBTBase)var4);
+            }
+        }
+        par1NBTTagCompound.setTag("Items", (NBTBase)var2);
+    }
+    
+    public int getSizeInventory() {
+        return this.containingItems.length;
+    }
+    
+    public ItemStack getStackInSlot(final int par1) {
+        return this.containingItems[par1];
+    }
+    
+    public ItemStack decrStackSize(final int par1, final int par2) {
+        if (this.containingItems[par1] == null) {
+            return null;
+        }
+        if (this.containingItems[par1].stackSize <= par2) {
+            final ItemStack var3 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var3;
+        }
+        final ItemStack var3 = this.containingItems[par1].splitStack(par2);
+        if (this.containingItems[par1].stackSize == 0) {
+            this.containingItems[par1] = null;
+        }
+        return var3;
+    }
+    
+    public ItemStack getStackInSlotOnClosing(final int par1) {
+        if (this.containingItems[par1] != null) {
+            final ItemStack var2 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var2;
+        }
+        return null;
+    }
+    
+    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+        this.containingItems[par1] = par2ItemStack;
+        if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit()) {
+            par2ItemStack.stackSize = this.getInventoryStackLimit();
+        }
+    }
+    
+    public String getInventoryName() {
+        return GCCoreUtil.translate((this.tierGC == 1) ? "tile.machine.1.name" : "tile.machine.8.name");
+    }
+    
+    public int getInventoryStackLimit() {
         return 1;
     }
-
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[0];
+    
+    public boolean isUseableByPlayer(final EntityPlayer par1EntityPlayer) {
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
     }
-
-    @Override
-    public boolean isItemValidForSlot(int slotID, ItemStack itemstack)
-    {
+    
+    public boolean hasCustomInventoryName() {
+        return true;
+    }
+    
+    public boolean isItemValidForSlot(final int slotID, final ItemStack itemstack) {
         return ItemElectricBase.isElectricItem(itemstack.getItem());
     }
-
-//    @Override
-//    public int[] getAccessibleSlotsFromSide(int slotID)
-//    {
-//        return new int[] { 0, 1 };
-//    }
-
-    @Override
-    public boolean canInsertItem(int slotID, ItemStack itemstack, EnumFacing side)
-    {
-        if (itemstack.getItem() instanceof IItemElectricBase)
-        {
-            if (slotID == 0)
-            {
-                return ((IItemElectricBase) itemstack.getItem()).getTransfer(itemstack) > 0;
-            } else if (slotID == 1)
-            {
-                return ((IItemElectricBase) itemstack.getItem()).getElectricityStored(itemstack) > 0;
+    
+    public int[] getAccessibleSlotsFromSide(final int slotID) {
+        return new int[] { 0, 1 };
+    }
+    
+    public boolean canInsertItem(final int slotID, final ItemStack itemstack, final int side) {
+        if (itemstack.getItem() instanceof IItemElectricBase) {
+            if (slotID == 0) {
+                return ((IItemElectricBase)itemstack.getItem()).getTransfer(itemstack) > 0.0f;
+            }
+            if (slotID == 1) {
+                return ((IItemElectricBase)itemstack.getItem()).getElectricityStored(itemstack) > 0.0f;
             }
         }
         return false;
     }
-
-    @Override
-    public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side)
-    {
-        if (itemstack.getItem() instanceof IItemElectricBase)
-        {
-            if (slotID == 0)
-            {
-                return ((IItemElectricBase) itemstack.getItem()).getTransfer(itemstack) <= 0;
-            } else if (slotID == 1)
-            {
-                return ((IItemElectricBase) itemstack.getItem()).getElectricityStored(itemstack) <= 0 || this.getEnergyStoredGC() >= this.getMaxEnergyStoredGC();
+    
+    public boolean canExtractItem(final int slotID, final ItemStack itemstack, final int side) {
+        if (itemstack.getItem() instanceof IItemElectricBase) {
+            if (slotID == 0) {
+                return ((IItemElectricBase)itemstack.getItem()).getTransfer(itemstack) <= 0.0f;
+            }
+            if (slotID == 1) {
+                return ((IItemElectricBase)itemstack.getItem()).getElectricityStored(itemstack) <= 0.0f || this.getEnergyStoredGC() >= this.getMaxEnergyStoredGC();
             }
         }
-
         return false;
-
     }
-
-    @Override
-    public EnumSet<EnumFacing> getElectricalInputDirections()
-    {
-        return EnumSet.of(getElectricInputDirection());
+    
+    public EnumSet<ForgeDirection> getElectricalInputDirections() {
+        return EnumSet.of(ForgeDirection.getOrientation((this.getBlockMetadata() & 0x3) + 2).getOpposite(), ForgeDirection.UNKNOWN);
     }
-
-    @Override
-    public EnumSet<EnumFacing> getElectricalOutputDirections()
-    {
-        return EnumSet.of(getElectricOutputDirection());
+    
+    public EnumSet<ForgeDirection> getElectricalOutputDirections() {
+        return EnumSet.of(ForgeDirection.getOrientation((this.getBlockMetadata() & 0x3) + 2), ForgeDirection.UNKNOWN);
     }
-
-    @Override
-    public boolean canConnect(EnumFacing direction, NetworkType type)
-    {
-        if (direction == null || type != NetworkType.POWER)
-        {
+    
+    public ForgeDirection getElectricalOutputDirectionMain() {
+        return ForgeDirection.getOrientation((this.getBlockMetadata() & 0x3) + 2);
+    }
+    
+    public boolean canConnect(final ForgeDirection direction, final NetworkType type) {
+        if (direction == null || direction.equals((Object)ForgeDirection.UNKNOWN) || type != NetworkType.POWER) {
             return false;
         }
-
-        return getElectricalInputDirections().contains(direction) || getElectricalOutputDirections().contains(direction);
+        final int metadata = this.getBlockMetadata() & 0x3;
+        return direction == ForgeDirection.getOrientation(metadata + 2) || direction == ForgeDirection.getOrientation(metadata + 2 ^ 0x1);
     }
-
-    @Override
-    public EnumFacing byIndex()
-    {
-        return BlockMachineBase.byIndex(this.world.getBlockState(getPos()));
-    }
-
-    @Override
-    public EnumFacing getElectricInputDirection()
-    {
-        switch (this.getSide(MachineSide.ELECTRIC_IN))
-        {
-            case LEFT:
-                return byIndex().rotateY();
-            case REAR:
-                return byIndex().getOpposite();
-            case TOP:
-                return EnumFacing.UP;
-            case BOTTOM:
-                return EnumFacing.DOWN;
-            case RIGHT:
-            default:
-                return byIndex().rotateYCCW();
-        }
-    }
-
-    @Override
-    public EnumFacing getElectricOutputDirection()
-    {
-        switch (this.getSide(MachineSide.ELECTRIC_OUT))
-        {
-            case RIGHT:
-                return byIndex().rotateYCCW();
-            case REAR:
-                return byIndex().getOpposite();
-            case TOP:
-                return EnumFacing.UP;
-            case BOTTOM:
-                return EnumFacing.DOWN;
-            case LEFT:
-            default:
-                return byIndex().rotateY();
-        }
-    }
-
-    // ------------------
-    // Added these methods and field to implement IMachineSides properly
-    // ------------------
-    @Override
-    public MachineSide[] listConfigurableSides()
-    {
-        return new MachineSide[]
-        {MachineSide.ELECTRIC_IN, MachineSide.ELECTRIC_OUT};
-    }
-
-    @Override
-    public Face[] listDefaultFaces()
-    {
-        return new Face[]
-        {Face.RIGHT, Face.LEFT};
-    }
-
-    private MachineSidePack[] machineSides;
-
-    @Override
-    public synchronized MachineSidePack[] getAllMachineSides()
-    {
-        if (this.machineSides == null)
-        {
-            this.initialiseSides();
-        }
-
-        return this.machineSides;
-    }
-
-    @Override
-    public void setupMachineSides(int length)
-    {
-        this.machineSides = new MachineSidePack[length];
-    }
-
-    @Override
-    public void onLoad()
-    {
-        this.clientOnLoad();
-    }
-
-    @Override
-    public IMachineSidesProperties getConfigurationType()
-    {
-        return BlockMachineTiered.MACHINESIDES_RENDERTYPE;
-    }
-    // ------------------END OF IMachineSides implementation
 }

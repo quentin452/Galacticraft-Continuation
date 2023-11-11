@@ -1,95 +1,63 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render;
 
-import java.util.ArrayList;
-import java.util.List;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityBeamOutput;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
+import net.minecraft.client.renderer.*;
+import cpw.mods.fml.client.*;
+import org.lwjgl.opengl.*;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraftforge.common.util.*;
+import java.util.*;
+import net.minecraft.client.entity.*;
 
 public class NetworkRenderer
 {
-
-    public static void renderNetworks(World world, float partialTicks)
-    {
-        List<TileEntityBeamOutput> nodes = new ArrayList<TileEntityBeamOutput>();
-
-        for (Object o : new ArrayList<TileEntity>(world.loadedTileEntityList))
-        {
-            if (o instanceof TileEntityBeamOutput)
-            {
-                nodes.add((TileEntityBeamOutput) o);
+    public static void renderNetworks(final World world, final float partialTicks) {
+        final List<TileEntityBeamOutput> nodes = new ArrayList<TileEntityBeamOutput>();
+        for (final Object o : new ArrayList<Object>(world.loadedTileEntityList)) {
+            if (o instanceof TileEntityBeamOutput) {
+                nodes.add((TileEntityBeamOutput)o);
             }
         }
-
-        if (nodes.isEmpty())
-        {
+        if (nodes.isEmpty()) {
             return;
         }
-
-        Tessellator tess = Tessellator.getInstance();
-        EntityPlayerSP player = FMLClientHandler.instance().getClient().player;
-        double interpPosX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
-        double interpPosY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
-        double interpPosZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
-
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-
-        for (TileEntityBeamOutput tileEntity : nodes)
-        {
-            if (tileEntity.getTarget() == null)
-            {
+        final Tessellator tess = Tessellator.instance;
+        final EntityClientPlayerMP player = FMLClientHandler.instance().getClient().thePlayer;
+        final double interpPosX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+        final double interpPosY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+        final double interpPosZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+        GL11.glDisable(3553);
+        GL11.glDisable(2896);
+        GL11.glDisable(2884);
+        for (final TileEntityBeamOutput tileEntity : nodes) {
+            if (tileEntity.getTarget() == null) {
                 continue;
             }
-
             GL11.glPushMatrix();
-
-            Vector3 outputPoint = tileEntity.getOutputPoint(true);
-            Vector3 targetInputPoint = tileEntity.getTarget().getInputPoint();
-
-            Vector3 direction = Vector3.subtract(outputPoint, targetInputPoint);
-            float directionLength = (float) direction.getMagnitude();
-
-            float posX = (float) (tileEntity.getPos().getX() - interpPosX);
-            float posY = (float) (tileEntity.getPos().getY() - interpPosY);
-            float posZ = (float) (tileEntity.getPos().getZ() - interpPosZ);
+            final Vector3 outputPoint = tileEntity.getOutputPoint(true);
+            final Vector3 targetInputPoint = tileEntity.getTarget().getInputPoint();
+            final Vector3 direction = Vector3.subtract(outputPoint, targetInputPoint);
+            final float directionLength = (float)direction.getMagnitude();
+            final float posX = (float)(tileEntity.xCoord - interpPosX);
+            final float posY = (float)(tileEntity.yCoord - interpPosY);
+            final float posZ = (float)(tileEntity.zCoord - interpPosZ);
             GL11.glTranslatef(posX, posY, posZ);
-
-            GL11.glTranslatef(outputPoint.floatX() - tileEntity.getPos().getX(), outputPoint.floatY() - tileEntity.getPos().getY(), outputPoint.floatZ() - tileEntity.getPos().getZ());
-            GL11.glRotatef(tileEntity.yaw + 180, 0, 1, 0);
-            GL11.glRotatef(-tileEntity.pitch, 1, 0, 0);
-            GL11.glRotatef(tileEntity.ticks * 10, 0, 0, 1);
-
-            tess.getBuffer().begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-
-            for (EnumFacing dir : EnumFacing.VALUES)
-            {
-                tess.getBuffer().pos(dir.getXOffset() / 40.0F, dir.getYOffset() / 40.0F, dir.getZOffset() / 40.0F)
-                    .color(tileEntity.getColor().floatX(), tileEntity.getColor().floatY(), tileEntity.getColor().floatZ(), 1.0F).endVertex();
-                tess.getBuffer().pos(dir.getXOffset() / 40.0F, dir.getYOffset() / 40.0F, directionLength + dir.getZOffset() / 40.0F)
-                    .color(tileEntity.getColor().floatX(), tileEntity.getColor().floatY(), tileEntity.getColor().floatZ(), 1.0F).endVertex();
+            GL11.glTranslatef(outputPoint.floatX() - tileEntity.xCoord, outputPoint.floatY() - tileEntity.yCoord, outputPoint.floatZ() - tileEntity.zCoord);
+            GL11.glRotatef(tileEntity.yaw + 180.0f, 0.0f, 1.0f, 0.0f);
+            GL11.glRotatef(-tileEntity.pitch, 1.0f, 0.0f, 0.0f);
+            GL11.glRotatef((float)(tileEntity.ticks * 10), 0.0f, 0.0f, 1.0f);
+            GL11.glColor4f(tileEntity.getColor().floatX(), tileEntity.getColor().floatY(), tileEntity.getColor().floatZ(), 1.0f);
+            tess.startDrawing(1);
+            for (final ForgeDirection dir : ForgeDirection.values()) {
+                tess.addVertex((double)(dir.offsetX / 40.0f), (double)(dir.offsetY / 40.0f), (double)(dir.offsetZ / 40.0f));
+                tess.addVertex((double)(dir.offsetX / 40.0f), (double)(dir.offsetY / 40.0f), (double)(directionLength + dir.offsetZ / 40.0f));
             }
-
             tess.draw();
-
             GL11.glPopMatrix();
         }
-
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-
-        GL11.glColor4f(1, 1, 1, 1);
+        GL11.glEnable(3553);
+        GL11.glEnable(2884);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }

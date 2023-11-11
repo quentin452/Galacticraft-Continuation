@@ -1,94 +1,82 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlaySensorGlasses;
-import micdoodle8.mods.galacticraft.core.client.model.ModelEvolvedZombie;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedZombie;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelZombie;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderBiped;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
-import net.minecraft.client.renderer.entity.layers.LayerHeldItem;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.entity.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.client.model.*;
+import net.minecraft.client.model.*;
+import net.minecraft.entity.*;
+import org.lwjgl.opengl.*;
+import cpw.mods.fml.client.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.client.*;
+import net.minecraft.client.entity.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.*;
 
 @SideOnly(Side.CLIENT)
-public class RenderEvolvedZombie extends RenderBiped<EntityEvolvedZombie>
+public class RenderEvolvedZombie extends RenderBiped
 {
-
-    private static final ResourceLocation zombieTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/model/zombie.png");
-    private static final ResourceLocation powerTexture = new ResourceLocation(Constants.ASSET_PREFIX, "textures/model/power.png");
-
-    private final ModelBase model = new ModelEvolvedZombie(0.2F, false, true);
-    private boolean texSwitch;
-
-    public RenderEvolvedZombie(RenderManager manager)
-    {
-        super(manager, new ModelEvolvedZombie(true), 0.5F);
-        LayerRenderer layerrenderer = (LayerRenderer) this.layerRenderers.get(0);
-        this.addLayer(new LayerHeldItem(this));
-        LayerBipedArmor layerbipedarmor = new LayerBipedArmor(this)
-        {
-
-            @Override
-            protected void initArmor()
-            {
-                this.modelLeggings = new ModelZombie(0.5F, true);
-                this.modelArmor = new ModelZombie(1.0F, true);
+    private static final ResourceLocation zombieTexture;
+    private static final ResourceLocation powerTexture;
+    private final ModelBase model;
+    
+    public RenderEvolvedZombie() {
+        super((ModelBiped)new ModelEvolvedZombie(true), 0.5f);
+        this.model = (ModelBase)new ModelEvolvedZombie(0.2f, false, true);
+    }
+    
+    protected void func_82421_b() {
+        this.field_82423_g = (ModelBiped)new ModelEvolvedZombie(1.0f, true, false);
+        this.field_82425_h = (ModelBiped)new ModelEvolvedZombie(0.5f, true, false);
+    }
+    
+    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+        return RenderEvolvedZombie.zombieTexture;
+    }
+    
+    protected void preRenderCallback(final EntityLivingBase par1EntityLiving, final float par2) {
+        GL11.glScalef(1.2f, 1.2f, 1.2f);
+    }
+    
+    protected int shouldRenderPass(final EntityLivingBase par1EntityLiving, final int par2, final float par3) {
+        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final EntityPlayerSP player = (EntityPlayerSP)minecraft.thePlayer;
+        ItemStack helmetSlot = null;
+        if (player != null && player.inventory.armorItemInSlot(3) != null) {
+            helmetSlot = player.inventory.armorItemInSlot(3);
+        }
+        if (helmetSlot != null && helmetSlot.getItem() instanceof ItemSensorGlasses && minecraft.currentScreen == null) {
+            if (par2 == 1) {
+                final float var4 = par1EntityLiving.ticksExisted * 2 + par3;
+                this.bindTexture(RenderEvolvedZombie.powerTexture);
+                GL11.glMatrixMode(5890);
+                GL11.glLoadIdentity();
+                final float var5 = var4 * 0.01f;
+                final float var6 = var4 * 0.01f;
+                GL11.glTranslatef(var5, var6, 0.0f);
+                this.setRenderPassModel(this.model);
+                GL11.glMatrixMode(5888);
+                GL11.glEnable(3042);
+                final float var7 = 0.5f;
+                GL11.glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+                GL11.glDisable(2896);
+                GL11.glBlendFunc(1, 1);
+                return 1;
             }
-        };
-        this.addLayer(layerbipedarmor);
-    }
-
-    @Override
-    protected ResourceLocation getEntityTexture(EntityEvolvedZombie par1Entity)
-    {
-        return texSwitch ? OverlaySensorGlasses.altTexture : RenderEvolvedZombie.zombieTexture;
-    }
-
-    @Override
-    protected void preRenderCallback(EntityEvolvedZombie zombie, float par2)
-    {
-        GL11.glScalef(1.2F, 1.2F, 1.2F);
-        if (texSwitch)
-        {
-            OverlaySensorGlasses.preRenderMobs();
+            if (par2 == 2) {
+                GL11.glMatrixMode(5890);
+                GL11.glLoadIdentity();
+                GL11.glMatrixMode(5888);
+                GL11.glEnable(2896);
+                GL11.glDisable(3042);
+            }
         }
+        return super.shouldRenderPass(par1EntityLiving, par2, (float)par2);
     }
-
-    @Override
-    public void doRender(EntityEvolvedZombie entity, double par2, double par4, double par6, float par8, float par9)
-    {
-        super.doRender(entity, par2, par4, par6, par8, par9);
-        if (OverlaySensorGlasses.overrideMobTexture())
-        {
-            texSwitch = true;
-            super.doRender(entity, par2, par4, par6, par8, par9);
-            texSwitch = false;
-            OverlaySensorGlasses.postRenderMobs();
-        }
-    }
-
-    @Override
-    protected void applyRotations(EntityEvolvedZombie zombie, float pitch, float yaw, float partialTicks)
-    {
-        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-        GL11.glTranslatef(0F, -zombie.height * 0.55F, 0F);
-        GL11.glRotatef(zombie.getTumbleAngle(partialTicks), zombie.getTumbleAxisX(), 0F, zombie.getTumbleAxisZ());
-        GL11.glTranslatef(0F, zombie.height * 0.55F, 0F);
-        GlStateManager.scale(-1.0F, -1.0F, 1.0F);
-        super.applyRotations(zombie, pitch, yaw, partialTicks);
+    
+    static {
+        zombieTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/zombie.png");
+        powerTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/power.png");
     }
 }

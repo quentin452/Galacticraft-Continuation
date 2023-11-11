@@ -1,264 +1,134 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.inventory;
 
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.planets.mars.entities.*;
+import net.minecraft.inventory.*;
+import net.minecraft.nbt.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.entity.*;
 
 public class InventorySlimeling implements IInventory
 {
-
-    private NonNullList<ItemStack> stacks = NonNullList.withSize(30, ItemStack.EMPTY);
+    private ItemStack[] stackList;
     private EntitySlimeling slimeling;
     public Container currentContainer;
-
-    public InventorySlimeling(EntitySlimeling slimeling)
-    {
+    
+    public InventorySlimeling(final EntitySlimeling slimeling) {
+        this.stackList = new ItemStack[30];
         this.slimeling = slimeling;
     }
-
-    @Override
-    public int getSizeInventory()
-    {
-        return this.stacks.size();
+    
+    public int getSizeInventory() {
+        return this.stackList.length;
     }
-
-    @Override
-    public ItemStack getStackInSlot(int par1)
-    {
-        return par1 >= this.getSizeInventory() ? ItemStack.EMPTY : this.stacks.get(par1);
+    
+    public ItemStack getStackInSlot(final int par1) {
+        return (par1 >= this.getSizeInventory()) ? null : this.stackList[par1];
     }
-
-    @Override
-    public String getName()
-    {
-        return GCCoreUtil.translate("container.slimeling_inventory.name");
+    
+    public String getInventoryName() {
+        return "Slimeling Inventory";
     }
-
-    @Override
-    public ItemStack removeStackFromSlot(int par1)
-    {
-        if (!this.stacks.get(par1).isEmpty())
-        {
-            final ItemStack var2 = this.stacks.get(par1);
-            this.stacks.set(par1, ItemStack.EMPTY);
-            this.markDirty();
+    
+    public ItemStack getStackInSlotOnClosing(final int par1) {
+        if (this.stackList[par1] != null) {
+            final ItemStack var2 = this.stackList[par1];
+            this.stackList[par1] = null;
             return var2;
-        } else
-        {
-            return ItemStack.EMPTY;
         }
+        return null;
     }
-
-    private void removeInventoryBagContents()
-    {
-        if (this.currentContainer instanceof ContainerSlimeling)
-        {
-            ContainerSlimeling.removeSlots((ContainerSlimeling) this.currentContainer);
+    
+    private void removeInventoryBagContents() {
+        if (this.currentContainer instanceof ContainerSlimeling) {
+            ContainerSlimeling.removeSlots((ContainerSlimeling)this.currentContainer);
         }
-
-        for (int i = 2; i < this.stacks.size(); i++)
-        {
-            if (!this.stacks.get(i).isEmpty())
-            {
-                if (!this.slimeling.world.isRemote)
-                {
-                    this.slimeling.entityDropItem(this.stacks.get(i), 0.5F);
+        for (int i = 2; i < this.stackList.length; ++i) {
+            if (this.stackList[i] != null) {
+                if (!this.slimeling.worldObj.isRemote) {
+                    this.slimeling.entityDropItem(this.stackList[i], 0.5f);
                 }
-
-                this.stacks.set(i, ItemStack.EMPTY);
+                this.stackList[i] = null;
             }
         }
     }
-
-    @Override
-    public ItemStack decrStackSize(int par1, int par2)
-    {
-        if (!this.stacks.get(par1).isEmpty())
-        {
-            ItemStack var3;
-
-            // It's a removal of the Slimeling Inventory Bag
-            if (par1 == 1 && this.stacks.get(par1).getCount() <= par2)
-            {
+    
+    public ItemStack decrStackSize(final int par1, final int par2) {
+        if (this.stackList[par1] == null) {
+            return null;
+        }
+        if (par1 == 1 && this.stackList[par1].stackSize <= par2) {
+            this.removeInventoryBagContents();
+            final ItemStack var3 = this.stackList[par1];
+            this.stackList[par1] = null;
+            return var3;
+        }
+        final ItemStack var3 = this.stackList[par1].splitStack(par2);
+        if (this.stackList[par1].stackSize == 0) {
+            if (par1 == 1) {
                 this.removeInventoryBagContents();
-                var3 = this.stacks.get(par1);
-                this.stacks.set(par1, ItemStack.EMPTY);
-                this.markDirty();
-                return var3;
-            } else
-            // Normal case of decrStackSize for a slot
-            {
-                var3 = this.stacks.get(par1).splitStack(par2);
-
-                if (this.stacks.get(par1).isEmpty())
-                {
-                    // Not sure if this is necessary again, given the above?
-                    if (par1 == 1)
-                    {
-                        this.removeInventoryBagContents();
-                    }
-
-                    this.stacks.set(par1, ItemStack.EMPTY);
-                }
-
-                this.markDirty();
-                return var3;
             }
-        } else
-        {
-            return ItemStack.EMPTY;
+            this.stackList[par1] = null;
         }
+        return var3;
     }
-
-    @Override
-    public void setInventorySlotContents(int par1, ItemStack par2ItemStack)
-    {
-        if (par1 == 1 && (par2ItemStack.isEmpty() && !this.stacks.get(par1).isEmpty() || !ItemStack.areItemStacksEqual(par2ItemStack, this.stacks.get(par1))))
-        {
-            ContainerSlimeling.addAdditionalSlots((ContainerSlimeling) this.currentContainer, this.slimeling, par2ItemStack);
+    
+    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+        if (par1 == 1 && ((par2ItemStack == null && this.stackList[par1] != null) || !ItemStack.areItemStacksEqual(par2ItemStack, this.stackList[par1]))) {
+            ContainerSlimeling.addAdditionalSlots((ContainerSlimeling)this.currentContainer, this.slimeling, par2ItemStack);
         }
-
-        this.stacks.set(par1, par2ItemStack);
-        this.markDirty();
+        this.stackList[par1] = par2ItemStack;
     }
-
-    @Override
-    public boolean isEmpty()
-    {
-        for (ItemStack itemstack : this.stacks)
-        {
-            if (!itemstack.isEmpty())
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public void readFromNBT(NBTTagList tagList)
-    {
-        if (tagList == null || tagList.tagCount() <= 0)
-        {
+    
+    public void readFromNBT(final NBTTagList tagList) {
+        if (tagList == null || tagList.tagCount() <= 0) {
             return;
         }
-
-        this.stacks = NonNullList.withSize(this.stacks.size(), ItemStack.EMPTY);
-
-        for (int i = 0; i < tagList.tagCount(); ++i)
-        {
+        this.stackList = new ItemStack[this.stackList.length];
+        for (int i = 0; i < tagList.tagCount(); ++i) {
             final NBTTagCompound nbttagcompound = tagList.getCompoundTagAt(i);
-            final int j = nbttagcompound.getByte("Slot") & 255;
-            final ItemStack itemstack = new ItemStack(nbttagcompound);
-
-            if (!itemstack.isEmpty())
-            {
-                this.stacks.set(j, itemstack);
+            final int j = nbttagcompound.getByte("Slot") & 0xFF;
+            final ItemStack itemstack = ItemStack.loadItemStackFromNBT(nbttagcompound);
+            if (itemstack != null) {
+                this.stackList[j] = itemstack;
             }
         }
     }
-
-    public NBTTagList writeToNBT(NBTTagList tagList)
-    {
-        NBTTagCompound nbttagcompound;
-
-        for (int i = 0; i < this.stacks.size(); ++i)
-        {
-            if (!this.stacks.get(i).isEmpty())
-            {
-                nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte) i);
-                this.stacks.get(i).writeToNBT(nbttagcompound);
-                tagList.appendTag(nbttagcompound);
+    
+    public NBTTagList writeToNBT(final NBTTagList tagList) {
+        for (int i = 0; i < this.stackList.length; ++i) {
+            if (this.stackList[i] != null) {
+                final NBTTagCompound nbttagcompound = new NBTTagCompound();
+                nbttagcompound.setByte("Slot", (byte)i);
+                this.stackList[i].writeToNBT(nbttagcompound);
+                tagList.appendTag((NBTBase)nbttagcompound);
             }
         }
-
         return tagList;
     }
-
-    @Override
-    public int getInventoryStackLimit()
-    {
+    
+    public int getInventoryStackLimit() {
         return 64;
     }
-
-    @Override
-    public void markDirty()
-    {
+    
+    public void markDirty() {
     }
-
-    @Override
-    public boolean isUsableByPlayer(EntityPlayer entityPlayer)
-    {
-        return !this.slimeling.isDead && entityPlayer.getDistanceSq(this.slimeling) <= 64.0D;
+    
+    public boolean isUseableByPlayer(final EntityPlayer par1EntityPlayer) {
+        return !this.slimeling.isDead && par1EntityPlayer.getDistanceSqToEntity((Entity)this.slimeling) <= 64.0;
     }
-
-    @Override
-    public boolean isItemValidForSlot(int i, ItemStack itemstack)
-    {
+    
+    public void openInventory() {
+    }
+    
+    public void closeInventory() {
+    }
+    
+    public boolean hasCustomInventoryName() {
+        return true;
+    }
+    
+    public boolean isItemValidForSlot(final int i, final ItemStack itemstack) {
         return false;
-    }
-
-    // We don't use these because we use forge containers
-    @Override
-    public void openInventory(EntityPlayer player)
-    {
-    }
-
-    // We don't use these because we use forge containers
-    @Override
-    public void closeInventory(EntityPlayer player)
-    {
-    }
-
-    @Override
-    public int getField(int id)
-    {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value)
-    {
-    }
-
-    @Override
-    public int getFieldCount()
-    {
-        return 0;
-    }
-
-    @Override
-    public void clear()
-    {
-
-    }
-
-    @Override
-    public boolean hasCustomName()
-    {
-        return false;
-    }
-
-    @Override
-    public ITextComponent getDisplayName()
-    {
-        return this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName(), new Object[0]);
     }
 }

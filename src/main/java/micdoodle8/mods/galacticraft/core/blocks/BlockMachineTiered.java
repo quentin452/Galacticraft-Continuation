@@ -1,162 +1,295 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.energy.tile.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.item.*;
+import java.util.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import micdoodle8.mods.galacticraft.core.tile.IMachineSides;
-import micdoodle8.mods.galacticraft.core.tile.IMachineSidesProperties;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricFurnace;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityEnergyStorageModule;
-
-public class BlockMachineTiered extends BlockMachineBase
+public class BlockMachineTiered extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc
 {
-
-    public static final PropertyEnum<EnumTieredMachineType> TYPE = PropertyEnum.create("type", EnumTieredMachineType.class);
-    public static IMachineSidesProperties MACHINESIDES_RENDERTYPE = IMachineSidesProperties.TWOFACES_HORIZ;
-    public static final PropertyEnum SIDES = MACHINESIDES_RENDERTYPE.asProperty;
-    public static final PropertyInteger FILL_VALUE = PropertyInteger.create("fill_value", 0, 33);
-
-    public enum EnumTieredMachineType implements EnumMachineBase, IStringSerializable
-    {
-
-        STORAGE_MODULE(0, "energy_storage", TileEntityEnergyStorageModule::new, "tile.energy_storage_module_tier1.description", "tile.machine.1"),
-        ELECTRIC_FURNACE(4, "electric_furnace", TileEntityElectricFurnace::new, "tile.electric_furnace_tier1.description", "tile.machine.2"),
-        STORAGE_CLUSTER(8, "cluster_storage", TileEntityEnergyStorageModule::new, "tile.energy_storage_module_tier2.description", "tile.machine.8"),
-        ARC_FURNACE(12, "arc_furnace", TileEntityElectricFurnace::new, "tile.electric_furnace_tier2.description", "tile.machine.7");
-
-        private final int meta;
-        private final String name;
-        private TileConstructor tile;
-        private final String shiftDescriptionKey;
-        private final String blockName;
-
-        EnumTieredMachineType(int meta, String name, TileConstructor tc, String key, String blockName)
-        {
-            this.meta = meta;
-            this.name = name;
-            this.tile = tc;
-            this.shiftDescriptionKey = key;
-            this.blockName = blockName;
+    public static final int STORAGE_MODULE_METADATA = 0;
+    public static final int ELECTRIC_FURNACE_METADATA = 4;
+    private IIcon iconMachineSide;
+    private IIcon iconInput;
+    private IIcon iconOutput;
+    private IIcon iconTier2;
+    private IIcon iconMachineSideT2;
+    private IIcon iconInputT2;
+    private IIcon iconOutputT2;
+    private IIcon[] iconEnergyStorageModule;
+    private IIcon[] iconEnergyStorageModuleT2;
+    private IIcon iconElectricFurnace;
+    private IIcon iconElectricFurnaceT2;
+    
+    public BlockMachineTiered(final String assetName) {
+        super(GCBlocks.machine);
+        this.setHardness(1.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + "machine");
+        this.setBlockName(assetName);
+    }
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
+        return GalacticraftCore.galacticraftBlocksTab;
+    }
+    
+    public int getRenderType() {
+        return GalacticraftCore.proxy.getBlockRender((Block)this);
+    }
+    
+    public void registerBlockIcons(final IIconRegister iconRegister) {
+        this.blockIcon = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine");
+        this.iconInput = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_input");
+        this.iconOutput = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_output");
+        this.iconMachineSide = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_side");
+        this.iconEnergyStorageModule = new IIcon[17];
+        for (int i = 0; i < this.iconEnergyStorageModule.length; ++i) {
+            this.iconEnergyStorageModule[i] = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "energyStorageModule_" + i);
         }
-
-        @Override
-        public int getMetadata()
-        {
-            return this.meta;
+        this.iconElectricFurnace = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "electricFurnace");
+        if (GalacticraftCore.isPlanetsLoaded) {
+            this.iconTier2 = iconRegister.registerIcon("galacticraftasteroids:machine");
+            this.iconInputT2 = iconRegister.registerIcon("galacticraftasteroids:machine_input");
+            this.iconOutputT2 = iconRegister.registerIcon("galacticraftasteroids:machine_output");
+            this.iconMachineSideT2 = iconRegister.registerIcon("galacticraftasteroids:machine_side");
+            this.iconEnergyStorageModuleT2 = new IIcon[17];
+            for (int i = 0; i < this.iconEnergyStorageModule.length; ++i) {
+                this.iconEnergyStorageModuleT2[i] = iconRegister.registerIcon("galacticraftasteroids:energyStorageModule_" + i);
+            }
+            this.iconElectricFurnaceT2 = iconRegister.registerIcon("galacticraftasteroids:electricFurnace");
         }
-
-        private final static EnumTieredMachineType[] values = values();
-
-        @Override
-        public EnumMachineBase fromMetadata(int meta)
-        {
-            return values[(meta / 4) % values.length];
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
-
-        @Override
-        public TileEntity tileConstructor()
-        {
-            int tier = this.meta / 8 + 1;
-            return this.tile.create(tier);
-        }
-
-        @FunctionalInterface
-        private static interface TileConstructor
-        {
-
-            TileEntity create(int tier); // Note this variant picks up the new
-                                         // TileEntityStorageModule(int tier)
-                                         // constructor, and forces the ::new
-                                         // above to that
-        }
-
-        @Override
-        public String getShiftDescriptionKey()
-        {
-            return this.shiftDescriptionKey;
-        }
-
-        @Override
-        public String getTranslationKey()
-        {
-            return this.blockName;
+        else {
+            this.iconTier2 = iconRegister.registerIcon("void");
+            this.iconInputT2 = iconRegister.registerIcon("void");
+            this.iconOutputT2 = iconRegister.registerIcon("void");
+            this.iconMachineSideT2 = iconRegister.registerIcon("void");
+            this.iconEnergyStorageModuleT2 = new IIcon[17];
+            for (int i = 0; i < this.iconEnergyStorageModule.length; ++i) {
+                this.iconEnergyStorageModuleT2[i] = iconRegister.registerIcon("void");
+            }
+            this.iconElectricFurnaceT2 = iconRegister.registerIcon("void");
         }
     }
-
-    public BlockMachineTiered(String assetName)
-    {
-        super(assetName);
+    
+    public IIcon getIcon(final IBlockAccess world, final int x, final int y, final int z, final int side) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        final int type = metadata & 0x4;
+        final int metaside = (metadata & 0x3) + 2;
+        if (type != 0) {
+            return this.getIcon(side, metadata);
+        }
+        if (side == 0 || side == 1) {
+            if (metadata >= 8) {
+                return this.iconTier2;
+            }
+            return this.blockIcon;
+        }
+        else if (side == metaside) {
+            if (metadata >= 8) {
+                return this.iconOutputT2;
+            }
+            return this.iconOutput;
+        }
+        else if (side == (metaside ^ 0x1)) {
+            if (metadata >= 8) {
+                return this.iconInputT2;
+            }
+            return this.iconInput;
+        }
+        else {
+            final TileEntity tile = world.getTileEntity(x, y, z);
+            int level = 0;
+            if (tile instanceof TileEntityEnergyStorageModule) {
+                level = ((TileEntityEnergyStorageModule)tile).scaledEnergyLevel;
+            }
+            if (metadata >= 8) {
+                return this.iconEnergyStorageModuleT2[level];
+            }
+            return this.iconEnergyStorageModule[level];
+        }
     }
-
+    
+    public IIcon getIcon(final int side, final int metadata) {
+        final int metaside = (metadata & 0x3) + 2;
+        if (side == 0 || side == 1) {
+            if (metadata >= 8) {
+                return this.iconTier2;
+            }
+            return this.blockIcon;
+        }
+        else if ((metadata & 0x4) == 0x4) {
+            if (side == metaside) {
+                if (metadata >= 8) {
+                    return this.iconInputT2;
+                }
+                return this.iconInput;
+            }
+            else if ((metaside == 2 && side == 4) || (metaside == 3 && side == 5) || (metaside == 4 && side == 3) || (metaside == 5 && side == 2)) {
+                if (metadata >= 8) {
+                    return this.iconElectricFurnaceT2;
+                }
+                return this.iconElectricFurnace;
+            }
+            else {
+                if (metadata >= 8) {
+                    return this.iconMachineSideT2;
+                }
+                return this.iconMachineSide;
+            }
+        }
+        else if (side == metaside) {
+            if (metadata >= 8) {
+                return this.iconOutputT2;
+            }
+            return this.iconOutput;
+        }
+        else if (side == (metaside ^ 0x1)) {
+            if (metadata >= 8) {
+                return this.iconInputT2;
+            }
+            return this.iconInput;
+        }
+        else {
+            if (metadata >= 8) {
+                return this.iconEnergyStorageModuleT2[16];
+            }
+            return this.iconEnergyStorageModule[16];
+        }
+    }
+    
+    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+        final int metadata = world.getBlockMetadata(x, y, z);
+        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
+        int change = 0;
+        switch (angle) {
+            case 0: {
+                change = 3;
+                break;
+            }
+            case 1: {
+                change = 1;
+                break;
+            }
+            case 2: {
+                change = 2;
+                break;
+            }
+            case 3: {
+                change = 0;
+                break;
+            }
+        }
+        world.setBlockMetadataWithNotify(x, y, z, (metadata & 0xC) + change, 3);
+    }
+    
+    public boolean onUseWrench(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        final int metadata = par1World.getBlockMetadata(x, y, z);
+        final int original = metadata & 0x3;
+        int change = 0;
+        switch (original) {
+            case 0: {
+                change = 3;
+                break;
+            }
+            case 3: {
+                change = 1;
+                break;
+            }
+            case 1: {
+                change = 2;
+                break;
+            }
+            case 2: {
+                change = 0;
+                break;
+            }
+        }
+        final TileEntity te = par1World.getTileEntity(x, y, z);
+        if (te instanceof TileBaseUniversalElectrical) {
+            ((TileBaseUniversalElectrical)te).updateFacing();
+        }
+        par1World.setBlockMetadataWithNotify(x, y, z, (metadata & 0xC) + change, 3);
+        return true;
+    }
+    
+    public boolean onMachineActivated(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+        if (!par1World.isRemote) {
+            par5EntityPlayer.openGui((Object)GalacticraftCore.instance, -1, par1World, x, y, z);
+        }
+        return true;
+    }
+    
+    public TileEntity createTileEntity(final World world, final int metadata) {
+        final int tier = metadata / 8 + 1;
+        if ((metadata & 0x4) == 0x4) {
+            return new TileEntityElectricFurnace(tier);
+        }
+        return new TileEntityEnergyStorageModule(tier);
+    }
+    
+    public ItemStack getEnergyStorageModule() {
+        return new ItemStack((Block)this, 1, 0);
+    }
+    
+    public ItemStack getEnergyStorageCluster() {
+        return new ItemStack((Block)this, 1, 8);
+    }
+    
+    public ItemStack getElectricFurnace() {
+        return new ItemStack((Block)this, 1, 4);
+    }
+    
+    public ItemStack getElectricArcFurnace() {
+        return new ItemStack((Block)this, 1, 12);
+    }
+    
+    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        par3List.add(this.getEnergyStorageModule());
+        par3List.add(this.getElectricFurnace());
+        if (GalacticraftCore.isPlanetsLoaded) {
+            par3List.add(this.getEnergyStorageCluster());
+            par3List.add(this.getElectricArcFurnace());
+        }
+    }
+    
+    public int damageDropped(final int metadata) {
+        return metadata & 0xC;
+    }
+    
+    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+        final int metadata = this.getDamageValue(world, x, y, z);
+        return new ItemStack((Block)this, 1, metadata);
+    }
+    
     @Override
-    protected void initialiseTypes()
-    {
-        this.types = EnumTieredMachineType.values;
-        this.typeBase = EnumTieredMachineType.values[0];
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state)
-    {
-        TileEntity tile = super.createTileEntity(world, state);
-        tile.setWorld(world);
-        return tile;
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        EnumFacing enumfacing = EnumFacing.byHorizontalIndex(meta % 4);
-        EnumTieredMachineType type = (EnumTieredMachineType) typeBase.fromMetadata(meta);
-        return this.getDefaultState().withProperty(FACING, enumfacing).withProperty(TYPE, type);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return ((EnumFacing) state.getValue(FACING)).getHorizontalIndex() + ((EnumTieredMachineType) state.getValue(TYPE)).getMetadata();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, FACING, TYPE, FILL_VALUE, SIDES);
-    }
-
-    @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
-        TileEntity tile = worldIn.getTileEntity(pos);
-        state = IMachineSides.addPropertyForTile(state, tile, MACHINESIDES_RENDERTYPE, SIDES);
-
-        if (!(tile instanceof TileEntityEnergyStorageModule))
-        {
-            return state.withProperty(FILL_VALUE, 0);
+    public String getShiftDescription(final int meta) {
+        final int tier = (meta >= 8) ? 2 : 1;
+        switch (meta & 0x4) {
+            case 4: {
+                return GCCoreUtil.translate("tile.electricFurnaceTier" + tier + ".description");
+            }
+            case 0: {
+                return GCCoreUtil.translate("tile.energyStorageModuleTier" + tier + ".description");
+            }
+            default: {
+                return "";
+            }
         }
-        int energyLevel = ((TileEntityEnergyStorageModule) tile).scaledEnergyLevel;
-        if (state.getValue(TYPE) == EnumTieredMachineType.STORAGE_CLUSTER)
-            energyLevel += 17;
-        return state.withProperty(FILL_VALUE, energyLevel);
+    }
+    
+    @Override
+    public boolean showDescription(final int meta) {
+        return true;
     }
 }

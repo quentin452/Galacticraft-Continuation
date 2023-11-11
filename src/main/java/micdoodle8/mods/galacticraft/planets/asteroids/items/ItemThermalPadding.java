@@ -1,143 +1,92 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.api.item.IItemThermal;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.item.*;
+import net.minecraft.util.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.texture.*;
+import java.util.*;
 
-public class ItemThermalPadding extends Item implements IItemThermal, ISortableItem, GCRarity
+public class ItemThermalPadding extends Item implements IItemThermal
 {
-
-    public static String[] names =
-    {"thermal_helm", "thermal_chestplate", "thermal_leggings", "thermal_boots", "thermal_helm0", "thermal_chestplate0", "thermal_leggings0", "thermal_boots0"};
-
-    public ItemThermalPadding(String assetName)
-    {
-        super();
+    public static String[] names;
+    protected IIcon[] icons;
+    
+    public ItemThermalPadding(final String assetName) {
+        this.icons = new IIcon[ItemThermalPadding.names.length];
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
         this.setMaxStackSize(1);
-        this.setTranslationKey(assetName);
+        this.setUnlocalizedName(assetName);
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public IIcon getIconFromDamageForRenderPass(final int damage, final int pass) {
+        if (pass == 1 && this.icons.length > damage + 4) {
+            return this.icons[damage + 4];
+        }
+        return this.getIconFromDamage(damage);
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public boolean requiresMultipleRenderPasses() {
+        return true;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            for (int i = 0; i < ItemThermalPadding.names.length / 2; i++)
-            {
-                list.add(new ItemStack(this, 1, i));
-            }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        int i = 0;
+        for (final String name : ItemThermalPadding.names) {
+            this.icons[i++] = iconRegister.registerIcon("galacticraftasteroids:" + name);
         }
     }
-
-    @Override
-    public String getTranslationKey(ItemStack par1ItemStack)
-    {
-        if (names.length > par1ItemStack.getItemDamage())
-        {
+    
+    public IIcon getIconFromDamage(final int damage) {
+        if (this.icons.length > damage) {
+            return this.icons[damage];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < ItemThermalPadding.names.length / 2; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
+        }
+    }
+    
+    public String getUnlocalizedName(final ItemStack par1ItemStack) {
+        if (this.icons.length > par1ItemStack.getItemDamage()) {
             return "item." + ItemThermalPadding.names[par1ItemStack.getItemDamage()];
         }
-
         return "unnamed";
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
+    
+    public int getMetadata(final int par1) {
         return par1;
     }
-
-    @Override
-    public int getThermalStrength()
-    {
+    
+    public int getThermalStrength() {
         return 1;
     }
-
-    @Override
-    public boolean isValidForSlot(ItemStack stack, int armorSlot)
-    {
+    
+    public boolean isValidForSlot(final ItemStack stack, final int armorSlot) {
         return stack.getItemDamage() == armorSlot;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.ARMOR;
-    }
-
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand hand)
-    {
-        ItemStack itemStack = player.getHeldItem(hand);
-
-        if (player instanceof EntityPlayerMP)
-        {
-            GCPlayerStats stats = GCPlayerStats.get(player);
-            ItemStack gear = stats.getExtendedInventory().getStackInSlot(6);
-            ItemStack gear1 = stats.getExtendedInventory().getStackInSlot(7);
-            ItemStack gear2 = stats.getExtendedInventory().getStackInSlot(8);
-            ItemStack gear3 = stats.getExtendedInventory().getStackInSlot(9);
-
-            if (itemStack.getItemDamage() == 0)
-            {
-                if (gear.isEmpty())
-                {
-                    stats.getExtendedInventory().setInventorySlotContents(6, itemStack.copy());
-                    itemStack.setCount(0);
-                }
-            } else if (itemStack.getItemDamage() == 1)
-            {
-                if (gear1.isEmpty())
-                {
-                    stats.getExtendedInventory().setInventorySlotContents(7, itemStack.copy());
-                    itemStack.setCount(0);
-                }
-            } else if (itemStack.getItemDamage() == 2)
-            {
-                if (gear2.isEmpty())
-                {
-                    stats.getExtendedInventory().setInventorySlotContents(8, itemStack.copy());
-                    itemStack.setCount(0);
-                }
-            } else if (itemStack.getItemDamage() == 3)
-            {
-                if (gear3.isEmpty())
-                {
-                    stats.getExtendedInventory().setInventorySlotContents(9, itemStack.copy());
-                    itemStack.setCount(0);
-                }
-            }
-        }
-        return new ActionResult<>(EnumActionResult.PASS, itemStack);
+    
+    static {
+        ItemThermalPadding.names = new String[] { "thermalHelm", "thermalChestplate", "thermalLeggings", "thermalBoots", "thermalHelm0", "thermalChestplate0", "thermalLeggings0", "thermalBoots0" };
     }
 }

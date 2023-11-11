@@ -1,109 +1,75 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.entities.player;
 
-import micdoodle8.mods.galacticraft.planets.asteroids.ConfigManagerAsteroids;
-import micdoodle8.mods.galacticraft.planets.asteroids.dimension.WorldProviderAsteroids;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntitySmallAsteroid;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
+import cpw.mods.fml.common.gameevent.*;
+import cpw.mods.fml.common.eventhandler.*;
+import net.minecraftforge.event.entity.*;
+import micdoodle8.mods.galacticraft.core.entities.player.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.dimension.*;
+import net.minecraft.entity.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.*;
+import net.minecraft.entity.player.*;
 
 public class AsteroidsPlayerHandler
 {
-
     @SubscribeEvent
-    public void onPlayerLogin(PlayerLoggedInEvent event)
-    {
-        if (event.player instanceof EntityPlayerMP)
-        {
-            this.onPlayerLogin((EntityPlayerMP) event.player);
+    public void onPlayerLogin(final PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.player instanceof EntityPlayerMP) {
+            this.onPlayerLogin((EntityPlayerMP)event.player);
         }
     }
-
+    
     @SubscribeEvent
-    public void onPlayerLogout(PlayerLoggedOutEvent event)
-    {
-        if (event.player instanceof EntityPlayerMP)
-        {
-            this.onPlayerLogout((EntityPlayerMP) event.player);
+    public void onPlayerLogout(final PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.player instanceof EntityPlayerMP) {
+            this.onPlayerLogout((EntityPlayerMP)event.player);
         }
     }
-
+    
     @SubscribeEvent
-    public void onPlayerRespawn(PlayerRespawnEvent event)
-    {
-        if (event.player instanceof EntityPlayerMP)
-        {
-            this.onPlayerRespawn((EntityPlayerMP) event.player);
+    public void onPlayerRespawn(final PlayerEvent.PlayerRespawnEvent event) {
+        if (event.player instanceof EntityPlayerMP) {
+            this.onPlayerRespawn((EntityPlayerMP)event.player);
         }
     }
-
-//    @SubscribeEvent
-//    public void onEntityConstructing(EntityEvent.EntityConstructing event)
-//    {
-//        if (event.getEntity() instanceof EntityPlayerMP && GCPlayerStats.get((EntityPlayerMP) event.entity) == null)
-//        {
-//            GCPlayerStats.register((EntityPlayerMP) event.entity);
-//        }
-//    }
-
-    private void onPlayerLogin(EntityPlayerMP player)
-    {
+    
+    @SubscribeEvent
+    public void onEntityConstructing(final EntityEvent.EntityConstructing event) {
+        if (event.entity instanceof EntityPlayerMP && GCPlayerStats.get((EntityPlayerMP)event.entity) == null) {
+            GCPlayerStats.register((EntityPlayerMP)event.entity);
+        }
     }
-
-    private void onPlayerLogout(EntityPlayerMP player)
-    {
-
+    
+    private void onPlayerLogin(final EntityPlayerMP player) {
     }
-
-    private void onPlayerRespawn(EntityPlayerMP player)
-    {
+    
+    private void onPlayerLogout(final EntityPlayerMP player) {
     }
-
-    public void onPlayerUpdate(EntityPlayerMP player)
-    {
-        if (!ConfigManagerAsteroids.disableSmallAsteroids)
-        {
-            if (!player.world.isRemote && player.world.provider instanceof WorldProviderAsteroids)
-            {
-                final int f = 50;
-
-                if (player.world.rand.nextInt(f) == 0 && player.posY < 260D)
-                {
-                    final EntityPlayer closestPlayer = player.world.getClosestPlayerToEntity(player, 100);
-
-                    if (closestPlayer == null || closestPlayer.getEntityId() <= player.getEntityId())
-                    {
-                        double x, y, z;
-                        double motX, motY, motZ;
-                        double r = player.world.rand.nextInt(60) + 30D;
-                        double theta = Math.PI * 2.0 * player.world.rand.nextDouble();
-                        x = player.posX + Math.cos(theta) * r;
-                        y = player.posY + player.world.rand.nextInt(5);
-                        z = player.posZ + Math.sin(theta) * r;
-                        motX = (player.posX - x + (player.world.rand.nextDouble() - 0.5) * 40) / 400.0F;
-                        motY = (player.world.rand.nextDouble() - 0.5) * 0.4;
-                        motZ = (player.posZ - z + (player.world.rand.nextDouble() - 0.5) * 40) / 400.0F;
-
-                        final EntitySmallAsteroid smallAsteroid = new EntitySmallAsteroid(player.world);
-                        smallAsteroid.setPosition(x, y, z);
-                        smallAsteroid.motionX = motX;
-                        smallAsteroid.motionY = motY;
-                        smallAsteroid.motionZ = motZ;
-                        smallAsteroid.spinYaw = player.world.rand.nextFloat() * 4;
-                        smallAsteroid.spinPitch = player.world.rand.nextFloat() * 2;
-
-                        player.world.spawnEntity(smallAsteroid);
-                    }
+    
+    private void onPlayerRespawn(final EntityPlayerMP player) {
+    }
+    
+    public void onPlayerUpdate(final EntityPlayerMP player) {
+        if (!player.worldObj.isRemote && player.worldObj.provider instanceof WorldProviderAsteroids) {
+            final int f = 50;
+            if (player.worldObj.rand.nextInt(50) == 0 && player.posY < 260.0) {
+                final EntityPlayer closestPlayer = player.worldObj.getClosestPlayerToEntity((Entity)player, 100.0);
+                if (closestPlayer == null || closestPlayer.getEntityId() <= player.getEntityId()) {
+                    final double r = player.worldObj.rand.nextInt(60) + 30.0;
+                    final double theta = 6.283185307179586 * player.worldObj.rand.nextDouble();
+                    final double x = player.posX + Math.cos(theta) * r;
+                    final double y = player.posY + player.worldObj.rand.nextInt(5);
+                    final double z = player.posZ + Math.sin(theta) * r;
+                    final double motX = (player.posX - x + (player.worldObj.rand.nextDouble() - 0.5) * 40.0) / 400.0;
+                    final double motY = (player.worldObj.rand.nextDouble() - 0.5) * 0.4;
+                    final double motZ = (player.posZ - z + (player.worldObj.rand.nextDouble() - 0.5) * 40.0) / 400.0;
+                    final EntitySmallAsteroid smallAsteroid = new EntitySmallAsteroid(player.worldObj);
+                    smallAsteroid.setPosition(x, y, z);
+                    smallAsteroid.motionX = motX;
+                    smallAsteroid.motionY = motY;
+                    smallAsteroid.motionZ = motZ;
+                    smallAsteroid.spinYaw = player.worldObj.rand.nextFloat() * 4.0f;
+                    smallAsteroid.spinPitch = player.worldObj.rand.nextFloat() * 2.0f;
+                    player.worldObj.spawnEntityInWorld((Entity)smallAsteroid);
                 }
             }
         }

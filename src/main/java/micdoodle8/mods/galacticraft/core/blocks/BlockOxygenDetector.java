@@ -1,126 +1,83 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.util.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.texture.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraftforge.common.util.*;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenDetector;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class BlockOxygenDetector extends BlockContainer implements ITileEntityProvider, IShiftDescription, ISortableBlock
+public class BlockOxygenDetector extends BlockContainer implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc
 {
-
-    public static final PropertyBool ACTIVE = PropertyBool.create("active");
-
-    public BlockOxygenDetector(String assetName)
-    {
-        super(Material.IRON);
-        this.setHardness(1.0F);
-        this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(assetName);
+    private IIcon iconSide;
+    private IIcon iconTop;
+    
+    protected BlockOxygenDetector(final String assetName) {
+        super(Material.iron);
+        this.setHardness(1.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.MODEL;
+    
+    public int getRenderType() {
+        return GalacticraftCore.proxy.getBlockRender((Block)this);
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.iconTop = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_blank");
+        this.iconSide = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "detector_side");
+    }
+    
+    public IIcon getIcon(final int side, final int metadata) {
+        if (side == 0 || side == 1) {
+            return this.iconTop;
+        }
+        return this.iconSide;
+    }
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
         return new TileEntityOxygenDetector();
     }
-
-    public void updateOxygenState(World worldIn, BlockPos pos, boolean valid)
-    {
-        if (valid)
-        {
-            worldIn.setBlockState(pos, getStateFromMeta(1), 3);
-        } else
-        {
-            worldIn.setBlockState(pos, getStateFromMeta(0), 3);
+    
+    public void updateOxygenState(final World par1World, final int x, final int y, final int z, final boolean valid) {
+        if (valid) {
+            par1World.setBlockMetadataWithNotify(x, y, z, 1, 3);
+        }
+        else {
+            par1World.setBlockMetadataWithNotify(x, y, z, 0, 3);
         }
     }
-
-    @Override
-    public boolean canProvidePower(IBlockState state)
-    {
+    
+    public boolean canProvidePower() {
         return true;
     }
-
-    @Override
-    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
-    {
-        return getMetaFromState(blockState) == 1 ? 15 : 0;
+    
+    public int isProvidingWeakPower(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4, final int par5) {
+        return (par1IBlockAccess.getBlockMetadata(par2, par3, par4) == 1) ? 15 : 0;
     }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(ACTIVE, meta > 0);
+    
+    public String getShiftDescription(final int meta) {
+        return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return state.getValue(ACTIVE) ? 1 : 0;
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, ACTIVE);
-    }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        return GCCoreUtil.translate(this.getTranslationKey() + ".description");
-    }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
     }
-
-    @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
-    {
+    
+    public boolean isSideSolid(final IBlockAccess world, final int x, final int y, final int z, final ForgeDirection side) {
         return true;
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.MACHINE;
     }
 }

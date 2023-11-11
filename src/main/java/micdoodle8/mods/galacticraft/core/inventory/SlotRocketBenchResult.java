@@ -1,65 +1,41 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
 
 public class SlotRocketBenchResult extends Slot
 {
-
     private final IInventory craftMatrix;
     private final EntityPlayer thePlayer;
-
-    public SlotRocketBenchResult(EntityPlayer entityPlayer, IInventory par2IInventory, IInventory par3IInventory, int par4, int par5, int par6)
-    {
+    
+    public SlotRocketBenchResult(final EntityPlayer par1EntityPlayer, final IInventory par2IInventory, final IInventory par3IInventory, final int par4, final int par5, final int par6) {
         super(par3IInventory, par4, par5, par6);
-        this.thePlayer = entityPlayer;
+        this.thePlayer = par1EntityPlayer;
         this.craftMatrix = par2IInventory;
     }
-
-    @Override
-    public boolean isItemValid(ItemStack par1ItemStack)
-    {
+    
+    public boolean isItemValid(final ItemStack par1ItemStack) {
         return false;
     }
-
-    @Override
-    public ItemStack onTake(EntityPlayer entityPlayer, ItemStack stack)
-    {
-        for (int var2 = 0; var2 < this.craftMatrix.getSizeInventory(); ++var2)
-        {
+    
+    public void onPickupFromSlot(final EntityPlayer par1EntityPlayer, final ItemStack par1ItemStack) {
+        for (int var2 = 0; var2 < this.craftMatrix.getSizeInventory(); ++var2) {
             final ItemStack var3 = this.craftMatrix.getStackInSlot(var2);
-
-            if (!var3.isEmpty())
-            {
+            if (var3 != null) {
                 this.craftMatrix.decrStackSize(var2, 1);
-
-                if (var3.getItem().hasContainerItem(var3))
-                {
+                if (var3.getItem().hasContainerItem(var3)) {
                     final ItemStack var4 = new ItemStack(var3.getItem().getContainerItem());
-
-                    if (!this.thePlayer.inventory.addItemStackToInventory(var4))
-                    {
-                        if (this.craftMatrix.getStackInSlot(var2).isEmpty())
-                        {
+                    if (!var3.getItem().doesContainerItemLeaveCraftingGrid(var3) || !this.thePlayer.inventory.addItemStackToInventory(var4)) {
+                        if (this.craftMatrix.getStackInSlot(var2) == null) {
                             this.craftMatrix.setInventorySlotContents(var2, var4);
-                        } else
-                        {
-                            this.thePlayer.entityDropItem(var4, 0.0F);
+                        }
+                        else {
+                            this.thePlayer.entityDropItem(var4, 0.0f);
                         }
                     }
                 }
             }
         }
-
-        return stack;
     }
 }

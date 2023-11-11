@@ -1,50 +1,30 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.inventory;
 
-import java.lang.reflect.Method;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
+import java.lang.reflect.*;
+import net.minecraft.entity.player.*;
 
-/**
- * A static method for other mods to access the Galacticraft extended inventory.
- * 
- * Call: AccessInventoryGC.getGCInventoryForPlayer(player)
- */
 public class AccessInventoryGC
 {
-
     private static Class<?> playerStatsClass;
-    private static Method getStats;
-    private static Method getExtendedInventory;
-
-    public static IInventoryGC getGCInventoryForPlayer(EntityPlayerMP player)
-    {
-        try
-        {
-            if (playerStatsClass == null || getStats == null || getExtendedInventory == null)
-            {
-                playerStatsClass = Class.forName("micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats");
-                getStats = playerStatsClass.getMethod("get", Entity.class);
-                getExtendedInventory = playerStatsClass.getMethod("getExtendedInventory");
+    private static Method getMethod;
+    private static Field extendedInventoryField;
+    
+    public static IInventoryGC getGCInventoryForPlayer(final EntityPlayerMP player) {
+        try {
+            if (AccessInventoryGC.playerStatsClass == null || AccessInventoryGC.getMethod == null || AccessInventoryGC.extendedInventoryField == null) {
+                AccessInventoryGC.playerStatsClass = Class.forName("micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats");
+                AccessInventoryGC.getMethod = AccessInventoryGC.playerStatsClass.getMethod("get", EntityPlayerMP.class);
+                AccessInventoryGC.extendedInventoryField = AccessInventoryGC.playerStatsClass.getField("extendedInventory");
             }
-
-            Object stats = getStats.invoke(null, player);
-            if (stats == null)
-            {
+            final Object stats = AccessInventoryGC.getMethod.invoke(null, player);
+            if (stats == null) {
                 return null;
             }
-            return (IInventoryGC) getExtendedInventory.invoke(stats);
-        } catch (Exception e)
-        {
-            e.printStackTrace();
+            return (IInventoryGC)AccessInventoryGC.extendedInventoryField.get(stats);
         }
-
-        return null;
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

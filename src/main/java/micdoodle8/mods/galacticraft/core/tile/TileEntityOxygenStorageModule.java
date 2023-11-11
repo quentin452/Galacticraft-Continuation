@@ -1,357 +1,236 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
+import net.minecraft.inventory.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.api.item.*;
+import net.minecraftforge.common.util.*;
+import net.minecraft.nbt.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
+import micdoodle8.mods.galacticraft.core.*;
+import micdoodle8.mods.galacticraft.planets.asteroids.*;
+import net.minecraftforge.fluids.*;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTankInfo;
-
-import micdoodle8.mods.galacticraft.annotations.ForRemoval;
-import micdoodle8.mods.galacticraft.annotations.ReplaceWith;
-import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachine2;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachineBase;
-import micdoodle8.mods.galacticraft.core.inventory.IInventoryDefaults;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-
-public class TileEntityOxygenStorageModule extends TileEntityOxygen implements IInventoryDefaults, ISidedInventory, IMachineSides
+public class TileEntityOxygenStorageModule extends TileEntityOxygen implements ISidedInventory, IFluidHandler
 {
-
-    public final Set<EntityPlayer> playersUsing = new HashSet<>();
+    public final Set<EntityPlayer> playersUsing;
     public int scaledOxygenLevel;
     private int lastScaledOxygenLevel;
-
     public static final int OUTPUT_PER_TICK = 500;
     public static final int OXYGEN_CAPACITY = 60000;
-
-    public TileEntityOxygenStorageModule()
-    {
-        super("tile.machine2.6.name", OXYGEN_CAPACITY, 40);
-        this.storage.setCapacity(0);
-        this.storage.setMaxExtract(0);
-        inventory = NonNullList.withSize(1, ItemStack.EMPTY);
+    private ItemStack[] containingItems;
+    
+    public TileEntityOxygenStorageModule() {
+        super(60000.0f, 40.0f);
+        this.playersUsing = new HashSet<EntityPlayer>();
+        this.containingItems = new ItemStack[1];
+        this.storage.setCapacity(0.0f);
+        this.storage.setMaxExtract(0.0f);
     }
-
-    @Override
-    public void update()
-    {
-        if (!this.world.isRemote)
-        {
-            ItemStack oxygenItemStack = this.getStackInSlot(0);
-            if (oxygenItemStack != null && oxygenItemStack.getItem() instanceof IItemOxygenSupply)
-            {
-                IItemOxygenSupply oxygenItem = (IItemOxygenSupply) oxygenItemStack.getItem();
-                int oxygenDraw = (int) Math.floor(Math.min(this.oxygenPerTick * 2.5F, this.getMaxOxygenStored() - this.getOxygenStored()));
-                this.setOxygenStored(getOxygenStored() + oxygenItem.discharge(oxygenItemStack, oxygenDraw));
-                if (this.getOxygenStored() > this.getMaxOxygenStored())
-                {
-                    this.setOxygenStored(this.getOxygenStored());
+    
+    public void updateEntity() {
+        if (!this.worldObj.isRemote) {
+            final ItemStack oxygenItemStack = this.getStackInSlot(0);
+            if (oxygenItemStack != null && oxygenItemStack.getItem() instanceof IItemOxygenSupply) {
+                final IItemOxygenSupply oxygenItem = (IItemOxygenSupply)oxygenItemStack.getItem();
+                final float oxygenDraw = Math.min(this.oxygenPerTick * 2.5f, this.maxOxygen - this.storedOxygen);
+                this.storedOxygen += oxygenItem.discharge(oxygenItemStack, oxygenDraw);
+                if (this.storedOxygen > this.maxOxygen) {
+                    this.storedOxygen = this.maxOxygen;
                 }
             }
         }
-
-        super.update();
-
+        super.updateEntity();
         this.scaledOxygenLevel = this.getScaledOxygenLevel(16);
-
-        if (this.scaledOxygenLevel != this.lastScaledOxygenLevel)
-        {
-            this.world.notifyLightSet(this.getPos());
+        if (this.scaledOxygenLevel != this.lastScaledOxygenLevel) {
+            this.worldObj.func_147479_m(this.xCoord, this.yCoord, this.zCoord);
         }
-
         this.lastScaledOxygenLevel = this.scaledOxygenLevel;
-
-        this.produceOxygen(byIndex().rotateY().getOpposite());
-
+        this.produceOxygen(ForgeDirection.getOrientation(this.getBlockMetadata() - 8 + 2 ^ 0x1));
         this.lastScaledOxygenLevel = this.scaledOxygenLevel;
     }
-
-    @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
-        super.readFromNBT(nbt);
-
-        this.readMachineSidesFromNBT(nbt); // Needed by IMachineSides
+    
+    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.readFromNBT(par1NBTTagCompound);
+        final NBTTagList var2 = par1NBTTagCompound.getTagList("Items", 10);
+        this.containingItems = new ItemStack[this.getSizeInventory()];
+        for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
+            final NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+            final int var5 = var4.getByte("Slot") & 0xFF;
+            if (var5 < this.containingItems.length) {
+                this.containingItems[var5] = ItemStack.loadItemStackFromNBT(var4);
+            }
+        }
     }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
-        super.writeToNBT(nbt);
-        this.addMachineSidesToNBT(nbt); // Needed by IMachineSides
-        return nbt;
+    
+    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+        super.writeToNBT(par1NBTTagCompound);
+        final NBTTagList list = new NBTTagList();
+        for (int var3 = 0; var3 < this.containingItems.length; ++var3) {
+            if (this.containingItems[var3] != null) {
+                final NBTTagCompound var4 = new NBTTagCompound();
+                var4.setByte("Slot", (byte)var3);
+                this.containingItems[var3].writeToNBT(var4);
+                list.appendTag((NBTBase)var4);
+            }
+        }
+        par1NBTTagCompound.setTag("Items", (NBTBase)list);
     }
-
-    @Override
-    public EnumSet<EnumFacing> getElectricalInputDirections()
-    {
-        return EnumSet.noneOf(EnumFacing.class);
+    
+    public EnumSet<ForgeDirection> getElectricalInputDirections() {
+        return EnumSet.noneOf(ForgeDirection.class);
     }
-
-    @Override
-    public EnumSet<EnumFacing> getElectricalOutputDirections()
-    {
-        return EnumSet.noneOf(EnumFacing.class);
+    
+    public EnumSet<ForgeDirection> getElectricalOutputDirections() {
+        return EnumSet.noneOf(ForgeDirection.class);
     }
-
-    @Override
-    public boolean shouldPullEnergy()
-    {
+    
+    public boolean shouldPullEnergy() {
         return false;
     }
-
-    @Override
-    public boolean shouldUseEnergy()
-    {
+    
+    public boolean shouldUseEnergy() {
         return false;
     }
-
-    @Override
-    public EnumFacing getElectricInputDirection()
-    {
+    
+    public ForgeDirection getElectricInputDirection() {
         return null;
     }
-
-    @Override
-    public ItemStack getBatteryInSlot()
-    {
-        return ItemStack.EMPTY;
+    
+    public ItemStack getBatteryInSlot() {
+        return null;
     }
-
-    @Override
-    public boolean shouldUseOxygen()
-    {
+    
+    public boolean shouldUseOxygen() {
         return false;
     }
-
-    @Override
-    public int getOxygenProvide(EnumFacing direction)
-    {
-        return this.getOxygenOutputDirections().contains(direction) ? Math.min(TileEntityOxygenStorageModule.OUTPUT_PER_TICK, this.getOxygenStored()) : 0;
+    
+    public float getOxygenProvide(final ForgeDirection direction) {
+        return (this.getOxygenOutputDirection() == direction) ? Math.min(500.0f, this.getOxygenStored()) : 0.0f;
     }
-
-    @Override
-    public EnumFacing byIndex()
-    {
-        return BlockMachineBase.byIndex(this.world.getBlockState(getPos()));
+    
+    public EnumSet<ForgeDirection> getOxygenInputDirections() {
+        return EnumSet.of(ForgeDirection.getOrientation(this.getBlockMetadata() - 8 + 2));
     }
-
-    @Override
-    public boolean isItemValidForSlot(int slotID, ItemStack itemstack)
-    {
+    
+    public EnumSet<ForgeDirection> getOxygenOutputDirections() {
+        return EnumSet.of(ForgeDirection.getOrientation(this.getBlockMetadata() - 8 + 2 ^ 0x1));
+    }
+    
+    public ForgeDirection getOxygenOutputDirection() {
+        return ForgeDirection.getOrientation(this.getBlockMetadata() - 8 + 2 ^ 0x1);
+    }
+    
+    public int getSizeInventory() {
+        return this.containingItems.length;
+    }
+    
+    public ItemStack getStackInSlot(final int par1) {
+        return this.containingItems[par1];
+    }
+    
+    public ItemStack decrStackSize(final int par1, final int par2) {
+        if (this.containingItems[par1] == null) {
+            return null;
+        }
+        if (this.containingItems[par1].stackSize <= par2) {
+            final ItemStack var3 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var3;
+        }
+        final ItemStack var3 = this.containingItems[par1].splitStack(par2);
+        if (this.containingItems[par1].stackSize == 0) {
+            this.containingItems[par1] = null;
+        }
+        return var3;
+    }
+    
+    public ItemStack getStackInSlotOnClosing(final int par1) {
+        if (this.containingItems[par1] != null) {
+            final ItemStack var2 = this.containingItems[par1];
+            this.containingItems[par1] = null;
+            return var2;
+        }
+        return null;
+    }
+    
+    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+        this.containingItems[par1] = par2ItemStack;
+        if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit()) {
+            par2ItemStack.stackSize = this.getInventoryStackLimit();
+        }
+    }
+    
+    public String getInventoryName() {
+        return GCCoreUtil.translate("tile.machine2.6.name");
+    }
+    
+    public int getInventoryStackLimit() {
+        return 64;
+    }
+    
+    public boolean isUseableByPlayer(final EntityPlayer par1EntityPlayer) {
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
+    }
+    
+    public void openInventory() {
+    }
+    
+    public void closeInventory() {
+    }
+    
+    public boolean hasCustomInventoryName() {
+        return true;
+    }
+    
+    public boolean isItemValidForSlot(final int slotID, final ItemStack itemstack) {
         return slotID == 0 && itemstack != null && itemstack.getItem() instanceof IItemOxygenSupply;
     }
-
-    // ISidedInventory
-    @Override
-    public int[] getSlotsForFace(EnumFacing side)
-    {
-        return new int[]
-        {0};
-    }
-
-    @Override
-    public boolean canInsertItem(int slotID, ItemStack itemstack, EnumFacing side)
-    {
-        if (slotID == 0 && this.isItemValidForSlot(slotID, itemstack))
-        {
-            return itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
-        }
-        return false;
-    }
-
-    @Override
-    public boolean canExtractItem(int slotID, ItemStack itemstack, EnumFacing side)
-    {
-        if (slotID == 0 && !itemstack.isEmpty())
-        {
-            return FluidUtil.isEmptyContainer(itemstack);
-        }
-        return false;
-    }
-
-    // IFluidHandler methods - to allow this to accept Liquid Oxygen
-    @Override
-    public boolean canDrain(EnumFacing from, Fluid fluid)
-    {
-        return super.canDrain(from, fluid);
-    }
-
-    @Override
-    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain)
-    {
-        return super.drain(from, resource, doDrain);
-    }
-
-    @Override
-    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain)
-    {
-        return super.drain(from, maxDrain, doDrain);
-    }
-
-    @Override
-    public boolean canFill(EnumFacing from, Fluid fluid)
-    {
-//        if (from.ordinal() == this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2 && GalacticraftCore.isPlanetsLoaded)
-//        {
-//            //Can fill with LOX only
-//            return fluid != null && fluid.getName().equals(AsteroidsModule.fluidLiquidOxygen.getName());
-//        }
-
-        return super.canFill(from, fluid);
-    }
-
-    @Override
-    public int fill(EnumFacing from, FluidStack resource, boolean doFill)
-    {
-//        int used = 0;
-//
-//        if (resource != null && this.canFill(from, resource.getFluid()))
-//        {
-//            used = (int) (this.receiveOxygen((int) Math.floor(resource.amount / Constants.LOX_GAS_RATIO), doFill) * Constants.LOX_GAS_RATIO);
-//        }
-
-        return super.fill(from, resource, doFill);
-    }
-
-    @Override
-    public FluidTankInfo[] getTankInfo(EnumFacing from)
-    {
-//        FluidTankInfo[] tankInfo = new FluidTankInfo[] {};
-//        int metaside = this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2;
-//        int side = from.ordinal();
-//
-//        if (metaside == side && GalacticraftCore.isPlanetsLoaded)
-//        {
-//            tankInfo = new FluidTankInfo[] { new FluidTankInfo(new FluidStack(AsteroidsModule.fluidLiquidOxygen, (int) (this.getOxygenStored() * Constants.LOX_GAS_RATIO)), (int) (OXYGEN_CAPACITY * Constants.LOX_GAS_RATIO)) };
-//        }
-//        return tankInfo;
-        return super.getTankInfo(from);
-    }
-
-    @Override
-    public EnumSet<EnumFacing> getOxygenInputDirections()
-    {
-        EnumFacing dir;
-        switch (this.getSide(MachineSide.ELECTRIC_IN))
-        {
-            case REAR:
-                dir = byIndex().getOpposite();
-                break;
-            case TOP:
-                dir = EnumFacing.UP;
-                break;
-            case BOTTOM:
-                dir = EnumFacing.DOWN;
-                break;
-            case RIGHT:
-                dir = byIndex().rotateYCCW();
-                break;
-            case LEFT:
-            default:
-                dir = byIndex().rotateY();
-        }
-        return EnumSet.of(dir);
-    }
-
-    @Override
-    public EnumSet<EnumFacing> getOxygenOutputDirections()
-    {
-        EnumFacing dir;
-        switch (this.getSide(MachineSide.PIPE_OUT))
-        {
-            case REAR:
-                dir = byIndex().getOpposite();
-                break;
-            case TOP:
-                dir = EnumFacing.UP;
-                break;
-            case BOTTOM:
-                dir = EnumFacing.DOWN;
-                break;
-            case LEFT:
-                dir = byIndex().rotateY();
-                break;
-            case RIGHT:
-            default:
-                dir = byIndex().rotateYCCW();
-        }
-        return EnumSet.of(dir);
-    }
-
-    // ------------------
-    // Added these methods and field to implement IMachineSides properly
-    // ------------------
-    @Override
-    public MachineSide[] listConfigurableSides()
-    {
-        // Have to use Electric_In for compatibility with other BlockMachine2,
-        // as all use same blockstate
-        return new MachineSide[]
-        {MachineSide.ELECTRIC_IN, MachineSide.PIPE_OUT};
-    }
-
-    @Override
-    public Face[] listDefaultFaces()
-    {
-        return new Face[]
-        {Face.LEFT, Face.RIGHT};
-    }
-
-    private MachineSidePack[] machineSides;
-
-    @Override
-    public synchronized MachineSidePack[] getAllMachineSides()
-    {
-        if (this.machineSides == null)
-        {
-            this.initialiseSides();
-        }
-
-        return this.machineSides;
-    }
-
-    @Override
-    public void setupMachineSides(int length)
-    {
-        this.machineSides = new MachineSidePack[length];
-    }
-
-    @Override
-    public void onLoad()
-    {
-        this.clientOnLoad();
-    }
-
-    @Override
-    public IMachineSidesProperties getConfigurationType()
-    {
-        return BlockMachine2.MACHINESIDES_RENDERTYPE;
-    }
-    // ------------------END OF IMachineSides implementation
     
-    @Override
-    @Deprecated
-    @ForRemoval(deadline = "4.1.0")
-    @ReplaceWith("byIndex()")
-    public EnumFacing getFront()
-    {
-        return this.byIndex();
+    public int[] getAccessibleSlotsFromSide(final int side) {
+        return new int[] { 0 };
+    }
+    
+    public boolean canInsertItem(final int slotID, final ItemStack itemstack, final int side) {
+        return slotID == 0 && this.isItemValidForSlot(slotID, itemstack) && itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
+    }
+    
+    public boolean canExtractItem(final int slotID, final ItemStack itemstack, final int side) {
+        return slotID == 0 && itemstack != null && FluidUtil.isEmptyContainer(itemstack);
+    }
+    
+    public boolean canDrain(final ForgeDirection from, final Fluid fluid) {
+        return false;
+    }
+    
+    public FluidStack drain(final ForgeDirection from, final FluidStack resource, final boolean doDrain) {
+        return null;
+    }
+    
+    public FluidStack drain(final ForgeDirection from, final int maxDrain, final boolean doDrain) {
+        return null;
+    }
+    
+    public boolean canFill(final ForgeDirection from, final Fluid fluid) {
+        return from.ordinal() == this.getBlockMetadata() - 8 + 2 && GalacticraftCore.isPlanetsLoaded && fluid != null && fluid.getName().equals(AsteroidsModule.fluidLiquidOxygen.getName());
+    }
+    
+    public int fill(final ForgeDirection from, final FluidStack resource, final boolean doFill) {
+        int used = 0;
+        if (resource != null && this.canFill(from, resource.getFluid())) {
+            used = (int)(this.receiveOxygen(resource.amount / 0.09259259f, doFill) * 0.09259259f);
+        }
+        return used;
+    }
+    
+    public FluidTankInfo[] getTankInfo(final ForgeDirection from) {
+        FluidTankInfo[] tankInfo = new FluidTankInfo[0];
+        final int metaside = this.getBlockMetadata() - 8 + 2;
+        final int side = from.ordinal();
+        if (metaside == side && GalacticraftCore.isPlanetsLoaded) {
+            tankInfo = new FluidTankInfo[] { new FluidTankInfo(new FluidStack(AsteroidsModule.fluidLiquidOxygen, (int)(this.getOxygenStored() * 0.09259259f)), 5555) };
+        }
+        return tankInfo;
     }
 }

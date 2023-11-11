@@ -1,136 +1,116 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.mars.world.gen;
 
-import com.google.common.collect.Lists;
-import java.util.List;
-import micdoodle8.mods.galacticraft.api.prefab.core.BlockMetaPair;
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.BiomeAdaptive;
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.BiomeDecoratorSpace;
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.ChunkProviderSpace;
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.MapGenBaseMeta;
-import micdoodle8.mods.galacticraft.core.world.gen.dungeon.DungeonConfiguration;
-import micdoodle8.mods.galacticraft.core.world.gen.dungeon.MapGenDungeon;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockBasicMars;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkPrimer;
+import micdoodle8.mods.galacticraft.core.world.gen.dungeon.*;
+import net.minecraft.world.*;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon.*;
+import net.minecraft.world.biome.*;
+import micdoodle8.mods.galacticraft.api.prefab.world.gen.*;
+import com.google.common.collect.*;
+import java.util.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import micdoodle8.mods.galacticraft.api.prefab.core.*;
+import net.minecraft.block.*;
+import net.minecraft.world.chunk.*;
 
 public class ChunkProviderMars extends ChunkProviderSpace
 {
+    private final BiomeDecoratorMars marsBiomeDecorator;
+    private final MapGenCavernMars caveGenerator;
+    private final MapGenCaveMars cavernGenerator;
+    private final MapGenDungeon dungeonGenerator;
 
-    private final BiomeDecoratorMars marsBiomeDecorator = new BiomeDecoratorMars();
-    private final MapGenCavernMars caveGenerator = new MapGenCavernMars();
-    private final MapGenCaveMars cavernGenerator = new MapGenCaveMars();
-
-    private final MapGenDungeon dungeonGenerator =
-        new MapGenDungeonMars(new DungeonConfiguration(MarsBlocks.marsBlock.getDefaultState().withProperty(BlockBasicMars.BASIC_TYPE, BlockBasicMars.EnumBlockBasic.DUNGEON_BRICK), 30, 8, 16, 7, 7,
-            RoomBossMars.class, RoomTreasureMars.class));
-
-    public ChunkProviderMars(World par1World, long seed, boolean mapFeaturesEnabled)
-    {
+    public ChunkProviderMars(final World par1World, final long seed, final boolean mapFeaturesEnabled) {
         super(par1World, seed, mapFeaturesEnabled);
+        this.marsBiomeDecorator = new BiomeDecoratorMars();
+        this.caveGenerator = new MapGenCavernMars();
+        this.cavernGenerator = new MapGenCaveMars();
+        this.dungeonGenerator = new MapGenDungeon(MarsBlocks.marsBlock, 7, 8, 16, 6);
+        this.dungeonGenerator.otherRooms.add(new RoomEmptyMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomSpawnerMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomSpawnerMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomSpawnerMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomSpawnerMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomSpawnerMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomSpawnerMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomSpawnerMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomSpawnerMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomChestsMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.otherRooms.add(new RoomChestsMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.bossRooms.add(new RoomBossMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
+        this.dungeonGenerator.treasureRooms.add(new RoomTreasureMars(null, 0, 0, 0, ForgeDirection.UNKNOWN));
     }
 
-    @Override
-    protected BiomeDecoratorSpace getBiomeGenerator()
-    {
-        return this.marsBiomeDecorator;
+    protected BiomeDecoratorSpace getBiomeGenerator() {
+        return (BiomeDecoratorSpace)this.marsBiomeDecorator;
     }
 
-    @Override
-    protected Biome[] getBiomesForGeneration()
-    {
-        return new Biome[]
-        {BiomeAdaptive.biomeDefault};
+    protected BiomeGenBase[] getBiomesForGeneration() {
+        return new BiomeGenBase[] { BiomeGenBaseMars.marsFlat };
     }
 
-    @Override
-    protected int getSeaLevel()
-    {
+    protected int getSeaLevel() {
         return 93;
     }
 
-    @Override
-    protected List<MapGenBaseMeta> getWorldGenerators()
-    {
-        List<MapGenBaseMeta> generators = Lists.newArrayList();
+    protected List<MapGenBaseMeta> getWorldGenerators() {
+        final List<MapGenBaseMeta> generators = Lists.newArrayList();
         generators.add(this.caveGenerator);
         generators.add(this.cavernGenerator);
         return generators;
     }
 
-    @Override
-    protected BlockMetaPair getGrassBlock()
-    {
-        return BiomeMars.BLOCK_TOP;
+    protected BiomeGenBase.SpawnListEntry[] getMonsters() {
+        final List<BiomeGenBase.SpawnListEntry> monsters = new ArrayList<BiomeGenBase.SpawnListEntry>();
+        monsters.add(new BiomeGenBase.SpawnListEntry((Class)EntityEvolvedZombie.class, 8, 2, 3));
+        monsters.add(new BiomeGenBase.SpawnListEntry((Class)EntityEvolvedSpider.class, 8, 2, 3));
+        monsters.add(new BiomeGenBase.SpawnListEntry((Class)EntityEvolvedSkeleton.class, 8, 2, 3));
+        monsters.add(new BiomeGenBase.SpawnListEntry((Class)EntityEvolvedCreeper.class, 8, 2, 3));
+        return monsters.toArray(new BiomeGenBase.SpawnListEntry[monsters.size()]);
     }
 
-    @Override
-    protected BlockMetaPair getDirtBlock()
-    {
-        return BiomeMars.BLOCK_FILL;
+    protected BiomeGenBase.SpawnListEntry[] getCreatures() {
+        return new BiomeGenBase.SpawnListEntry[0];
     }
 
-    @Override
-    protected BlockMetaPair getStoneBlock()
-    {
-        return BiomeMars.BLOCK_LOWER;
+    protected BlockMetaPair getGrassBlock() {
+        return new BlockMetaPair(MarsBlocks.marsBlock, (byte)5);
     }
 
-    @Override
-    public double getHeightModifier()
-    {
-        return 12;
+    protected BlockMetaPair getDirtBlock() {
+        return new BlockMetaPair(MarsBlocks.marsBlock, (byte)6);
     }
 
-    @Override
-    public double getSmallFeatureHeightModifier()
-    {
-        return 26;
+    protected BlockMetaPair getStoneBlock() {
+        return new BlockMetaPair(MarsBlocks.marsBlock, (byte)9);
     }
 
-    @Override
-    public double getMountainHeightModifier()
-    {
-        return 95;
+    public double getHeightModifier() {
+        return 12.0;
     }
 
-    @Override
-    public double getValleyHeightModifier()
-    {
-        return 50;
+    public double getSmallFeatureHeightModifier() {
+        return 26.0;
     }
 
-    @Override
-    public int getCraterProbability()
-    {
+    public double getMountainHeightModifier() {
+        return 95.0;
+    }
+
+    public double getValleyHeightModifier() {
+        return 50.0;
+    }
+
+    public int getCraterProbability() {
         return 2000;
     }
 
-    @Override
-    public void onChunkProvide(int cX, int cZ, ChunkPrimer primer)
-    {
-        this.dungeonGenerator.generate(this.world, cX, cZ, primer);
+    public void onChunkProvide(final int cX, final int cZ, final Block[] blocks, final byte[] metadata) {
+        this.dungeonGenerator.generateUsingArrays(this.worldObj, this.worldObj.getSeed(), cX * 16, 30, cZ * 16, cX, cZ, blocks, metadata);
     }
 
-    @Override
-    public void onPopulate(int cX, int cZ)
-    {
-        this.dungeonGenerator.generateStructure(this.world, this.rand, new ChunkPos(cX, cZ));
-    }
-
-    @Override
-    public void recreateStructures(Chunk chunk, int x, int z)
-    {
-        this.dungeonGenerator.generate(this.world, x, z, null);
+    public void onPopulate(final IChunkProvider provider, final int cX, final int cZ) {
+        this.dungeonGenerator.handleTileEntities(this.rand);
     }
 }

@@ -1,35 +1,24 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.DamageSource;
+import net.minecraft.entity.player.*;
+import net.minecraft.entity.*;
+import net.minecraft.util.*;
 
 public interface IPlayerServer
 {
-
-    void updateRiddenPre(EntityPlayerMP player);
-
-    void updateRiddenPost(EntityPlayerMP player);
-
-    boolean dismountEntity(EntityPlayerMP player, Entity par1Entity);
-
-    void move(EntityPlayerMP player, MoverType type, double x, double y, double z);
-
-    boolean wakeUpPlayer(EntityPlayerMP player, boolean immediately, boolean updateWorldFlag, boolean setSpawn);
-
-    float attackEntityFrom(EntityPlayerMP player, DamageSource par1DamageSource, float par2);
-
-    void knockBack(EntityPlayerMP player, Entity p_70653_1_, float p_70653_2_, double impulseX, double impulseZ);
-
-    boolean isSpectator(EntityPlayerMP player);
-
-    void setNoClip(EntityPlayerMP player, boolean noClip);
+    void clonePlayer(final EntityPlayerMP p0, final EntityPlayer p1, final boolean p2);
+    
+    void updateRiddenPre(final EntityPlayerMP p0);
+    
+    void updateRiddenPost(final EntityPlayerMP p0);
+    
+    boolean mountEntity(final EntityPlayerMP p0, final Entity p1);
+    
+    void moveEntity(final EntityPlayerMP p0, final double p1, final double p2, final double p3);
+    
+    boolean wakeUpPlayer(final EntityPlayerMP p0, final boolean p1, final boolean p2, final boolean p3);
+    
+    float attackEntityFrom(final EntityPlayerMP p0, final DamageSource p1, final float p2);
+    
+    void knockBack(final EntityPlayerMP p0, final Entity p1, final float p2, final double p3, final double p4);
 }

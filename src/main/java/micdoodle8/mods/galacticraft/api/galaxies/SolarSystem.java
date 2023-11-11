@@ -1,94 +1,67 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.api.galaxies;
 
-import micdoodle8.mods.galacticraft.annotations.ReplaceWith;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.api.vector.*;
+import java.util.*;
+import net.minecraft.util.*;
 
-public class SolarSystem extends CelestialObject
+public class SolarSystem
 {
-
-    protected Vector3 mapPosition = null;
-    protected Star mainStar = null;
+    protected final String systemName;
+    protected String unlocalizedName;
+    protected Vector3 mapPosition;
+    protected Star mainStar;
     protected String unlocalizedGalaxyName;
-
-    public SolarSystem(String solarSystem, String parentGalaxy)
-    {
-        super(CelestialType.SOLARSYSTEM, solarSystem);
+    
+    public SolarSystem(final String solarSystem, final String parentGalaxy) {
+        this.mapPosition = null;
+        this.mainStar = null;
+        this.systemName = solarSystem.toLowerCase(Locale.ENGLISH);
+        this.unlocalizedName = solarSystem;
         this.unlocalizedGalaxyName = parentGalaxy;
     }
-
-    @Override
-    public void setOwnerId(String ownerId)
-    {
-        super.setOwnerId(ownerId);
+    
+    public String getName() {
+        return this.systemName;
     }
-
-    public Vector3 getMapPosition()
-    {
+    
+    public final int getID() {
+        return GalaxyRegistry.getSolarSystemID(this.systemName);
+    }
+    
+    public String getLocalizedName() {
+        final String s = this.getUnlocalizedName();
+        return (s == null) ? "" : StatCollector.translateToLocal(s);
+    }
+    
+    public String getUnlocalizedName() {
+        return "solarsystem." + this.unlocalizedName;
+    }
+    
+    public Vector3 getMapPosition() {
         return this.mapPosition;
     }
-
-    public SolarSystem setMapPosition(Vector3 mapPosition)
-    {
-        mapPosition.scale(500D);
+    
+    public SolarSystem setMapPosition(final Vector3 mapPosition) {
+        mapPosition.scale(500.0);
         this.mapPosition = mapPosition;
         return this;
     }
-
-    public Star getMainStar()
-    {
+    
+    public Star getMainStar() {
         return this.mainStar;
     }
-
-    public SolarSystem setMainStar(Star star)
-    {
+    
+    public SolarSystem setMainStar(final Star star) {
         this.mainStar = star;
         return this;
     }
-
-    public String getTranslatedParentGalaxyName()
-    {
-        return super.getTranslatedName();
+    
+    public String getLocalizedParentGalaxyName() {
+        final String s = this.getUnlocalizedParentGalaxyName();
+        return (s == null) ? "" : StatCollector.translateToLocal(s);
     }
-
-    public String getParentGalaxyTranslationKey()
-    {
-        return "galaxy." + this.unlocalizedGalaxyName;
-    }
-
-    // DEPRECATED METHODS
-
-    @Deprecated
-    @ReplaceWith("getTranslationKey()")
-    public String getUnlocalizedName()
-    {
-        return getTranslationKey();
-    }
-
-    @Deprecated
-    @ReplaceWith("getTranslatedName()")
-    public String getLocalizedName()
-    {
-        return getTranslatedName();
-    }
-
-    @Deprecated
-    @ReplaceWith("getTranslatedParentGalaxyName()")
-    public String getLocalizedParentGalaxyName()
-    {
-        return getTranslatedParentGalaxyName();
-    }
-
-    @Deprecated
-    @ReplaceWith("getParentGalaxyTranslationKey()")
-    public String getUnlocalizedParentGalaxyName()
-    {
+    
+    public String getUnlocalizedParentGalaxyName() {
         return "galaxy." + this.unlocalizedGalaxyName;
     }
 }

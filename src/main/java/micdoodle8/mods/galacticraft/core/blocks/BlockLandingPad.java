@@ -1,227 +1,113 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import micdoodle8.mods.galacticraft.api.block.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import net.minecraft.util.*;
+import net.minecraft.block.material.*;
+import net.minecraft.block.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.creativetab.*;
+import java.util.*;
+import net.minecraft.item.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.world.*;
+import net.minecraft.tileentity.*;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import net.minecraftforge.common.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.core.GCBlocks;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.IShiftDescription;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityBuggyFuelerSingle;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityLandingPadSingle;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryBlock;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class BlockLandingPad extends BlockAdvancedTile implements IPartialSealableBlock, IShiftDescription, ISortableBlock
+public class BlockLandingPad extends BlockAdvancedTile implements IPartialSealableBlock, ItemBlockDesc.IBlockShiftDesc
 {
-
-    public static final PropertyEnum<EnumLandingPadType> PAD_TYPE = PropertyEnum.create("type", EnumLandingPadType.class);
-    protected static final AxisAlignedBB AABB = new AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 0.1875, 1.0);
-
-    public enum EnumLandingPadType implements IStringSerializable
-    {
-
-        ROCKET_PAD(0, "rocket"), BUGGY_PAD(1, "buggy");
-
-        private final int meta;
-        private final String name;
-
-        EnumLandingPadType(int meta, String name)
-        {
-            this.meta = meta;
-            this.name = name;
-        }
-
-        public int getMeta()
-        {
-            return this.meta;
-        }
-
-        private final static EnumLandingPadType[] values = values();
-
-        public static EnumLandingPadType byMetadata(int meta)
-        {
-            return values[meta % values.length];
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name;
-        }
+    private IIcon[] icons;
+    
+    public BlockLandingPad(final String assetName) {
+        super(Material.iron);
+        this.icons = new IIcon[3];
+        this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.2f, 1.0f);
+        this.setHardness(1.0f);
+        this.setResistance(10.0f);
+        this.setStepSound(Block.soundTypeMetal);
+        this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
+        this.setBlockName(assetName);
     }
-
-    public BlockLandingPad(String assetName)
-    {
-        super(Material.IRON);
-        this.setHardness(1.0F);
-        this.setResistance(10.0F);
-        this.setSoundType(SoundType.METAL);
-        this.setTranslationKey(assetName);
-    }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        return AABB;
-    }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        for (int i = 0; i < 2; i++)
-        {
-            list.add(new ItemStack(this, 1, i));
+    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < 2; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
         }
     }
-
-    private boolean checkAxis(World worldIn, BlockPos pos, Block block, EnumFacing facing)
-    {
-        int sameCount = 0;
-        for (int i = 1; i <= 3; i++)
-        {
-            if (worldIn.getBlockState(pos.offset(facing, i)).getBlock() == block)
-            {
-                sameCount++;
+    
+    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+        this.icons[0] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "launch_pad");
+        this.icons[1] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "buggy_fueler_blank");
+        this.icons[2] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "cargo_pad");
+        this.blockIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "launch_pad");
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(final int par1, final int par2) {
+        if (par2 < 0 || par2 > this.icons.length) {
+            return this.blockIcon;
+        }
+        return this.icons[par2];
+    }
+    
+    public boolean canPlaceBlockOnSide(final World par1World, final int par2, final int par3, final int par4, final int par5) {
+        final Block id = GCBlocks.landingPad;
+        return (par1World.getBlock(par2 + 1, par3, par4) != id || par1World.getBlock(par2 + 2, par3, par4) != id || par1World.getBlock(par2 + 3, par3, par4) != id) && (par1World.getBlock(par2 - 1, par3, par4) != id || par1World.getBlock(par2 - 2, par3, par4) != id || par1World.getBlock(par2 - 3, par3, par4) != id) && (par1World.getBlock(par2, par3, par4 + 1) != id || par1World.getBlock(par2, par3, par4 + 2) != id || par1World.getBlock(par2, par3, par4 + 3) != id) && (par1World.getBlock(par2, par3, par4 - 1) != id || par1World.getBlock(par2, par3, par4 - 2) != id || par1World.getBlock(par2, par3, par4 - 3) != id) && (par1World.getBlock(par2, par3 - 1, par4) != GCBlocks.landingPad || par5 != 1) && this.canPlaceBlockAt(par1World, par2, par3, par4);
+    }
+    
+    public TileEntity createTileEntity(final World world, final int metadata) {
+        if (world.isRemote) {
+            return null;
+        }
+        switch (metadata) {
+            case 0: {
+                return new TileEntityLandingPadSingle();
+            }
+            case 1: {
+                return new TileEntityBuggyFuelerSingle();
+            }
+            default: {
+                return null;
             }
         }
-
-        return sameCount < 3;
     }
-
-    @Override
-    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side)
-    {
-        final Block id = GCBlocks.landingPad;
-
-        if (!checkAxis(worldIn, pos, id, EnumFacing.EAST) || !checkAxis(worldIn, pos, id, EnumFacing.WEST) || !checkAxis(worldIn, pos, id, EnumFacing.NORTH)
-            || !checkAxis(worldIn, pos, id, EnumFacing.SOUTH))
-        {
-            return false;
-        }
-
-        if (worldIn.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() == GCBlocks.landingPad && side == EnumFacing.UP)
-        {
-            return false;
-        } else
-        {
-            return this.canPlaceBlockAt(worldIn, pos);
-        }
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    
+    public boolean isOpaqueCube() {
         return false;
     }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    
+    public boolean renderAsNormalBlock() {
         return false;
     }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
+    
+    public TileEntity createNewTileEntity(final World world, final int meta) {
+        return null;
     }
-
-    @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
-        switch (meta)
-        {
-            case 0:
-                return new TileEntityLandingPadSingle();
-            case 1:
-                return new TileEntityBuggyFuelerSingle();
-            default:
-                return null;
+    
+    public boolean isSealed(final World world, final int x, final int y, final int z, final ForgeDirection direction) {
+        return direction == ForgeDirection.UP;
+    }
+    
+    public int damageDropped(final int meta) {
+        return meta;
+    }
+    
+    public String getShiftDescription(final int meta) {
+        if (meta == 0) {
+            return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
         }
+        return GCCoreUtil.translate("tile.buggyPad.description");
     }
-
-    @Override
-    public boolean isSealed(World worldIn, BlockPos pos, EnumFacing direction)
-    {
-        return direction == EnumFacing.UP;
-    }
-
-    @Override
-    public int damageDropped(IBlockState state)
-    {
-        return getMetaFromState(state);
-    }
-
-    @Override
-    public String getShiftDescription(int meta)
-    {
-        if (meta == 0)
-        {
-            return GCCoreUtil.translate(this.getTranslationKey() + ".description");
-        }
-        return GCCoreUtil.translate("tile.buggy_pad.description");
-    }
-
-    @Override
-    public boolean showDescription(int meta)
-    {
+    
+    public boolean showDescription(final int meta) {
         return true;
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(PAD_TYPE, EnumLandingPadType.byMetadata(meta));
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state)
-    {
-        return ((EnumLandingPadType) state.getValue(PAD_TYPE)).getMeta();
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState()
-    {
-        return new BlockStateContainer(this, PAD_TYPE);
-    }
-
-    @Override
-    public EnumSortCategoryBlock getCategory(int meta)
-    {
-        return EnumSortCategoryBlock.PAD;
     }
 }

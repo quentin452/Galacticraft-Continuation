@@ -1,204 +1,124 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
+import micdoodle8.mods.galacticraft.api.item.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import cpw.mods.fml.relauncher.*;
+import java.util.*;
+import net.minecraft.world.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.entity.*;
+import net.minecraft.init.*;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import net.minecraftforge.fluids.*;
+import net.minecraft.util.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-import javax.annotation.Nullable;
-
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GCFluids;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.EntityBuggy;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-
-public class ItemBuggy extends Item implements IHoldableItem, ISortableItem, GCRarity
+public class ItemBuggy extends Item implements IHoldableItem
 {
-
-    public ItemBuggy(String assetName)
-    {
-        super();
-        this.setTranslationKey(assetName);
+    public ItemBuggy(final String assetName) {
+        this.setUnlocalizedName(assetName);
+        this.setTextureName("arrow");
         this.setMaxStackSize(1);
     }
-
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                list.add(new ItemStack(this, 1, i));
-            }
-        }
-    }
-
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand)
-    {
-        ItemStack itemstack = playerIn.getHeldItem(hand);
-        final float var4 = 1.0F;
-        final float var5 = playerIn.prevRotationPitch + (playerIn.rotationPitch - playerIn.prevRotationPitch) * var4;
-        final float var6 = playerIn.prevRotationYaw + (playerIn.rotationYaw - playerIn.prevRotationYaw) * var4;
-        final double var7 = playerIn.prevPosX + (playerIn.posX - playerIn.prevPosX) * var4;
-        final double var9 = playerIn.prevPosY + (playerIn.posY - playerIn.prevPosY) * var4 + 1.62D - playerIn.getYOffset();
-        final double var11 = playerIn.prevPosZ + (playerIn.posZ - playerIn.prevPosZ) * var4;
-        final Vec3d var13 = new Vec3d(var7, var9, var11);
-        final float var14 = MathHelper.cos(-var6 / Constants.RADIANS_TO_DEGREES - (float) Math.PI);
-        final float var15 = MathHelper.sin(-var6 / Constants.RADIANS_TO_DEGREES - (float) Math.PI);
-        final float var16 = -MathHelper.cos(-var5 / Constants.RADIANS_TO_DEGREES);
-        final float var17 = MathHelper.sin(-var5 / Constants.RADIANS_TO_DEGREES);
-        final float var18 = var15 * var16;
-        final float var20 = var14 * var16;
-        final double var21 = 5.0D;
-        final Vec3d var23 = var13.add(var18 * var21, var17 * var21, var20 * var21);
-        final RayTraceResult var24 = worldIn.rayTraceBlocks(var13, var23, true);
-
-        if (var24 == null)
-        {
-            return new ActionResult<>(EnumActionResult.PASS, itemstack);
-        } else
-        {
-            final Vec3d var25 = playerIn.getLook(var4);
-            boolean var26 = false;
-            final float var27 = 1.0F;
-            final List<?> var28 =
-                worldIn.getEntitiesWithinAABBExcludingEntity(playerIn, playerIn.getEntityBoundingBox().grow(var25.x * var21, var25.y * var21, var25.z * var21).expand(var27, var27, var27));
-            int var29;
-
-            for (var29 = 0; var29 < var28.size(); ++var29)
-            {
-                final Entity var30 = (Entity) var28.get(var29);
-
-                if (var30.canBeCollidedWith())
-                {
-                    final float var31 = var30.getCollisionBorderSize();
-                    final AxisAlignedBB var32 = var30.getEntityBoundingBox().expand(var31, var31, var31);
-
-                    if (var32.contains(var13))
-                    {
-                        var26 = true;
-                    }
-                }
-            }
-
-            if (var26)
-            {
-                return new ActionResult<>(EnumActionResult.PASS, itemstack);
-            } else
-            {
-                if (var24.typeOfHit == RayTraceResult.Type.BLOCK)
-                {
-                    var29 = var24.getBlockPos().getX();
-                    int var33 = var24.getBlockPos().getY();
-                    final int var34 = var24.getBlockPos().getZ();
-
-                    if (worldIn.getBlockState(new BlockPos(var29, var33, var34)).getBlock() == Blocks.SNOW)
-                    {
-                        --var33;
-                    }
-
-                    final EntityBuggy var35 = new EntityBuggy(worldIn, var29 + 0.5F, var33 + 1.0F, var34 + 0.5F, itemstack.getItemDamage());
-
-                    if (!worldIn.getCollisionBoxes(var35, var35.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty())
-                    {
-                        return new ActionResult<>(EnumActionResult.PASS, itemstack);
-                    }
-
-                    if (itemstack.hasTagCompound() && itemstack.getTagCompound().hasKey("BuggyFuel"))
-                    {
-                        var35.buggyFuelTank.setFluid(new FluidStack(GCFluids.fluidFuel, itemstack.getTagCompound().getInteger("BuggyFuel")));
-                    }
-
-                    if (!worldIn.isRemote)
-                    {
-                        worldIn.spawnEntity(var35);
-                    }
-
-                    if (!playerIn.capabilities.isCreativeMode)
-                    {
-                        itemstack.shrink(1);
-                    }
-                }
-
-                return new ActionResult<>(EnumActionResult.SUCCESS, itemstack);
-            }
-        }
-    }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        if (par1ItemStack.getItemDamage() != 0)
-        {
-            tooltip.add(GCCoreUtil.translate("gui.buggy.storage_space") + ": " + par1ItemStack.getItemDamage() * 18);
-        }
-
-        if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound().hasKey("BuggyFuel"))
-        {
-            tooltip.add(GCCoreUtil.translate("gui.message.fuel.name") + ": " + par1ItemStack.getTagCompound().getInteger("BuggyFuel") + " / " + EntityBuggy.tankCapacity);
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < 4; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
         }
     }
-
-    @Override
-    public boolean shouldHoldLeftHandUp(EntityPlayer player)
-    {
+    
+    public ItemStack onItemRightClick(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer) {
+        final float var4 = 1.0f;
+        final float var5 = par3EntityPlayer.prevRotationPitch + (par3EntityPlayer.rotationPitch - par3EntityPlayer.prevRotationPitch) * 1.0f;
+        final float var6 = par3EntityPlayer.prevRotationYaw + (par3EntityPlayer.rotationYaw - par3EntityPlayer.prevRotationYaw) * 1.0f;
+        final double var7 = par3EntityPlayer.prevPosX + (par3EntityPlayer.posX - par3EntityPlayer.prevPosX) * 1.0;
+        final double var8 = par3EntityPlayer.prevPosY + (par3EntityPlayer.posY - par3EntityPlayer.prevPosY) * 1.0 + 1.62 - par3EntityPlayer.yOffset;
+        final double var9 = par3EntityPlayer.prevPosZ + (par3EntityPlayer.posZ - par3EntityPlayer.prevPosZ) * 1.0;
+        final Vec3 var10 = Vec3.createVectorHelper(var7, var8, var9);
+        final float var11 = MathHelper.cos(-var6 * 0.017453292f - 3.1415927f);
+        final float var12 = MathHelper.sin(-var6 * 0.017453292f - 3.1415927f);
+        final float var13 = -MathHelper.cos(-var5 * 0.017453292f);
+        final float var14 = MathHelper.sin(-var5 * 0.017453292f);
+        final float var15 = var12 * var13;
+        final float var16 = var11 * var13;
+        final double var17 = 5.0;
+        final Vec3 var18 = var10.addVector(var15 * 5.0, var14 * 5.0, var16 * 5.0);
+        final MovingObjectPosition var19 = par2World.rayTraceBlocks(var10, var18, true);
+        if (var19 == null) {
+            return par1ItemStack;
+        }
+        final Vec3 var20 = par3EntityPlayer.getLook(1.0f);
+        boolean var21 = false;
+        final float var22 = 1.0f;
+        final List<?> var23 = (List<?>)par2World.getEntitiesWithinAABBExcludingEntity((Entity)par3EntityPlayer, par3EntityPlayer.boundingBox.addCoord(var20.xCoord * 5.0, var20.yCoord * 5.0, var20.zCoord * 5.0).expand(1.0, 1.0, 1.0));
+        for (int var24 = 0; var24 < var23.size(); ++var24) {
+            final Entity var25 = (Entity)var23.get(var24);
+            if (var25.canBeCollidedWith()) {
+                final float var26 = var25.getCollisionBorderSize();
+                final AxisAlignedBB var27 = var25.boundingBox.expand((double)var26, (double)var26, (double)var26);
+                if (var27.isVecInside(var10)) {
+                    var21 = true;
+                }
+            }
+        }
+        if (var21) {
+            return par1ItemStack;
+        }
+        if (var19.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            final int var24 = var19.blockX;
+            int var28 = var19.blockY;
+            final int var29 = var19.blockZ;
+            if (par2World.getBlock(var24, var28, var29) == Blocks.snow) {
+                --var28;
+            }
+            final EntityBuggy var30 = new EntityBuggy(par2World, (double)(var24 + 0.5f), (double)(var28 + 1.0f), (double)(var29 + 0.5f), par1ItemStack.getItemDamage());
+            if (!par2World.getCollidingBoundingBoxes((Entity)var30, var30.boundingBox.expand(-0.1, -0.1, -0.1)).isEmpty()) {
+                return par1ItemStack;
+            }
+            if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound().hasKey("BuggyFuel")) {
+                var30.buggyFuelTank.setFluid(new FluidStack(GalacticraftCore.fluidFuel, par1ItemStack.getTagCompound().getInteger("BuggyFuel")));
+            }
+            if (!par2World.isRemote) {
+                par2World.spawnEntityInWorld((Entity)var30);
+            }
+            if (!par3EntityPlayer.capabilities.isCreativeMode) {
+                --par1ItemStack.stackSize;
+            }
+        }
+        return par1ItemStack;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer player, final List par2List, final boolean b) {
+        if (par1ItemStack.getItemDamage() != 0) {
+            par2List.add(GCCoreUtil.translate("gui.buggy.storageSpace") + ": " + par1ItemStack.getItemDamage() * 18);
+        }
+        if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound().hasKey("BuggyFuel")) {
+            par2List.add(GCCoreUtil.translate("gui.message.fuel.name") + ": " + par1ItemStack.getTagCompound().getInteger("BuggyFuel") + " / " + 1000);
+        }
+    }
+    
+    public boolean shouldHoldLeftHandUp(final EntityPlayer player) {
         return true;
     }
-
-    @Override
-    public boolean shouldHoldRightHandUp(EntityPlayer player)
-    {
+    
+    public boolean shouldHoldRightHandUp(final EntityPlayer player) {
         return true;
     }
-
-    @Override
-    public boolean shouldCrouch(EntityPlayer player)
-    {
+    
+    public boolean shouldCrouch(final EntityPlayer player) {
         return true;
-    }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        return EnumSortCategoryItem.GENERAL;
     }
 }

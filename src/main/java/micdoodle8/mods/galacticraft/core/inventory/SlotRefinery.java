@@ -1,29 +1,31 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import net.minecraft.inventory.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.items.*;
+import java.lang.reflect.*;
 
 public class SlotRefinery extends Slot
 {
-
-    public SlotRefinery(IInventory par1iInventory, int par2, int par3, int par4)
-    {
+    public SlotRefinery(final IInventory par1iInventory, final int par2, final int par3, final int par4) {
         super(par1iInventory, par2, par3, par4);
     }
-
-    @Override
-    public boolean isItemValid(ItemStack stack)
-    {
-        return FluidUtil.isOilContainerAny(stack);
+    
+    public boolean isItemValid(final ItemStack par1ItemStack) {
+        Class<?> buildCraftClass = null;
+        try {
+            if ((buildCraftClass = Class.forName("buildcraft.BuildCraftEnergy")) != null) {
+                for (final Field f : buildCraftClass.getFields()) {
+                    if (f.getName().equals("bucketOil")) {
+                        final Item item = (Item)f.get(null);
+                        if (par1ItemStack.getItem() == item) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Throwable t) {}
+        return par1ItemStack.getItem() instanceof ItemOilCanister && par1ItemStack.getItemDamage() > 0;
     }
 }

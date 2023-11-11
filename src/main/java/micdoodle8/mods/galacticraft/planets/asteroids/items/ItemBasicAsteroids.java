@@ -1,112 +1,78 @@
-/*
- * Copyright (c) 2023 Team Galacticraft
- *
- * Licensed under the MIT license.
- * See LICENSE file in the project root for details.
- */
-
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import java.util.List;
-import javax.annotation.Nullable;
-import micdoodle8.mods.galacticraft.api.item.GCRarity;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ISortableItem;
-import micdoodle8.mods.galacticraft.core.util.EnumSortCategoryItem;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.*;
+import net.minecraft.creativetab.*;
+import micdoodle8.mods.galacticraft.core.*;
+import cpw.mods.fml.relauncher.*;
+import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.client.renderer.texture.*;
+import java.util.*;
+import net.minecraft.entity.player.*;
+import micdoodle8.mods.galacticraft.core.util.*;
 
-public class ItemBasicAsteroids extends Item implements ISortableItem, GCRarity
+public class ItemBasicAsteroids extends Item
 {
-
-    public static String[] names =
-    {"ingot_titanium", "engine_t2", "rocket_fins_t2", "shard_iron", "shard_titanium", "reinforced_plate_t3", "compressed_titanium", "thermal_cloth", "beam_core", "dust_titanium"};
-
-    public ItemBasicAsteroids(String name)
-    {
-        super();
+    public static String[] names;
+    protected IIcon[] icons;
+    
+    public ItemBasicAsteroids() {
+        this.icons = new IIcon[ItemBasicAsteroids.names.length];
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
-        this.setTranslationKey(name);
+        this.setUnlocalizedName("itemBasicAsteroids");
     }
-
+    
     @SideOnly(Side.CLIENT)
-    @Override
-    public CreativeTabs getCreativeTab()
-    {
+    public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list)
-    {
-        if (tab == GalacticraftCore.galacticraftItemsTab || tab == CreativeTabs.SEARCH)
-        {
-            for (int i = 0; i < ItemBasicAsteroids.names.length; i++)
-            {
-                list.add(new ItemStack(this, 1, i));
-            }
+    
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+        return ClientProxyCore.galacticraftItem;
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(final IIconRegister iconRegister) {
+        int i = 0;
+        for (final String name : ItemBasicAsteroids.names) {
+            this.icons[i++] = iconRegister.registerIcon("galacticraftasteroids:" + name);
         }
     }
-
-    @Override
-    public String getTranslationKey(ItemStack par1ItemStack)
-    {
-        if (ItemBasicAsteroids.names.length > par1ItemStack.getItemDamage())
-        {
+    
+    public IIcon getIconFromDamage(final int damage) {
+        if (this.icons.length > damage) {
+            return this.icons[damage];
+        }
+        return super.getIconFromDamage(damage);
+    }
+    
+    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+        for (int i = 0; i < ItemBasicAsteroids.names.length; ++i) {
+            par3List.add(new ItemStack(par1, 1, i));
+        }
+    }
+    
+    public String getUnlocalizedName(final ItemStack par1ItemStack) {
+        if (this.icons.length > par1ItemStack.getItemDamage()) {
             return "item." + ItemBasicAsteroids.names[par1ItemStack.getItemDamage()];
         }
-
         return "unnamed";
     }
-
-    @Override
+    
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack par1ItemStack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-    {
-        if (par1ItemStack != null && par1ItemStack.getItemDamage() == 5)
-        {
-            tooltip.add(GCCoreUtil.translate("item.tier3.desc"));
+    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
+        if (par1ItemStack != null && par1ItemStack.getItemDamage() == 0) {
+            par3List.add(GCCoreUtil.translate("item.tier3.desc"));
         }
     }
-
-    @Override
-    public int getMetadata(int par1)
-    {
+    
+    public int getMetadata(final int par1) {
         return par1;
     }
-
-    @Override
-    public EnumSortCategoryItem getCategory(int meta)
-    {
-        switch (meta)
-        {
-            case 0:
-                return EnumSortCategoryItem.INGOT;
-            case 5:
-            case 6:
-                return EnumSortCategoryItem.PLATE;
-        }
-        return EnumSortCategoryItem.GENERAL;
-    }
-
-    @Override
-    public float getSmeltingExperience(ItemStack item)
-    {
-        switch (item.getItemDamage())
-        {
-            case 5:
-                return 2F;
-            case 6:
-                return 1F;
-        }
-        return -1F;
+    
+    static {
+        ItemBasicAsteroids.names = new String[] { "reinforcedPlateT3", "engineT2", "rocketFinsT2", "shardIron", "shardTitanium", "ingotTitanium", "compressedTitanium", "thermalCloth", "beamCore" };
     }
 }
