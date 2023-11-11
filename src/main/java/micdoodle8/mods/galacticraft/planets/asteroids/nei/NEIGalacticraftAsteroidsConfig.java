@@ -114,10 +114,10 @@ public class NEIGalacticraftAsteroidsConfig implements IConfigureNEI {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 4; j++) {
                 input.add(
-                        new PositionedStack(
-                                new ItemStack(MarsItems.marsItemBasic, 1, 3),
-                                44 + j * 18 - x,
-                                19 + i * 72 - y));
+                    new PositionedStack(
+                        new ItemStack(MarsItems.marsItemBasic, 1, 3),
+                        44 + j * 18 - x,
+                        19 + i * 72 - y));
             }
         }
         input.add(new PositionedStack(new ItemStack(GCItems.flagPole), 116 - x, 19 - y));
@@ -139,7 +139,7 @@ public class NEIGalacticraftAsteroidsConfig implements IConfigureNEI {
         input.add(new PositionedStack(new ItemStack(AsteroidsItems.basicItem, 1, 8), 44 - x, 73 - y));
         input.add(new PositionedStack(new ItemStack(AsteroidBlocks.beamReceiver), 62 - x, 73 - y));
         this.registerAstroMinerRecipe(
-                input,
-                new PositionedStack(new ItemStack(AsteroidsItems.astroMiner), 143 - x, 55 - y));
+            input,
+            new PositionedStack(new ItemStack(AsteroidsItems.astroMiner), 143 - x, 55 - y));
     }
 }

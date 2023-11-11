@@ -1,5 +1,6 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
+import micdoodle8.mods.galacticraft.api.recipe.ISchematicItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -8,8 +9,6 @@ import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.api.recipe.ISchematicItem;
 
 public class ContainerSchematic extends Container {
 
@@ -28,7 +27,7 @@ public class ContainerSchematic extends Container {
         for (var6 = 0; var6 < 3; ++var6) {
             for (var7 = 0; var7 < 9; ++var7) {
                 this.addSlotToContainer(
-                        new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 111 + var6 * 18 - 59 + 16));
+                    new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 111 + var6 * 18 - 59 + 16));
             }
         }
 

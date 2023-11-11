@@ -1,15 +1,14 @@
 package micdoodle8.mods.galacticraft.api.recipe;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import cpw.mods.fml.common.FMLLog;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import cpw.mods.fml.common.FMLLog;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SpaceStationRecipe {
 
@@ -31,9 +30,8 @@ public class SpaceStationRecipe {
                 this.input.put(new ItemStack((Block) obj), amount);
             } else if (obj instanceof String) {
                 FMLLog.info(
-                        "While registering space station recipe, found " + OreDictionary.getOres((String) obj).size()
-                                + " type(s) of "
-                                + obj);
+                    "While registering space station recipe, found " + OreDictionary.getOres((String) obj)
+                        .size() + " type(s) of " + obj);
                 this.input.put(OreDictionary.getOres((String) obj), amount);
             } else if (obj instanceof ArrayList) {
                 this.input.put(obj, amount);
@@ -134,7 +132,7 @@ public class SpaceStationRecipe {
 
     public static boolean checkItemEquals(ItemStack target, ItemStack input) {
         return target.getItem() == input.getItem() && (target.getItemDamage() == OreDictionary.WILDCARD_VALUE
-                || target.getItemDamage() == input.getItemDamage());
+            || target.getItemDamage() == input.getItemDamage());
     }
 
     /**

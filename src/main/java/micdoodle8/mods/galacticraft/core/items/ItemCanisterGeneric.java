@@ -1,7 +1,10 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
-
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.EnumRarity;
@@ -9,17 +12,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.ItemFluidContainer;
+import net.minecraftforge.fluids.*;
 
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import java.util.List;
 
 public abstract class ItemCanisterGeneric extends ItemFluidContainer {
 
@@ -57,7 +52,8 @@ public abstract class ItemCanisterGeneric extends ItemFluidContainer {
     public ItemStack getContainerItem(ItemStack itemStack) {
         // Workaround for strange behaviour in TE Transposer
         if (isTELoaded) {
-            final StackTraceElement[] st = Thread.currentThread().getStackTrace();
+            final StackTraceElement[] st = Thread.currentThread()
+                .getStackTrace();
             final int imax = Math.max(st.length, 5);
             for (int i = 1; i < imax; i++) {
                 final String ste = st[i].getClassName();
@@ -97,21 +93,23 @@ public abstract class ItemCanisterGeneric extends ItemFluidContainer {
     @Override
     public int fill(ItemStack container, FluidStack resource, boolean doFill) {
         if (resource == null || resource.getFluid() == null
-                || resource.amount == 0
-                || container == null
-                || container.getItemDamage() <= 1
-                || !(container.getItem() instanceof ItemCanisterGeneric)) {
+            || resource.amount == 0
+            || container == null
+            || container.getItemDamage() <= 1
+            || !(container.getItem() instanceof ItemCanisterGeneric)) {
             return 0;
         }
 
-        final String fluidName = resource.getFluid().getName();
+        final String fluidName = resource.getFluid()
+            .getName();
         if (container.getItemDamage() == ItemCanisterGeneric.EMPTY) {
             // Empty canister - find a new canister to match the fluid
             for (final String key : GalacticraftCore.itemList.keySet()) {
                 if (key.contains("CanisterFull")) {
-                    final Item i = GalacticraftCore.itemList.get(key).getItem();
+                    final Item i = GalacticraftCore.itemList.get(key)
+                        .getItem();
                     if (i instanceof ItemCanisterGeneric
-                            && fluidName.equalsIgnoreCase(((ItemCanisterGeneric) i).allowedFluid)) {
+                        && fluidName.equalsIgnoreCase(((ItemCanisterGeneric) i).allowedFluid)) {
                         if (!doFill) {
                             return Math.min(resource.amount, this.capacity);
                         }

@@ -1,5 +1,17 @@
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
+import cpw.mods.fml.common.Loader;
+import micdoodle8.mods.galacticraft.api.entity.ICameraZoomEntity;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.client.model.ModelPlayerGC;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityMulti;
+import micdoodle8.mods.galacticraft.core.wrappers.PlayerGearData;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMars;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -14,21 +26,7 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.common.Loader;
-import micdoodle8.mods.galacticraft.api.entity.ICameraZoomEntity;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.client.model.ModelPlayerGC;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityMulti;
-import micdoodle8.mods.galacticraft.core.wrappers.PlayerGearData;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMars;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 
 /**
  * This renders the thermal armor (unless RenderPlayerAPI is installed). The thermal armor render is done after the
@@ -62,8 +60,9 @@ public class RenderPlayerGC extends RenderPlayer {
         if (GalacticraftCore.isPlanetsLoaded) {
             try {
                 final String prefix = (String) Class
-                        .forName("micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule")
-                        .getField("ASSET_PREFIX").get(null);
+                    .forName("micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule")
+                    .getField("ASSET_PREFIX")
+                    .get(null);
                 thermalPaddingTexture0 = new ResourceLocation(prefix, "textures/misc/thermalPadding_0.png");
                 thermalPaddingTexture1 = new ResourceLocation(prefix, "textures/misc/thermalPadding_1.png");
             } catch (final Exception e) {
@@ -73,7 +72,7 @@ public class RenderPlayerGC extends RenderPlayer {
     }
 
     public static void renderModelS(RendererLivingEntity inst, EntityLivingBase par1EntityLivingBase, float par2,
-            float par3, float par4, float par5, float par6, float par7) {
+        float par3, float par4, float par5, float par6, float par7) {
         if (inst instanceof RenderPlayer) {
             RenderPlayer thisInst = (RenderPlayer) inst;
             if (isSmartRenderLoaded == null) {
@@ -82,7 +81,7 @@ public class RenderPlayerGC extends RenderPlayer {
 
             if (RenderPlayerGC.thermalPaddingTexture0 != null && !isSmartRenderLoaded) {
                 final PlayerGearData gearData = ClientProxyCore.playerItemData
-                        .get(par1EntityLivingBase.getCommandSenderName());
+                    .get(par1EntityLivingBase.getCommandSenderName());
 
                 if (gearData != null && !RenderPlayerGC.flagThermalOverride) {
                     ModelBiped modelBiped;
@@ -137,7 +136,7 @@ public class RenderPlayerGC extends RenderPlayer {
 
                             if (par1EntityLivingBase.worldObj.provider instanceof IGalacticraftWorldProvider) {
                                 final float modifier = ((IGalacticraftWorldProvider) par1EntityLivingBase.worldObj.provider)
-                                        .getThermalLevelModifier();
+                                    .getThermalLevelModifier();
 
                                 if (modifier > 0) {
                                     b = g;
@@ -180,18 +179,18 @@ public class RenderPlayerGC extends RenderPlayer {
                     int meta = par1AbstractClientPlayer.worldObj.getBlockMetadata(pos.posX, pos.posY, pos.posZ);
 
                     if (bed.isBed(
-                            par1AbstractClientPlayer.worldObj,
-                            pos.posX,
-                            pos.posY,
-                            pos.posZ,
-                            par1AbstractClientPlayer)) {
+                        par1AbstractClientPlayer.worldObj,
+                        pos.posX,
+                        pos.posY,
+                        pos.posZ,
+                        par1AbstractClientPlayer)) {
                         if (bed == GCBlocks.fakeBlock && meta == 5) {
                             final TileEntity tile = event.entityPlayer.worldObj
-                                    .getTileEntity(pos.posX, pos.posY, pos.posZ);
+                                .getTileEntity(pos.posX, pos.posY, pos.posZ);
                             if (tile instanceof TileEntityMulti) {
                                 bed = ((TileEntityMulti) tile).mainBlockPosition.getBlock(event.entityPlayer.worldObj);
                                 meta = ((TileEntityMulti) tile).mainBlockPosition
-                                        .getBlockMetadata(event.entityPlayer.worldObj);
+                                    .getBlockMetadata(event.entityPlayer.worldObj);
                             }
                         }
 
@@ -237,7 +236,7 @@ public class RenderPlayerGC extends RenderPlayer {
         }
 
         if (par1AbstractClientPlayer.isSneaking()
-                && par1AbstractClientPlayer.worldObj.provider instanceof IZeroGDimension) {
+            && par1AbstractClientPlayer.worldObj.provider instanceof IZeroGDimension) {
             GL11.glTranslatef(0F, -0.1F, 0F);
         }
     }

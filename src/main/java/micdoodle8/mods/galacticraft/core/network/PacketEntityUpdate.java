@@ -1,14 +1,13 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import java.util.UUID;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import micdoodle8.mods.galacticraft.api.vector.Vector2;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+
+import java.util.UUID;
 
 public class PacketEntityUpdate implements IPacket {
 
@@ -32,11 +31,11 @@ public class PacketEntityUpdate implements IPacket {
 
     public PacketEntityUpdate(Entity entity) {
         this(
-                entity.getEntityId(),
-                new Vector3(entity.posX, entity.posY, entity.posZ),
-                new Vector2(entity.rotationYaw, entity.rotationPitch),
-                new Vector3(entity.motionX, entity.motionY, entity.motionZ),
-                entity.onGround);
+            entity.getEntityId(),
+            new Vector3(entity.posX, entity.posY, entity.posZ),
+            new Vector2(entity.rotationYaw, entity.rotationPitch),
+            new Vector3(entity.motionX, entity.motionY, entity.motionZ),
+            entity.onGround);
     }
 
     @Override
@@ -78,7 +77,8 @@ public class PacketEntityUpdate implements IPacket {
 
         if (entity instanceof IEntityFullSync) {
             IEntityFullSync controllable = (IEntityFullSync) entity;
-            if (player.worldObj.isRemote || player.getUniqueID().equals(controllable.getOwnerUUID()) || controllable.getOwnerUUID() == null) {
+            if (player.worldObj.isRemote || player.getUniqueID()
+                .equals(controllable.getOwnerUUID()) || controllable.getOwnerUUID() == null) {
                 controllable.setPositionRotationAndMotion(
                     this.position.x,
                     this.position.y,
@@ -96,7 +96,7 @@ public class PacketEntityUpdate implements IPacket {
     public interface IEntityFullSync {
 
         void setPositionRotationAndMotion(double x, double y, double z, float yaw, float pitch, double motX,
-                double motY, double motZ, boolean onGround);
+            double motY, double motZ, boolean onGround);
 
         UUID getOwnerUUID();
     }

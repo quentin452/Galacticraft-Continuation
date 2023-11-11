@@ -1,14 +1,12 @@
 package micdoodle8.mods.galacticraft.core.mixins.minecraft;
 
+import micdoodle8.mods.galacticraft.core.event.EventHandlerGC;
 import net.minecraft.client.gui.GuiSleepMP;
 import net.minecraftforge.common.MinecraftForge;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import micdoodle8.mods.galacticraft.core.event.EventHandlerGC;
 
 @Mixin(GuiSleepMP.class)
 public class GuiSleepMPMxin {

@@ -1,5 +1,8 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -10,10 +13,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidRegistry;
-
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
 
 public class EntityParachest extends Entity {
 
@@ -90,7 +89,8 @@ public class EntityParachest extends Entity {
 
                     final Block block = this.worldObj.getBlock(x, y + i, z);
 
-                    if (block.getMaterial().isReplaceable()) {
+                    if (block.getMaterial()
+                        .isReplaceable()) {
                         if (this.placeChest(x, y + i, z)) {
                             this.setDead();
                             return;
@@ -98,11 +98,11 @@ public class EntityParachest extends Entity {
                         if (this.cargo != null) {
                             for (final ItemStack stack : this.cargo) {
                                 final EntityItem e = new EntityItem(
-                                        this.worldObj,
-                                        this.posX,
-                                        this.posY,
-                                        this.posZ,
-                                        stack);
+                                    this.worldObj,
+                                    this.posX,
+                                    this.posY,
+                                    this.posZ,
+                                    stack);
                                 this.worldObj.spawnEntityInWorld(e);
                             }
 
@@ -139,7 +139,10 @@ public class EntityParachest extends Entity {
                 }
 
                 chest.fuelTank.fill(
-                    FluidRegistry.getFluidStack(GalacticraftCore.fluidFuel.getName().toLowerCase(), this.fuelLevel),
+                    FluidRegistry.getFluidStack(
+                        GalacticraftCore.fluidFuel.getName()
+                            .toLowerCase(),
+                        this.fuelLevel),
                     true);
 
                 return true;

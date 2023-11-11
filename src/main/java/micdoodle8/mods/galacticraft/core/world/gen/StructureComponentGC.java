@@ -1,13 +1,13 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.StructureComponent;
+
+import java.util.Random;
 
 public abstract class StructureComponentGC extends StructureComponent {
 
@@ -16,7 +16,7 @@ public abstract class StructureComponentGC extends StructureComponent {
     }
 
     public static StructureBoundingBox getComponentToAddBoundingBox(int x, int y, int z, int lengthOffset,
-                                                                    int heightOffset, int widthOffset, int length, int height, int width, int coordBaseMode) {
+        int heightOffset, int widthOffset, int length, int height, int width, int coordBaseMode) {
         switch (coordBaseMode) {
             case 0:
                 return new StructureBoundingBox(
@@ -62,7 +62,7 @@ public abstract class StructureComponentGC extends StructureComponent {
     }
 
     protected void placeSpawnerAtCurrentPosition(World var1, Random var2, int var3, int var4, int var5, String var6,
-            StructureBoundingBox var7) {
+        StructureBoundingBox var7) {
         final int var8 = this.getXWithOffset(var3, var5);
         final int var9 = this.getYWithOffset(var4);
         final int var10 = this.getZWithOffset(var3, var5);
@@ -72,7 +72,8 @@ public abstract class StructureComponentGC extends StructureComponent {
             final TileEntityMobSpawner var11 = (TileEntityMobSpawner) var1.getTileEntity(var8, var9, var10);
 
             if (var11 != null) {
-                var11.func_145881_a().setEntityName(var6);
+                var11.func_145881_a()
+                    .setEntityName(var6);
             }
         }
     }
@@ -82,10 +83,9 @@ public abstract class StructureComponentGC extends StructureComponent {
         final int var7 = this.getYWithOffset(var2);
         final int var8 = this.getZWithOffset(var1, var3);
         return var5 == 0 ? new int[] { var6 + 1, var7 - 1, var8 - var4 / 2 }
-                : var5 == 1 ? new int[] { var6 + var4 / 2, var7 - 1, var8 + 1 }
-                        : var5 == 2 ? new int[] { var6 - 1, var7 - 1, var8 + var4 / 2 }
-                                : var5 == 3 ? new int[] { var6 - var4 / 2, var7 - 1, var8 - 1 }
-                                        : new int[] { var1, var2, var3 };
+            : var5 == 1 ? new int[] { var6 + var4 / 2, var7 - 1, var8 + 1 }
+                : var5 == 2 ? new int[] { var6 - 1, var7 - 1, var8 + var4 / 2 }
+                    : var5 == 3 ? new int[] { var6 - var4 / 2, var7 - 1, var8 - 1 } : new int[] { var1, var2, var3 };
     }
 
     public int[] getOffsetAsIfRotated(int[] var1, int var2) {
@@ -151,7 +151,7 @@ public abstract class StructureComponentGC extends StructureComponent {
 
     @Override
     protected void placeBlockAtCurrentPosition(World world, Block blockID, int meta, int x, int y, int z,
-            StructureBoundingBox bb) {
+        StructureBoundingBox bb) {
         super.placeBlockAtCurrentPosition(world, blockID, meta, x, y, z, bb);
     }
 }

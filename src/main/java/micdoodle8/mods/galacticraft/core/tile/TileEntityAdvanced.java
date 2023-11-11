@@ -1,16 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
 import io.netty.buffer.ByteBuf;
@@ -19,6 +8,11 @@ import micdoodle8.mods.galacticraft.core.network.IPacketReceiver;
 import micdoodle8.mods.galacticraft.core.network.NetworkUtil;
 import micdoodle8.mods.galacticraft.core.network.PacketDynamic;
 import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+
+import java.lang.reflect.Field;
+import java.util.*;
 
 public abstract class TileEntityAdvanced extends TileEntity implements IPacketReceiver {
 
@@ -59,13 +53,13 @@ public abstract class TileEntityAdvanced extends TileEntity implements IPacketRe
                 final PacketDynamic packet = new PacketDynamic(this);
                 if (this.networkDataChanged) {
                     GalacticraftCore.packetPipeline.sendToAllAround(
-                            packet,
-                            new TargetPoint(
-                                    this.worldObj.provider.dimensionId,
-                                    this.xCoord,
-                                    this.yCoord,
-                                    this.zCoord,
-                                    this.getPacketRange()));
+                        packet,
+                        new TargetPoint(
+                            this.worldObj.provider.dimensionId,
+                            this.xCoord,
+                            this.yCoord,
+                            this.zCoord,
+                            this.getPacketRange()));
                 }
             }
         }
@@ -76,7 +70,8 @@ public abstract class TileEntityAdvanced extends TileEntity implements IPacketRe
             this.fieldCacheClient = new LinkedHashSet<>();
             this.fieldCacheServer = new LinkedHashSet<>();
 
-            for (final Field field : this.getClass().getFields()) {
+            for (final Field field : this.getClass()
+                .getFields()) {
                 if (field.isAnnotationPresent(NetworkedField.class)) {
                     final NetworkedField f = field.getAnnotation(NetworkedField.class);
 
@@ -163,7 +158,7 @@ public abstract class TileEntityAdvanced extends TileEntity implements IPacketRe
         }
 
         if (this.worldObj.isRemote && this.fieldCacheClient.size() == 0
-                || !this.worldObj.isRemote && this.fieldCacheServer.size() == 0) {
+            || !this.worldObj.isRemote && this.fieldCacheServer.size() == 0) {
             return;
         }
 

@@ -1,22 +1,22 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
-import net.minecraftforge.client.IItemRenderer;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.core.client.model.ModelFlag;
 import micdoodle8.mods.galacticraft.core.client.render.entities.RenderFlag;
 import micdoodle8.mods.galacticraft.core.entities.EntityFlag;
 import micdoodle8.mods.galacticraft.core.util.ClientUtil;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.MathHelper;
+import net.minecraftforge.client.IItemRenderer;
+import org.lwjgl.opengl.GL11;
 
 public class ItemRendererFlag implements IItemRenderer {
 
-    private final EntityFlag entityFlagDummy = new EntityFlag(FMLClientHandler.instance().getClient().theWorld);
+    private final EntityFlag entityFlagDummy = new EntityFlag(
+        FMLClientHandler.instance()
+            .getClient().theWorld);
     private final ModelFlag modelFlag = new ModelFlag();
 
     private void renderFlag(ItemRenderType type, ItemStack item, Object... data) {
@@ -27,15 +27,19 @@ public class ItemRendererFlag implements IItemRenderer {
         final float var13 = (((var10 >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
         final float var14 = (((var10 >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
 
-        this.entityFlagDummy.worldObj = FMLClientHandler.instance().getClient().theWorld;
-        this.entityFlagDummy.ticksExisted = (int) FMLClientHandler.instance().getWorldClient().getTotalWorldTime();
+        this.entityFlagDummy.worldObj = FMLClientHandler.instance()
+            .getClient().theWorld;
+        this.entityFlagDummy.ticksExisted = (int) FMLClientHandler.instance()
+            .getWorldClient()
+            .getTotalWorldTime();
         this.entityFlagDummy.setType(item.getItemDamage());
 
         if (type == ItemRenderType.EQUIPPED) {
             final EntityLivingBase entityHolding = (EntityLivingBase) data[1];
 
             if (entityHolding instanceof EntityPlayer) {
-                final String playerName = ((EntityPlayer) entityHolding).getGameProfile().getName();
+                final String playerName = ((EntityPlayer) entityHolding).getGameProfile()
+                    .getName();
 
                 if (!playerName.equals(this.entityFlagDummy.getOwner())) {
                     this.entityFlagDummy.setOwner(playerName);
@@ -43,7 +47,9 @@ public class ItemRendererFlag implements IItemRenderer {
                 }
             }
         } else {
-            final String playerName = FMLClientHandler.instance().getClient().thePlayer.getGameProfile().getName();
+            final String playerName = FMLClientHandler.instance()
+                .getClient().thePlayer.getGameProfile()
+                    .getName();
 
             if (!playerName.equals(this.entityFlagDummy.getOwner()) || this.entityFlagDummy.ticksExisted % 100 == 0) {
                 this.entityFlagDummy.setOwner(playerName);
@@ -63,12 +69,12 @@ public class ItemRendererFlag implements IItemRenderer {
             GL11.glRotatef(-145F, 0F, 1F, 0F);
         }
 
-        if (type == ItemRenderType.EQUIPPED_FIRST_PERSON
-                && FMLClientHandler.instance().getClient().thePlayer.getItemInUseCount() > 0) {
+        if (type == ItemRenderType.EQUIPPED_FIRST_PERSON && FMLClientHandler.instance()
+            .getClient().thePlayer.getItemInUseCount() > 0) {
             float var13b;
             float var14b;
-            var13b = item.getMaxItemUseDuration()
-                    - (FMLClientHandler.instance().getClient().thePlayer.getItemInUseCount() + 1.0F);
+            var13b = item.getMaxItemUseDuration() - (FMLClientHandler.instance()
+                .getClient().thePlayer.getItemInUseCount() + 1.0F);
             var14b = var13b / 20.0F;
             var14b = (var14b * var14b + var14b * 2.0F) / 3.0F;
 
@@ -99,7 +105,8 @@ public class ItemRendererFlag implements IItemRenderer {
             GL11.glTranslatef(0, -0.6F, 0);
         }
 
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(RenderFlag.flagTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(RenderFlag.flagTexture);
 
         this.modelFlag.render(this.entityFlagDummy, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
         GL11.glPopMatrix();
@@ -110,10 +117,9 @@ public class ItemRendererFlag implements IItemRenderer {
      */
     @Override
     public boolean handleRenderType(ItemStack item, ItemRenderType type) {
-        return type == ItemRenderType.ENTITY ||
-            type == ItemRenderType.EQUIPPED ||
-            type == ItemRenderType.EQUIPPED_FIRST_PERSON ||
-            type == ItemRenderType.INVENTORY;
+        return type == ItemRenderType.ENTITY || type == ItemRenderType.EQUIPPED
+            || type == ItemRenderType.EQUIPPED_FIRST_PERSON
+            || type == ItemRenderType.INVENTORY;
     }
 
     @Override

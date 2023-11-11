@@ -1,13 +1,13 @@
 package micdoodle8.mods.galacticraft.api.world;
 
-import java.lang.reflect.Method;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+
+import java.lang.reflect.Method;
 
 public class OxygenHooks {
 
@@ -63,7 +63,7 @@ public class OxygenHooks {
                     oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
                 breathableAirBlockMethod = oxygenUtilClass
-                        .getDeclaredMethod("isAABBInBreathableAirBlock", World.class, AxisAlignedBB.class);
+                    .getDeclaredMethod("isAABBInBreathableAirBlock", World.class, AxisAlignedBB.class);
             }
             return (Boolean) breathableAirBlockMethod.invoke(null, world, bb);
         } catch (final Exception e) {
@@ -88,7 +88,7 @@ public class OxygenHooks {
                     oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
                 breathableAirBlockEntityMethod = oxygenUtilClass
-                        .getDeclaredMethod("isAABBInBreathableAirBlock", EntityLivingBase.class);
+                    .getDeclaredMethod("isAABBInBreathableAirBlock", EntityLivingBase.class);
             }
             return (Boolean) breathableAirBlockEntityMethod.invoke(null, entity);
         } catch (final Exception e) {
@@ -118,12 +118,12 @@ public class OxygenHooks {
                     oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
                 torchHasOxygenMethod = oxygenUtilClass.getDeclaredMethod(
-                        "checkTorchHasOxygen",
-                        World.class,
-                        Block.class,
-                        int.class,
-                        int.class,
-                        int.class);
+                    "checkTorchHasOxygen",
+                    World.class,
+                    Block.class,
+                    int.class,
+                    int.class,
+                    int.class);
             }
             return (Boolean) torchHasOxygenMethod.invoke(null, world, block, x, y, z);
         } catch (final Exception e) {
@@ -149,7 +149,7 @@ public class OxygenHooks {
                     oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
                 oxygenBubbleMethod = oxygenUtilClass
-                        .getDeclaredMethod("inOxygenBubble", World.class, double.class, double.class, double.class);
+                    .getDeclaredMethod("inOxygenBubble", World.class, double.class, double.class, double.class);
             }
             return (Boolean) oxygenBubbleMethod.invoke(null, worldObj, avgX, avgY, avgZ);
         } catch (final Exception e) {

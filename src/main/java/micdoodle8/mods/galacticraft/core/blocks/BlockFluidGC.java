@@ -1,7 +1,11 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -16,12 +20,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
+import java.util.Random;
 
 public class BlockFluidGC extends BlockFluidClassic {
 
@@ -32,9 +31,9 @@ public class BlockFluidGC extends BlockFluidClassic {
 
     public BlockFluidGC(Fluid fluid, String assetName) {
         super(
-                fluid,
-                assetName.startsWith("oil") || assetName.startsWith("fuel") ? GalacticraftCore.materialOil
-                        : Material.water);
+            fluid,
+            assetName.startsWith("oil") || assetName.startsWith("fuel") ? GalacticraftCore.materialOil
+                : Material.water);
         this.setRenderPass(1);
         this.fluidName = assetName;
         this.fluid = fluid;
@@ -66,7 +65,7 @@ public class BlockFluidGC extends BlockFluidClassic {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         if (world.isRemote && this.fluidName.startsWith("oil") && entityPlayer instanceof EntityPlayerSP) {
             ClientProxyCore.playerClientHandler.onBuild(7, (EntityPlayerSP) entityPlayer);
         }
@@ -81,22 +80,24 @@ public class BlockFluidGC extends BlockFluidClassic {
 
         if (this.fluidName.startsWith("oil") && rand.nextInt(1200) == 0) {
             world.playSound(
-                    x + 0.5F,
-                    y + 0.5F,
-                    z + 0.5F,
-                    "liquid.lava",
-                    rand.nextFloat() * 0.25F + 0.75F,
-                    0.00001F + rand.nextFloat() * 0.5F,
-                    false);
+                x + 0.5F,
+                y + 0.5F,
+                z + 0.5F,
+                "liquid.lava",
+                rand.nextFloat() * 0.25F + 0.75F,
+                0.00001F + rand.nextFloat() * 0.5F,
+                false);
         }
         if ("oil".equals(this.fluidName) && rand.nextInt(10) == 0
-                && World.doesBlockHaveSolidTopSurface(world, x, y - 1, z)
-                && !world.getBlock(x, y - 2, z).getMaterial().blocksMovement()) {
+            && World.doesBlockHaveSolidTopSurface(world, x, y - 1, z)
+            && !world.getBlock(x, y - 2, z)
+                .getMaterial()
+                .blocksMovement()) {
             GalacticraftCore.proxy.spawnParticle(
-                    "oilDrip",
-                    new Vector3(x + rand.nextFloat(), y - 1.05D, z + rand.nextFloat()),
-                    new Vector3(0, 0, 0),
-                    new Object[] {});
+                "oilDrip",
+                new Vector3(x + rand.nextFloat(), y - 1.05D, z + rand.nextFloat()),
+                new Vector3(0, 0, 0),
+                new Object[] {});
         }
     }
 
@@ -133,10 +134,8 @@ public class BlockFluidGC extends BlockFluidClassic {
 
     @Override
     public boolean isFlammable(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
-        if (!(world instanceof World) || (OxygenUtil.noAtmosphericCombustion(((World) world).provider)
-                && !OxygenUtil.isAABBInBreathableAirBlock(
-                        (World) world,
-                        AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 2, z + 1)))) {
+        if (!(world instanceof World) || (OxygenUtil.noAtmosphericCombustion(((World) world).provider) && !OxygenUtil
+            .isAABBInBreathableAirBlock((World) world, AxisAlignedBB.getBoundingBox(x, y, z, x + 1, y + 2, z + 1)))) {
             return false;
         }
 

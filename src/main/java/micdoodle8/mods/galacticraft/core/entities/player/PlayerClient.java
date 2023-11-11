@@ -1,16 +1,5 @@
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraftforge.common.MinecraftForge;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.api.entity.ICameraZoomEntity;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
@@ -32,6 +21,12 @@ import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import micdoodle8.mods.galacticraft.core.wrappers.PlayerGearData;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.*;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraftforge.common.MinecraftForge;
 
 public class PlayerClient implements IPlayerClient {
 
@@ -150,11 +145,12 @@ public class PlayerClient implements IPlayerClient {
         }
 
         final boolean ridingThirdPersonEntity = player.ridingEntity instanceof ICameraZoomEntity
-                && ((ICameraZoomEntity) player.ridingEntity).defaultThirdPerson();
+            && ((ICameraZoomEntity) player.ridingEntity).defaultThirdPerson();
 
         if (ridingThirdPersonEntity && !stats.lastRidingCameraZoomEntity
-                && !ConfigManagerCore.disableVehicleCameraChanges) {
-            FMLClientHandler.instance().getClient().gameSettings.thirdPersonView = 1;
+            && !ConfigManagerCore.disableVehicleCameraChanges) {
+            FMLClientHandler.instance()
+                .getClient().gameSettings.thirdPersonView = 1;
         }
 
         if (player.ridingEntity instanceof ICameraZoomEntity) {
@@ -191,18 +187,23 @@ public class PlayerClient implements IPlayerClient {
 
         if (stats.usingParachute && player.onGround) {
             stats.setParachute(false);
-            FMLClientHandler.instance().getClient().gameSettings.thirdPersonView = stats.thirdPersonView;
+            FMLClientHandler.instance()
+                .getClient().gameSettings.thirdPersonView = stats.thirdPersonView;
         }
 
         if (!stats.lastUsingParachute && stats.usingParachute) {
-            FMLClientHandler.instance().getClient().getSoundHandler().playSound(
+            FMLClientHandler.instance()
+                .getClient()
+                .getSoundHandler()
+                .playSound(
                     new PositionedSoundRecord(
-                            new ResourceLocation(GalacticraftCore.TEXTURE_PREFIX + "player.parachute"),
-                            0.95F + player.getRNG().nextFloat() * 0.1F,
-                            1.0F,
-                            (float) player.posX,
-                            (float) player.posY,
-                            (float) player.posZ));
+                        new ResourceLocation(GalacticraftCore.TEXTURE_PREFIX + "player.parachute"),
+                        0.95F + player.getRNG()
+                            .nextFloat() * 0.1F,
+                        1.0F,
+                        (float) player.posX,
+                        (float) player.posY,
+                        (float) player.posZ));
         }
 
         stats.lastUsingParachute = stats.usingParachute;
@@ -242,9 +243,9 @@ public class PlayerClient implements IPlayerClient {
 
         // If the player is on the moon, not airbourne and not riding anything
         if (motionSqrd > 0.001 && player.worldObj != null
-                && player.worldObj.provider instanceof WorldProviderMoon
-                && player.ridingEntity == null
-                && !player.capabilities.isFlying) {
+            && player.worldObj.provider instanceof WorldProviderMoon
+            && player.ridingEntity == null
+            && !player.capabilities.isFlying) {
             final int iPosX = (int) Math.floor(player.posX);
             final int iPosY = (int) Math.floor(player.posY - 2);
             final int iPosZ = (int) Math.floor(player.posZ);
@@ -252,45 +253,43 @@ public class PlayerClient implements IPlayerClient {
             // If the block below is the moon block
             // And is the correct metadata (moon turf)
             if (player.worldObj.getBlock(iPosX, iPosY, iPosZ) == GCBlocks.blockMoon
-                    && player.worldObj.getBlockMetadata(iPosX, iPosY, iPosZ) == 5) {
+                && player.worldObj.getBlockMetadata(iPosX, iPosY, iPosZ) == 5) {
                 // If it has been long enough since the last step
                 if (stats.distanceSinceLastStep > 0.35) {
                     Vector3 pos = new Vector3(player);
                     // Set the footprint position to the block below and add random number to stop
                     // z-fighting
-                    pos.y = MathHelper.floor_double(player.posY - 1) + player.getRNG().nextFloat() / 100.0F;
+                    pos.y = MathHelper.floor_double(player.posY - 1) + player.getRNG()
+                        .nextFloat() / 100.0F;
 
                     // Adjust footprint to left or right depending on step count
                     switch (stats.lastStep) {
                         case 0:
                             pos.translate(
-                                    new Vector3(
-                                            Math.sin(Math.toRadians(-player.rotationYaw + 90)) * 0.25,
-                                            0,
-                                            Math.cos(Math.toRadians(-player.rotationYaw + 90)) * 0.25));
+                                new Vector3(
+                                    Math.sin(Math.toRadians(-player.rotationYaw + 90)) * 0.25,
+                                    0,
+                                    Math.cos(Math.toRadians(-player.rotationYaw + 90)) * 0.25));
                             break;
                         case 1:
                             pos.translate(
-                                    new Vector3(
-                                            Math.sin(Math.toRadians(-player.rotationYaw - 90)) * 0.25,
-                                            0,
-                                            Math.cos(Math.toRadians(-player.rotationYaw - 90)) * 0.25));
+                                new Vector3(
+                                    Math.sin(Math.toRadians(-player.rotationYaw - 90)) * 0.25,
+                                    0,
+                                    Math.cos(Math.toRadians(-player.rotationYaw - 90)) * 0.25));
                             break;
                     }
 
-                    pos = WorldUtil.getFootprintPosition(
-                            player.worldObj,
-                            player.rotationYaw - 180,
-                            pos,
-                            new BlockVec3(player));
+                    pos = WorldUtil
+                        .getFootprintPosition(player.worldObj, player.rotationYaw - 180, pos, new BlockVec3(player));
 
                     final long chunkKey = ChunkCoordIntPair.chunkXZ2Int(pos.intX() >> 4, pos.intZ() >> 4);
                     ClientProxyCore.footprintRenderer.addFootprint(
-                            chunkKey,
-                            player.worldObj.provider.dimensionId,
-                            pos,
-                            player.rotationYaw,
-                            player.getCommandSenderName());
+                        chunkKey,
+                        player.worldObj.provider.dimensionId,
+                        pos,
+                        player.rotationYaw,
+                        player.getCommandSenderName());
 
                     // Increment and cap step counter at 1
                     stats.lastStep++;
@@ -337,100 +336,99 @@ public class PlayerClient implements IPlayerClient {
         }
         flag |= 1 << i;
         stats.buildFlags = (flag & 511) + (repeatCount << 9);
-        GalacticraftCore.packetPipeline.sendToServer(
-                new PacketSimple(EnumSimplePacket.S_BUILDFLAGS_UPDATE, new Object[] { stats.buildFlags }));
+        GalacticraftCore.packetPipeline
+            .sendToServer(new PacketSimple(EnumSimplePacket.S_BUILDFLAGS_UPDATE, new Object[] { stats.buildFlags }));
         switch (i) {
             case 0:
             case 1:
             case 2:
             case 3:
                 player.addChatMessage(
-                        IChatComponent.Serializer.func_150699_a(
-                                "[{\"text\":\"" + GCCoreUtil.translate("gui.message.help1")
-                                        + ": \",\"color\":\"white\"},"
-                                        + "{\"text\":\" "
-                                        + EnumColor.BRIGHT_GREEN
-                                        + "wiki."
-                                        + GalacticraftCore.PREFIX
-                                        + "com/wiki/1"
-                                        + "\","
-                                        + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":"
-                                        + "{\"text\":\""
-                                        + GCCoreUtil.translate("gui.message.clicklink")
-                                        + "\",\"color\":\"yellow\"}},"
-                                        + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\""
-                                        + "http://wiki."
-                                        + GalacticraftCore.PREFIX
-                                        + "com/wiki/1"
-                                        + "\"}}]"));
+                    IChatComponent.Serializer.func_150699_a(
+                        "[{\"text\":\"" + GCCoreUtil.translate("gui.message.help1")
+                            + ": \",\"color\":\"white\"},"
+                            + "{\"text\":\" "
+                            + EnumColor.BRIGHT_GREEN
+                            + "wiki."
+                            + GalacticraftCore.PREFIX
+                            + "com/wiki/1"
+                            + "\","
+                            + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":"
+                            + "{\"text\":\""
+                            + GCCoreUtil.translate("gui.message.clicklink")
+                            + "\",\"color\":\"yellow\"}},"
+                            + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\""
+                            + "http://wiki."
+                            + GalacticraftCore.PREFIX
+                            + "com/wiki/1"
+                            + "\"}}]"));
                 player.addChatMessage(
-                        new ChatComponentText(
-                                GCCoreUtil.translate("gui.message.help1a") + EnumColor.AQUA + " /gchelp"));
+                    new ChatComponentText(GCCoreUtil.translate("gui.message.help1a") + EnumColor.AQUA + " /gchelp"));
                 break;
             case 4:
             case 5:
             case 6:
                 player.addChatMessage(
-                        IChatComponent.Serializer.func_150699_a(
-                                "[{\"text\":\"" + GCCoreUtil.translate("gui.message.help2")
-                                        + ": \",\"color\":\"white\"},"
-                                        + "{\"text\":\" "
-                                        + EnumColor.BRIGHT_GREEN
-                                        + "wiki."
-                                        + GalacticraftCore.PREFIX
-                                        + "com/wiki/2"
-                                        + "\","
-                                        + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":"
-                                        + "{\"text\":\""
-                                        + GCCoreUtil.translate("gui.message.clicklink")
-                                        + "\",\"color\":\"yellow\"}},"
-                                        + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\""
-                                        + "http://wiki."
-                                        + GalacticraftCore.PREFIX
-                                        + "com/wiki/2"
-                                        + "\"}}]"));
+                    IChatComponent.Serializer.func_150699_a(
+                        "[{\"text\":\"" + GCCoreUtil.translate("gui.message.help2")
+                            + ": \",\"color\":\"white\"},"
+                            + "{\"text\":\" "
+                            + EnumColor.BRIGHT_GREEN
+                            + "wiki."
+                            + GalacticraftCore.PREFIX
+                            + "com/wiki/2"
+                            + "\","
+                            + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":"
+                            + "{\"text\":\""
+                            + GCCoreUtil.translate("gui.message.clicklink")
+                            + "\",\"color\":\"yellow\"}},"
+                            + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\""
+                            + "http://wiki."
+                            + GalacticraftCore.PREFIX
+                            + "com/wiki/2"
+                            + "\"}}]"));
                 break;
             case 7:
                 player.addChatMessage(
-                        IChatComponent.Serializer.func_150699_a(
-                                "[{\"text\":\"" + GCCoreUtil.translate("gui.message.help3")
-                                        + ": \",\"color\":\"white\"},"
-                                        + "{\"text\":\" "
-                                        + EnumColor.BRIGHT_GREEN
-                                        + "wiki."
-                                        + GalacticraftCore.PREFIX
-                                        + "com/wiki/oil"
-                                        + "\","
-                                        + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":"
-                                        + "{\"text\":\""
-                                        + GCCoreUtil.translate("gui.message.clicklink")
-                                        + "\",\"color\":\"yellow\"}},"
-                                        + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\""
-                                        + "http://wiki."
-                                        + GalacticraftCore.PREFIX
-                                        + "com/wiki/oil"
-                                        + "\"}}]"));
+                    IChatComponent.Serializer.func_150699_a(
+                        "[{\"text\":\"" + GCCoreUtil.translate("gui.message.help3")
+                            + ": \",\"color\":\"white\"},"
+                            + "{\"text\":\" "
+                            + EnumColor.BRIGHT_GREEN
+                            + "wiki."
+                            + GalacticraftCore.PREFIX
+                            + "com/wiki/oil"
+                            + "\","
+                            + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":"
+                            + "{\"text\":\""
+                            + GCCoreUtil.translate("gui.message.clicklink")
+                            + "\",\"color\":\"yellow\"}},"
+                            + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\""
+                            + "http://wiki."
+                            + GalacticraftCore.PREFIX
+                            + "com/wiki/oil"
+                            + "\"}}]"));
                 break;
             case 8:
                 player.addChatMessage(
-                        IChatComponent.Serializer.func_150699_a(
-                                "[{\"text\":\"" + GCCoreUtil.translate("gui.message.prelaunch")
-                                        + ": \",\"color\":\"white\"},"
-                                        + "{\"text\":\" "
-                                        + EnumColor.BRIGHT_GREEN
-                                        + "wiki."
-                                        + GalacticraftCore.PREFIX
-                                        + "com/wiki/pre"
-                                        + "\","
-                                        + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":"
-                                        + "{\"text\":\""
-                                        + GCCoreUtil.translate("gui.message.clicklink")
-                                        + "\",\"color\":\"yellow\"}},"
-                                        + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\""
-                                        + "http://wiki."
-                                        + GalacticraftCore.PREFIX
-                                        + "com/wiki/pre"
-                                        + "\"}}]"));
+                    IChatComponent.Serializer.func_150699_a(
+                        "[{\"text\":\"" + GCCoreUtil.translate("gui.message.prelaunch")
+                            + ": \",\"color\":\"white\"},"
+                            + "{\"text\":\" "
+                            + EnumColor.BRIGHT_GREEN
+                            + "wiki."
+                            + GalacticraftCore.PREFIX
+                            + "com/wiki/pre"
+                            + "\","
+                            + "\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":"
+                            + "{\"text\":\""
+                            + GCCoreUtil.translate("gui.message.clicklink")
+                            + "\",\"color\":\"yellow\"}},"
+                            + "\"clickEvent\":{\"action\":\"open_url\",\"value\":\""
+                            + "http://wiki."
+                            + GalacticraftCore.PREFIX
+                            + "com/wiki/pre"
+                            + "\"}}]"));
                 break;
         }
     }

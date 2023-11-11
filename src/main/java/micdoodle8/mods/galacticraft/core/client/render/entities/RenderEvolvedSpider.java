@@ -1,5 +1,11 @@
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.client.model.ModelEvolvedSpider;
+import micdoodle8.mods.galacticraft.core.items.ItemSensorGlasses;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBase;
@@ -10,28 +16,20 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.client.model.ModelEvolvedSpider;
-import micdoodle8.mods.galacticraft.core.items.ItemSensorGlasses;
 
 @SideOnly(Side.CLIENT)
 public class RenderEvolvedSpider extends RenderLiving {
 
     private static final ResourceLocation spiderEyesTextures = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/spider_eyes.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/spider_eyes.png");
     private static final ResourceLocation spiderTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/spider.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/spider.png");
     private static final ResourceLocation powerTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/power.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/power.png");
 
     private final ModelBase model = new ModelEvolvedSpider(0.2F);
 
@@ -60,7 +58,8 @@ public class RenderEvolvedSpider extends RenderLiving {
 
     @Override
     protected int shouldRenderPass(EntityLivingBase par1EntityLiving, int par2, float par3) {
-        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final Minecraft minecraft = FMLClientHandler.instance()
+            .getClient();
 
         final EntityPlayerSP player = minecraft.thePlayer;
 
@@ -87,7 +86,7 @@ public class RenderEvolvedSpider extends RenderLiving {
         }
 
         if (helmetSlot != null && helmetSlot.getItem() instanceof ItemSensorGlasses
-                && minecraft.currentScreen == null) {
+            && minecraft.currentScreen == null) {
             if (par2 == 1) {
                 final float var4 = par1EntityLiving.ticksExisted * 2 + par3;
                 this.bindTexture(RenderEvolvedSpider.powerTexture);

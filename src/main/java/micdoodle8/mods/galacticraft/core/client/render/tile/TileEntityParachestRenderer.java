@@ -1,30 +1,28 @@
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.client.model.block.ModelParaChestTile;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityParachestRenderer extends TileEntitySpecialRenderer {
 
     private static final ResourceLocation parachestTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/parachest.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/parachest.png");
 
     private final ModelParaChestTile chestModel = new ModelParaChestTile();
 
     public void renderGCTileEntityTreasureChestAt(TileEntityParaChest tile, double par2, double par4, double par6,
-            float par8) {
+        float par8) {
         int var9;
 
         if (!tile.hasWorldObj()) {

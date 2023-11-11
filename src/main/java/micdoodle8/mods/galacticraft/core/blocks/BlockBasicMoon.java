@@ -1,10 +1,16 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
+import micdoodle8.mods.galacticraft.api.block.IPlantableBlock;
+import micdoodle8.mods.galacticraft.api.block.ITerraformableBlock;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3Dim;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityDungeonSpawner;
+import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.material.Material;
@@ -25,20 +31,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
-import micdoodle8.mods.galacticraft.api.block.IPlantableBlock;
-import micdoodle8.mods.galacticraft.api.block.ITerraformableBlock;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3Dim;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityDungeonSpawner;
-import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class BlockBasicMoon extends BlockAdvancedTile
-        implements IDetectableResource, IPlantableBlock, ITerraformableBlock {
+    implements IDetectableResource, IPlantableBlock, ITerraformableBlock {
 
     // CopperMoon: 0, TinMoon: 1, CheeseStone: 2
     // Moon dirt: 3; Moon rock: 4; Moon topsoil: 5-13 (6-13 have GC2 footprints);
@@ -97,10 +96,10 @@ public class BlockBasicMoon extends BlockAdvancedTile
         this.moonBlockIcons[10] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_7");
         this.moonBlockIcons[11] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_8");
         this.moonBlockIcons[12] = par1IconRegister
-                .registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "moonore_copper");
+            .registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "moonore_copper");
         this.moonBlockIcons[13] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "moonore_tin");
         this.moonBlockIcons[14] = par1IconRegister
-                .registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "moonore_cheese");
+            .registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "moonore_cheese");
         this.moonBlockIcons[15] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "bottom");
         this.moonBlockIcons[16] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "blank");
     }
@@ -113,7 +112,7 @@ public class BlockBasicMoon extends BlockAdvancedTile
 
     @Override
     public float getExplosionResistance(Entity par1Entity, World world, int x, int y, int z, double explosionX,
-            double explosionY, double explosionZ) {
+        double explosionY, double explosionZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
 
         switch (metadata) {
@@ -250,7 +249,6 @@ public class BlockBasicMoon extends BlockAdvancedTile
         return droppedItem;
     }
 
-
     @Override
     public int damageDropped(int meta) {
         if (meta >= 5 && meta <= 13) {
@@ -324,7 +322,7 @@ public class BlockBasicMoon extends BlockAdvancedTile
 
     @Override
     public boolean canSustainPlant(IBlockAccess world, int x, int y, int z, ForgeDirection direction,
-            IPlantable plantable) {
+        IPlantable plantable) {
         final int metadata = world.getBlockMetadata(x, y, z);
 
         if (metadata < 5 && metadata > 13) {
@@ -351,7 +349,8 @@ public class BlockBasicMoon extends BlockAdvancedTile
         final int meta = world.getBlockMetadata(x, y, z);
 
         if (meta >= 5 && meta <= 13) {
-            return !world.getBlock(x, y + 1, z).isOpaqueCube();
+            return !world.getBlock(x, y + 1, z)
+                .isOpaqueCube();
         }
 
         return false;
@@ -377,7 +376,7 @@ public class BlockBasicMoon extends BlockAdvancedTile
 
         if (!world.isRemote && block == this && par6 == 5) {
             final Map<Long, List<Footprint>> footprintChunkMap = TickHandlerServer.serverFootprintMap
-                    .get(world.provider.dimensionId);
+                .get(world.provider.dimensionId);
 
             if (footprintChunkMap != null) {
                 final long chunkKey = ChunkCoordIntPair.chunkXZ2Int(x >> 4, z >> 4);
@@ -388,8 +387,8 @@ public class BlockBasicMoon extends BlockAdvancedTile
 
                     for (final Footprint footprint : footprintList) {
                         if (footprint.position.x > x && footprint.position.x < x + 1
-                                && footprint.position.z > z
-                                && footprint.position.z < z + 1) {
+                            && footprint.position.z > z
+                            && footprint.position.z < z + 1) {
                             toRemove.add(footprint);
                         }
                     }

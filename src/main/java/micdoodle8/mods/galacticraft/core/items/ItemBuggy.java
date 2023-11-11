@@ -1,7 +1,12 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.EntityBuggy;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,13 +22,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.EntityBuggy;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class ItemBuggy extends Item implements IHoldableItem {
 
@@ -55,13 +54,13 @@ public class ItemBuggy extends Item implements IHoldableItem {
     public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer) {
         final float var4 = 1.0F;
         final float var5 = par3EntityPlayer.prevRotationPitch
-                + (par3EntityPlayer.rotationPitch - par3EntityPlayer.prevRotationPitch) * var4;
+            + (par3EntityPlayer.rotationPitch - par3EntityPlayer.prevRotationPitch) * var4;
         final float var6 = par3EntityPlayer.prevRotationYaw
-                + (par3EntityPlayer.rotationYaw - par3EntityPlayer.prevRotationYaw) * var4;
+            + (par3EntityPlayer.rotationYaw - par3EntityPlayer.prevRotationYaw) * var4;
         final double var7 = par3EntityPlayer.prevPosX + (par3EntityPlayer.posX - par3EntityPlayer.prevPosX) * var4;
         final double var9 = par3EntityPlayer.prevPosY + (par3EntityPlayer.posY - par3EntityPlayer.prevPosY) * var4
-                + 1.62D
-                - par3EntityPlayer.yOffset;
+            + 1.62D
+            - par3EntityPlayer.yOffset;
         final double var11 = par3EntityPlayer.prevPosZ + (par3EntityPlayer.posZ - par3EntityPlayer.prevPosZ) * var4;
         final Vec3 var13 = Vec3.createVectorHelper(var7, var9, var11);
         final float var14 = MathHelper.cos(-var6 * 0.017453292F - (float) Math.PI);
@@ -81,9 +80,9 @@ public class ItemBuggy extends Item implements IHoldableItem {
         boolean var26 = false;
         final float var27 = 1.0F;
         final List<?> var28 = par2World.getEntitiesWithinAABBExcludingEntity(
-                par3EntityPlayer,
-                par3EntityPlayer.boundingBox.addCoord(var25.xCoord * var21, var25.yCoord * var21, var25.zCoord * var21)
-                        .expand(var27, var27, var27));
+            par3EntityPlayer,
+            par3EntityPlayer.boundingBox.addCoord(var25.xCoord * var21, var25.yCoord * var21, var25.zCoord * var21)
+                .expand(var27, var27, var27));
         int var29;
 
         for (var29 = 0; var29 < var28.size(); ++var29) {
@@ -109,21 +108,24 @@ public class ItemBuggy extends Item implements IHoldableItem {
             }
 
             final EntityBuggy var35 = new EntityBuggy(
-                    par2World,
-                    var29 + 0.5F,
-                    var33 + 1.0F,
-                    var34 + 0.5F,
-                    par1ItemStack.getItemDamage());
+                par2World,
+                var29 + 0.5F,
+                var33 + 1.0F,
+                var34 + 0.5F,
+                par1ItemStack.getItemDamage());
 
-            if (!par2World.getCollidingBoundingBoxes(var35, var35.boundingBox.expand(-0.1D, -0.1D, -0.1D)).isEmpty()) {
+            if (!par2World.getCollidingBoundingBoxes(var35, var35.boundingBox.expand(-0.1D, -0.1D, -0.1D))
+                .isEmpty()) {
                 return par1ItemStack;
             }
 
-            if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound().hasKey("BuggyFuel")) {
+            if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound()
+                .hasKey("BuggyFuel")) {
                 var35.buggyFuelTank.setFluid(
-                        new FluidStack(
-                                GalacticraftCore.fluidFuel,
-                                par1ItemStack.getTagCompound().getInteger("BuggyFuel")));
+                    new FluidStack(
+                        GalacticraftCore.fluidFuel,
+                        par1ItemStack.getTagCompound()
+                            .getInteger("BuggyFuel")));
             }
 
             if (!par2World.isRemote) {
@@ -144,12 +146,14 @@ public class ItemBuggy extends Item implements IHoldableItem {
             par2List.add(GCCoreUtil.translate("gui.buggy.storageSpace") + ": " + par1ItemStack.getItemDamage() * 18);
         }
 
-        if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound().hasKey("BuggyFuel")) {
+        if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound()
+            .hasKey("BuggyFuel")) {
             par2List.add(
-                    GCCoreUtil.translate("gui.message.fuel.name") + ": "
-                            + par1ItemStack.getTagCompound().getInteger("BuggyFuel")
-                            + " / "
-                            + EntityBuggy.tankCapacity);
+                GCCoreUtil.translate("gui.message.fuel.name") + ": "
+                    + par1ItemStack.getTagCompound()
+                        .getInteger("BuggyFuel")
+                    + " / "
+                    + EntityBuggy.tankCapacity);
         }
     }
 

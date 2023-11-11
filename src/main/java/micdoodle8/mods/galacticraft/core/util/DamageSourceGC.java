@@ -5,11 +5,13 @@ import net.minecraft.util.DamageSource;
 public class DamageSourceGC extends DamageSource {
 
     public static final DamageSourceGC spaceshipCrash = (DamageSourceGC) new DamageSourceGC("spaceshipCrash")
-            .setDamageBypassesArmor().setExplosion();
+        .setDamageBypassesArmor()
+        .setExplosion();
     public static final DamageSourceGC oxygenSuffocation = (DamageSourceGC) new DamageSourceGC("oxygenSuffocation")
-            .setDamageBypassesArmor().setDamageIsAbsolute();
+        .setDamageBypassesArmor()
+        .setDamageIsAbsolute();
     public static final DamageSourceGC thermal = (DamageSourceGC) new DamageSourceGC("thermal").setDamageBypassesArmor()
-            .setDamageIsAbsolute();
+        .setDamageIsAbsolute();
 
     public DamageSourceGC(String damageType) {
         super(damageType);

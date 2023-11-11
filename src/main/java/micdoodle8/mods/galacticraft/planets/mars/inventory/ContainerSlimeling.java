@@ -1,14 +1,13 @@
 package micdoodle8.mods.galacticraft.planets.mars.inventory;
 
+import micdoodle8.mods.galacticraft.core.inventory.SlotSpecific;
+import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
+import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
-import micdoodle8.mods.galacticraft.core.inventory.SlotSpecific;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
-import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
 
 public class ContainerSlimeling extends Container {
 
@@ -25,13 +24,13 @@ public class ContainerSlimeling extends Container {
     }
 
     public static void addSlots(ContainerSlimeling container, InventoryPlayer playerInventory,
-            EntitySlimeling slimeling) {
+        EntitySlimeling slimeling) {
         Slot slot = new SlotSpecific(
-                slimeling.slimelingInventory,
-                1,
-                9,
-                30,
-                new ItemStack(MarsItems.marsItemBasic, 1, 4));
+            slimeling.slimelingInventory,
+            1,
+            9,
+            30,
+            new ItemStack(MarsItems.marsItemBasic, 1, 4));
         container.addSlotToContainer(slot);
 
         int var3;
@@ -59,15 +58,15 @@ public class ContainerSlimeling extends Container {
         // InventorySlimeling.setInventorySlotContents even if
         // the container already has the slots
         if (stack != null && stack.getItem() == MarsItems.marsItemBasic
-                && stack.getItemDamage() == 4
-                && container.inventorySlots.size() < 63) {
+            && stack.getItemDamage() == 4
+            && container.inventorySlots.size() < 63) {
             for (int var3 = 0; var3 < 3; ++var3) {
                 for (int var4 = 0; var4 < 9; ++var4) {
                     final Slot slot = new Slot(
-                            slimeling.slimelingInventory,
-                            var4 + var3 * 9 + 2,
-                            8 + var4 * 18,
-                            54 + var3 * 18);
+                        slimeling.slimelingInventory,
+                        var4 + var3 * 9 + 2,
+                        8 + var4 * 18,
+                        54 + var3 * 18);
                     slot.slotNumber = container.inventorySlots.size();
                     container.inventorySlots.add(slot);
                     container.inventoryItemStacks.add(null);

@@ -1,16 +1,14 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.block;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTreasureChestMars;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.world.IBlockAccess;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTreasureChestMars;
 
 public class BlockRendererTier2TreasureChest implements ISimpleBlockRenderingHandler {
 
@@ -30,7 +28,7 @@ public class BlockRendererTier2TreasureChest implements ISimpleBlockRenderingHan
 
     @Override
     public boolean renderWorldBlock(IBlockAccess var1, int var2, int var3, int var4, Block var5, int var6,
-            RenderBlocks var7) {
+        RenderBlocks var7) {
         return false;
     }
 

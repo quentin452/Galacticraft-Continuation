@@ -1,13 +1,11 @@
 package micdoodle8.mods.galacticraft.core.client.model;
 
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
-
 import org.lwjgl.opengl.GL11;
-
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 
 public class ModelEvolvedZombie extends ModelBiped {
 
@@ -254,10 +252,10 @@ public class ModelEvolvedZombie extends ModelBiped {
         this.bipedRightArm.rotateAngleZ = 0.0F;
         this.bipedLeftArm.rotateAngleZ = 0.0F;
         this.bipedRightLeg.rotateAngleX = MathHelper.cos(par1 * 0.6662F / this.saveGravity) * (1.5F - this.saveGravity)
-                * par2;
+            * par2;
         this.bipedLeftLeg.rotateAngleX = MathHelper.cos(par1 * 0.6662F / this.saveGravity + (float) Math.PI)
-                * (1.5F - this.saveGravity)
-                * par2;
+            * (1.5F - this.saveGravity)
+            * par2;
         this.bipedRightLeg.rotateAngleY = 0.0F;
         this.bipedLeftLeg.rotateAngleY = 0.0F;
 
@@ -291,7 +289,7 @@ public class ModelEvolvedZombie extends ModelBiped {
             var7 = 1.0F - var7;
             var8 = MathHelper.sin(var7 * (float) Math.PI);
             final float var9 = MathHelper.sin(this.onGround * (float) Math.PI) * -(this.bipedHead.rotateAngleX - 0.7F)
-                    * 0.75F;
+                * 0.75F;
             this.bipedRightArm.rotateAngleX = (float) (this.bipedRightArm.rotateAngleX - (var8 * 1.2D + var9));
             this.bipedRightArm.rotateAngleY += this.bipedBody.rotateAngleY * 2.0F;
             this.bipedRightArm.rotateAngleZ = MathHelper.sin(this.onGround * (float) Math.PI) * -0.4F;

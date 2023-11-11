@@ -1,21 +1,19 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.item;
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.IItemRenderer;
-
-import org.lwjgl.Sys;
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile.TileEntityBeamReflectorRenderer;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.IItemRenderer;
+import org.lwjgl.Sys;
+import org.lwjgl.opengl.GL11;
 
 public class ItemRendererBeamReflector implements IItemRenderer {
 
     private void renderBeamReflector(ItemRenderType type) {
         GL11.glPushMatrix();
         this.transform(type);
-        FMLClientHandler.instance().getClient().renderEngine
-                .bindTexture(TileEntityBeamReflectorRenderer.reflectorTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(TileEntityBeamReflectorRenderer.reflectorTexture);
         TileEntityBeamReflectorRenderer.reflectorModel.renderAll();
         GL11.glPopMatrix();
     }

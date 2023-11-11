@@ -1,8 +1,5 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.EnumConnectionState;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
@@ -21,6 +18,8 @@ import micdoodle8.mods.galacticraft.core.util.GCLog;
 import micdoodle8.mods.galacticraft.core.util.MapUtil;
 import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import micdoodle8.mods.galacticraft.core.world.ChunkLoadingCallback;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.EnumConnectionState;
 
 @SuppressWarnings("unchecked")
 public class ConnectionEvents {
@@ -48,36 +47,39 @@ public class ConnectionEvents {
             GalacticraftCore.packetPipeline.sendTo(
                 new PacketSimple(
                     EnumSimplePacket.C_UPDATE_SPACESTATION_CLIENT_ID,
-                    new Object[] {
-                        WorldUtil.spaceStationDataToString(stats.spaceStationDimensionData) }),
+                    new Object[] { WorldUtil.spaceStationDataToString(stats.spaceStationDimensionData) }),
                 thePlayer);
-            final SpaceRace raceForPlayer = SpaceRaceManager.getSpaceRaceFromPlayer(thePlayer.getGameProfile().getName());
+            final SpaceRace raceForPlayer = SpaceRaceManager.getSpaceRaceFromPlayer(
+                thePlayer.getGameProfile()
+                    .getName());
             if (raceForPlayer != null) {
                 SpaceRaceManager.sendSpaceRaceData(thePlayer, raceForPlayer);
             }
         }
 
         if (event.player.worldObj.provider instanceof WorldProviderSpaceStation
-                && event.player instanceof EntityPlayerMP) {
+            && event.player instanceof EntityPlayerMP) {
             ((WorldProviderSpaceStation) event.player.worldObj.provider).getSpinManager()
-                    .sendPacketsToClient((EntityPlayerMP) event.player);
+                .sendPacketsToClient((EntityPlayerMP) event.player);
         }
     }
 
     @SubscribeEvent
     public void onConnectionReceived(ServerConnectionFromClientEvent event) {
         if (ConfigManagerCore.enableDebug) {
-            final Integer[] idList = (Integer[]) WorldUtil.getPlanetList().get(0);
+            final Integer[] idList = (Integer[]) WorldUtil.getPlanetList()
+                .get(0);
             StringBuilder ids = new StringBuilder();
             for (final Integer element : idList) {
-                ids.append(element.toString()).append(" ");
+                ids.append(element.toString())
+                    .append(" ");
             }
             GCLog.info("Galacticraft server sending dimension IDs to connecting client: " + ids.toString());
         }
         event.manager.scheduleOutboundPacket(ConnectionPacket.createDimPacket(WorldUtil.getPlanetListInts()));
         event.manager.scheduleOutboundPacket(ConnectionPacket.createSSPacket(WorldUtil.getSpaceStationListInts()));
-        event.manager.scheduleOutboundPacket(
-                ConnectionPacket.createConfigPacket(ConfigManagerCore.getServerConfigOverride()));
+        event.manager
+            .scheduleOutboundPacket(ConnectionPacket.createConfigPacket(ConfigManagerCore.getServerConfigOverride()));
     }
 
     @SubscribeEvent

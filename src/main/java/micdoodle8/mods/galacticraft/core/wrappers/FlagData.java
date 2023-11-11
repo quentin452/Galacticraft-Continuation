@@ -1,12 +1,11 @@
 package micdoodle8.mods.galacticraft.core.wrappers;
 
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
-
-import net.minecraft.nbt.NBTTagCompound;
-
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
 import micdoodle8.mods.galacticraft.core.util.ColorUtil;
+import net.minecraft.nbt.NBTTagCompound;
+
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 public class FlagData {
 
@@ -59,9 +58,9 @@ public class FlagData {
         }
 
         return new Vector3(
-                (this.color[posX][posY][0] + 128) / 256.0D,
-                (this.color[posX][posY][1] + 128) / 256.0D,
-                (this.color[posX][posY][2] + 128) / 256.0D);
+            (this.color[posX][posY][0] + 128) / 256.0D,
+            (this.color[posX][posY][1] + 128) / 256.0D,
+            (this.color[posX][posY][2] + 128) / 256.0D);
     }
 
     /**
@@ -132,7 +131,7 @@ public class FlagData {
         for (int i = 0; i < this.width; i++) {
             for (int j = 0; j < this.height; j++) {
                 final int col = this.color[i][j][0] + 128 << 16 | this.color[i][j][1] + 128 << 8
-                        | this.color[i][j][2] + 128;
+                    | this.color[i][j][2] + 128;
                 image.setRGB(i, j, col);
             }
         }

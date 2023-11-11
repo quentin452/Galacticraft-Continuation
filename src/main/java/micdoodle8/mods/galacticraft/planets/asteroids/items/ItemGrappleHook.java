@@ -1,25 +1,20 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBow;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityGrapple;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.*;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
 
 public class ItemGrappleHook extends ItemBow {
 
@@ -43,18 +38,18 @@ public class ItemGrappleHook extends ItemBow {
 
     @Override
     public void onPlayerStoppedUsing(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer,
-            int par4) {
+        int par4) {
         final boolean flag = par3EntityPlayer.capabilities.isCreativeMode
-                || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, par1ItemStack) > 0;
+            || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, par1ItemStack) > 0;
 
         if (flag || par3EntityPlayer.inventory.hasItem(Items.string)) {
             final EntityGrapple grapple = new EntityGrapple(par2World, par3EntityPlayer, 2.0F);
 
             par2World.playSoundAtEntity(
-                    par3EntityPlayer,
-                    "random.bow",
-                    1.0F,
-                    1.0F / (Item.itemRand.nextFloat() * 0.4F + 1.2F) + 0.5F);
+                par3EntityPlayer,
+                "random.bow",
+                1.0F,
+                1.0F / (Item.itemRand.nextFloat() * 0.4F + 1.2F) + 0.5F);
 
             if (!par2World.isRemote) {
                 par2World.spawnEntityInWorld(grapple);

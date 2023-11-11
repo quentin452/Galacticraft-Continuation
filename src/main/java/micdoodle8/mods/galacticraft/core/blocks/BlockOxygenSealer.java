@@ -1,5 +1,12 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenSealer;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -12,14 +19,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenSealer;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 
 public class BlockOxygenSealer extends BlockAdvancedTile implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -57,7 +56,7 @@ public class BlockOxygenSealer extends BlockAdvancedTile implements ItemBlockDes
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         int change = 0;
 
         // Re-orient the block
@@ -87,7 +86,7 @@ public class BlockOxygenSealer extends BlockAdvancedTile implements ItemBlockDes
 
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         entityPlayer.openGui(GalacticraftCore.instance, -1, world, x, y, z);
         return true;
     }
@@ -100,7 +99,9 @@ public class BlockOxygenSealer extends BlockAdvancedTile implements ItemBlockDes
         if (side == metadata + 2) {
             return this.iconOutput;
         }
-        if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
+        if (side == ForgeDirection.getOrientation(metadata + 2)
+            .getOpposite()
+            .ordinal()) {
             return this.iconInput;
         } else {
             return this.iconMachineSide;

@@ -1,7 +1,11 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,12 +19,7 @@ import net.minecraftforge.common.EnumPlantType;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.EnumSet;
 
 public class TileEntityOxygenCollector extends TileEntityOxygen implements IInventory, ISidedInventory {
 
@@ -43,7 +42,7 @@ public class TileEntityOxygenCollector extends TileEntityOxygen implements IInve
     @Override
     public int getCappedScaledOxygenLevel(int scale) {
         return (int) Math
-                .max(Math.min(Math.floor((double) this.storedOxygen / (double) this.maxOxygen * scale), scale), 0);
+            .max(Math.min(Math.floor((double) this.storedOxygen / (double) this.maxOxygen * scale), scale), 0);
     }
 
     @Override
@@ -102,8 +101,8 @@ public class TileEntityOxygenCollector extends TileEntityOxygen implements IInve
 
                     if (!this.isInitialised) {
                         this.noAtmosphericOxygen = this.worldObj.provider instanceof IGalacticraftWorldProvider
-                                && !((IGalacticraftWorldProvider) this.worldObj.provider)
-                                        .isGasPresent(IAtmosphericGas.OXYGEN);
+                            && !((IGalacticraftWorldProvider) this.worldObj.provider)
+                                .isGasPresent(IAtmosphericGas.OXYGEN);
                         this.isInitialised = true;
                     }
 
@@ -112,8 +111,8 @@ public class TileEntityOxygenCollector extends TileEntityOxygen implements IInve
                         // doesn't have to continually test for map edges inside the
                         // loop
                         if (this.xCoord > -29999995 && this.xCoord < 2999995
-                                && this.zCoord > -29999995
-                                && this.zCoord < 29999995) {
+                            && this.zCoord > -29999995
+                            && this.zCoord < 29999995) {
                             // Test the y coordinates, so code doesn't have to keep
                             // testing that either
                             int miny = this.yCoord - 5;
@@ -150,10 +149,10 @@ public class TileEntityOxygenCollector extends TileEntityOxygen implements IInve
                                         // Test for the two most common blocks (air
                                         // and breatheable air) without looking up
                                         // in the blocksList
-                                        if (!(block instanceof BlockAir) && (block.isLeaves(this.worldObj, x, y, z)
-                                                || block instanceof IPlantable
-                                                        && ((IPlantable) block).getPlantType(this.worldObj, x, y, z)
-                                                                == EnumPlantType.Crop)) {
+                                        if (!(block instanceof BlockAir)
+                                            && (block.isLeaves(this.worldObj, x, y, z) || block instanceof IPlantable
+                                                && ((IPlantable) block).getPlantType(this.worldObj, x, y, z)
+                                                    == EnumPlantType.Crop)) {
                                             nearbyLeaves += 0.075F * 10F;
                                         }
                                     }
@@ -273,7 +272,7 @@ public class TileEntityOxygenCollector extends TileEntityOxygen implements IInve
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -341,13 +340,15 @@ public class TileEntityOxygenCollector extends TileEntityOxygen implements IInve
 
     @Override
     public EnumSet<ForgeDirection> getOxygenOutputDirections() {
-        return EnumSet.of(this.getElectricInputDirection().getOpposite());
+        return EnumSet.of(
+            this.getElectricInputDirection()
+                .getOpposite());
     }
 
     @Override
     public float getOxygenProvide(ForgeDirection direction) {
-        return this.getOxygenOutputDirections().contains(direction)
-                ? Math.min(TileEntityOxygenStorageModule.OUTPUT_PER_TICK, this.getOxygenStored())
+        return this.getOxygenOutputDirections()
+            .contains(direction) ? Math.min(TileEntityOxygenStorageModule.OUTPUT_PER_TICK, this.getOxygenStored())
                 : 0.0F;
     }
 }

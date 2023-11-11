@@ -1,16 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
@@ -23,6 +12,16 @@ import micdoodle8.mods.galacticraft.planets.asteroids.ConfigManagerAsteroids;
 import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
 import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
 import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
+import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
 
 public class ItemAstroMiner extends Item implements IHoldableItem {
 
@@ -47,7 +46,7 @@ public class ItemAstroMiner extends Item implements IHoldableItem {
 
     @Override
     public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4,
-            int par5, int par6, int par7, float par8, float par9, float par10) {
+        int par5, int par6, int par7, float par8, float par9, float par10) {
         TileEntity tile = null;
 
         if (par3World.isRemote || par2EntityPlayer == null) {
@@ -62,13 +61,13 @@ public class ItemAstroMiner extends Item implements IHoldableItem {
         if (tile instanceof TileEntityMinerBase) {
             if (par3World.provider instanceof WorldProviderSpaceStation) {
                 par2EntityPlayer
-                        .addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner7.fail")));
+                    .addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner7.fail")));
                 return false;
             }
 
             if (((TileEntityMinerBase) tile).getLinkedMiner() != null) {
                 par2EntityPlayer
-                        .addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner.fail")));
+                    .addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner.fail")));
                 return false;
             }
 
@@ -82,15 +81,15 @@ public class ItemAstroMiner extends Item implements IHoldableItem {
             final int astroCount = GCPlayerStats.get(playerMP).astroMinerCount;
             if (astroCount >= ConfigManagerAsteroids.astroMinerMax && !par2EntityPlayer.capabilities.isCreativeMode) {
                 par2EntityPlayer
-                        .addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner2.fail")));
+                    .addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner2.fail")));
                 return false;
             }
 
             if (!((TileEntityMinerBase) tile).spawnMiner(playerMP)) {
                 par2EntityPlayer.addChatMessage(
-                        new ChatComponentText(
-                                GCCoreUtil.translate("gui.message.astroMiner1.fail") + " "
-                                        + GCCoreUtil.translate(EntityAstroMiner.blockingBlock.toString())));
+                    new ChatComponentText(
+                        GCCoreUtil.translate("gui.message.astroMiner1.fail") + " "
+                            + GCCoreUtil.translate(EntityAstroMiner.blockingBlock.toString())));
                 return false;
             }
 

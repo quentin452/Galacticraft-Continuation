@@ -1,24 +1,60 @@
 package micdoodle8.mods.galacticraft.core.proxy;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import api.player.client.ClientPlayerAPI;
+import api.player.model.ModelPlayerAPI;
+import api.player.render.RenderPlayerAPI;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.Event;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import micdoodle8.mods.galacticraft.api.entity.ICameraZoomEntity;
+import micdoodle8.mods.galacticraft.api.event.client.CelestialBodyRenderEvent;
+import micdoodle8.mods.galacticraft.api.prefab.entity.EntityAutoRocket;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.Constants;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.BlockUnlitTorch;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.client.DynamicTextureProper;
+import micdoodle8.mods.galacticraft.core.client.FootprintRenderer;
+import micdoodle8.mods.galacticraft.core.client.fx.EffectHandler;
+import micdoodle8.mods.galacticraft.core.client.gui.screen.GuiCelestialSelection;
+import micdoodle8.mods.galacticraft.core.client.gui.screen.InventoryTabGalacticraft;
+import micdoodle8.mods.galacticraft.core.client.model.ModelPlayerBaseGC;
+import micdoodle8.mods.galacticraft.core.client.model.ModelRocketTier1;
+import micdoodle8.mods.galacticraft.core.client.render.ThreadDownloadImageDataGC;
+import micdoodle8.mods.galacticraft.core.client.render.block.*;
+import micdoodle8.mods.galacticraft.core.client.render.entities.*;
+import micdoodle8.mods.galacticraft.core.client.render.item.*;
+import micdoodle8.mods.galacticraft.core.client.render.tile.*;
+import micdoodle8.mods.galacticraft.core.client.sounds.MusicTickerGC;
+import micdoodle8.mods.galacticraft.core.dimension.WorldProviderMoon;
+import micdoodle8.mods.galacticraft.core.dimension.WorldProviderSpaceStation;
+import micdoodle8.mods.galacticraft.core.entities.*;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerBaseSP;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStatsClient;
+import micdoodle8.mods.galacticraft.core.entities.player.IPlayerClient;
+import micdoodle8.mods.galacticraft.core.entities.player.PlayerClient;
+import micdoodle8.mods.galacticraft.core.inventory.InventoryExtended;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.tick.KeyHandlerClient;
+import micdoodle8.mods.galacticraft.core.tick.TickHandlerClient;
+import micdoodle8.mods.galacticraft.core.tile.*;
+import micdoodle8.mods.galacticraft.core.util.VersionUtil;
+import micdoodle8.mods.galacticraft.core.wrappers.BlockMetaList;
+import micdoodle8.mods.galacticraft.core.wrappers.PlayerGearData;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
@@ -49,131 +85,21 @@ import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.IFluidBlock;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import api.player.client.ClientPlayerAPI;
-import api.player.model.ModelPlayerAPI;
-import api.player.render.RenderPlayerAPI;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.Event;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import micdoodle8.mods.galacticraft.api.entity.ICameraZoomEntity;
-import micdoodle8.mods.galacticraft.api.event.client.CelestialBodyRenderEvent;
-import micdoodle8.mods.galacticraft.api.prefab.entity.EntityAutoRocket;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockUnlitTorch;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.client.DynamicTextureProper;
-import micdoodle8.mods.galacticraft.core.client.FootprintRenderer;
-import micdoodle8.mods.galacticraft.core.client.fx.EffectHandler;
-import micdoodle8.mods.galacticraft.core.client.gui.screen.GuiCelestialSelection;
-import micdoodle8.mods.galacticraft.core.client.gui.screen.InventoryTabGalacticraft;
-import micdoodle8.mods.galacticraft.core.client.model.ModelPlayerBaseGC;
-import micdoodle8.mods.galacticraft.core.client.model.ModelRocketTier1;
-import micdoodle8.mods.galacticraft.core.client.render.ThreadDownloadImageDataGC;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererBreathableAir;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererLandingPad;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererMachine;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererMeteor;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererNasaWorkbench;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererOxygenPipe;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererParachest;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererTreasureChest;
-import micdoodle8.mods.galacticraft.core.client.render.block.BlockRendererUnlitTorch;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderAlienVillager;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderBuggy;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderEntityFake;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderEvolvedCreeper;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderEvolvedSkeleton;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderEvolvedSkeletonBoss;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderEvolvedSpider;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderEvolvedZombie;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderFlag;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderLander;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderMeteor;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderMeteorChunk;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderParaChest;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderPlayerBaseGC;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderPlayerGC;
-import micdoodle8.mods.galacticraft.core.client.render.entities.RenderTier1Rocket;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererArclamp;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererBuggy;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererFlag;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererKey;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererMeteorChunk;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererScreen;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererThruster;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererTier1Rocket;
-import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererUnlitTorch;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityAluminumWireRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityArclampRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityBubbleProviderRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityDishRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityNasaWorkbenchRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityParachestRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityScreenRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntitySolarPanelRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityThrusterRenderer;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityTreasureChestRenderer;
-import micdoodle8.mods.galacticraft.core.client.sounds.MusicTickerGC;
-import micdoodle8.mods.galacticraft.core.dimension.WorldProviderMoon;
-import micdoodle8.mods.galacticraft.core.dimension.WorldProviderSpaceStation;
-import micdoodle8.mods.galacticraft.core.entities.EntityAlienVillager;
-import micdoodle8.mods.galacticraft.core.entities.EntityBuggy;
-import micdoodle8.mods.galacticraft.core.entities.EntityCelestialFake;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedCreeper;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSkeleton;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSpider;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedZombie;
-import micdoodle8.mods.galacticraft.core.entities.EntityFlag;
-import micdoodle8.mods.galacticraft.core.entities.EntityLander;
-import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
-import micdoodle8.mods.galacticraft.core.entities.EntityMeteor;
-import micdoodle8.mods.galacticraft.core.entities.EntityMeteorChunk;
-import micdoodle8.mods.galacticraft.core.entities.EntityParachest;
-import micdoodle8.mods.galacticraft.core.entities.EntitySkeletonBoss;
-import micdoodle8.mods.galacticraft.core.entities.EntityTier1Rocket;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerBaseSP;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStatsClient;
-import micdoodle8.mods.galacticraft.core.entities.player.IPlayerClient;
-import micdoodle8.mods.galacticraft.core.entities.player.PlayerClient;
-import micdoodle8.mods.galacticraft.core.inventory.InventoryExtended;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.tick.KeyHandlerClient;
-import micdoodle8.mods.galacticraft.core.tick.TickHandlerClient;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityAluminumWire;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityArclamp;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityDish;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityNasaWorkbench;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenDistributor;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityScreen;
-import micdoodle8.mods.galacticraft.core.tile.TileEntitySolar;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityThruster;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityTreasureChest;
-import micdoodle8.mods.galacticraft.core.util.VersionUtil;
-import micdoodle8.mods.galacticraft.core.wrappers.BlockMetaList;
-import micdoodle8.mods.galacticraft.core.wrappers.PlayerGearData;
 import tconstruct.client.tabs.InventoryTabVanilla;
 import tconstruct.client.tabs.TabRegistry;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.FloatBuffer;
+import java.util.List;
+import java.util.*;
 
 public class ClientProxyCore extends CommonProxyCore {
 
@@ -220,8 +146,8 @@ public class ClientProxyCore extends CommonProxyCore {
     public static InventoryExtended dummyInventory = new InventoryExtended();
 
     private static final ResourceLocation underOilTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/underoil.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/underoil.png");
 
     private static final float[] numbers = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
     private static final FloatBuffer scaleup = BufferUtils.createFloatBuffer(16 * Float.SIZE);
@@ -232,7 +158,8 @@ public class ClientProxyCore extends CommonProxyCore {
     private static final Map<String, ResourceLocation> capesMap = Maps.newHashMap();
 
     public static IPlayerClient playerClientHandler = new PlayerClient();
-    public static Minecraft mc = FMLClientHandler.instance().getClient();
+    public static Minecraft mc = FMLClientHandler.instance()
+        .getClient();
     public static List<String> gearDataRequests = Lists.newArrayList();
     // private static int playerList;
 
@@ -245,11 +172,11 @@ public class ClientProxyCore extends CommonProxyCore {
     public static float PLAYER_Y_OFFSET = 1.6200000047683716F;
 
     private static final ResourceLocation saturnRingTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/celestialbodies/saturnRings.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/celestialbodies/saturnRings.png");
     private static final ResourceLocation uranusRingTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/celestialbodies/uranusRings.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/celestialbodies/uranusRings.png");
 
     public static void reset() {
         ClientProxyCore.playerItemData.clear();
@@ -272,14 +199,14 @@ public class ClientProxyCore extends CommonProxyCore {
     @Override
     public void init(FMLInitializationEvent event) {
         final Class<?>[][] commonTypes = {
-                { MusicTicker.MusicType.class, ResourceLocation.class, int.class, int.class }, };
+            { MusicTicker.MusicType.class, ResourceLocation.class, int.class, int.class }, };
         MUSIC_TYPE_MARS = EnumHelper.addEnum(
-                commonTypes,
-                MusicTicker.MusicType.class,
-                "MARS_JC",
-                new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "galacticraft.musicSpace"),
-                12000,
-                24000);
+            commonTypes,
+            MusicTicker.MusicType.class,
+            "MARS_JC",
+            new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "galacticraft.musicSpace"),
+            12000,
+            24000);
         ClientProxyCore.registerHandlers();
         ClientProxyCore.registerTileEntityRenderers();
         ClientProxyCore.registerBlockHandlers();
@@ -295,8 +222,9 @@ public class ClientProxyCore extends CommonProxyCore {
         // ClientProxyCore.playerList = GLAllocation.generateDisplayLists(1);
 
         try {
-            final Field ftc = Minecraft.getMinecraft().getClass()
-                    .getDeclaredField(VersionUtil.getNameDynamic(VersionUtil.KEY_FIELD_MUSICTICKER));
+            final Field ftc = Minecraft.getMinecraft()
+                .getClass()
+                .getDeclaredField(VersionUtil.getNameDynamic(VersionUtil.KEY_FIELD_MUSICTICKER));
             ftc.setAccessible(true);
             ftc.set(Minecraft.getMinecraft(), new MusicTickerGC(Minecraft.getMinecraft()));
         } catch (final Exception e) {
@@ -306,8 +234,8 @@ public class ClientProxyCore extends CommonProxyCore {
 
     public static void registerEntityRenderers() {
         RenderingRegistry.registerEntityRenderingHandler(
-                EntityTier1Rocket.class,
-                new RenderTier1Rocket(new ModelRocketTier1(), GalacticraftCore.ASSET_PREFIX, "rocketT1"));
+            EntityTier1Rocket.class,
+            new RenderTier1Rocket(new ModelRocketTier1(), GalacticraftCore.ASSET_PREFIX, "rocketT1"));
         RenderingRegistry.registerEntityRenderingHandler(EntityEvolvedSpider.class, new RenderEvolvedSpider());
         RenderingRegistry.registerEntityRenderingHandler(EntityEvolvedZombie.class, new RenderEvolvedZombie());
         RenderingRegistry.registerEntityRenderingHandler(EntityEvolvedCreeper.class, new RenderEvolvedCreeper());
@@ -336,32 +264,35 @@ public class ClientProxyCore extends CommonProxyCore {
 
     public static void registerItemRenderers() {
         MinecraftForgeClient
-                .registerItemRenderer(Item.getItemFromBlock(GCBlocks.unlitTorch), new ItemRendererUnlitTorch());
+            .registerItemRenderer(Item.getItemFromBlock(GCBlocks.unlitTorch), new ItemRendererUnlitTorch());
         MinecraftForgeClient.registerItemRenderer(
-                GCItems.rocketTier1,
-                new ItemRendererTier1Rocket(
-                        new EntityTier1Rocket(ClientProxyCore.mc.theWorld),
-                        new ModelRocketTier1(),
-                        new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/rocketT1.png")));
+            GCItems.rocketTier1,
+            new ItemRendererTier1Rocket(
+                new EntityTier1Rocket(ClientProxyCore.mc.theWorld),
+                new ModelRocketTier1(),
+                new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/rocketT1.png")));
         MinecraftForgeClient.registerItemRenderer(GCItems.buggy, new ItemRendererBuggy());
         MinecraftForgeClient.registerItemRenderer(GCItems.flag, new ItemRendererFlag());
         MinecraftForgeClient.registerItemRenderer(
-                GCItems.key,
-                new ItemRendererKey(
-                        new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/treasure.png")));
+            GCItems.key,
+            new ItemRendererKey(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/treasure.png")));
         MinecraftForgeClient.registerItemRenderer(GCItems.meteorChunk, new ItemRendererMeteorChunk());
         MinecraftForgeClient
-                .registerItemRenderer(Item.getItemFromBlock(GCBlocks.spinThruster), new ItemRendererThruster());
+            .registerItemRenderer(Item.getItemFromBlock(GCBlocks.spinThruster), new ItemRendererThruster());
         MinecraftForgeClient
-                .registerItemRenderer(Item.getItemFromBlock(GCBlocks.brightLamp), new ItemRendererArclamp());
+            .registerItemRenderer(Item.getItemFromBlock(GCBlocks.brightLamp), new ItemRendererArclamp());
         MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(GCBlocks.screen), new ItemRendererScreen());
     }
 
     public static void registerHandlers() {
         final TickHandlerClient tickHandlerClient = new TickHandlerClient();
-        FMLCommonHandler.instance().bus().register(tickHandlerClient);
+        FMLCommonHandler.instance()
+            .bus()
+            .register(tickHandlerClient);
         MinecraftForge.EVENT_BUS.register(tickHandlerClient);
-        FMLCommonHandler.instance().bus().register(new KeyHandlerClient());
+        FMLCommonHandler.instance()
+            .bus()
+            .register(new KeyHandlerClient());
         ClientRegistry.registerKeyBinding(KeyHandlerClient.galaxyMap);
         ClientRegistry.registerKeyBinding(KeyHandlerClient.openFuelGui);
         ClientRegistry.registerKeyBinding(KeyHandlerClient.toggleAdvGoggles);
@@ -370,16 +301,16 @@ public class ClientProxyCore extends CommonProxyCore {
 
     public static void registerTileEntityRenderers() {
         ClientRegistry
-                .bindTileEntitySpecialRenderer(TileEntityAluminumWire.class, new TileEntityAluminumWireRenderer());
+            .bindTileEntitySpecialRenderer(TileEntityAluminumWire.class, new TileEntityAluminumWireRenderer());
         ClientRegistry
-                .bindTileEntitySpecialRenderer(TileEntityTreasureChest.class, new TileEntityTreasureChestRenderer());
+            .bindTileEntitySpecialRenderer(TileEntityTreasureChest.class, new TileEntityTreasureChestRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityParaChest.class, new TileEntityParachestRenderer());
         ClientRegistry
-                .bindTileEntitySpecialRenderer(TileEntityNasaWorkbench.class, new TileEntityNasaWorkbenchRenderer());
+            .bindTileEntitySpecialRenderer(TileEntityNasaWorkbench.class, new TileEntityNasaWorkbenchRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySolar.class, new TileEntitySolarPanelRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(
-                TileEntityOxygenDistributor.class,
-                new TileEntityBubbleProviderRenderer(0.25F, 0.25F, 1.0F));
+            TileEntityOxygenDistributor.class,
+            new TileEntityBubbleProviderRenderer(0.25F, 0.25F, 1.0F));
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityDish.class, new TileEntityDishRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityThruster.class, new TileEntityThrusterRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityArclamp.class, new TileEntityArclampRenderer());
@@ -466,8 +397,8 @@ public class ClientProxyCore extends CommonProxyCore {
                     final int splitLocation = line.indexOf(":");
                     final String username = line.substring(0, splitLocation);
                     final String capeUrl = "https://raw.github.com/micdoodle8/Galacticraft/master/capes/"
-                            + line.substring(splitLocation + 1)
-                            + ".png";
+                        + line.substring(splitLocation + 1)
+                        + ".png";
                     ClientProxyCore.capeMap.put(username, capeUrl);
                 }
             }
@@ -493,7 +424,8 @@ public class ClientProxyCore extends CommonProxyCore {
     }
 
     public static void registerInventoryTabs() {
-        if (!Loader.isModLoaded("TConstruct") && TabRegistry.getTabList().size() < 1) {
+        if (!Loader.isModLoaded("TConstruct") && TabRegistry.getTabList()
+            .size() < 1) {
             TabRegistry.registerTab(new InventoryTabVanilla());
         }
 
@@ -519,19 +451,18 @@ public class ClientProxyCore extends CommonProxyCore {
         } else if (blockID instanceof BlockUnlitTorch || blockID == GCBlocks.glowstoneTorch) {
             return ClientProxyCore.renderIdTorchUnlit;
         } else if (blockID == GCBlocks.fuelLoader || blockID == GCBlocks.cargoLoader
-                || blockID == GCBlocks.machineBase
-                || blockID == GCBlocks.machineBase2
-                || blockID == GCBlocks.machineTiered
-                || blockID == GCBlocks.oxygenCollector
-                || blockID == GCBlocks.oxygenCompressor
-                || blockID == GCBlocks.oxygenDetector
-                || blockID == GCBlocks.oxygenDistributor
-                || blockID == GCBlocks.oxygenSealer
-                || blockID == GCBlocks.refinery
-                || blockID == GCBlocks.telemetry) {
-                    return ClientProxyCore.renderIdMachine;
-                } else
-            if (blockID == GCBlocks.treasureChestTier1) {
+            || blockID == GCBlocks.machineBase
+            || blockID == GCBlocks.machineBase2
+            || blockID == GCBlocks.machineTiered
+            || blockID == GCBlocks.oxygenCollector
+            || blockID == GCBlocks.oxygenCompressor
+            || blockID == GCBlocks.oxygenDetector
+            || blockID == GCBlocks.oxygenDistributor
+            || blockID == GCBlocks.oxygenSealer
+            || blockID == GCBlocks.refinery
+            || blockID == GCBlocks.telemetry) {
+                return ClientProxyCore.renderIdMachine;
+            } else if (blockID == GCBlocks.treasureChestTier1) {
                 return ClientProxyCore.renderIdTreasureChest;
             } else if (blockID == GCBlocks.parachest) {
                 return ClientProxyCore.renderIdParachest;
@@ -564,7 +495,8 @@ public class ClientProxyCore extends CommonProxyCore {
         if (!ClientProxyCore.isInsideOfFluid(ClientProxyCore.mc.thePlayer, GalacticraftCore.fluidOil)) {
             return;
         }
-        ClientProxyCore.mc.getTextureManager().bindTexture(ClientProxyCore.underOilTexture);
+        ClientProxyCore.mc.getTextureManager()
+            .bindTexture(ClientProxyCore.underOilTexture);
 
         final Tessellator tessellator = Tessellator.instance;
         final float f1 = ClientProxyCore.mc.thePlayer.getBrightness(partialTicks) / 3.0F;
@@ -599,8 +531,10 @@ public class ClientProxyCore extends CommonProxyCore {
         final Block block = entity.worldObj.getBlock(i, j, k);
 
         if (block == null || !(block instanceof IFluidBlock)
-                || ((IFluidBlock) block).getFluid() == null
-                || !((IFluidBlock) block).getFluid().getName().equals(fluid.getName())) {
+            || ((IFluidBlock) block).getFluid() == null
+            || !((IFluidBlock) block).getFluid()
+                .getName()
+                .equals(fluid.getName())) {
             return false;
         }
         double filled = ((IFluidBlock) block).getFilledPercentage(entity.worldObj, i, j, k);
@@ -643,16 +577,16 @@ public class ClientProxyCore extends CommonProxyCore {
         final EntityPlayer player = event.entityPlayer;
 
         if (player.ridingEntity instanceof ICameraZoomEntity && player == Minecraft.getMinecraft().thePlayer
-                && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0) {
+            && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0) {
             final Entity entity = player.ridingEntity;
             float rotateOffset = ((ICameraZoomEntity) entity).getRotateOffset();
             if (rotateOffset > -10F) {
                 rotateOffset += PLAYER_Y_OFFSET;
                 GL11.glTranslatef(0, -rotateOffset, 0);
                 final float anglePitch = entity.prevRotationPitch
-                        + (entity.rotationPitch - entity.prevRotationPitch) * event.partialRenderTick;
+                    + (entity.rotationPitch - entity.prevRotationPitch) * event.partialRenderTick;
                 final float angleYaw = entity.prevRotationYaw
-                        + (entity.rotationYaw - entity.prevRotationYaw) * event.partialRenderTick;
+                    + (entity.rotationYaw - entity.prevRotationYaw) * event.partialRenderTick;
                 GL11.glRotatef(-angleYaw, 0.0F, 1.0F, 0.0F);
                 GL11.glRotatef(anglePitch, 0.0F, 0.0F, 1.0F);
                 GL11.glTranslatef(0, rotateOffset, 0);
@@ -707,34 +641,36 @@ public class ClientProxyCore extends CommonProxyCore {
                         }
 
                         if (success) {
-                            final String hash = String.valueOf(player.getCommandSenderName().hashCode());
+                            final String hash = String.valueOf(
+                                player.getCommandSenderName()
+                                    .hashCode());
                             final File file1 = new File(directory, hash.substring(0, 2));
                             final File file2 = new File(file1, hash);
                             final ResourceLocation resourcelocation = new ResourceLocation("gcCapes/" + hash);
                             final ThreadDownloadImageDataGC threaddownloadimagedata = new ThreadDownloadImageDataGC(
-                                    file2,
-                                    url,
-                                    null,
-                                    new IImageBuffer() {
+                                file2,
+                                url,
+                                null,
+                                new IImageBuffer() {
 
-                                        @Override
-                                        public BufferedImage parseUserSkin(BufferedImage p_78432_1_) {
-                                            if (p_78432_1_ == null) {
-                                                return null;
-                                            }
-                                            final BufferedImage bufferedimage1 = new BufferedImage(512, 256, 2);
-                                            final Graphics graphics = bufferedimage1.getGraphics();
-                                            graphics.drawImage(p_78432_1_, 0, 0, null);
-                                            graphics.dispose();
-                                            return bufferedimage1;
+                                    @Override
+                                    public BufferedImage parseUserSkin(BufferedImage p_78432_1_) {
+                                        if (p_78432_1_ == null) {
+                                            return null;
                                         }
+                                        final BufferedImage bufferedimage1 = new BufferedImage(512, 256, 2);
+                                        final Graphics graphics = bufferedimage1.getGraphics();
+                                        graphics.drawImage(p_78432_1_, 0, 0, null);
+                                        graphics.dispose();
+                                        return bufferedimage1;
+                                    }
 
-                                        @Override
-                                        public void func_152634_a() {}
-                                    });
+                                    @Override
+                                    public void func_152634_a() {}
+                                });
 
                             if (ClientProxyCore.mc.getTextureManager()
-                                    .loadTexture(resourcelocation, threaddownloadimagedata)) {
+                                .loadTexture(resourcelocation, threaddownloadimagedata)) {
                                 capeLoc = resourcelocation;
                             }
                         }
@@ -747,21 +683,22 @@ public class ClientProxyCore extends CommonProxyCore {
             }
 
             if (capeLoc != null) {
-                ClientProxyCore.mc.getTextureManager().bindTexture(capeLoc);
+                ClientProxyCore.mc.getTextureManager()
+                    .bindTexture(capeLoc);
                 GL11.glPushMatrix();
                 GL11.glTranslatef(0.0F, 0.0F, 0.125F);
                 final double d3 = player.field_71091_bM
-                        + (player.field_71094_bP - player.field_71091_bM) * event.partialRenderTick
-                        - (player.prevPosX + (player.posX - player.prevPosX) * event.partialRenderTick);
+                    + (player.field_71094_bP - player.field_71091_bM) * event.partialRenderTick
+                    - (player.prevPosX + (player.posX - player.prevPosX) * event.partialRenderTick);
                 final double d4 = player.field_71096_bN
-                        + (player.field_71095_bQ - player.field_71096_bN) * event.partialRenderTick
-                        - (player.prevPosY + (player.posY - player.prevPosY) * event.partialRenderTick);
+                    + (player.field_71095_bQ - player.field_71096_bN) * event.partialRenderTick
+                    - (player.prevPosY + (player.posY - player.prevPosY) * event.partialRenderTick);
                 final double d0 = player.field_71097_bO
-                        + (player.field_71085_bR - player.field_71097_bO) * event.partialRenderTick
-                        - (player.prevPosZ + (player.posZ - player.prevPosZ) * event.partialRenderTick);
+                    + (player.field_71085_bR - player.field_71097_bO) * event.partialRenderTick
+                    - (player.prevPosZ + (player.posZ - player.prevPosZ) * event.partialRenderTick);
                 f4 = (player.prevRenderYawOffset
-                        + (player.renderYawOffset - player.prevRenderYawOffset) * event.partialRenderTick)
-                        / (180F / (float) Math.PI);
+                    + (player.renderYawOffset - player.prevRenderYawOffset) * event.partialRenderTick)
+                    / (180F / (float) Math.PI);
                 final double d1 = MathHelper.sin(f4);
                 final double d2 = -MathHelper.cos(f4);
                 float f5 = (float) d4 * 10.0F;
@@ -782,14 +719,13 @@ public class ClientProxyCore extends CommonProxyCore {
                 }
 
                 final float f8 = player.prevCameraYaw
-                        + (player.cameraYaw - player.prevCameraYaw) * event.partialRenderTick;
+                    + (player.cameraYaw - player.prevCameraYaw) * event.partialRenderTick;
                 f5 += MathHelper.sin(
-                        (player.prevDistanceWalkedModified
-                                + (player.distanceWalkedModified - player.prevDistanceWalkedModified)
-                                        * event.partialRenderTick)
-                                * 6.0F)
-                        * 32.0F
-                        * f8;
+                    (player.prevDistanceWalkedModified
+                        + (player.distanceWalkedModified - player.prevDistanceWalkedModified) * event.partialRenderTick)
+                        * 6.0F)
+                    * 32.0F
+                    * f8;
 
                 if (player.isSneaking()) {
                     f5 += 25.0F;
@@ -862,8 +798,8 @@ public class ClientProxyCore extends CommonProxyCore {
                     phi += 360F;
                 }
                 final float ytranslate = ClientProxyCore.globalRadius + (float) (player.posY - entity.posY)
-                        + eY
-                        - ClientProxyCore.terrainHeight;
+                    + eY
+                    - ClientProxyCore.terrainHeight;
                 GL11.glTranslatef(-dX + eX - floatPX + 8F, -ytranslate, -dZ + eZ - floatPZ + 8F);
                 if (theta > 0) {
                     GL11.glRotatef(theta, 0, 0, -1);
@@ -931,9 +867,9 @@ public class ClientProxyCore extends CommonProxyCore {
                     phi += 360F;
                 }
                 final float ytranslate = ClientProxyCore.globalRadius + (float) player.posY
-                        - tile.yCoord
-                        + eY
-                        - ClientProxyCore.terrainHeight;
+                    - tile.yCoord
+                    + eY
+                    - ClientProxyCore.terrainHeight;
                 GL11.glTranslatef(-dX - floatPX + eX + 8F, -ytranslate, -dZ - floatPZ + eZ + 8F);
                 if (theta > 0) {
                     GL11.glRotatef(theta, 0, 0, -1);
@@ -959,9 +895,9 @@ public class ClientProxyCore extends CommonProxyCore {
                 offset += PLAYER_Y_OFFSET;
                 GL11.glTranslatef(0, -offset, 0);
                 final float anglePitch = entity.prevRotationPitch
-                        + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
+                    + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
                 final float angleYaw = entity.prevRotationYaw
-                        + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
+                    + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
                 GL11.glRotatef(-anglePitch, 0.0F, 0.0F, 1.0F);
                 GL11.glRotatef(angleYaw, 0.0F, 1.0F, 0.0F);
                 GL11.glTranslatef(0, offset, 0);
@@ -969,13 +905,13 @@ public class ClientProxyCore extends CommonProxyCore {
         }
 
         if (entityLivingBase.worldObj.provider instanceof WorldProviderSpaceStation
-                && !entityLivingBase.isPlayerSleeping()) {
+            && !entityLivingBase.isPlayerSleeping()) {
             final float f1 = entityLivingBase.yOffset - 1.62F;
             final float pitch = entityLivingBase.prevRotationPitch
-                    + (entityLivingBase.rotationPitch - entityLivingBase.prevRotationPitch) * partialTicks;
+                + (entityLivingBase.rotationPitch - entityLivingBase.prevRotationPitch) * partialTicks;
             final float yaw = entityLivingBase.prevRotationYaw
-                    + (entityLivingBase.rotationYaw - entityLivingBase.prevRotationYaw) * partialTicks
-                    + 180.0F;
+                + (entityLivingBase.rotationYaw - entityLivingBase.prevRotationYaw) * partialTicks
+                + 180.0F;
             final float eyeHeightChange = entityLivingBase.yOffset - entityLivingBase.width / 2.0F;
 
             GL11.glTranslatef(0.0F, -f1, 0.0F);
@@ -1000,17 +936,17 @@ public class ClientProxyCore extends CommonProxyCore {
             // }
             //
             GL11.glTranslatef(
-                    eyeHeightChange * stats.gdir.getEyeVecX(),
-                    eyeHeightChange * stats.gdir.getEyeVecY(),
-                    eyeHeightChange * stats.gdir.getEyeVecZ());
+                eyeHeightChange * stats.gdir.getEyeVecX(),
+                eyeHeightChange * stats.gdir.getEyeVecY(),
+                eyeHeightChange * stats.gdir.getEyeVecZ());
 
             if (stats.gravityTurnRate < 1.0F) {
                 GL11.glRotatef(
-                        90.0F * (stats.gravityTurnRatePrev
-                                + (stats.gravityTurnRate - stats.gravityTurnRatePrev) * partialTicks),
-                        stats.gravityTurnVecX,
-                        stats.gravityTurnVecY,
-                        stats.gravityTurnVecZ);
+                    90.0F * (stats.gravityTurnRatePrev
+                        + (stats.gravityTurnRate - stats.gravityTurnRatePrev) * partialTicks),
+                    stats.gravityTurnVecX,
+                    stats.gravityTurnVecY,
+                    stats.gravityTurnVecZ);
             }
         }
 
@@ -1116,11 +1052,11 @@ public class ClientProxyCore extends CommonProxyCore {
                     GL11.glTranslatef(-8F, origClipY + globeRadius - 8F, -8F);
                     if (dX != 0 || dZ != 0) {
                         final float scalex = (ClientProxyCore.globalRadius * 2F + scalerX)
-                                / ClientProxyCore.globalRadius
-                                / 2F;
+                            / ClientProxyCore.globalRadius
+                            / 2F;
                         final float scalez = (ClientProxyCore.globalRadius * 2F + scalerZ)
-                                / ClientProxyCore.globalRadius
-                                / 2F;
+                            / ClientProxyCore.globalRadius
+                            / 2F;
                         ClientProxyCore.scaleup.rewind();
                         ClientProxyCore.scaleup.put(scalex);
                         ClientProxyCore.scaleup.position(10);
@@ -1150,7 +1086,8 @@ public class ClientProxyCore extends CommonProxyCore {
         if (handler instanceof NetHandlerPlayServer) {
             return ((NetHandlerPlayServer) handler).playerEntity;
         }
-        return FMLClientHandler.instance().getClientPlayerEntity();
+        return FMLClientHandler.instance()
+            .getClientPlayerEntity();
     }
 
     // For testing purposes only
@@ -1170,7 +1107,7 @@ public class ClientProxyCore extends CommonProxyCore {
         if (event.celestialBody == GalacticraftCore.planetOverworld) {
             if (!ClientProxyCore.overworldTextureRequestSent) {
                 GalacticraftCore.packetPipeline.sendToServer(
-                        new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_OVERWORLD_IMAGE, new Object[] {}));
+                    new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_OVERWORLD_IMAGE, new Object[] {}));
                 ClientProxyCore.overworldTextureRequestSent = true;
             }
 
@@ -1188,34 +1125,34 @@ public class ClientProxyCore extends CommonProxyCore {
                 ClientProxyCore.mc.renderEngine.bindTexture(saturnRingTexture);
                 final float size = GuiCelestialSelection.getWidthForCelestialBodyStatic(event.celestialBody) / 6.0F;
                 ((GuiCelestialSelection) ClientProxyCore.mc.currentScreen).drawTexturedModalRect(
-                        -7.5F * size,
-                        -1.75F * size,
-                        15.0F * size,
-                        3.5F * size,
-                        0,
-                        0,
-                        30,
-                        7,
-                        false,
-                        false,
-                        30,
-                        7);
+                    -7.5F * size,
+                    -1.75F * size,
+                    15.0F * size,
+                    3.5F * size,
+                    0,
+                    0,
+                    30,
+                    7,
+                    false,
+                    false,
+                    30,
+                    7);
             } else if (event.celestialBody == GalacticraftCore.planetUranus) {
                 ClientProxyCore.mc.renderEngine.bindTexture(uranusRingTexture);
                 final float size = GuiCelestialSelection.getWidthForCelestialBodyStatic(event.celestialBody) / 6.0F;
                 ((GuiCelestialSelection) ClientProxyCore.mc.currentScreen).drawTexturedModalRect(
-                        -1.75F * size,
-                        -7.0F * size,
-                        3.5F * size,
-                        14.0F * size,
-                        0,
-                        0,
-                        28,
-                        7,
-                        false,
-                        false,
-                        28,
-                        7);
+                    -1.75F * size,
+                    -7.0F * size,
+                    3.5F * size,
+                    14.0F * size,
+                    0,
+                    0,
+                    28,
+                    7,
+                    false,
+                    false,
+                    28,
+                    7);
             }
         }
     }

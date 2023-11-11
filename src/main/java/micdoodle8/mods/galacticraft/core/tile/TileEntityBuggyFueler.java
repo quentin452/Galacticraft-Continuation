@@ -1,16 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.HashSet;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fluids.FluidStack;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.api.entity.ICargoEntity;
 import micdoodle8.mods.galacticraft.api.entity.IDockable;
@@ -20,6 +9,16 @@ import micdoodle8.mods.galacticraft.api.tile.ILandingPadAttachable;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.blocks.BlockMulti;
 import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fluids.FluidStack;
+
+import java.util.HashSet;
+import java.util.List;
 
 public class TileEntityBuggyFueler extends TileEntityMulti implements IMultiBlock, IFuelable, IFuelDock, ICargoEntity {
 
@@ -31,14 +30,14 @@ public class TileEntityBuggyFueler extends TileEntityMulti implements IMultiBloc
 
         if (!this.worldObj.isRemote) {
             final List<?> list = this.worldObj.getEntitiesWithinAABB(
-                    IFuelable.class,
-                    AxisAlignedBB.getBoundingBox(
-                            this.xCoord - 1.5D,
-                            this.yCoord - 2.0,
-                            this.zCoord - 1.5D,
-                            this.xCoord + 1.5D,
-                            this.yCoord + 4.0,
-                            this.zCoord + 1.5D));
+                IFuelable.class,
+                AxisAlignedBB.getBoundingBox(
+                    this.xCoord - 1.5D,
+                    this.yCoord - 2.0,
+                    this.zCoord - 1.5D,
+                    this.xCoord + 1.5D,
+                    this.yCoord + 4.0,
+                    this.zCoord + 1.5D));
 
             boolean changed = false;
 
@@ -98,7 +97,8 @@ public class TileEntityBuggyFueler extends TileEntityMulti implements IMultiBloc
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
                 if (this.worldObj.isRemote && this.worldObj.rand.nextDouble() < 0.1D) {
-                    FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(
+                    FMLClientHandler.instance()
+                        .getClient().effectRenderer.addBlockDestroyEffects(
                             thisBlock.x + x,
                             thisBlock.y,
                             thisBlock.z + z,
@@ -161,10 +161,10 @@ public class TileEntityBuggyFueler extends TileEntityMulti implements IMultiBloc
                 if (x == -2 || x == 2 || z == -2 || z == 2) {
                     if (Math.abs(x) != Math.abs(z)) {
                         final TileEntity tile = this.worldObj
-                                .getTileEntity(this.xCoord + x, this.yCoord, this.zCoord + z);
+                            .getTileEntity(this.xCoord + x, this.yCoord, this.zCoord + z);
 
                         if (tile instanceof ILandingPadAttachable && ((ILandingPadAttachable) tile)
-                                .canAttachToLandingPad(this.worldObj, this.xCoord, this.yCoord, this.zCoord)) {
+                            .canAttachToLandingPad(this.worldObj, this.xCoord, this.yCoord, this.zCoord)) {
                             connectedTiles.add((ILandingPadAttachable) tile);
                         }
                     }

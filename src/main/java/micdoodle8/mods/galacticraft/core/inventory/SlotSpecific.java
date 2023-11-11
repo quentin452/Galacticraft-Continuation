@@ -1,14 +1,13 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import micdoodle8.mods.galacticraft.api.item.IItemElectric;
+import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import micdoodle8.mods.galacticraft.api.item.IItemElectric;
-import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Creates a slot with a specific amount of items that matches the slot's requirements. Allows easy shift right clicking
@@ -33,7 +32,8 @@ public class SlotSpecific extends Slot {
 
     public SlotSpecific(IInventory par2IInventory, int par3, int par4, int par5, Class<?>... validClasses) {
         super(par2IInventory, par3, par4, par5);
-        if (validClasses != null && Arrays.asList(validClasses).contains(IItemElectric.class)) {
+        if (validClasses != null && Arrays.asList(validClasses)
+            .contains(IItemElectric.class)) {
             if (EnergyConfigHandler.isRFAPILoaded()) {
                 try {
                     final Class<?> itemElectricRF = Class.forName("cofh.api.energy.IEnergyContainerItem");

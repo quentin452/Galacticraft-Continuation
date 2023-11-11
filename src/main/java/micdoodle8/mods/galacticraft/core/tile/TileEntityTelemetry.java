@@ -1,28 +1,6 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityOcelot;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.WorldProvider;
-
 import com.mojang.authlib.GameProfile;
-
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import micdoodle8.mods.galacticraft.api.entity.ITelemetry;
 import micdoodle8.mods.galacticraft.api.prefab.entity.EntitySpaceshipBase;
@@ -34,6 +12,22 @@ import micdoodle8.mods.galacticraft.core.network.PacketSimple;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
 import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.*;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.WorldProvider;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 public class TileEntityTelemetry extends TileEntity {
 
@@ -92,18 +86,18 @@ public class TileEntityTelemetry extends TileEntity {
 
                     if (name == null) {
                         GCLog.info(
-                                "Telemetry Unit: Error finding name for "
-                                        + this.linkedEntity.getClass().getSimpleName());
+                            "Telemetry Unit: Error finding name for " + this.linkedEntity.getClass()
+                                .getSimpleName());
                         name = "";
                     }
 
                     final double xmotion = this.linkedEntity.motionX;
                     final double ymotion = this.linkedEntity instanceof EntityLivingBase
-                            ? this.linkedEntity.motionY + 0.078D
-                            : this.linkedEntity.motionY;
+                        ? this.linkedEntity.motionY + 0.078D
+                        : this.linkedEntity.motionY;
                     final double zmotion = this.linkedEntity.motionZ;
                     data[2] = (int) (MathHelper.sqrt_double(xmotion * xmotion + ymotion * ymotion + zmotion * zmotion)
-                            * 2000D);
+                        * 2000D);
 
                     if (this.linkedEntity instanceof ITelemetry) {
                         ((ITelemetry) this.linkedEntity).transmitData(data);
@@ -133,7 +127,8 @@ public class TileEntityTelemetry extends TileEntity {
 
                         data[1] = (int) (eLiving.getHealth() * 100 / eLiving.getMaxHealth());
                         if (eLiving instanceof EntityPlayerMP) {
-                            data[3] = ((EntityPlayerMP) eLiving).getFoodStats().getFoodLevel() * 5;
+                            data[3] = ((EntityPlayerMP) eLiving).getFoodStats()
+                                .getFoodLevel() * 5;
                             final GCPlayerStats stats = GCPlayerStats.get((EntityPlayerMP) eLiving);
                             data[4] = stats.airRemaining * 4096 + stats.airRemaining2;
                             final UUID uuid = eLiving.getUniqueID();
@@ -166,11 +161,11 @@ public class TileEntityTelemetry extends TileEntity {
                 name = "";
             }
             GalacticraftCore.packetPipeline.sendToAllAround(
-                    new PacketSimple(
-                            EnumSimplePacket.C_UPDATE_TELEMETRY,
-                            new Object[] { this.xCoord, this.yCoord, this.zCoord, name, data[0], data[1], data[2],
-                                    data[3], data[4], strUUID }),
-                    new TargetPoint(this.worldObj.provider.dimensionId, this.xCoord, this.yCoord, this.zCoord, 320D));
+                new PacketSimple(
+                    EnumSimplePacket.C_UPDATE_TELEMETRY,
+                    new Object[] { this.xCoord, this.yCoord, this.zCoord, name, data[0], data[1], data[2], data[3],
+                        data[4], strUUID }),
+                new TargetPoint(this.worldObj.provider.dimensionId, this.xCoord, this.yCoord, this.zCoord, 320D));
         }
     }
 
@@ -186,8 +181,14 @@ public class TileEntityTelemetry extends TileEntity {
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         if (this.linkedEntity != null && !this.linkedEntity.isDead) {
-            nbt.setLong("entityUUIDMost", this.linkedEntity.getUniqueID().getMostSignificantBits());
-            nbt.setLong("entityUUIDLeast", this.linkedEntity.getUniqueID().getLeastSignificantBits());
+            nbt.setLong(
+                "entityUUIDMost",
+                this.linkedEntity.getUniqueID()
+                    .getMostSignificantBits());
+            nbt.setLong(
+                "entityUUIDLeast",
+                this.linkedEntity.getUniqueID()
+                    .getLeastSignificantBits());
         }
     }
 
@@ -196,7 +197,8 @@ public class TileEntityTelemetry extends TileEntity {
         this.lastHurttime = 0;
         final List<Entity> eList = this.worldObj.loadedEntityList;
         for (final Entity e : eList) {
-            if (e.getUniqueID().equals(uuid)) {
+            if (e.getUniqueID()
+                .equals(uuid)) {
                 this.linkedEntity = e;
                 if (e instanceof EntitySpaceshipBase) {
                     ((EntitySpaceshipBase) e).addTelemetry(this);
@@ -245,7 +247,8 @@ public class TileEntityTelemetry extends TileEntity {
         if (nearest == null) {
             return null;
         }
-        final TileEntity result = te.getWorldObj().getTileEntity(nearest.x, nearest.y, nearest.z);
+        final TileEntity result = te.getWorldObj()
+            .getTileEntity(nearest.x, nearest.y, nearest.z);
         if (result instanceof TileEntityTelemetry) {
             return (TileEntityTelemetry) result;
         }

@@ -1,25 +1,23 @@
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.blocks.BlockSolar;
 import micdoodle8.mods.galacticraft.core.client.model.block.ModelSolarPanel;
 import micdoodle8.mods.galacticraft.core.tile.TileEntitySolar;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 public class TileEntitySolarPanelRenderer extends TileEntitySpecialRenderer {
 
     private static final ResourceLocation solarPanelTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/solarPanelBasic.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/solarPanelBasic.png");
     private static final ResourceLocation solarPanelAdvTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/solarPanelAdvanced.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/solarPanelAdvanced.png");
     public ModelSolarPanel model = new ModelSolarPanel();
 
     @Override
@@ -44,8 +42,10 @@ public class TileEntitySolarPanelRenderer extends TileEntitySpecialRenderer {
         GL11.glRotatef(180.0F, 0, 0, 1);
         GL11.glRotatef(-90.0F, 0, 1, 0);
 
-        final float celestialAngle = (panel.getWorldObj().getCelestialAngle(1.0F) - 0.784690560F) * 360.0F;
-        final float celestialAngle2 = panel.getWorldObj().getCelestialAngle(1.0F) * 360.0F;
+        final float celestialAngle = (panel.getWorldObj()
+            .getCelestialAngle(1.0F) - 0.784690560F) * 360.0F;
+        final float celestialAngle2 = panel.getWorldObj()
+            .getCelestialAngle(1.0F) * 360.0F;
 
         GL11.glRotatef(panel.currentAngle - (celestialAngle - celestialAngle2), 1.0F, 0.0F, 0.0F);
 

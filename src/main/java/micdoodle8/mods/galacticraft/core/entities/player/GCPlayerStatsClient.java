@@ -1,8 +1,6 @@
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-
+import micdoodle8.mods.galacticraft.api.recipe.ISchematicPage;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,7 +8,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 
-import micdoodle8.mods.galacticraft.api.recipe.ISchematicPage;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public class GCPlayerStatsClient implements IExtendedEntityProperties {
 

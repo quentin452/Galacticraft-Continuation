@@ -1,16 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.nei;
 
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
@@ -18,12 +7,21 @@ import codechicken.nei.recipe.TemplateRecipeHandler;
 import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class CargoRocketRecipeHandler extends TemplateRecipeHandler {
 
     private static final ResourceLocation cargoRocketTexture = new ResourceLocation(
-            MarsModule.ASSET_PREFIX,
-            "textures/gui/schematic_rocket_GS1_Cargo.png");
+        MarsModule.ASSET_PREFIX,
+        "textures/gui/schematic_rocket_GS1_Cargo.png");
     public static final int x = -1;
     public static final int y = -12;
     public static final int tX = 3;

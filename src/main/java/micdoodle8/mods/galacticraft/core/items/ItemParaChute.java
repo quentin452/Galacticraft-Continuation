@@ -1,7 +1,9 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.EnumRarity;
@@ -9,29 +11,26 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import java.util.List;
 
 public class ItemParaChute extends Item {
 
     public static final String[] names = { "plain", // 0
-            "black", // 1
-            "blue", // 2
-            "lime", // 3
-            "brown", // 4
-            "darkblue", // 5
-            "darkgray", // 6
-            "darkgreen", // 7
-            "gray", // 8
-            "magenta", // 9
-            "orange", // 10
-            "pink", // 11
-            "purple", // 12
-            "red", // 13
-            "teal", // 14
-            "yellow" }; // 15
+        "black", // 1
+        "blue", // 2
+        "lime", // 3
+        "brown", // 4
+        "darkblue", // 5
+        "darkgray", // 6
+        "darkgreen", // 7
+        "gray", // 8
+        "magenta", // 9
+        "orange", // 10
+        "pink", // 11
+        "purple", // 12
+        "red", // 13
+        "teal", // 14
+        "yellow" }; // 15
 
     protected IIcon[] icons;
 

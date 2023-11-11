@@ -20,11 +20,13 @@ public class TileEntityBeamReflector extends TileEntityBeamOutput implements ILa
     public Vector3 getInputPoint() {
         final float distance = 0.15F;
         final Vector3 deviation = new Vector3(
-                Math.sin(Math.toRadians(this.yaw - 180)) * distance,
-                0,
-                Math.cos(Math.toRadians(this.yaw - 180)) * distance);
+            Math.sin(Math.toRadians(this.yaw - 180)) * distance,
+            0,
+            Math.cos(Math.toRadians(this.yaw - 180)) * distance);
         final Vector3 headVec = new Vector3(this.xCoord + 0.5, this.yCoord + 1.13228 / 2.0, this.zCoord + 0.5);
-        headVec.translate(deviation.clone().invert());
+        headVec.translate(
+            deviation.clone()
+                .invert());
         return headVec;
     }
 
@@ -62,13 +64,14 @@ public class TileEntityBeamReflector extends TileEntityBeamOutput implements ILa
     public float receiveEnergyGC(EnergySource from, float amount, boolean simulate) {
         if (this.getTarget() != null) {
             if (!(from instanceof EnergySourceWireless)
-                    || ((EnergySourceWireless) from).nodes.contains(this.getTarget())) {
+                || ((EnergySourceWireless) from).nodes.contains(this.getTarget())) {
                 return 0;
             }
 
             ((EnergySourceWireless) from).nodes.add(this);
 
-            return this.getTarget().receiveEnergyGC(from, amount, simulate);
+            return this.getTarget()
+                .receiveEnergyGC(from, amount, simulate);
         }
 
         return this.storage.receiveEnergyGC(amount, simulate);

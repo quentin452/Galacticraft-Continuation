@@ -1,39 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.entities;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.boss.IBossDisplayData;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ChestGenHooks;
-
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
 import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
@@ -51,9 +17,33 @@ import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.planets.asteroids.ConfigManagerAsteroids;
 import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTreasureChestMars;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.*;
+import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.*;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ChestGenHooks;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class EntityCreeperBoss extends EntityMob
-        implements IEntityBreathable, IBossDisplayData, IRangedAttackMob, IBoss {
+    implements IEntityBreathable, IBossDisplayData, IRangedAttackMob, IBoss {
 
     protected long ticks = 0;
     private TileEntityDungeonSpawner spawner;
@@ -102,8 +92,9 @@ public class EntityCreeperBoss extends EntityMob
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
         this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
-                .setBaseValue(200.0F * ConfigManagerCore.dungeonBossHealthMod);
-        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.05F);
+            .setBaseValue(200.0F * ConfigManagerCore.dungeonBossHealthMod);
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
+            .setBaseValue(0.05F);
     }
 
     public EntityCreeperBoss(World world, Vector3 vec) {
@@ -132,9 +123,9 @@ public class EntityCreeperBoss extends EntityMob
     @Override
     protected String getHurtSound() {
         this.playSound(
-                GalacticraftCore.TEXTURE_PREFIX + "entity.bossliving",
-                this.getSoundVolume(),
-                this.getSoundPitch() + 6.0F);
+            GalacticraftCore.TEXTURE_PREFIX + "entity.bossliving",
+            this.getSoundVolume(),
+            this.getSoundPitch() + 6.0F);
         return null;
     }
 
@@ -153,14 +144,8 @@ public class EntityCreeperBoss extends EntityMob
             final float f = (this.rand.nextFloat() - 0.5F) * 1.5F;
             final float f1 = (this.rand.nextFloat() - 0.5F) * 2.0F;
             final float f2 = (this.rand.nextFloat() - 0.5F) * 1.5F;
-            this.worldObj.spawnParticle(
-                    "hugeexplosion",
-                    this.posX + f,
-                    this.posY + 2.0D + f1,
-                    this.posZ + f2,
-                    0.0D,
-                    0.0D,
-                    0.0D);
+            this.worldObj
+                .spawnParticle("hugeexplosion", this.posX + f, this.posY + 2.0D + f1, this.posZ + f2, 0.0D, 0.0D, 0.0D);
         }
 
         int i;
@@ -169,8 +154,8 @@ public class EntityCreeperBoss extends EntityMob
         if (!this.worldObj.isRemote) {
             if (this.deathTicks >= 180 && this.deathTicks % 5 == 0) {
                 GalacticraftCore.packetPipeline.sendToAllAround(
-                        new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_EXPLODE, new Object[] {}),
-                        new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
+                    new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_EXPLODE, new Object[] {}),
+                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
                 // PacketDispatcher.sendPacketToAllAround(this.posX, this.posY, this.posZ, 40.0,
                 // this.worldObj.provider.dimensionId,
                 // PacketUtil.createPacket(GalacticraftCore.CHANNEL,
@@ -184,14 +169,14 @@ public class EntityCreeperBoss extends EntityMob
                     j = EntityXPOrb.getXPSplit(i);
                     i -= j;
                     this.worldObj
-                            .spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, j));
+                        .spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, j));
                 }
             }
 
             if (this.deathTicks == 1) {
                 GalacticraftCore.packetPipeline.sendToAllAround(
-                        new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_BOSS_DEATH, new Object[] {}),
-                        new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
+                    new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_BOSS_DEATH, new Object[] {}),
+                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
                 // PacketDispatcher.sendPacketToAllAround(this.posX, this.posY, this.posZ, 40.0,
                 // this.worldObj.provider.dimensionId,
                 // PacketUtil.createPacket(GalacticraftCore.CHANNEL,
@@ -232,24 +217,24 @@ public class EntityCreeperBoss extends EntityMob
 
                         // Generate three times, since it's an extra extra special chest
                         WeightedRandomChestContent.generateChestContents(
-                                this.rand,
-                                info.getItems(this.rand),
-                                chest,
-                                info.getCount(this.rand));
+                            this.rand,
+                            info.getItems(this.rand),
+                            chest,
+                            info.getCount(this.rand));
                         WeightedRandomChestContent.generateChestContents(
-                                this.rand,
-                                info.getItems(this.rand),
-                                chest,
-                                info.getCount(this.rand));
+                            this.rand,
+                            info.getItems(this.rand),
+                            chest,
+                            info.getCount(this.rand));
                         WeightedRandomChestContent.generateChestContents(
-                                this.rand,
-                                info.getItems(this.rand),
-                                chest,
-                                info.getCount(this.rand));
+                            this.rand,
+                            info.getItems(this.rand),
+                            chest,
+                            info.getCount(this.rand));
 
                         chest.setInventorySlotContents(
-                                this.rand.nextInt(chest.getSizeInventory()),
-                                this.getGuaranteedLoot(this.rand));
+                            this.rand.nextInt(chest.getSizeInventory()),
+                            this.getGuaranteedLoot(this.rand));
 
                         break;
                     }
@@ -299,7 +284,8 @@ public class EntityCreeperBoss extends EntityMob
 
         if (player != null && !player.equals(this.targetEntity)) {
             if (this.getDistanceSqToEntity(player) < 400.0D) {
-                this.getNavigator().getPathToEntityLiving(player);
+                this.getNavigator()
+                    .getPathToEntityLiving(player);
                 this.targetEntity = player;
             }
         } else {
@@ -310,27 +296,27 @@ public class EntityCreeperBoss extends EntityMob
 
         if (this.roomCoords != null && this.roomSize != null) {
             final List<EntityPlayer> entitiesWithin = this.worldObj.getEntitiesWithinAABB(
-                    EntityPlayer.class,
-                    AxisAlignedBB.getBoundingBox(
-                            this.roomCoords.intX() - 1,
-                            this.roomCoords.intY() - 1,
-                            this.roomCoords.intZ() - 1,
-                            this.roomCoords.intX() + this.roomSize.intX(),
-                            this.roomCoords.intY() + this.roomSize.intY(),
-                            this.roomCoords.intZ() + this.roomSize.intZ()));
+                EntityPlayer.class,
+                AxisAlignedBB.getBoundingBox(
+                    this.roomCoords.intX() - 1,
+                    this.roomCoords.intY() - 1,
+                    this.roomCoords.intZ() - 1,
+                    this.roomCoords.intX() + this.roomSize.intX(),
+                    this.roomCoords.intY() + this.roomSize.intY(),
+                    this.roomCoords.intZ() + this.roomSize.intZ()));
 
             this.entitiesWithin = entitiesWithin.size();
 
             if (this.entitiesWithin == 0 && this.entitiesWithinLast != 0) {
                 final List<EntityPlayer> entitiesWithin2 = this.worldObj.getEntitiesWithinAABB(
-                        EntityPlayer.class,
-                        AxisAlignedBB.getBoundingBox(
-                                this.roomCoords.intX() - 11,
-                                this.roomCoords.intY() - 11,
-                                this.roomCoords.intZ() - 11,
-                                this.roomCoords.intX() + this.roomSize.intX() + 10,
-                                this.roomCoords.intY() + this.roomSize.intY() + 10,
-                                this.roomCoords.intZ() + this.roomSize.intZ() + 10));
+                    EntityPlayer.class,
+                    AxisAlignedBB.getBoundingBox(
+                        this.roomCoords.intX() - 11,
+                        this.roomCoords.intY() - 11,
+                        this.roomCoords.intZ() - 11,
+                        this.roomCoords.intX() + this.roomSize.intX() + 10,
+                        this.roomCoords.intY() + this.roomSize.intY() + 10,
+                        this.roomCoords.intZ() + this.roomSize.intZ() + 10));
 
                 for (final EntityPlayer p : entitiesWithin2) {
                     p.addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.skeletonBoss.message")));
@@ -362,11 +348,11 @@ public class EntityCreeperBoss extends EntityMob
     @Override
     public EntityItem entityDropItem(ItemStack par1ItemStack, float par2) {
         final EntityItem entityitem = new EntityItem(
-                this.worldObj,
-                this.posX,
-                this.posY + par2,
-                this.posZ,
-                par1ItemStack);
+            this.worldObj,
+            this.posX,
+            this.posY + par2,
+            this.posZ,
+            par1ItemStack);
         entityitem.motionY = -2.0D;
         entityitem.delayBeforeCanPickup = 10;
         if (this.captureDrops) {
@@ -438,7 +424,8 @@ public class EntityCreeperBoss extends EntityMob
         // otherwise return the full list (note: addons could have added more schematics
         // to the list)
         final int range = !hasT3Rocket ? 2 : stackList.size();
-        return stackList.get(rand.nextInt(range)).copy();
+        return stackList.get(rand.nextInt(range))
+            .copy();
     }
 
     @Override
@@ -470,10 +457,10 @@ public class EntityCreeperBoss extends EntityMob
 
     private void func_82216_a(int par1, EntityLivingBase par2EntityLivingBase) {
         this.func_82209_a(
-                par1,
-                par2EntityLivingBase.posX,
-                par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight() * 0.5D,
-                par2EntityLivingBase.posZ);
+            par1,
+            par2EntityLivingBase.posX,
+            par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight() * 0.5D,
+            par2EntityLivingBase.posZ);
     }
 
     private void func_82209_a(int par1, double par2, double par4, double par6) {
@@ -485,11 +472,11 @@ public class EntityCreeperBoss extends EntityMob
         final double d7 = par4 - d4;
         final double d8 = par6 - d5;
         final EntityProjectileTNT entitywitherskull = new EntityProjectileTNT(
-                this.worldObj,
-                this,
-                d6 * 0.5D,
-                d7 * 0.5D,
-                d8 * 0.5D);
+            this.worldObj,
+            this,
+            d6 * 0.5D,
+            d7 * 0.5D,
+            d8 * 0.5D);
 
         entitywitherskull.posY = d4;
         entitywitherskull.posX = d3;

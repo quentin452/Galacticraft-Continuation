@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public class NEIGalacticraftConfig implements IConfigureNEI
-{
+public class NEIGalacticraftConfig implements IConfigureNEI {
+
     private static HashMap<HashMap<Integer, PositionedStack>, PositionedStack> rocketBenchRecipes;
     private static HashMap<HashMap<Integer, PositionedStack>, PositionedStack> buggyBenchRecipes;
     private static HashMap<PositionedStack, PositionedStack> refineryRecipes;
@@ -73,7 +73,8 @@ public class NEIGalacticraftConfig implements IConfigureNEI
         NEIGalacticraftConfig.ingotCompressorRecipes.put((HashMap<Integer, PositionedStack>) input, output);
     }
 
-    public void registerCircuitFabricatorRecipe(final Map<Integer, PositionedStack> input, final PositionedStack output) {
+    public void registerCircuitFabricatorRecipe(final Map<Integer, PositionedStack> input,
+        final PositionedStack output) {
         NEIGalacticraftConfig.circuitFabricatorRecipes.put((HashMap<Integer, PositionedStack>) input, output);
     }
 
@@ -110,7 +111,9 @@ public class NEIGalacticraftConfig implements IConfigureNEI
     }
 
     public void registerRecipes() {
-        this.registerRefineryRecipe(new PositionedStack(new ItemStack(GCItems.oilCanister, 1, 1), 2, 3), new PositionedStack(new ItemStack(GCItems.fuelCanister, 1, 1), 148, 3));
+        this.registerRefineryRecipe(
+            new PositionedStack(new ItemStack(GCItems.oilCanister, 1, 1), 2, 3),
+            new PositionedStack(new ItemStack(GCItems.fuelCanister, 1, 1), 148, 3));
         this.addRocketRecipes();
         this.addBuggyRecipes();
         this.addCircuitFabricatorRecipes();
@@ -127,10 +130,13 @@ public class NEIGalacticraftConfig implements IConfigureNEI
         for (int x = 0; x < 3; ++x) {
             for (int y = 0; y < 4; ++y) {
                 if (x == 1 && y == 1) {
-                    input1.put(y * 3 + x + 4, new PositionedStack(new ItemStack(GCItems.partBuggy, 1, 1), 36 + x * 18, 37 + y * 18));
-                }
-                else {
-                    input1.put(y * 3 + x + 4, new PositionedStack(new ItemStack(GCItems.heavyPlatingTier1), 36 + x * 18, 37 + y * 18));
+                    input1.put(
+                        y * 3 + x + 4,
+                        new PositionedStack(new ItemStack(GCItems.partBuggy, 1, 1), 36 + x * 18, 37 + y * 18));
+                } else {
+                    input1.put(
+                        y * 3 + x + 4,
+                        new PositionedStack(new ItemStack(GCItems.heavyPlatingTier1), 36 + x * 18, 37 + y * 18));
                 }
             }
         }
@@ -211,44 +217,57 @@ public class NEIGalacticraftConfig implements IConfigureNEI
     private void addCircuitFabricatorRecipes() {
         final HashMap<Integer, PositionedStack> input1 = new HashMap<>();
         input1.put(0, new PositionedStack(new ItemStack(Items.diamond), 10, 22));
-        final int siliconCount = OreDictionary.getOres(ConfigManagerCore.otherModsSilicon).size();
+        final int siliconCount = OreDictionary.getOres(ConfigManagerCore.otherModsSilicon)
+            .size();
         final ItemStack[] silicons = new ItemStack[siliconCount];
         for (int j = 0; j < siliconCount; ++j) {
-            silicons[j] = OreDictionary.getOres(ConfigManagerCore.otherModsSilicon).get(j);
+            silicons[j] = OreDictionary.getOres(ConfigManagerCore.otherModsSilicon)
+                .get(j);
         }
         input1.put(1, new PositionedStack(silicons, 69, 51));
         input1.put(2, new PositionedStack(silicons, 69, 69));
         input1.put(3, new PositionedStack(new ItemStack(Items.redstone), 117, 51));
         input1.put(4, new PositionedStack(new ItemStack(Blocks.redstone_torch), 140, 25));
-        this.registerCircuitFabricatorRecipe(input1, new PositionedStack(new ItemStack(GCItems.basicItem, ConfigManagerCore.quickMode ? 5 : 3, 13), 147, 91));
+        this.registerCircuitFabricatorRecipe(
+            input1,
+            new PositionedStack(new ItemStack(GCItems.basicItem, ConfigManagerCore.quickMode ? 5 : 3, 13), 147, 91));
         HashMap<Integer, PositionedStack> input2 = new HashMap<>(input1);
         input2.put(4, new PositionedStack(new ItemStack(Items.dye, 1, 4), 140, 25));
-        this.registerCircuitFabricatorRecipe(input2, new PositionedStack(new ItemStack(GCItems.basicItem, 9, 12), 147, 91));
+        this.registerCircuitFabricatorRecipe(
+            input2,
+            new PositionedStack(new ItemStack(GCItems.basicItem, 9, 12), 147, 91));
         input2 = new HashMap<>(input1);
         input2.put(4, new PositionedStack(new ItemStack(Items.repeater), 140, 25));
-        this.registerCircuitFabricatorRecipe(input2, new PositionedStack(new ItemStack(GCItems.basicItem, ConfigManagerCore.quickMode ? 2 : 1, 14), 147, 91));
+        this.registerCircuitFabricatorRecipe(
+            input2,
+            new PositionedStack(new ItemStack(GCItems.basicItem, ConfigManagerCore.quickMode ? 2 : 1, 14), 147, 91));
     }
 
     private void addIngotCompressorRecipes() {
-        for (int i = 0; i < CompressorRecipes.getRecipeList().size(); ++i) {
+        for (int i = 0; i < CompressorRecipes.getRecipeList()
+            .size(); ++i) {
             final HashMap<Integer, PositionedStack> input1 = new HashMap<>();
-            final IRecipe rec = CompressorRecipes.getRecipeList().get(i);
+            final IRecipe rec = CompressorRecipes.getRecipeList()
+                .get(i);
             if (rec instanceof ShapedRecipes) {
-                final ShapedRecipes recipe = (ShapedRecipes)rec;
+                final ShapedRecipes recipe = (ShapedRecipes) rec;
                 for (int j = 0; j < recipe.recipeItems.length; ++j) {
                     final ItemStack stack = recipe.recipeItems[j];
                     input1.put(j, new PositionedStack(stack, 21 + j % 3 * 18, 26 + j / 3 * 18));
                 }
-            }
-            else if (rec instanceof ShapelessOreRecipe) {
-                final ShapelessOreRecipe recipe2 = (ShapelessOreRecipe)rec;
-                for (int j = 0; j < recipe2.getInput().size(); ++j) {
-                    final Object obj = recipe2.getInput().get(j);
+            } else if (rec instanceof ShapelessOreRecipe) {
+                final ShapelessOreRecipe recipe2 = (ShapelessOreRecipe) rec;
+                for (int j = 0; j < recipe2.getInput()
+                    .size(); ++j) {
+                    final Object obj = recipe2.getInput()
+                        .get(j);
                     input1.put(j, new PositionedStack(obj, 21 + j % 3 * 18, 26 + j / 3 * 18));
                 }
             }
             final ItemStack resultItemStack = rec.getRecipeOutput();
-            if (ConfigManagerCore.quickMode && Objects.requireNonNull(resultItemStack.getItem()).getUnlocalizedName(resultItemStack).contains("compressed")) {
+            if (ConfigManagerCore.quickMode && Objects.requireNonNull(resultItemStack.getItem())
+                .getUnlocalizedName(resultItemStack)
+                .contains("compressed")) {
                 resultItemStack.stackSize *= 2;
             }
             this.registerIngotCompressorRecipe(input1, new PositionedStack(resultItemStack, 140, 46));

@@ -1,5 +1,6 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
+import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -9,8 +10,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
-
 public class ContainerCoalGenerator extends Container {
 
     private final TileEntityCoalGenerator tileEntity;
@@ -18,19 +17,19 @@ public class ContainerCoalGenerator extends Container {
     public ContainerCoalGenerator(InventoryPlayer par1InventoryPlayer, TileEntityCoalGenerator tileEntity) {
         this.tileEntity = tileEntity;
         this.addSlotToContainer(
-                new SlotSpecific(
-                        tileEntity,
-                        0,
-                        33,
-                        34,
-                        new ItemStack(Items.coal),
-                        new ItemStack(Item.getItemFromBlock(Blocks.coal_block))));
+            new SlotSpecific(
+                tileEntity,
+                0,
+                33,
+                34,
+                new ItemStack(Items.coal),
+                new ItemStack(Item.getItemFromBlock(Blocks.coal_block))));
         int var3;
 
         for (var3 = 0; var3 < 3; ++var3) {
             for (int var4 = 0; var4 < 9; ++var4) {
                 this.addSlotToContainer(
-                        new Slot(par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 84 + var3 * 18));
+                    new Slot(par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 84 + var3 * 18));
             }
         }
 

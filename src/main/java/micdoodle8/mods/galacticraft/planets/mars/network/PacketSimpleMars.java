@@ -1,17 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.network;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraftforge.common.MinecraftForge;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -29,6 +17,17 @@ import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityCryogenicChamber;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityLaunchController;
 import micdoodle8.mods.galacticraft.planets.mars.util.MarsUtil;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraftforge.common.MinecraftForge;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class PacketSimpleMars implements IPacket {
 
@@ -114,8 +113,9 @@ public class PacketSimpleMars implements IPacket {
                         entity = player.worldObj.getEntityByID(entityID);
 
                         if (entity instanceof EntitySlimeling) {
-                            FMLClientHandler.instance().getClient()
-                                    .displayGuiScreen(new GuiSlimelingInventory(player, (EntitySlimeling) entity));
+                            FMLClientHandler.instance()
+                                .getClient()
+                                .displayGuiScreen(new GuiSlimelingInventory(player, (EntitySlimeling) entity));
                         }
 
                         player.openContainer.windowId = (Integer) this.data.get(0);
@@ -125,25 +125,24 @@ public class PacketSimpleMars implements IPacket {
                         entity = player.worldObj.getEntityByID(entityID);
 
                         if (entity instanceof EntityCargoRocket) {
-                            FMLClientHandler.instance().getClient()
-                                    .displayGuiScreen(new GuiCargoRocket(player.inventory, (EntityCargoRocket) entity));
+                            FMLClientHandler.instance()
+                                .getClient()
+                                .displayGuiScreen(new GuiCargoRocket(player.inventory, (EntityCargoRocket) entity));
                         }
 
                         player.openContainer.windowId = (Integer) this.data.get(0);
                         break;
                 }
             case C_BEGIN_CRYOGENIC_SLEEP:
-                final TileEntity tile = player.worldObj.getTileEntity(
-                        (Integer) this.data.get(0),
-                        (Integer) this.data.get(1),
-                        (Integer) this.data.get(2));
+                final TileEntity tile = player.worldObj
+                    .getTileEntity((Integer) this.data.get(0), (Integer) this.data.get(1), (Integer) this.data.get(2));
 
                 if (tile instanceof TileEntityCryogenicChamber) {
                     ((TileEntityCryogenicChamber) tile).sleepInBedAt(
-                            player,
-                            (Integer) this.data.get(0),
-                            (Integer) this.data.get(1),
-                            (Integer) this.data.get(2));
+                        player,
+                        (Integer) this.data.get(0),
+                        (Integer) this.data.get(1),
+                        (Integer) this.data.get(2));
                 }
             default:
                 break;
@@ -224,10 +223,8 @@ public class PacketSimpleMars implements IPacket {
                 }
                 break;
             case S_UPDATE_ADVANCED_GUI:
-                final TileEntity tile = player.worldObj.getTileEntity(
-                    (Integer) this.data.get(1),
-                    (Integer) this.data.get(2),
-                    (Integer) this.data.get(3));
+                final TileEntity tile = player.worldObj
+                    .getTileEntity((Integer) this.data.get(1), (Integer) this.data.get(2), (Integer) this.data.get(3));
 
                 switch ((Integer) this.data.get(0)) {
                     case 0:

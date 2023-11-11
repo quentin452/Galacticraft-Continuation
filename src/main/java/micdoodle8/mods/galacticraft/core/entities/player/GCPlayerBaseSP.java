@@ -31,14 +31,17 @@ public class GCPlayerBaseSP extends ClientPlayerBase {
 
     @Override
     public boolean isEntityInsideOpaqueBlock() {
-        return this.getClientHandler().isEntityInsideOpaqueBlock(this.player, super.isEntityInsideOpaqueBlock());
+        return this.getClientHandler()
+            .isEntityInsideOpaqueBlock(this.player, super.isEntityInsideOpaqueBlock());
     }
 
     @Override
     public void onLivingUpdate() {
-        this.getClientHandler().onLivingUpdatePre(this.player);
+        this.getClientHandler()
+            .onLivingUpdatePre(this.player);
         super.onLivingUpdate();
-        this.getClientHandler().onLivingUpdatePost(this.player);
+        this.getClientHandler()
+            .onLivingUpdatePost(this.player);
     }
 
     @Override
@@ -75,7 +78,8 @@ public class GCPlayerBaseSP extends ClientPlayerBase {
     @Override
     public void moveEntity(double par1, double par3, double par5) {
         super.moveEntity(par1, par3, par5);
-        this.getClientHandler().moveEntity(this.player, par1, par3, par5);
+        this.getClientHandler()
+            .moveEntity(this.player, par1, par3, par5);
     }
 
     @Override
@@ -90,7 +94,8 @@ public class GCPlayerBaseSP extends ClientPlayerBase {
 
     @Override
     public void onUpdate() {
-        this.getClientHandler().onUpdate(this.player);
+        this.getClientHandler()
+            .onUpdate(this.player);
         super.onUpdate();
     }
 
@@ -110,7 +115,7 @@ public class GCPlayerBaseSP extends ClientPlayerBase {
                 return true;
             }
             if (ClientProxyCore.sneakRenderOverride
-                    && (FreefallHandler.testFreefall(this.player) || stats.inFreefall)) {
+                && (FreefallHandler.testFreefall(this.player) || stats.inFreefall)) {
                 return false;
             }
         }

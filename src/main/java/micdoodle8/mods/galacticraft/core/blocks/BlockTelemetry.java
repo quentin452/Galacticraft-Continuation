@@ -1,7 +1,13 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.UUID;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityTelemetry;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -17,14 +23,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityTelemetry;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.UUID;
 
 public class BlockTelemetry extends BlockAdvancedTile implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -86,7 +85,7 @@ public class BlockTelemetry extends BlockAdvancedTile implements ItemBlockDesc.I
 
     @Override
     public boolean onUseWrench(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
         final int facing = metadata & 3;
         int change = 0;
@@ -128,7 +127,7 @@ public class BlockTelemetry extends BlockAdvancedTile implements ItemBlockDesc.I
 
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer player, int side, float subX,
-            float subY, float subZ) {
+        float subY, float subZ) {
         if (!world.isRemote) {
             final TileEntity tile = world.getTileEntity(x, y, z);
             if (tile instanceof TileEntityTelemetry) {
@@ -140,7 +139,7 @@ public class BlockTelemetry extends BlockAdvancedTile implements ItemBlockDesc.I
                         final UUID uuid = new UUID(fmData.getLong("linkedUUIDMost"), fmData.getLong("linkedUUIDLeast"));
                         ((TileEntityTelemetry) tile).addTrackedEntity(uuid);
                         player.addChatMessage(
-                                new ChatComponentText(GCCoreUtil.translate("gui.telemetrySucceed.message")));
+                            new ChatComponentText(GCCoreUtil.translate("gui.telemetrySucceed.message")));
                     } else {
                         player.addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.telemetryFail.message")));
 
@@ -158,14 +157,15 @@ public class BlockTelemetry extends BlockAdvancedTile implements ItemBlockDesc.I
 
                 final ItemStack wearing = GCPlayerStats.get((EntityPlayerMP) player).frequencyModuleInSlot;
                 if (wearing != null) {
-                    if (wearing.hasTagCompound() && wearing.getTagCompound().hasKey("teDim")) {
+                    if (wearing.hasTagCompound() && wearing.getTagCompound()
+                        .hasKey("teDim")) {
                         return false;
                     }
                     player.addChatMessage(
-                            new ChatComponentText(GCCoreUtil.translate("gui.telemetryFailWearingIt.message")));
+                        new ChatComponentText(GCCoreUtil.translate("gui.telemetryFailWearingIt.message")));
                 } else {
                     player.addChatMessage(
-                            new ChatComponentText(GCCoreUtil.translate("gui.telemetryFailNoFrequencyModule.message")));
+                        new ChatComponentText(GCCoreUtil.translate("gui.telemetryFailNoFrequencyModule.message")));
                 }
             }
         }

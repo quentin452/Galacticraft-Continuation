@@ -1,9 +1,7 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
-
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.entities.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityMob;
@@ -12,13 +10,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedCreeper;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSkeleton;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSpider;
-import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedZombie;
-import micdoodle8.mods.galacticraft.core.entities.EntitySkeletonBoss;
-import micdoodle8.mods.galacticraft.core.entities.IBoss;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileEntityDungeonSpawner extends TileEntityAdvanced {
 
@@ -51,14 +45,14 @@ public class TileEntityDungeonSpawner extends TileEntityAdvanced {
         if (!this.worldObj.isRemote) {
             final Vector3 thisVec = new Vector3(this);
             final List<? extends IBoss> l = this.worldObj.getEntitiesWithinAABB(
-                    this.bossClass,
-                    AxisAlignedBB.getBoundingBox(
-                            thisVec.x - 15,
-                            thisVec.y - 15,
-                            thisVec.z - 15,
-                            thisVec.x + 15,
-                            thisVec.y + 15,
-                            thisVec.z + 15));
+                this.bossClass,
+                AxisAlignedBB.getBoundingBox(
+                    thisVec.x - 15,
+                    thisVec.y - 15,
+                    thisVec.z - 15,
+                    thisVec.x + 15,
+                    thisVec.y + 15,
+                    thisVec.z + 15));
 
             for (final IBoss e : l) {
                 if (!((Entity) e).isDead) {
@@ -70,17 +64,18 @@ public class TileEntityDungeonSpawner extends TileEntityAdvanced {
             }
 
             List<EntityMob> entitiesWithin = this.worldObj.getEntitiesWithinAABB(
-                    EntityMob.class,
-                    AxisAlignedBB.getBoundingBox(
-                            this.roomCoords.intX() - 4,
-                            this.roomCoords.intY() - 4,
-                            this.roomCoords.intZ() - 4,
-                            this.roomCoords.intX() + this.roomSize.intX() + 3,
-                            this.roomCoords.intY() + this.roomSize.intY() + 3,
-                            this.roomCoords.intZ() + this.roomSize.intZ() + 3));
+                EntityMob.class,
+                AxisAlignedBB.getBoundingBox(
+                    this.roomCoords.intX() - 4,
+                    this.roomCoords.intY() - 4,
+                    this.roomCoords.intZ() - 4,
+                    this.roomCoords.intX() + this.roomSize.intX() + 3,
+                    this.roomCoords.intY() + this.roomSize.intY() + 3,
+                    this.roomCoords.intZ() + this.roomSize.intZ() + 3));
 
             for (final Entity mob : entitiesWithin) {
-                if (this.getDisabledCreatures().contains(mob.getClass())) {
+                if (this.getDisabledCreatures()
+                    .contains(mob.getClass())) {
                     mob.setDead();
                 }
             }
@@ -97,14 +92,14 @@ public class TileEntityDungeonSpawner extends TileEntityAdvanced {
             }
 
             List<EntityPlayer> playersWithin = this.worldObj.getEntitiesWithinAABB(
-                    EntityPlayer.class,
-                    AxisAlignedBB.getBoundingBox(
-                            this.roomCoords.intX() - 1,
-                            this.roomCoords.intY() - 1,
-                            this.roomCoords.intZ() - 1,
-                            this.roomCoords.intX() + this.roomSize.intX(),
-                            this.roomCoords.intY() + this.roomSize.intY(),
-                            this.roomCoords.intZ() + this.roomSize.intZ()));
+                EntityPlayer.class,
+                AxisAlignedBB.getBoundingBox(
+                    this.roomCoords.intX() - 1,
+                    this.roomCoords.intY() - 1,
+                    this.roomCoords.intZ() - 1,
+                    this.roomCoords.intX() + this.roomSize.intX(),
+                    this.roomCoords.intY() + this.roomSize.intY(),
+                    this.roomCoords.intZ() + this.roomSize.intZ()));
 
             if (this.playerCheated && !playersWithin.isEmpty()) {
                 this.isBossDefeated = false;

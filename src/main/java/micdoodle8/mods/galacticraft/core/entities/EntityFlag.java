@@ -1,5 +1,9 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.util.ClientUtil;
+import micdoodle8.mods.galacticraft.core.wrappers.FlagData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.client.Minecraft;
@@ -11,11 +15,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.core.wrappers.FlagData;
 
 public class EntityFlag extends Entity {
 
@@ -44,7 +43,7 @@ public class EntityFlag extends Entity {
     @Override
     public boolean attackEntityFrom(DamageSource par1DamageSource, float par2) {
         final boolean flag = par1DamageSource.getEntity() instanceof EntityPlayer
-                && ((EntityPlayer) par1DamageSource.getEntity()).capabilities.isCreativeMode;
+            && ((EntityPlayer) par1DamageSource.getEntity()).capabilities.isCreativeMode;
 
         if (this.worldObj.isRemote || this.isDead || this.indestructable) {
             return true;
@@ -55,15 +54,15 @@ public class EntityFlag extends Entity {
         this.setBeenAttacked();
         this.setDamage(this.getDamage() + par2 * 10);
         this.worldObj.playSoundEffect(
-                this.posX,
-                this.posY,
-                this.posZ,
-                Block.soundTypeMetal.getBreakSound(),
-                Block.soundTypeMetal.getVolume(),
-                Block.soundTypeMetal.getPitch() + 1.0F);
+            this.posX,
+            this.posY,
+            this.posZ,
+            Block.soundTypeMetal.getBreakSound(),
+            Block.soundTypeMetal.getVolume(),
+            Block.soundTypeMetal.getPitch() + 1.0F);
 
         if (par1DamageSource.getEntity() instanceof EntityPlayer
-                && ((EntityPlayer) par1DamageSource.getEntity()).capabilities.isCreativeMode) {
+            && ((EntityPlayer) par1DamageSource.getEntity()).capabilities.isCreativeMode) {
             this.setDamage(100.0F);
         }
 
@@ -161,9 +160,8 @@ public class EntityFlag extends Entity {
         super.onUpdate();
 
         if ((this.ticksExisted - 1) % 20 == 0 && this.worldObj.isRemote) {
-            this.flagData = ClientUtil.updateFlagData(
-                    this.getOwner(),
-                    Minecraft.getMinecraft().thePlayer.getDistanceToEntity(this) < 50.0D);
+            this.flagData = ClientUtil
+                .updateFlagData(this.getOwner(), Minecraft.getMinecraft().thePlayer.getDistanceToEntity(this) < 50.0D);
         }
 
         Vector3 vec = new Vector3(this.posX, this.posY, this.posZ);

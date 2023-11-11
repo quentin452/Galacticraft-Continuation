@@ -1,17 +1,6 @@
 package micdoodle8.mods.galacticraft.core.world;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-
+import micdoodle8.mods.galacticraft.core.util.GCLog;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
@@ -26,7 +15,11 @@ import net.minecraftforge.common.ForgeChunkManager.LoadingCallback;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.config.Configuration;
 
-import micdoodle8.mods.galacticraft.core.util.GCLog;
+import java.io.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class ChunkLoadingCallback implements LoadingCallback {
 
@@ -69,12 +62,12 @@ public class ChunkLoadingCallback implements LoadingCallback {
             // "Set to false if you want each player's chunk loaders to unload when they log
             // out.").getBoolean(true);
             ChunkLoadingCallback.loadOnLogin = ChunkLoadingCallback.config
-                    .get(
-                            "CHUNKLOADING",
-                            "LoadOnLogin",
-                            true,
-                            "If you don't want each player's chunks to load when they log in, set to false.")
-                    .getBoolean(true);
+                .get(
+                    "CHUNKLOADING",
+                    "LoadOnLogin",
+                    true,
+                    "If you don't want each player's chunks to load when they log in, set to false.")
+                .getBoolean(true);
         } catch (final Exception e) {
             GCLog.severe("Problem loading chunkloading config (\"core.conf\")");
         } finally {
@@ -159,14 +152,18 @@ public class ChunkLoadingCallback implements LoadingCallback {
                     dataStream.writeInt(ChunkLoadingCallback.chunkLoaderList.size());
 
                     for (final Entry<String, HashMap<Integer, HashSet<ChunkCoordinates>>> playerEntry : ChunkLoadingCallback.chunkLoaderList
-                            .entrySet()) {
+                        .entrySet()) {
                         dataStream.writeUTF(playerEntry.getKey());
-                        dataStream.writeInt(playerEntry.getValue().size());
+                        dataStream.writeInt(
+                            playerEntry.getValue()
+                                .size());
 
                         for (final Entry<Integer, HashSet<ChunkCoordinates>> dimensionEntry : playerEntry.getValue()
-                                .entrySet()) {
+                            .entrySet()) {
                             dataStream.writeInt(dimensionEntry.getKey());
-                            dataStream.writeInt(dimensionEntry.getValue().size());
+                            dataStream.writeInt(
+                                dimensionEntry.getValue()
+                                    .size());
 
                             for (final ChunkCoordinates coords : dimensionEntry.getValue()) {
                                 dataStream.writeInt(coords.posX);
@@ -238,10 +235,10 @@ public class ChunkLoadingCallback implements LoadingCallback {
 
                             for (int j = 0; j < coordSetSize; j++) {
                                 coords.add(
-                                        new ChunkCoordinates(
-                                                dataStream.readInt(),
-                                                dataStream.readInt(),
-                                                dataStream.readInt()));
+                                    new ChunkCoordinates(
+                                        dataStream.readInt(),
+                                        dataStream.readInt(),
+                                        dataStream.readInt()));
                             }
                         }
 
@@ -268,14 +265,17 @@ public class ChunkLoadingCallback implements LoadingCallback {
 
     public static void onPlayerLogin(EntityPlayer player) {
         for (final Entry<String, HashMap<Integer, HashSet<ChunkCoordinates>>> playerEntry : ChunkLoadingCallback.chunkLoaderList
-                .entrySet()) {
-            if (player.getGameProfile().getName().equals(playerEntry.getKey())) {
+            .entrySet()) {
+            if (player.getGameProfile()
+                .getName()
+                .equals(playerEntry.getKey())) {
                 for (final Entry<Integer, HashSet<ChunkCoordinates>> dimensionEntry : playerEntry.getValue()
-                        .entrySet()) {
+                    .entrySet()) {
                     final int dimID = dimensionEntry.getKey();
 
                     if (ChunkLoadingCallback.loadOnLogin) {
-                        MinecraftServer.getServer().worldServerForDimension(dimID);
+                        MinecraftServer.getServer()
+                            .worldServerForDimension(dimID);
                     }
                 }
             }

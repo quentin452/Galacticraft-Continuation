@@ -1,41 +1,5 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EnumCreatureAttribute;
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.boss.IBossDisplayData;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.AchievementList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ChestGenHooks;
-
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -52,9 +16,31 @@ import micdoodle8.mods.galacticraft.core.tile.TileEntityDungeonSpawner;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityTreasureChest;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.*;
+import net.minecraft.entity.ai.*;
+import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.AchievementList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.*;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ChestGenHooks;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class EntitySkeletonBoss extends EntityMob
-        implements IEntityBreathable, IBossDisplayData, IRangedAttackMob, IBoss, IIgnoreShift {
+    implements IEntityBreathable, IBossDisplayData, IRangedAttackMob, IBoss, IIgnoreShift {
 
     protected long ticks = 0;
     private static final ItemStack defaultHeldItem = new ItemStack(Items.bow, 1);
@@ -92,9 +78,9 @@ public class EntitySkeletonBoss extends EntityMob
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
         this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
-                .setBaseValue(150.0F * ConfigManagerCore.dungeonBossHealthMod);
+            .setBaseValue(150.0F * ConfigManagerCore.dungeonBossHealthMod);
         this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
-                .setBaseValue(ConfigManagerCore.hardMode ? 0.4F : 0.25F);
+            .setBaseValue(ConfigManagerCore.hardMode ? 0.4F : 0.25F);
     }
 
     public EntitySkeletonBoss(World world, Vector3 vec) {
@@ -120,9 +106,9 @@ public class EntitySkeletonBoss extends EntityMob
             final double offsetY = 2 * Math.cos((this.throwTimer + this.postThrowDelay) * 0.05F);
 
             this.riddenByEntity.setPosition(
-                    this.posX + offsetX,
-                    this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset() + offsetY,
-                    this.posZ + offsetZ);
+                this.posX + offsetX,
+                this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset() + offsetY,
+                this.posZ + offsetZ);
         }
     }
 
@@ -132,13 +118,13 @@ public class EntitySkeletonBoss extends EntityMob
     @Override
     public void onCollideWithPlayer(EntityPlayer par1EntityPlayer) {
         if (this.riddenByEntity == null && this.postThrowDelay == 0
-                && this.throwTimer == 0
-                && par1EntityPlayer.equals(this.targetEntity)
-                && this.deathTicks == 0) {
+            && this.throwTimer == 0
+            && par1EntityPlayer.equals(this.targetEntity)
+            && this.deathTicks == 0) {
             if (!this.worldObj.isRemote) {
                 GalacticraftCore.packetPipeline.sendToAllAround(
-                        new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_BOSS_LAUGH, new Object[] {}),
-                        new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
+                    new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_BOSS_LAUGH, new Object[] {}),
+                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
                 par1EntityPlayer.mountEntity(this);
             }
 
@@ -166,9 +152,9 @@ public class EntitySkeletonBoss extends EntityMob
     @Override
     protected String getHurtSound() {
         this.playSound(
-                GalacticraftCore.TEXTURE_PREFIX + "entity.bossliving",
-                this.getSoundVolume(),
-                this.getSoundPitch() + 6.0F);
+            GalacticraftCore.TEXTURE_PREFIX + "entity.bossliving",
+            this.getSoundVolume(),
+            this.getSoundPitch() + 6.0F);
         return null;
     }
 
@@ -185,14 +171,8 @@ public class EntitySkeletonBoss extends EntityMob
             final float f = (this.rand.nextFloat() - 0.5F) * 1.5F;
             final float f1 = (this.rand.nextFloat() - 0.5F) * 2.0F;
             final float f2 = (this.rand.nextFloat() - 0.5F) * 1.5F;
-            this.worldObj.spawnParticle(
-                    "hugeexplosion",
-                    this.posX + f,
-                    this.posY + 2.0D + f1,
-                    this.posZ + f2,
-                    0.0D,
-                    0.0D,
-                    0.0D);
+            this.worldObj
+                .spawnParticle("hugeexplosion", this.posX + f, this.posY + 2.0D + f1, this.posZ + f2, 0.0D, 0.0D, 0.0D);
         }
 
         int i;
@@ -201,8 +181,8 @@ public class EntitySkeletonBoss extends EntityMob
         if (!this.worldObj.isRemote) {
             if (this.deathTicks >= 180 && this.deathTicks % 5 == 0) {
                 GalacticraftCore.packetPipeline.sendToAllAround(
-                        new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_EXPLODE, new Object[] {}),
-                        new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
+                    new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_EXPLODE, new Object[] {}),
+                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
             }
 
             if (this.deathTicks > 150 && this.deathTicks % 5 == 0) {
@@ -212,14 +192,14 @@ public class EntitySkeletonBoss extends EntityMob
                     j = EntityXPOrb.getXPSplit(i);
                     i -= j;
                     this.worldObj
-                            .spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, j));
+                        .spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, j));
                 }
             }
 
             if (this.deathTicks == 1) {
                 GalacticraftCore.packetPipeline.sendToAllAround(
-                        new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_BOSS_DEATH, new Object[] {}),
-                        new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
+                    new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_BOSS_DEATH, new Object[] {}),
+                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
             }
         }
 
@@ -257,15 +237,15 @@ public class EntitySkeletonBoss extends EntityMob
 
                             // Generate twice, since it's an extra special chest
                             WeightedRandomChestContent.generateChestContents(
-                                    this.rand,
-                                    info.getItems(this.rand),
-                                    chest,
-                                    info.getCount(this.rand));
+                                this.rand,
+                                info.getItems(this.rand),
+                                chest,
+                                info.getCount(this.rand));
                             WeightedRandomChestContent.generateChestContents(
-                                    this.rand,
-                                    info.getItems(this.rand),
-                                    chest,
-                                    info.getCount(this.rand));
+                                this.rand,
+                                info.getItems(this.rand),
+                                chest,
+                                info.getCount(this.rand));
 
                             final ItemStack schematic = this.getGuaranteedLoot(this.rand);
                             final int slot = this.rand.nextInt(chest.getSizeInventory());
@@ -327,7 +307,8 @@ public class EntitySkeletonBoss extends EntityMob
 
         if (player != null && !player.equals(this.targetEntity)) {
             if (this.getDistanceSqToEntity(player) < 400.0D) {
-                this.getNavigator().getPathToEntityLiving(player);
+                this.getNavigator()
+                    .getPathToEntityLiving(player);
                 this.targetEntity = player;
             }
         } else {
@@ -363,27 +344,27 @@ public class EntitySkeletonBoss extends EntityMob
 
         if (this.roomCoords != null && this.roomSize != null) {
             final List<EntityPlayer> entitiesWithin = this.worldObj.getEntitiesWithinAABB(
-                    EntityPlayer.class,
-                    AxisAlignedBB.getBoundingBox(
-                            this.roomCoords.intX() - 1,
-                            this.roomCoords.intY() - 1,
-                            this.roomCoords.intZ() - 1,
-                            this.roomCoords.intX() + this.roomSize.intX(),
-                            this.roomCoords.intY() + this.roomSize.intY(),
-                            this.roomCoords.intZ() + this.roomSize.intZ()));
+                EntityPlayer.class,
+                AxisAlignedBB.getBoundingBox(
+                    this.roomCoords.intX() - 1,
+                    this.roomCoords.intY() - 1,
+                    this.roomCoords.intZ() - 1,
+                    this.roomCoords.intX() + this.roomSize.intX(),
+                    this.roomCoords.intY() + this.roomSize.intY(),
+                    this.roomCoords.intZ() + this.roomSize.intZ()));
 
             this.entitiesWithin = entitiesWithin.size();
 
             if (this.entitiesWithin == 0 && this.entitiesWithinLast != 0) {
                 final List<EntityPlayer> entitiesWithin2 = this.worldObj.getEntitiesWithinAABB(
-                        EntityPlayer.class,
-                        AxisAlignedBB.getBoundingBox(
-                                this.roomCoords.intX() - 11,
-                                this.roomCoords.intY() - 11,
-                                this.roomCoords.intZ() - 11,
-                                this.roomCoords.intX() + this.roomSize.intX() + 10,
-                                this.roomCoords.intY() + this.roomSize.intY() + 10,
-                                this.roomCoords.intZ() + this.roomSize.intZ() + 10));
+                    EntityPlayer.class,
+                    AxisAlignedBB.getBoundingBox(
+                        this.roomCoords.intX() - 11,
+                        this.roomCoords.intY() - 11,
+                        this.roomCoords.intZ() - 11,
+                        this.roomCoords.intX() + this.roomSize.intX() + 10,
+                        this.roomCoords.intY() + this.roomSize.intY() + 10,
+                        this.roomCoords.intZ() + this.roomSize.intZ() + 10));
 
                 for (final EntityPlayer p : entitiesWithin2) {
                     p.addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.skeletonBoss.message")));
@@ -416,17 +397,17 @@ public class EntitySkeletonBoss extends EntityMob
             double d1;
 
             for (d1 = this.posZ - this.thrownEntity.posZ; d0 * d0 + d1 * d1
-                    < 1.0E-4D; d1 = (Math.random() - Math.random()) * 0.01D) {
+                < 1.0E-4D; d1 = (Math.random() - Math.random()) * 0.01D) {
                 d0 = (Math.random() - Math.random()) * 0.01D;
             }
 
             if (!this.worldObj.isRemote) {
                 GalacticraftCore.packetPipeline.sendToAllAround(
-                        new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_BOW, new Object[] {}),
-                        new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
+                    new PacketSimple(EnumSimplePacket.C_PLAY_SOUND_BOW, new Object[] {}),
+                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 40.0D));
             }
             ((EntityPlayer) this.thrownEntity).attackedAtYaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI)
-                    - this.rotationYaw;
+                - this.rotationYaw;
 
             this.thrownEntity.isAirBorne = true;
             final float f = MathHelper.sqrt_double(d0 * d0 + d1 * d1);
@@ -451,7 +432,7 @@ public class EntitySkeletonBoss extends EntityMob
         super.onDeath(par1DamageSource);
 
         if (par1DamageSource.getSourceOfDamage() instanceof EntityArrow
-                && par1DamageSource.getEntity() instanceof EntityPlayer) {
+            && par1DamageSource.getEntity() instanceof EntityPlayer) {
             final EntityPlayer var2 = (EntityPlayer) par1DamageSource.getEntity();
             final double var3 = var2.posX - this.posX;
             final double var5 = var2.posZ - this.posZ;
@@ -473,11 +454,11 @@ public class EntitySkeletonBoss extends EntityMob
     @Override
     public EntityItem entityDropItem(ItemStack par1ItemStack, float par2) {
         final EntityItem entityitem = new EntityItem(
-                this.worldObj,
-                this.posX,
-                this.posY + par2,
-                this.posZ,
-                par1ItemStack);
+            this.worldObj,
+            this.posX,
+            this.posY + par2,
+            this.posZ,
+            par1ItemStack);
         entityitem.motionY = -2.0D;
         entityitem.delayBeforeCanPickup = 10;
         if (this.captureDrops) {
@@ -514,7 +495,8 @@ public class EntitySkeletonBoss extends EntityMob
 
     public ItemStack getGuaranteedLoot(Random rand) {
         final List<ItemStack> stackList = GalacticraftRegistry.getDungeonLoot(1);
-        return stackList.get(rand.nextInt(stackList.size())).copy();
+        return stackList.get(rand.nextInt(stackList.size()))
+            .copy();
     }
 
     @Override
@@ -558,7 +540,12 @@ public class EntitySkeletonBoss extends EntityMob
             var1 = new EntityArrow(this.worldObj, this, entitylivingbase, 1.6F, 12.0F);
         }
 
-        this.worldObj.playSoundAtEntity(this, "random.bow", 1.0F, 1.0F / (this.getRNG().nextFloat() * 0.4F + 0.8F));
+        this.worldObj.playSoundAtEntity(
+            this,
+            "random.bow",
+            1.0F,
+            1.0F / (this.getRNG()
+                .nextFloat() * 0.4F + 0.8F));
         this.worldObj.spawnEntityInWorld(var1);
     }
 

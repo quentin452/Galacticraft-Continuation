@@ -1,16 +1,14 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.client.model.ModelKey;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
-
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.client.model.ModelKey;
 
 public class ItemRendererKey implements IItemRenderer {
 
@@ -59,7 +57,8 @@ public class ItemRendererKey implements IItemRenderer {
             GL11.glRotatef((float) (Math.sin((entityItem.age + 1) / 100.0F) * 180.0F), 0, 1, 0);
         }
 
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(this.treasureChestTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(this.treasureChestTexture);
 
         this.keyModel.renderAll();
         GL11.glPopMatrix();

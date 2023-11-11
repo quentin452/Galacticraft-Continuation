@@ -19,9 +19,9 @@ public class ElectricItemHelper {
     public static float chargeItem(ItemStack itemStack, float joules) {
         if (itemStack != null && itemStack.getItem() instanceof IItemElectric) {
             return ((IItemElectric) itemStack.getItem()).recharge(
-                    itemStack,
-                    Math.min(((IItemElectric) itemStack.getItem()).getTransfer(itemStack), joules),
-                    true);
+                itemStack,
+                Math.min(((IItemElectric) itemStack.getItem()).getTransfer(itemStack), joules),
+                true);
         }
 
         return 0;
@@ -36,9 +36,9 @@ public class ElectricItemHelper {
     public static float dischargeItem(ItemStack itemStack, float joules) {
         if (itemStack != null && itemStack.getItem() instanceof IItemElectric) {
             return ((IItemElectric) itemStack.getItem()).discharge(
-                    itemStack,
-                    Math.min(((IItemElectric) itemStack.getItem()).getMaxElectricityStored(itemStack), joules),
-                    true);
+                itemStack,
+                Math.min(((IItemElectric) itemStack.getItem()).getMaxElectricityStored(itemStack), joules),
+                true);
         }
 
         return 0;

@@ -1,9 +1,5 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import java.util.EnumMap;
-
-import net.minecraft.entity.player.EntityPlayerMP;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.FMLIndexedMessageToMessageCodec;
@@ -14,6 +10,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import micdoodle8.mods.galacticraft.core.Constants;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
+import net.minecraft.entity.player.EntityPlayerMP;
+
+import java.util.EnumMap;
 
 public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<IPacket> {
 
@@ -31,7 +30,7 @@ public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<
     public static GalacticraftChannelHandler init() {
         final GalacticraftChannelHandler channelHandler = new GalacticraftChannelHandler();
         channelHandler.channels = NetworkRegistry.INSTANCE
-                .newChannel(Constants.MOD_ID_CORE, channelHandler, new GalacticraftPacketHandler());
+            .newChannel(Constants.MOD_ID_CORE, channelHandler, new GalacticraftPacketHandler());
         return channelHandler;
     }
 
@@ -53,9 +52,11 @@ public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<
      * @param message The message to send
      */
     public void sendToAll(IPacket message) {
-        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
-                .set(FMLOutboundHandler.OutboundTarget.ALL);
-        this.channels.get(Side.SERVER).writeOutbound(message);
+        this.channels.get(Side.SERVER)
+            .attr(FMLOutboundHandler.FML_MESSAGETARGET)
+            .set(FMLOutboundHandler.OutboundTarget.ALL);
+        this.channels.get(Side.SERVER)
+            .writeOutbound(message);
     }
 
     /**
@@ -67,10 +68,14 @@ public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<
      * @param player  The player to send it to
      */
     public void sendTo(IPacket message, EntityPlayerMP player) {
-        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
-                .set(FMLOutboundHandler.OutboundTarget.PLAYER);
-        this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
-        this.channels.get(Side.SERVER).writeOutbound(message);
+        this.channels.get(Side.SERVER)
+            .attr(FMLOutboundHandler.FML_MESSAGETARGET)
+            .set(FMLOutboundHandler.OutboundTarget.PLAYER);
+        this.channels.get(Side.SERVER)
+            .attr(FMLOutboundHandler.FML_MESSAGETARGETARGS)
+            .set(player);
+        this.channels.get(Side.SERVER)
+            .writeOutbound(message);
     }
 
     /**
@@ -83,13 +88,17 @@ public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<
      */
     public void sendToAllAround(IPacket message, NetworkRegistry.TargetPoint point) {
         try {
-            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
-                    .set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
-            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(point);
-            this.channels.get(Side.SERVER).writeOutbound(message);
+            this.channels.get(Side.SERVER)
+                .attr(FMLOutboundHandler.FML_MESSAGETARGET)
+                .set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT);
+            this.channels.get(Side.SERVER)
+                .attr(FMLOutboundHandler.FML_MESSAGETARGETARGS)
+                .set(point);
+            this.channels.get(Side.SERVER)
+                .writeOutbound(message);
         } catch (final Exception e) {
             GCLog.severe(
-                    "Forge error when sending network packet to nearby players - this is not a Galacticraft bug, does another mod make fake players?");
+                "Forge error when sending network packet to nearby players - this is not a Galacticraft bug, does another mod make fake players?");
             e.printStackTrace();
         }
     }
@@ -104,13 +113,17 @@ public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<
      */
     public void sendToDimension(IPacket message, int dimensionId) {
         try {
-            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET)
-                    .set(FMLOutboundHandler.OutboundTarget.DIMENSION);
-            this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(dimensionId);
-            this.channels.get(Side.SERVER).writeOutbound(message);
+            this.channels.get(Side.SERVER)
+                .attr(FMLOutboundHandler.FML_MESSAGETARGET)
+                .set(FMLOutboundHandler.OutboundTarget.DIMENSION);
+            this.channels.get(Side.SERVER)
+                .attr(FMLOutboundHandler.FML_MESSAGETARGETARGS)
+                .set(dimensionId);
+            this.channels.get(Side.SERVER)
+                .writeOutbound(message);
         } catch (final Exception e) {
             GCLog.severe(
-                    "Forge error when sending network packet to all players in dimension - this is not a Galacticraft bug, does another mod make fake players?");
+                "Forge error when sending network packet to all players in dimension - this is not a Galacticraft bug, does another mod make fake players?");
             e.printStackTrace();
         }
     }
@@ -123,11 +136,14 @@ public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<
      * @param message The message to send
      */
     public void sendToServer(IPacket message) {
-        if (FMLCommonHandler.instance().getSide() != Side.CLIENT) {
+        if (FMLCommonHandler.instance()
+            .getSide() != Side.CLIENT) {
             return;
         }
-        this.channels.get(Side.CLIENT).attr(FMLOutboundHandler.FML_MESSAGETARGET)
-                .set(FMLOutboundHandler.OutboundTarget.TOSERVER);
-        this.channels.get(Side.CLIENT).writeOutbound(message);
+        this.channels.get(Side.CLIENT)
+            .attr(FMLOutboundHandler.FML_MESSAGETARGET)
+            .set(FMLOutboundHandler.OutboundTarget.TOSERVER);
+        this.channels.get(Side.CLIENT)
+            .writeOutbound(message);
     }
 }

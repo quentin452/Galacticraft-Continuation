@@ -1,9 +1,9 @@
 package micdoodle8.mods.galacticraft.core.perlin.generator;
 
-import java.util.Random;
-
 import micdoodle8.mods.galacticraft.core.perlin.FishyNoise;
 import micdoodle8.mods.galacticraft.core.perlin.NoiseModule;
+
+import java.util.Random;
 
 public class Gradient extends NoiseModule {
 
@@ -41,7 +41,7 @@ public class Gradient extends NoiseModule {
     public float getNoise(float i, float j) {
         if (this.numOctaves == 1) {
             return this.noiseGen.noise2d(i * this.frequencyX + this.offsetX, j * this.frequencyY + this.offsetY)
-                    * this.amplitude;
+                * this.amplitude;
         }
 
         i *= this.frequencyX;
@@ -61,9 +61,9 @@ public class Gradient extends NoiseModule {
     public float getNoise(float i, float j, float k) {
         if (this.numOctaves == 1) {
             return this.noiseGen.noise3d(
-                    i * this.frequencyX + this.offsetX,
-                    j * this.frequencyY + this.offsetY,
-                    k * this.frequencyZ + this.offsetZ) * this.amplitude;
+                i * this.frequencyX + this.offsetX,
+                j * this.frequencyY + this.offsetY,
+                k * this.frequencyZ + this.offsetZ) * this.amplitude;
         }
 
         i *= this.frequencyX;

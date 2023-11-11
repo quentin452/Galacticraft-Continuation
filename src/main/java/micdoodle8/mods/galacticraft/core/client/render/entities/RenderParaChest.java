@@ -1,23 +1,21 @@
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.client.model.ModelParaChest;
 import micdoodle8.mods.galacticraft.core.entities.EntityParachest;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class RenderParaChest extends Render {
 
     private static final ResourceLocation parachestTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/parachest.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/parachest.png");
 
     private final ModelParaChest chestModel;
 
@@ -36,7 +34,7 @@ public class RenderParaChest extends Render {
     }
 
     public void doRenderParaChest(EntityParachest entity, double par2, double par4, double par6, float par8,
-            float par9) {
+        float par9) {
         GL11.glPushMatrix();
         GL11.glTranslatef((float) par2 - 0.5F, (float) par4, (float) par6);
 

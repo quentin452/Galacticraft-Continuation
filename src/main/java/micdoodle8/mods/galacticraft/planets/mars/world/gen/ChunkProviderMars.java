@@ -1,16 +1,6 @@
 package micdoodle8.mods.galacticraft.planets.mars.world.gen;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import com.google.common.collect.Lists;
-
 import micdoodle8.mods.galacticraft.api.prefab.core.BlockMetaPair;
 import micdoodle8.mods.galacticraft.api.prefab.world.gen.BiomeDecoratorSpace;
 import micdoodle8.mods.galacticraft.api.prefab.world.gen.ChunkProviderSpace;
@@ -21,11 +11,15 @@ import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedSpider;
 import micdoodle8.mods.galacticraft.core.entities.EntityEvolvedZombie;
 import micdoodle8.mods.galacticraft.core.world.gen.dungeon.MapGenDungeon;
 import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
-import micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon.RoomBossMars;
-import micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon.RoomChestsMars;
-import micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon.RoomEmptyMars;
-import micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon.RoomSpawnerMars;
-import micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon.RoomTreasureMars;
+import micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon.*;
+import net.minecraft.block.Block;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChunkProviderMars extends ChunkProviderSpace {
 
@@ -133,15 +127,15 @@ public class ChunkProviderMars extends ChunkProviderSpace {
     @Override
     public void onChunkProvide(int cX, int cZ, Block[] blocks, byte[] metadata) {
         this.dungeonGenerator.generateUsingArrays(
-                this.worldObj,
-                this.worldObj.getSeed(),
-                cX * 16,
-                30,
-                cZ * 16,
-                cX,
-                cZ,
-                blocks,
-                metadata);
+            this.worldObj,
+            this.worldObj.getSeed(),
+            cX * 16,
+            30,
+            cZ * 16,
+            cX,
+            cZ,
+            blocks,
+            metadata);
     }
 
     @Override

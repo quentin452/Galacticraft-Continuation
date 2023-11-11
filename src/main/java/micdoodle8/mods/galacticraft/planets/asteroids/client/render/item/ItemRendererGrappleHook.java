@@ -1,5 +1,7 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.init.Items;
@@ -7,19 +9,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
-
 public class ItemRendererGrappleHook implements IItemRenderer {
 
     public static final ResourceLocation grappleTexture = new ResourceLocation(
-            AsteroidsModule.ASSET_PREFIX,
-            "textures/model/grapple.png");
+        AsteroidsModule.ASSET_PREFIX,
+        "textures/model/grapple.png");
 
     public static IModelCustom modelGrapple;
 
@@ -37,10 +35,11 @@ public class ItemRendererGrappleHook implements IItemRenderer {
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
             RenderManager.instance.itemRenderer.renderItem(
-                    FMLClientHandler.instance().getClientPlayerEntity(),
-                    new ItemStack(Items.string, 1),
-                    0,
-                    ItemRenderType.INVENTORY);
+                FMLClientHandler.instance()
+                    .getClientPlayerEntity(),
+                new ItemStack(Items.string, 1),
+                0,
+                ItemRenderType.INVENTORY);
             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
             GL11.glEnable(GL11.GL_LIGHTING);
             GL11.glDisable(GL11.GL_BLEND);
@@ -50,7 +49,8 @@ public class ItemRendererGrappleHook implements IItemRenderer {
         GL11.glPushMatrix();
         this.transform(type);
 
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(ItemRendererGrappleHook.grappleTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(ItemRendererGrappleHook.grappleTexture);
         ItemRendererGrappleHook.modelGrapple.renderAll();
         GL11.glPopMatrix();
     }

@@ -1,10 +1,10 @@
 package micdoodle8.mods.galacticraft.core.world.gen.dungeon;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.Random;
 
 public class RoomEmptyMoon extends DungeonRoom {
 
@@ -28,20 +28,20 @@ public class RoomEmptyMoon extends DungeonRoom {
             for (int j = this.posY - 1; j <= this.posY + this.sizeY; j++) {
                 for (int k = this.posZ - 1; k <= this.posZ + this.sizeZ; k++) {
                     if (i == this.posX - 1 || i == this.posX + this.sizeX
-                            || j == this.posY - 1
-                            || j == this.posY + this.sizeY
-                            || k == this.posZ - 1
-                            || k == this.posZ + this.sizeZ) {
+                        || j == this.posY - 1
+                        || j == this.posY + this.sizeY
+                        || k == this.posZ - 1
+                        || k == this.posZ + this.sizeZ) {
                         this.placeBlock(
-                                chunk,
-                                meta,
-                                i,
-                                j,
-                                k,
-                                cx,
-                                cz,
-                                this.dungeonInstance.DUNGEON_WALL_ID,
-                                this.dungeonInstance.DUNGEON_WALL_META);
+                            chunk,
+                            meta,
+                            i,
+                            j,
+                            k,
+                            cx,
+                            cz,
+                            this.dungeonInstance.DUNGEON_WALL_ID,
+                            this.dungeonInstance.DUNGEON_WALL_META);
                     } else {
                         this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.air, 0);
                     }

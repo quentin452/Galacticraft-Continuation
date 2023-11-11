@@ -1,16 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.tile;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayer.EnumStatus;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.world.biome.BiomeGenBase;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -25,6 +14,16 @@ import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import micdoodle8.mods.galacticraft.planets.mars.network.PacketSimpleMars;
 import micdoodle8.mods.galacticraft.planets.mars.network.PacketSimpleMars.EnumSimplePacketMars;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayer.EnumStatus;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.world.biome.BiomeGenBase;
 
 public class TileEntityCryogenicChamber extends TileEntityMulti implements IMultiBlock {
 
@@ -34,12 +33,12 @@ public class TileEntityCryogenicChamber extends TileEntityMulti implements IMult
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
         return AxisAlignedBB.getBoundingBox(
-                this.xCoord - 1,
-                this.yCoord,
-                this.zCoord - 1,
-                this.xCoord + 2,
-                this.yCoord + 3,
-                this.zCoord + 2);
+            this.xCoord - 1,
+            this.yCoord,
+            this.zCoord - 1,
+            this.xCoord + 2,
+            this.yCoord + 3,
+            this.zCoord + 2);
     }
 
     @Override
@@ -61,7 +60,7 @@ public class TileEntityCryogenicChamber extends TileEntityMulti implements IMult
                 GalacticraftCore.packetPipeline.sendTo(
                     new PacketSimpleMars(
                         EnumSimplePacketMars.C_BEGIN_CRYOGENIC_SLEEP,
-                        new Object[]{this.xCoord, this.yCoord, this.zCoord}),
+                        new Object[] { this.xCoord, this.yCoord, this.zCoord }),
                     (EntityPlayerMP) entityPlayer);
                 return true;
             case NOT_POSSIBLE_NOW:
@@ -158,7 +157,8 @@ public class TileEntityCryogenicChamber extends TileEntityMulti implements IMult
 
         for (int y = 0; y < 3; y++) {
             if (this.worldObj.isRemote && this.worldObj.rand.nextDouble() < 0.1D) {
-                FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(
+                FMLClientHandler.instance()
+                    .getClient().effectRenderer.addBlockDestroyEffects(
                         thisBlock.x,
                         thisBlock.y + y,
                         thisBlock.z,

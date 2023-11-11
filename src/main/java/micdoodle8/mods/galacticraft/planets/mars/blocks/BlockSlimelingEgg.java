@@ -1,8 +1,15 @@
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import java.util.List;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.core.util.VersionUtil;
+import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntitySlimelingEgg;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -21,16 +28,8 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.VersionUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
-import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntitySlimelingEgg;
+import java.util.List;
+import java.util.Random;
 
 public class BlockSlimelingEgg extends Block implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
 
@@ -79,8 +78,9 @@ public class BlockSlimelingEgg extends Block implements ITileEntityProvider, Ite
         if (tile instanceof TileEntitySlimelingEgg) {
             ((TileEntitySlimelingEgg) tile).timeToHatch = world.rand.nextInt(50) + 20;
             ((TileEntitySlimelingEgg) tile).lastTouchedPlayerUUID = VersionUtil.mcVersion1_7_2
-                    ? player.getCommandSenderName()
-                    : player.getUniqueID().toString();
+                ? player.getCommandSenderName()
+                : player.getUniqueID()
+                    .toString();
             ((TileEntitySlimelingEgg) tile).lastTouchedPlayerName = player.getCommandSenderName();
         }
 
@@ -91,7 +91,7 @@ public class BlockSlimelingEgg extends Block implements ITileEntityProvider, Ite
     public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
         final ItemStack currentStack = player.getCurrentEquippedItem();
         if (currentStack != null && currentStack.getItem() instanceof ItemPickaxe
-                || player.capabilities.isCreativeMode) {
+            || player.capabilities.isCreativeMode) {
             return world.setBlockToAir(x, y, z);
         }
         this.beginHatch(world, x, y, z, player);
@@ -100,7 +100,7 @@ public class BlockSlimelingEgg extends Block implements ITileEntityProvider, Ite
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         return this.beginHatch(world, x, y, z, player);
     }
 
@@ -113,7 +113,7 @@ public class BlockSlimelingEgg extends Block implements ITileEntityProvider, Ite
             par2EntityPlayer.addExhaustion(0.025F);
             this.dropBlockAsItem(world, x, y, z, par6 % 3, 0);
             if (currentStack.getItem() == MarsItems.deshPickaxe
-                    && EnchantmentHelper.getSilkTouchModifier(par2EntityPlayer)) {
+                && EnchantmentHelper.getSilkTouchModifier(par2EntityPlayer)) {
                 final ItemStack itemstack = new ItemStack(MarsItems.deshPickSlime, 1, currentStack.getItemDamage());
                 if (currentStack.stackTagCompound != null) {
                     itemstack.stackTagCompound = (NBTTagCompound) currentStack.stackTagCompound.copy();

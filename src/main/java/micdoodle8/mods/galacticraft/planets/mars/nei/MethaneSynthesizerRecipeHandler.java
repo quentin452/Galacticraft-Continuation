@@ -1,23 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.nei;
 
-import static codechicken.lib.gui.GuiDraw.getMousePosition;
-
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
@@ -28,15 +10,31 @@ import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.asteroids.items.AsteroidsItems;
 import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
 import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import static codechicken.lib.gui.GuiDraw.getMousePosition;
 
 public class MethaneSynthesizerRecipeHandler extends TemplateRecipeHandler {
 
     private static final ResourceLocation synthesizerGuiTexture = new ResourceLocation(
-            MarsModule.ASSET_PREFIX,
-            "textures/gui/methaneSynthesizer.png");
+        MarsModule.ASSET_PREFIX,
+        "textures/gui/methaneSynthesizer.png");
     private static final ResourceLocation synthesizerGasesTexture = new ResourceLocation(
-            AsteroidsModule.ASSET_PREFIX,
-            "textures/gui/gasesMethaneOxygenNitrogen.png");
+        AsteroidsModule.ASSET_PREFIX,
+        "textures/gui/gasesMethaneOxygenNitrogen.png");
     int ticksPassed;
     int extra = 0;
 
@@ -144,18 +142,21 @@ public class MethaneSynthesizerRecipeHandler extends TemplateRecipeHandler {
 
     @Override
     public ArrayList<PositionedStack> getIngredientStacks(int recipe) {
-        final PositionedStack input = this.arecipes.get(recipe).getIngredients().get(0);
+        final PositionedStack input = this.arecipes.get(recipe)
+            .getIngredients()
+            .get(0);
         final Item inputItem = input.item.getItem();
 
         this.fillAtmos = inputItem == AsteroidsItems.atmosphericValve;
 
         if (this.ticksPassed % 144 <= 40) {
-            return (ArrayList<PositionedStack>) this.arecipes.get(recipe).getIngredients();
+            return (ArrayList<PositionedStack>) this.arecipes.get(recipe)
+                .getIngredients();
         }
         final ArrayList<PositionedStack> stacks = new ArrayList<>();
         if (inputItem != MarsItems.carbonFragments) {
             stacks.add(
-                    new PositionedStack(new ItemStack(inputItem, 1, inputItem.getMaxDamage()), input.relx, input.rely));
+                new PositionedStack(new ItemStack(inputItem, 1, inputItem.getMaxDamage()), input.relx, input.rely));
         } else if (this.ticksPassed % 144 < 104) {
             final int number = 24 - (this.ticksPassed % 144 - 40) * 3 / 8;
             stacks.add(new PositionedStack(new ItemStack(inputItem, number, 0), input.relx, input.rely));
@@ -166,14 +167,16 @@ public class MethaneSynthesizerRecipeHandler extends TemplateRecipeHandler {
     @Override
     public PositionedStack getResultStack(int recipe) {
         if (this.ticksPassed % 144 < 104) {
-            final PositionedStack output = this.arecipes.get(recipe).getResult();
+            final PositionedStack output = this.arecipes.get(recipe)
+                .getResult();
             final Item outputItem = output.item.getItem();
             return new PositionedStack(
-                    new ItemStack(outputItem, 1, outputItem.getMaxDamage()),
-                    output.relx,
-                    output.rely);
+                new ItemStack(outputItem, 1, outputItem.getMaxDamage()),
+                output.relx,
+                output.rely);
         }
-        return this.arecipes.get(recipe).getResult();
+        return this.arecipes.get(recipe)
+            .getResult();
     }
 
     public class CachedSynthesizerRecipe extends TemplateRecipeHandler.CachedRecipe {
@@ -219,8 +222,10 @@ public class MethaneSynthesizerRecipeHandler extends TemplateRecipeHandler {
         final Point mousePos = getMousePosition();
         try {
             final Class<GuiContainer> clazz = GuiContainer.class;
-            mousePos.x -= (Integer) clazz.getField("field_147003_i").get(gui);
-            mousePos.y -= (Integer) clazz.getField("field_147009_r").get(gui);
+            mousePos.x -= (Integer) clazz.getField("field_147003_i")
+                .get(gui);
+            mousePos.y -= (Integer) clazz.getField("field_147009_r")
+                .get(gui);
         } catch (final Exception ee) {
             ee.printStackTrace();
         }

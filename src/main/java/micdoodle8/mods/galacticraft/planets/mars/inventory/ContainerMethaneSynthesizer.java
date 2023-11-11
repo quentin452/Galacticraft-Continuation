@@ -1,11 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.inventory;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-
 import micdoodle8.mods.galacticraft.api.item.IItemElectric;
 import micdoodle8.mods.galacticraft.core.inventory.SlotSpecific;
 import micdoodle8.mods.galacticraft.core.util.FluidUtil;
@@ -13,6 +7,11 @@ import micdoodle8.mods.galacticraft.planets.asteroids.items.AsteroidsItems;
 import micdoodle8.mods.galacticraft.planets.asteroids.items.ItemAtmosphericValve;
 import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityMethaneSynthesizer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 
 public class ContainerMethaneSynthesizer extends Container {
 
@@ -32,7 +31,7 @@ public class ContainerMethaneSynthesizer extends Container {
 
         // Carbon slot
         this.addSlotToContainer(
-                new SlotSpecific(tileEntity, 3, 28, 53, new ItemStack(MarsItems.carbonFragments, 1, 0)));
+            new SlotSpecific(tileEntity, 3, 28, 53, new ItemStack(MarsItems.carbonFragments, 1, 0)));
 
         // Output slot
         this.addSlotToContainer(new Slot(tileEntity, 4, 153, 7));
@@ -41,7 +40,7 @@ public class ContainerMethaneSynthesizer extends Container {
         for (var3 = 0; var3 < 3; ++var3) {
             for (int var4 = 0; var4 < 9; ++var4) {
                 this.addSlotToContainer(
-                        new Slot(par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 104 + var3 * 18 - 18));
+                    new Slot(par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 104 + var3 * 18 - 18));
             }
         }
 

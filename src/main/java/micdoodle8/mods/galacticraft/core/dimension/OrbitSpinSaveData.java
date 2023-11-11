@@ -32,14 +32,15 @@ public class OrbitSpinSaveData extends WorldSavedData {
 
     public static OrbitSpinSaveData initWorldData(World world) {
         OrbitSpinSaveData worldData = (OrbitSpinSaveData) world
-                .loadItemData(OrbitSpinSaveData.class, OrbitSpinSaveData.saveDataID);
+            .loadItemData(OrbitSpinSaveData.class, OrbitSpinSaveData.saveDataID);
 
         if (worldData == null) {
             worldData = new OrbitSpinSaveData("");
             world.setItemData(OrbitSpinSaveData.saveDataID, worldData);
             if (world.provider instanceof WorldProviderSpaceStation) {
                 worldData.dim = world.provider.dimensionId;
-                ((WorldProviderSpaceStation) world.provider).getSpinManager().writeToNBT(worldData.datacompound);
+                ((WorldProviderSpaceStation) world.provider).getSpinManager()
+                    .writeToNBT(worldData.datacompound);
             }
             worldData.markDirty();
         } else if (world.provider instanceof WorldProviderSpaceStation) {

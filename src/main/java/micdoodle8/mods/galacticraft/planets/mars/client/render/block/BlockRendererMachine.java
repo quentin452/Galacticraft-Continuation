@@ -1,15 +1,13 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.block;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMars;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.IBlockAccess;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMars;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 
 public class BlockRendererMachine implements ISimpleBlockRenderingHandler {
 
@@ -20,7 +18,7 @@ public class BlockRendererMachine implements ISimpleBlockRenderingHandler {
     }
 
     public void renderMachineInWorld(RenderBlocks renderBlocks, IBlockAccess iblockaccess, Block par1Block, int x,
-            int y, int z) {
+        int y, int z) {
         par1Block.setBlockBoundsBasedOnState(iblockaccess, x, y, z);
         renderBlocks.setRenderBoundsFromBlock(par1Block);
 
@@ -73,7 +71,7 @@ public class BlockRendererMachine implements ISimpleBlockRenderingHandler {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
-            RenderBlocks renderer) {
+        RenderBlocks renderer) {
         this.renderMachineInWorld(renderer, world, block, x, y, z);
         return true;
     }

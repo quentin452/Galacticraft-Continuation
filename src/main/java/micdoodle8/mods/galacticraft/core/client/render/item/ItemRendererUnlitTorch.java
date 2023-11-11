@@ -2,7 +2,6 @@ package micdoodle8.mods.galacticraft.core.client.render.item;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.IItemRenderer;
-
 import org.lwjgl.opengl.GL11;
 
 import java.util.Objects;

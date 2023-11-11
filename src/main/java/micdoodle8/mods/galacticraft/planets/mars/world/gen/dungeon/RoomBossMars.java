@@ -1,13 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityDungeonSpawner;
 import micdoodle8.mods.galacticraft.core.world.gen.dungeon.DungeonBoundingBox;
@@ -15,6 +7,13 @@ import micdoodle8.mods.galacticraft.core.world.gen.dungeon.DungeonRoom;
 import micdoodle8.mods.galacticraft.core.world.gen.dungeon.MapGenDungeon;
 import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityDungeonSpawnerMars;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.Random;
 
 public class RoomBossMars extends DungeonRoom {
 
@@ -40,32 +39,33 @@ public class RoomBossMars extends DungeonRoom {
             for (int k = this.posZ - 1; k <= this.posZ + this.sizeZ; k++) {
                 for (int j = this.posY - 1; j <= this.posY + this.sizeY; j++) {
                     if (i == this.posX - 1 || i == this.posX + this.sizeX
-                            || j == this.posY - 1
-                            || j == this.posY + this.sizeY
-                            || k == this.posZ - 1
-                            || k == this.posZ + this.sizeZ) {
+                        || j == this.posY - 1
+                        || j == this.posY + this.sizeY
+                        || k == this.posZ - 1
+                        || k == this.posZ + this.sizeZ) {
                         if (j == this.posY - 1
-                                && (i <= this.posX + 1 || i >= this.posX + this.sizeX - 2
-                                        || k == this.posZ + 1
-                                        || k == this.posZ + this.sizeZ - 2)
-                                && this.rand.nextInt(4) == 0) {
+                            && (i <= this.posX + 1 || i >= this.posX + this.sizeX - 2
+                                || k == this.posZ + 1
+                                || k == this.posZ + this.sizeZ - 2)
+                            && this.rand.nextInt(4) == 0) {
                             this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.glowstone, 0);
                         } else {
                             this.placeBlock(
-                                    chunk,
-                                    meta,
-                                    i,
-                                    j,
-                                    k,
-                                    cx,
-                                    cz,
-                                    this.dungeonInstance.DUNGEON_WALL_ID,
-                                    this.dungeonInstance.DUNGEON_WALL_META);
+                                chunk,
+                                meta,
+                                i,
+                                j,
+                                k,
+                                cx,
+                                cz,
+                                this.dungeonInstance.DUNGEON_WALL_ID,
+                                this.dungeonInstance.DUNGEON_WALL_META);
                         }
-                    } else if (j == this.posY
+                    } else
+                        if (j == this.posY
                             && (i <= this.posX + 1 || i >= this.posX + this.sizeX - 2
-                                    || k == this.posZ + 1
-                                    || k == this.posZ + this.sizeZ - 2)
+                                || k == this.posZ + 1
+                                || k == this.posZ + this.sizeZ - 2)
                             && this.rand.nextInt(6) == 0) {
                                 this.placeBlock(chunk, meta, i, j, k, cx, cz, MarsBlocks.creeperEgg, 0);
                             } else {
@@ -97,27 +97,25 @@ public class RoomBossMars extends DungeonRoom {
         }
 
         this.worldObj.setBlock(
-                this.spawnerCoords.posX,
-                this.spawnerCoords.posY,
-                this.spawnerCoords.posZ,
-                MarsBlocks.marsBlock,
-                10,
-                3);
+            this.spawnerCoords.posX,
+            this.spawnerCoords.posY,
+            this.spawnerCoords.posZ,
+            MarsBlocks.marsBlock,
+            10,
+            3);
 
         final TileEntity tile = this.worldObj
-                .getTileEntity(this.spawnerCoords.posX, this.spawnerCoords.posY, this.spawnerCoords.posZ);
+            .getTileEntity(this.spawnerCoords.posX, this.spawnerCoords.posY, this.spawnerCoords.posZ);
 
         if (tile == null || !(tile instanceof TileEntityDungeonSpawnerMars)) {
             final TileEntityDungeonSpawner spawner = new TileEntityDungeonSpawnerMars();
-            spawner.setRoom(
-                    new Vector3(this.posX, this.posY, this.posZ),
-                    new Vector3(this.sizeX, this.sizeY, this.sizeZ));
+            spawner
+                .setRoom(new Vector3(this.posX, this.posY, this.posZ), new Vector3(this.sizeX, this.sizeY, this.sizeZ));
             this.worldObj
-                    .setTileEntity(this.spawnerCoords.posX, this.spawnerCoords.posY, this.spawnerCoords.posZ, spawner);
+                .setTileEntity(this.spawnerCoords.posX, this.spawnerCoords.posY, this.spawnerCoords.posZ, spawner);
         } else if (tile instanceof TileEntityDungeonSpawner) {
-            ((TileEntityDungeonSpawner) tile).setRoom(
-                    new Vector3(this.posX, this.posY, this.posZ),
-                    new Vector3(this.sizeX, this.sizeY, this.sizeZ));
+            ((TileEntityDungeonSpawner) tile)
+                .setRoom(new Vector3(this.posX, this.posY, this.posZ), new Vector3(this.sizeX, this.sizeY, this.sizeZ));
         }
     }
 }

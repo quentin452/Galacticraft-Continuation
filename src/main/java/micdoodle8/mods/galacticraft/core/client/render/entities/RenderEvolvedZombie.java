@@ -1,5 +1,11 @@
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.client.model.ModelEvolvedZombie;
+import micdoodle8.mods.galacticraft.core.items.ItemSensorGlasses;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBase;
@@ -8,25 +14,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.client.model.ModelEvolvedZombie;
-import micdoodle8.mods.galacticraft.core.items.ItemSensorGlasses;
 
 @SideOnly(Side.CLIENT)
 public class RenderEvolvedZombie extends RenderBiped {
 
     private static final ResourceLocation zombieTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/zombie.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/zombie.png");
     private static final ResourceLocation powerTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/power.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/power.png");
 
     private final ModelBase model = new ModelEvolvedZombie(0.2F, false, true);
 
@@ -52,7 +50,8 @@ public class RenderEvolvedZombie extends RenderBiped {
 
     @Override
     protected int shouldRenderPass(EntityLivingBase par1EntityLiving, int par2, float par3) {
-        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final Minecraft minecraft = FMLClientHandler.instance()
+            .getClient();
 
         final EntityPlayerSP player = minecraft.thePlayer;
 
@@ -63,7 +62,7 @@ public class RenderEvolvedZombie extends RenderBiped {
         }
 
         if (helmetSlot != null && helmetSlot.getItem() instanceof ItemSensorGlasses
-                && minecraft.currentScreen == null) {
+            && minecraft.currentScreen == null) {
             if (par2 == 1) {
                 final float var4 = par1EntityLiving.ticksExisted * 2 + par3;
                 this.bindTexture(RenderEvolvedZombie.powerTexture);

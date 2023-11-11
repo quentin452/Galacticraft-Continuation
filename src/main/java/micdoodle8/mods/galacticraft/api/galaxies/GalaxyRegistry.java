@@ -1,20 +1,10 @@
 package micdoodle8.mods.galacticraft.api.galaxies;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import com.google.common.collect.*;
+import cpw.mods.fml.common.eventhandler.Event;
 import net.minecraftforge.common.MinecraftForge;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-
-import cpw.mods.fml.common.eventhandler.Event;
+import java.util.*;
 
 /**
  * Credits to KingLemming and CovertJaguar, since this is based on the Liquid/Fluid API
@@ -64,7 +54,8 @@ public class GalaxyRegistry {
         GalaxyRegistry.satelliteList.clear();
         GalaxyRegistry.solarSystemList.clear();
 
-        for (final Moon moon : GalaxyRegistry.getRegisteredMoons().values()) {
+        for (final Moon moon : GalaxyRegistry.getRegisteredMoons()
+            .values()) {
             final Planet planet = moon.getParentPlanet();
             List<Moon> listOfMoons = GalaxyRegistry.moonList.get(planet);
             if (listOfMoons == null) {
@@ -74,7 +65,8 @@ public class GalaxyRegistry {
             GalaxyRegistry.moonList.put(planet, listOfMoons);
         }
 
-        for (final Satellite satellite : GalaxyRegistry.getRegisteredSatellites().values()) {
+        for (final Satellite satellite : GalaxyRegistry.getRegisteredSatellites()
+            .values()) {
             final CelestialBody celestialBody = satellite.getParentPlanet();
             List<Satellite> satelliteList1 = GalaxyRegistry.satelliteList.get(celestialBody);
             if (satelliteList1 == null) {
@@ -84,7 +76,8 @@ public class GalaxyRegistry {
             GalaxyRegistry.satelliteList.put(celestialBody, satelliteList1);
         }
 
-        for (final Planet planet : GalaxyRegistry.getRegisteredPlanets().values()) {
+        for (final Planet planet : GalaxyRegistry.getRegisteredPlanets()
+            .values()) {
             final SolarSystem solarSystem = planet.getParentSolarSystem();
             List<Planet> planetList = GalaxyRegistry.solarSystemList.get(solarSystem);
             if (planetList == null) {
@@ -127,13 +120,15 @@ public class GalaxyRegistry {
 
     public static CelestialBody getCelestialBodyFromUnlocalizedName(String unlocalizedName) {
         for (final Planet planet : GalaxyRegistry.planets.values()) {
-            if (planet.getUnlocalizedName().equals(unlocalizedName)) {
+            if (planet.getUnlocalizedName()
+                .equals(unlocalizedName)) {
                 return planet;
             }
         }
 
         for (final Moon moon : GalaxyRegistry.moons.values()) {
-            if (moon.getUnlocalizedName().equals(unlocalizedName)) {
+            if (moon.getUnlocalizedName()
+                .equals(unlocalizedName)) {
                 return moon;
             }
         }
@@ -150,7 +145,7 @@ public class GalaxyRegistry {
         GalaxyRegistry.solarSystemIDs.put(solarSystem.getName(), ++GalaxyRegistry.maxSolarSystemID);
 
         MinecraftForge.EVENT_BUS
-                .post(new SolarSystemRegisterEvent(solarSystem.getName(), GalaxyRegistry.maxSolarSystemID));
+            .post(new SolarSystemRegisterEvent(solarSystem.getName(), GalaxyRegistry.maxSolarSystemID));
         return true;
     }
 

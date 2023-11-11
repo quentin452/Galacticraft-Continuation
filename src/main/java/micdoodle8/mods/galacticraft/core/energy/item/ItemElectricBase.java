@@ -1,17 +1,5 @@
 package micdoodle8.mods.galacticraft.core.energy.item;
 
-import java.util.List;
-
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagDouble;
-import net.minecraft.nbt.NBTTagFloat;
-import net.minecraft.world.World;
-
 import cofh.api.energy.IEnergyContainerItem;
 import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.common.Optional.InterfaceList;
@@ -24,12 +12,23 @@ import micdoodle8.mods.galacticraft.api.item.IItemElectricBase;
 import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
 import micdoodle8.mods.galacticraft.core.energy.EnergyDisplayHelper;
 import micdoodle8.mods.galacticraft.core.items.ItemBatteryInfinite;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagDouble;
+import net.minecraft.nbt.NBTTagFloat;
+import net.minecraft.world.World;
+
+import java.util.List;
 
 @InterfaceList({ @Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyContainerItem"),
-        @Interface(modid = "IC2API", iface = "ic2.api.item.ISpecialElectricItem"),
-        @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.IEnergizedItem"), })
+    @Interface(modid = "IC2API", iface = "ic2.api.item.ISpecialElectricItem"),
+    @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.IEnergizedItem"), })
 public abstract class ItemElectricBase extends Item
-        implements IItemElectricBase, IEnergyContainerItem, ISpecialElectricItem, IEnergizedItem {
+    implements IItemElectricBase, IEnergyContainerItem, ISpecialElectricItem, IEnergizedItem {
 
     private static Object itemManagerIC2;
     public float transferMax;
@@ -68,9 +67,9 @@ public abstract class ItemElectricBase extends Item
         }
 
         list.add(
-                color + EnergyDisplayHelper.getEnergyDisplayS(joules)
-                        + "/"
-                        + EnergyDisplayHelper.getEnergyDisplayS(this.getMaxElectricityStored(itemStack)));
+            color + EnergyDisplayHelper.getEnergyDisplayS(joules)
+                + "/"
+                + EnergyDisplayHelper.getEnergyDisplayS(this.getMaxElectricityStored(itemStack)));
     }
 
     /**
@@ -85,7 +84,7 @@ public abstract class ItemElectricBase extends Item
     @Override
     public float recharge(ItemStack itemStack, float energy, boolean doReceive) {
         final float rejectedElectricity = Math
-                .max(this.getElectricityStored(itemStack) + energy - this.getMaxElectricityStored(itemStack), 0);
+            .max(this.getElectricityStored(itemStack) + energy - this.getMaxElectricityStored(itemStack), 0);
         float energyToReceive = energy - rejectedElectricity;
         if (energyToReceive > this.transferMax) {
             energyToReceive = this.transferMax;
@@ -101,7 +100,7 @@ public abstract class ItemElectricBase extends Item
     @Override
     public float discharge(ItemStack itemStack, float energy, boolean doTransfer) {
         final float energyToTransfer = Math
-                .min(Math.min(this.getElectricityStored(itemStack), energy), this.transferMax);
+            .min(Math.min(this.getElectricityStored(itemStack), energy), this.transferMax);
 
         if (doTransfer) {
             this.setElectricity(itemStack, this.getElectricityStored(itemStack) - energyToTransfer);
@@ -123,7 +122,8 @@ public abstract class ItemElectricBase extends Item
         }
 
         final float electricityStored = Math.max(Math.min(joules, this.getMaxElectricityStored(itemStack)), 0);
-        itemStack.getTagCompound().setFloat("electricity", electricityStored);
+        itemStack.getTagCompound()
+            .setFloat("electricity", electricityStored);
 
         /* Sets the damage as a percentage to render the bar properly. */
         itemStack.setItemDamage((int) (100 - electricityStored / this.getMaxElectricityStored(itemStack) * 100));
@@ -132,7 +132,7 @@ public abstract class ItemElectricBase extends Item
     @Override
     public float getTransfer(ItemStack itemStack) {
         return Math
-                .min(this.transferMax, this.getMaxElectricityStored(itemStack) - this.getElectricityStored(itemStack));
+            .min(this.transferMax, this.getMaxElectricityStored(itemStack) - this.getElectricityStored(itemStack));
     }
 
     /**
@@ -144,8 +144,10 @@ public abstract class ItemElectricBase extends Item
             itemStack.setTagCompound(new NBTTagCompound());
         }
         float energyStored = 0f;
-        if (itemStack.getTagCompound().hasKey("electricity")) {
-            final NBTBase obj = itemStack.getTagCompound().getTag("electricity");
+        if (itemStack.getTagCompound()
+            .hasKey("electricity")) {
+            final NBTBase obj = itemStack.getTagCompound()
+                .getTag("electricity");
             if (obj instanceof NBTTagDouble) {
                 energyStored = ((NBTTagDouble) obj).func_150288_h();
             } else if (obj instanceof NBTTagFloat) {
@@ -162,8 +164,7 @@ public abstract class ItemElectricBase extends Item
     public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
         par3List.add(ElectricItemHelper.getUncharged(new ItemStack(this)));
         par3List.add(
-                ElectricItemHelper
-                        .getWithCharge(new ItemStack(this), this.getMaxElectricityStored(new ItemStack(this))));
+            ElectricItemHelper.getWithCharge(new ItemStack(this), this.getMaxElectricityStored(new ItemStack(this))));
     }
 
     public static boolean isElectricItem(Item item) {
@@ -217,13 +218,13 @@ public abstract class ItemElectricBase extends Item
     @Override
     public int receiveEnergy(ItemStack container, int maxReceive, boolean simulate) {
         return (int) (this.recharge(container, maxReceive * EnergyConfigHandler.RF_RATIO, !simulate)
-                / EnergyConfigHandler.RF_RATIO);
+            / EnergyConfigHandler.RF_RATIO);
     }
 
     @Override
     public int extractEnergy(ItemStack container, int maxExtract, boolean simulate) {
         return (int) (this.discharge(container, maxExtract / EnergyConfigHandler.TO_RF_RATIO, !simulate)
-                * EnergyConfigHandler.TO_RF_RATIO);
+            * EnergyConfigHandler.TO_RF_RATIO);
     }
 
     @Override

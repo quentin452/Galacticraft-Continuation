@@ -1,22 +1,16 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fluids.IFluidContainerItem;
-
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.items.GCItems;
 import micdoodle8.mods.galacticraft.core.items.ItemCanisterGeneric;
 import micdoodle8.mods.galacticraft.planets.asteroids.items.AsteroidsItems;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class FluidUtil {
 
@@ -95,7 +89,8 @@ public class FluidUtil {
         }
 
         final FluidStack liquid = FluidContainerRegistry.getFluidForFilledItem(var4);
-        return liquid != null && FluidRegistry.getFluidName(liquid).startsWith("oil");
+        return liquid != null && FluidRegistry.getFluidName(liquid)
+            .startsWith("oil");
     }
 
     /**
@@ -111,7 +106,10 @@ public class FluidUtil {
 
         final FluidStack stack = FluidContainerRegistry.getFluidForFilledItem(var4);
         return stack != null && stack.getFluid() != null
-                && stack.getFluid().getName().toLowerCase().contains("methane");
+            && stack.getFluid()
+                .getName()
+                .toLowerCase()
+                .contains("methane");
     }
 
     /**
@@ -143,14 +141,14 @@ public class FluidUtil {
      *                     type)
      */
     public static void tryFillContainer(FluidTank tank, FluidStack liquid, ItemStack[] inventory, int slot,
-            Item canisterType) {
+        Item canisterType) {
         final ItemStack slotItem = inventory[slot];
         final boolean isCanister = slotItem.getItem() instanceof ItemCanisterGeneric;
         final int amountToFill = Math
-                .min(liquid.amount, isCanister ? slotItem.getItemDamage() - 1 : FluidContainerRegistry.BUCKET_VOLUME);
+            .min(liquid.amount, isCanister ? slotItem.getItemDamage() - 1 : FluidContainerRegistry.BUCKET_VOLUME);
 
         if (amountToFill <= 0 || isCanister && slotItem.getItem() != canisterType
-                && slotItem.getItemDamage() != ItemCanisterGeneric.EMPTY) {
+            && slotItem.getItemDamage() != ItemCanisterGeneric.EMPTY) {
             return;
         }
 
@@ -179,7 +177,8 @@ public class FluidUtil {
             FluidStack liquid = tank.getFluid();
 
             if (liquid != null && liquid.amount > 0) {
-                final String liquidname = liquid.getFluid().getName();
+                final String liquidname = liquid.getFluid()
+                    .getName();
 
                 // Test for the GC fuels (though anything similarly named would also pass here)
                 if (liquidname.startsWith("fuel")) {
@@ -195,8 +194,9 @@ public class FluidUtil {
                     // check above
                     if (stack.getItem() instanceof IFluidContainerItem) {
                         final FluidStack existingFluid = ((IFluidContainerItem) stack.getItem()).getFluid(stack);
-                        if (existingFluid != null
-                                && !existingFluid.getFluid().getName().equals(GalacticraftCore.fluidFuel.getName())) {
+                        if (existingFluid != null && !existingFluid.getFluid()
+                            .getName()
+                            .equals(GalacticraftCore.fluidFuel.getName())) {
                             liquid = new FluidStack(existingFluid, liquid.amount);
                         }
                     }
@@ -219,7 +219,7 @@ public class FluidUtil {
     public static boolean isEmptyContainer(ItemStack var4, Item canisterType) {
         if (var4.getItem() instanceof ItemCanisterGeneric) {
             return var4.getItemDamage() == ItemCanisterGeneric.EMPTY
-                    || var4.getItem() == canisterType && var4.getItemDamage() > 1;
+                || var4.getItem() == canisterType && var4.getItemDamage() > 1;
         }
 
         return FluidContainerRegistry.isEmptyContainer(var4);
@@ -266,7 +266,8 @@ public class FluidUtil {
         if (f1 == null || f2 == null || f1.getName() == null) {
             return false;
         }
-        return f1.getName().equals(f2.getName());
+        return f1.getName()
+            .equals(f2.getName());
     }
 
     /**
@@ -315,7 +316,10 @@ public class FluidUtil {
      */
     public static boolean isWaterContainer(ItemStack var4) {
         final FluidStack liquid = FluidContainerRegistry.getFluidForFilledItem(var4);
-        return liquid != null && liquid.getFluid() != null && "water".equals(liquid.getFluid().getName());
+        return liquid != null && liquid.getFluid() != null
+            && "water".equals(
+                liquid.getFluid()
+                    .getName());
     }
 
     /**
@@ -326,7 +330,7 @@ public class FluidUtil {
      */
     public static boolean isValidContainer(ItemStack slotItem) {
         return slotItem != null && slotItem.stackSize == 1
-                && (slotItem.getItem() instanceof ItemCanisterGeneric || FluidContainerRegistry.isContainer(slotItem));
+            && (slotItem.getItem() instanceof ItemCanisterGeneric || FluidContainerRegistry.isContainer(slotItem));
     }
 
     /**

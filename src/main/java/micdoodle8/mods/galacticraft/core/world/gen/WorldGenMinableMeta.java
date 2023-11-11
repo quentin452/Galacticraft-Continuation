@@ -1,11 +1,11 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenMinable;
+
+import java.util.Random;
 
 public class WorldGenMinableMeta extends WorldGenMinable {
 
@@ -49,8 +49,8 @@ public class WorldGenMinableMeta extends WorldGenMinable {
             final float cy = y1 + y2 * progress;
             final float cz = z1 + z2 * progress;
             final float size = ((MathHelper.sin((float) Math.PI * progress) + 1.0F) * par2Random.nextFloat()
-                    * this.numberOfBlocks
-                    / 16.0F + 1.0F) / 2.0F;
+                * this.numberOfBlocks
+                / 16.0F + 1.0F) / 2.0F;
             final int xMin = MathHelper.floor_float(cx - size);
             final int yMin = MathHelper.floor_float(cy - size);
             final int zMin = MathHelper.floor_float(cz - size);
@@ -73,7 +73,7 @@ public class WorldGenMinableMeta extends WorldGenMinable {
                                 dz *= dz;
 
                                 if (dx + dy + dz < 1.0F && par1World.getBlock(ix, iy, iz) == this.fillerID
-                                        && par1World.getBlockMetadata(ix, iy, iz) == this.fillerMetadata) {
+                                    && par1World.getBlockMetadata(ix, iy, iz) == this.fillerMetadata) {
                                     if (!this.usingMetadata) {
                                         par1World.setBlock(ix, iy, iz, this.minableBlockId, 0, 3);
                                     } else {

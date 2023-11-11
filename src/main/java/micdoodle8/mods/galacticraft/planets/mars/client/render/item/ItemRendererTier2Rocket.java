@@ -1,15 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.item;
 
-import net.minecraft.client.model.ModelChest;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModelCustom;
-
-import org.lwjgl.Sys;
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.api.entity.IRocketType.EnumRocketType;
 import micdoodle8.mods.galacticraft.core.client.render.item.ItemRendererTier1Rocket;
@@ -17,47 +7,59 @@ import micdoodle8.mods.galacticraft.core.entities.EntityTier1Rocket;
 import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
 import micdoodle8.mods.galacticraft.planets.mars.client.model.ModelTier2Rocket;
 import micdoodle8.mods.galacticraft.planets.mars.entities.EntityTier2Rocket;
+import net.minecraft.client.model.ModelChest;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.IModelCustom;
+import org.lwjgl.Sys;
+import org.lwjgl.opengl.GL11;
 
 public class ItemRendererTier2Rocket extends ItemRendererTier1Rocket {
 
     private static final ResourceLocation cargoRocketTexture = new ResourceLocation(
-            MarsModule.ASSET_PREFIX,
-            "textures/model/cargoRocket.png");
+        MarsModule.ASSET_PREFIX,
+        "textures/model/cargoRocket.png");
     private final IModelCustom cargoRocketModel;
 
     public ItemRendererTier2Rocket(IModelCustom cargoRocketModel) {
         super(
-                new EntityTier2Rocket(FMLClientHandler.instance().getClient().theWorld),
-                new ModelTier2Rocket(),
-                new ResourceLocation(MarsModule.ASSET_PREFIX, "textures/model/rocketT2.png"));
+            new EntityTier2Rocket(
+                FMLClientHandler.instance()
+                    .getClient().theWorld),
+            new ModelTier2Rocket(),
+            new ResourceLocation(MarsModule.ASSET_PREFIX, "textures/model/rocketT2.png"));
         this.cargoRocketModel = cargoRocketModel;
     }
 
     @Override
     protected void renderSpaceship(ItemRenderType type, RenderBlocks render, ItemStack item, float translateX,
-            float translateY, float translateZ) {
+        float translateY, float translateZ) {
         GL11.glPushMatrix();
 
         this.transform(item, type);
 
         if (item.getItemDamage() < 10) {
-            FMLClientHandler.instance().getClient().renderEngine.bindTexture(this.texture);
+            FMLClientHandler.instance()
+                .getClient().renderEngine.bindTexture(this.texture);
             this.modelSpaceship.render(this.spaceship, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
         } else {
-            FMLClientHandler.instance().getClient().renderEngine
-                    .bindTexture(ItemRendererTier2Rocket.cargoRocketTexture);
+            FMLClientHandler.instance()
+                .getClient().renderEngine.bindTexture(ItemRendererTier2Rocket.cargoRocketTexture);
             this.cargoRocketModel.renderAll();
         }
         GL11.glPopMatrix();
 
         if (type == ItemRenderType.INVENTORY) {
             final int index = Math.min(
-                    Math.max(item.getItemDamage() >= 10 ? item.getItemDamage() - 10 : item.getItemDamage(), 0),
-                    EnumRocketType.values().length - 1);
+                Math.max(item.getItemDamage() >= 10 ? item.getItemDamage() - 10 : item.getItemDamage(), 0),
+                EnumRocketType.values().length - 1);
 
             if (EnumRocketType.values()[index].getInventorySpace() > 3) {
                 final ModelChest modelChest = this.chestModel;
-                FMLClientHandler.instance().getClient().renderEngine.bindTexture(ItemRendererTier1Rocket.chestTexture);
+                FMLClientHandler.instance()
+                    .getClient().renderEngine.bindTexture(ItemRendererTier1Rocket.chestTexture);
 
                 GL11.glPushMatrix();
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -85,7 +87,8 @@ public class ItemRendererTier2Rocket extends ItemRendererTier1Rocket {
 
     @Override
     public void transform(ItemStack itemstack, ItemRenderType type) {
-        final EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
+        final EntityPlayer player = FMLClientHandler.instance()
+            .getClient().thePlayer;
         long var10 = this.spaceship.getEntityId() * 493286711L;
         var10 = var10 * var10 * 4392167121L + var10 * 98761L;
         final float var12 = (((var10 >> 16 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;

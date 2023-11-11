@@ -1,13 +1,12 @@
 package micdoodle8.mods.galacticraft.core.client.fx;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class EntityFXOilDrip extends EntityFX {
@@ -60,18 +59,20 @@ public class EntityFXOilDrip extends EntityFX {
             this.motionZ *= 0.699999988079071D;
         }
 
-        final Material material = this.worldObj.getBlock(
+        final Material material = this.worldObj
+            .getBlock(
                 MathHelper.floor_double(this.posX),
                 MathHelper.floor_double(this.posY),
-                MathHelper.floor_double(this.posZ)).getMaterial();
+                MathHelper.floor_double(this.posZ))
+            .getMaterial();
 
         if (material.isLiquid() || material.isSolid()) {
             final double var2 = MathHelper.floor_double(this.posY) + 1
-                    - BlockLiquid.getLiquidHeightPercent(
-                            this.worldObj.getBlockMetadata(
-                                    MathHelper.floor_double(this.posX),
-                                    MathHelper.floor_double(this.posY),
-                                    MathHelper.floor_double(this.posZ)));
+                - BlockLiquid.getLiquidHeightPercent(
+                    this.worldObj.getBlockMetadata(
+                        MathHelper.floor_double(this.posX),
+                        MathHelper.floor_double(this.posY),
+                        MathHelper.floor_double(this.posZ)));
 
             if (this.posY < var2) {
                 this.setDead();

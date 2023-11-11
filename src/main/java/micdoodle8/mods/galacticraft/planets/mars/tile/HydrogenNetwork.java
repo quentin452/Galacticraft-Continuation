@@ -1,17 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.tile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.common.FMLLog;
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
 import micdoodle8.mods.galacticraft.api.transmission.grid.IHydrogenNetwork;
@@ -22,6 +10,10 @@ import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkConnection;
 import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkProvider;
 import micdoodle8.mods.galacticraft.api.transmission.tile.ITransmitter;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.*;
 
 public class HydrogenNetwork implements IHydrogenNetwork {
 
@@ -58,10 +50,12 @@ public class HydrogenNetwork implements IHydrogenNetwork {
                                     if (this.pipes.contains(transmitter)) {
                                         final float hydrogenToSend = Math.max(
                                             totalHydrogen,
-                                            totalHydrogen * (hydrogenTile.getHydrogenRequest(direction) / totalHydrogenRequest));
+                                            totalHydrogen
+                                                * (hydrogenTile.getHydrogenRequest(direction) / totalHydrogenRequest));
 
                                         if (hydrogenToSend > 0) {
-                                            remainingUsableHydrogen -= hydrogenTile.receiveHydrogen(direction, hydrogenToSend, true);
+                                            remainingUsableHydrogen -= hydrogenTile
+                                                .receiveHydrogen(direction, hydrogenToSend, true);
                                         }
                                     }
                                 }
@@ -93,16 +87,17 @@ public class HydrogenNetwork implements IHydrogenNetwork {
             }
 
             if ((tileEntity instanceof TileEntityMethaneSynthesizer
-                    && ((TileEntityMethaneSynthesizer) tileEntity).shouldPullHydrogen()
-                    && !tileEntity.isInvalid())
-                    && (tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord)
-                            == tileEntity)) {
+                && ((TileEntityMethaneSynthesizer) tileEntity).shouldPullHydrogen()
+                && !tileEntity.isInvalid())
+                && (tileEntity.getWorldObj()
+                    .getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord) == tileEntity)) {
                 for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
                     final BlockVec3 tileVec = new BlockVec3(tileEntity);
                     final TileEntity tile = tileVec.modifyPositionFromSide(direction, 1)
-                            .getTileEntity(tileEntity.getWorldObj());
+                        .getTileEntity(tileEntity.getWorldObj());
 
-                    if (((TileEntityMethaneSynthesizer) tileEntity).canConnect(direction, NetworkType.HYDROGEN) && tile instanceof ITransmitter) {
+                    if (((TileEntityMethaneSynthesizer) tileEntity).canConnect(direction, NetworkType.HYDROGEN)
+                        && tile instanceof ITransmitter) {
                         ITransmitter transmitter = (ITransmitter) tile;
 
                         if (this.pipes.contains(transmitter)) {
@@ -162,7 +157,7 @@ public class HydrogenNetwork implements IHydrogenNetwork {
                 final ITransmitter transmitter = it.next();
 
                 if (transmitter == null || ((TileEntity) transmitter).isInvalid()
-                        || ((TileEntity) transmitter).getWorldObj() == null) {
+                    || ((TileEntity) transmitter).getWorldObj() == null) {
                     it.remove();
                     continue;
                 }
@@ -220,10 +215,10 @@ public class HydrogenNetwork implements IHydrogenNetwork {
                     for (final TileEntity connectedBlockB : connectedBlocks) {
                         if (connectedBlockA != connectedBlockB && connectedBlockB instanceof INetworkConnection) {
                             final Pathfinder finder = new PathfinderChecker(
-                                    ((TileEntity) splitPoint).getWorldObj(),
-                                    (INetworkConnection) connectedBlockB,
-                                    NetworkType.HYDROGEN,
-                                    splitPoint);
+                                ((TileEntity) splitPoint).getWorldObj(),
+                                (INetworkConnection) connectedBlockB,
+                                NetworkType.HYDROGEN,
+                                splitPoint);
                             finder.init(new BlockVec3(connectedBlockA));
 
                             if (finder.results.size() > 0) {
@@ -233,7 +228,7 @@ public class HydrogenNetwork implements IHydrogenNetwork {
                                  */
                                 for (final BlockVec3 node : finder.closedSet) {
                                     final TileEntity nodeTile = node
-                                            .getTileEntity(((TileEntity) splitPoint).getWorldObj());
+                                        .getTileEntity(((TileEntity) splitPoint).getWorldObj());
 
                                     if (nodeTile instanceof INetworkProvider && nodeTile != splitPoint) {
                                         ((INetworkProvider) nodeTile).setNetwork(this);
@@ -247,10 +242,11 @@ public class HydrogenNetwork implements IHydrogenNetwork {
 
                                 for (final BlockVec3 node : finder.closedSet) {
                                     final TileEntity nodeTile = node
-                                            .getTileEntity(((TileEntity) splitPoint).getWorldObj());
+                                        .getTileEntity(((TileEntity) splitPoint).getWorldObj());
 
                                     if (nodeTile instanceof INetworkProvider && nodeTile != splitPoint) {
-                                        newNetwork.getTransmitters().add((ITransmitter) nodeTile);
+                                        newNetwork.getTransmitters()
+                                            .add((ITransmitter) nodeTile);
                                     }
                                 }
 
@@ -266,6 +262,6 @@ public class HydrogenNetwork implements IHydrogenNetwork {
     @Override
     public String toString() {
         return "HydrogenNetwork[" + this
-                .hashCode() + "|Pipes:" + this.pipes.size() + "|Acceptors:" + this.hydrogenTiles.size() + "]";
+            .hashCode() + "|Pipes:" + this.pipes.size() + "|Acceptors:" + this.hydrogenTiles.size() + "]";
     }
 }

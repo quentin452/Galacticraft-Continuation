@@ -1,8 +1,16 @@
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import java.util.List;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
+import micdoodle8.mods.galacticraft.api.block.IPlantableBlock;
+import micdoodle8.mods.galacticraft.api.block.ITerraformableBlock;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityDungeonSpawnerMars;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
@@ -23,20 +31,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
-import micdoodle8.mods.galacticraft.api.block.IPlantableBlock;
-import micdoodle8.mods.galacticraft.api.block.ITerraformableBlock;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
-import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityDungeonSpawnerMars;
+import java.util.List;
+import java.util.Random;
 
 public class BlockBasicMars extends Block
-        implements IDetectableResource, IPlantableBlock, ITileEntityProvider, ITerraformableBlock {
+    implements IDetectableResource, IPlantableBlock, ITileEntityProvider, ITerraformableBlock {
 
     @SideOnly(Side.CLIENT)
     private IIcon[] marsBlockIcons;
@@ -84,7 +83,7 @@ public class BlockBasicMars extends Block
 
     @Override
     public float getExplosionResistance(Entity par1Entity, World world, int x, int y, int z, double explosionX,
-            double explosionY, double explosionZ) {
+        double explosionY, double explosionZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
 
         if (metadata == 10) {
@@ -248,7 +247,7 @@ public class BlockBasicMars extends Block
 
     @Override
     public boolean canSustainPlant(IBlockAccess world, int x, int y, int z, ForgeDirection direction,
-            IPlantable plantable) {
+        IPlantable plantable) {
         return false;
     }
 
@@ -269,19 +268,19 @@ public class BlockBasicMars extends Block
 
             if (metadata == 7) {
                 GalacticraftPlanets.spawnParticle(
-                        "sludgeDrip",
-                        new Vector3(x + rand.nextDouble(), y, z + rand.nextDouble()),
-                        new Vector3(0, 0, 0));
+                    "sludgeDrip",
+                    new Vector3(x + rand.nextDouble(), y, z + rand.nextDouble()),
+                    new Vector3(0, 0, 0));
 
                 if (rand.nextInt(100) == 0) {
                     world.playSound(
-                            x,
-                            y,
-                            z,
-                            GalacticraftCore.TEXTURE_PREFIX + "ambience.singledrip",
-                            1,
-                            0.8F + rand.nextFloat() / 5.0F,
-                            false);
+                        x,
+                        y,
+                        z,
+                        GalacticraftCore.TEXTURE_PREFIX + "ambience.singledrip",
+                        1,
+                        0.8F + rand.nextFloat() / 5.0F,
+                        false);
                 }
             }
         }
@@ -289,7 +288,8 @@ public class BlockBasicMars extends Block
 
     @Override
     public boolean isTerraformable(World world, int x, int y, int z) {
-        return world.getBlockMetadata(x, y, z) == 5 && !world.getBlock(x, y + 1, z).isOpaqueCube();
+        return world.getBlockMetadata(x, y, z) == 5 && !world.getBlock(x, y + 1, z)
+            .isOpaqueCube();
     }
 
     @Override

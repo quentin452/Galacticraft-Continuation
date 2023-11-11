@@ -1,9 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
@@ -14,6 +10,9 @@ import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.oxygen.OxygenNetwork;
 import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
 import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class TileEntityOxygenTransmitter extends TileEntityAdvanced implements ITransmitter {
 
@@ -32,7 +31,8 @@ public abstract class TileEntityOxygenTransmitter extends TileEntityAdvanced imp
     @Override
     public void invalidate() {
         if (!this.worldObj.isRemote) {
-            this.getNetwork().split(this);
+            this.getNetwork()
+                .split(this);
         }
 
         super.invalidate();
@@ -63,7 +63,8 @@ public abstract class TileEntityOxygenTransmitter extends TileEntityAdvanced imp
 
     protected void resetNetwork() {
         final OxygenNetwork network = new OxygenNetwork();
-        network.getTransmitters().add(this);
+        network.getTransmitters()
+            .add(this);
         this.setNetwork(network);
     }
 
@@ -81,14 +82,17 @@ public abstract class TileEntityOxygenTransmitter extends TileEntityAdvanced imp
                 final TileEntity tileEntity = new BlockVec3(this).getTileEntityOnSide(this.worldObj, side);
 
                 if (tileEntity != null && tileEntity.getClass() == this.getClass()
-                        && tileEntity instanceof INetworkProvider
-                        && !this.getNetwork().equals(((INetworkProvider) tileEntity).getNetwork())) {
+                    && tileEntity instanceof INetworkProvider
+                    && !this.getNetwork()
+                        .equals(((INetworkProvider) tileEntity).getNetwork())) {
                     this.setNetwork(
-                            (IGridNetwork) this.getNetwork().merge(((INetworkProvider) tileEntity).getNetwork()));
+                        (IGridNetwork) this.getNetwork()
+                            .merge(((INetworkProvider) tileEntity).getNetwork()));
                 }
             }
 
-            this.getNetwork().refresh();
+            this.getNetwork()
+                .refresh();
         }
     }
 
@@ -129,13 +133,8 @@ public abstract class TileEntityOxygenTransmitter extends TileEntityAdvanced imp
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
-        return AxisAlignedBB.getBoundingBox(
-                this.xCoord,
-                this.yCoord,
-                this.zCoord,
-                this.xCoord + 1,
-                this.yCoord + 1,
-                this.zCoord + 1);
+        return AxisAlignedBB
+            .getBoundingBox(this.xCoord, this.yCoord, this.zCoord, this.xCoord + 1, this.yCoord + 1, this.zCoord + 1);
     }
 
     @Override

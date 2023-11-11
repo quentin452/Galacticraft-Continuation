@@ -1,7 +1,8 @@
 package micdoodle8.mods.galacticraft.core.client;
 
-import java.util.Random;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GLAllocation;
@@ -11,20 +12,17 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.IRenderHandler;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import java.util.Random;
 
 public class SkyProviderOrbit extends IRenderHandler {
 
     private static final ResourceLocation moonTexture = new ResourceLocation("textures/environment/moon_phases.png");
     private static final ResourceLocation sunTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/planets/orbitalsun.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/planets/orbitalsun.png");
 
     public int starGLCallList = GLAllocation.generateDisplayLists(3);
     public int glSkyList;
@@ -83,7 +81,8 @@ public class SkyProviderOrbit extends IRenderHandler {
         GL11.glEndList();
     }
 
-    private final Minecraft minecraft = FMLClientHandler.instance().getClient();
+    private final Minecraft minecraft = FMLClientHandler.instance()
+        .getClient();
 
     @Override
     public void render(float partialTicks, WorldClient world, Minecraft mc) {
@@ -123,7 +122,7 @@ public class SkyProviderOrbit extends IRenderHandler {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         RenderHelper.disableStandardItemLighting();
         final float[] var24 = this.minecraft.theWorld.provider
-                .calcSunriseSunsetColors(this.minecraft.theWorld.getCelestialAngle(partialTicks), partialTicks);
+            .calcSunriseSunsetColors(this.minecraft.theWorld.getCelestialAngle(partialTicks), partialTicks);
         float var9;
         float var10;
         float var11;
@@ -135,11 +134,10 @@ public class SkyProviderOrbit extends IRenderHandler {
             GL11.glPushMatrix();
             GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
             GL11.glRotatef(
-                    MathHelper.sin(this.minecraft.theWorld.getCelestialAngleRadians(partialTicks)) < 0.0F ? 180.0F
-                            : 0.0F,
-                    0.0F,
-                    0.0F,
-                    1.0F);
+                MathHelper.sin(this.minecraft.theWorld.getCelestialAngleRadians(partialTicks)) < 0.0F ? 180.0F : 0.0F,
+                0.0F,
+                0.0F,
+                1.0F);
             GL11.glRotatef(90.0F, 0.0F, 0.0F, 1.0F);
             var8 = var24[0];
             var9 = var24[1];

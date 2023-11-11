@@ -1,21 +1,19 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
+import com.mojang.authlib.GameProfile;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
-import com.mojang.authlib.GameProfile;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 public class PlayerUtil {
 
@@ -41,7 +39,8 @@ public class PlayerUtil {
                 }
 
                 entityplayermp = iterator.next();
-            } while (!entityplayermp.getCommandSenderName().equalsIgnoreCase(username));
+            } while (!entityplayermp.getCommandSenderName()
+                .equalsIgnoreCase(username));
 
             return entityplayermp;
         }
@@ -65,12 +64,13 @@ public class PlayerUtil {
 
     @SideOnly(Side.CLIENT)
     public static EntityClientPlayerMP getPlayerBaseClientFromPlayer(EntityPlayer player, boolean ignoreCase) {
-        final EntityClientPlayerMP clientPlayer = FMLClientHandler.instance().getClientPlayerEntity();
+        final EntityClientPlayerMP clientPlayer = FMLClientHandler.instance()
+            .getClientPlayerEntity();
 
         if (clientPlayer == null && player != null) {
             GCLog.severe(
-                    "Warning: Could not find player base client instance for player "
-                            + player.getGameProfile().getName());
+                "Warning: Could not find player base client instance for player " + player.getGameProfile()
+                    .getName());
         }
 
         return clientPlayer;
@@ -84,10 +84,13 @@ public class PlayerUtil {
     @SideOnly(Side.CLIENT)
     public static GameProfile makeOtherPlayerProfile(String strName, String strUUID) {
         GameProfile profile = null;
-        for (final Object e : FMLClientHandler.instance().getWorldClient().getLoadedEntityList()) {
+        for (final Object e : FMLClientHandler.instance()
+            .getWorldClient()
+            .getLoadedEntityList()) {
             if (e instanceof AbstractClientPlayer) {
                 final GameProfile gp2 = ((AbstractClientPlayer) e).getGameProfile();
-                if (gp2.getName().equals(strName)) {
+                if (gp2.getName()
+                    .equals(strName)) {
                     profile = gp2;
                     break;
                 }
@@ -110,12 +113,14 @@ public class PlayerUtil {
     }
 
     public static EntityPlayerMP getPlayerByUUID(UUID theUUID) {
-        final List<EntityPlayerMP> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+        final List<EntityPlayerMP> players = MinecraftServer.getServer()
+            .getConfigurationManager().playerEntityList;
         EntityPlayerMP entityplayermp;
         for (int i = players.size() - 1; i >= 0; --i) {
             entityplayermp = players.get(i);
 
-            if (entityplayermp.getUniqueID().equals(theUUID)) {
+            if (entityplayermp.getUniqueID()
+                .equals(theUUID)) {
                 return entityplayermp;
             }
         }
@@ -123,6 +128,7 @@ public class PlayerUtil {
     }
 
     public static boolean isPlayerOnline(EntityPlayerMP player) {
-        return MinecraftServer.getServer().getConfigurationManager().playerEntityList.contains(player);
+        return MinecraftServer.getServer()
+            .getConfigurationManager().playerEntityList.contains(player);
     }
 }

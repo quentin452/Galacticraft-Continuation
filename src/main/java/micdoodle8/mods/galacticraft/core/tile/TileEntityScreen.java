@@ -1,12 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -17,6 +10,12 @@ import micdoodle8.mods.galacticraft.core.client.gui.screen.DrawGameScreen;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import micdoodle8.mods.galacticraft.core.tick.TickHandlerClient;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class TileEntityScreen extends TileEntity {
 
@@ -42,13 +41,14 @@ public class TileEntityScreen extends TileEntity {
     @Override
     public void validate() {
         super.validate();
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+        if (FMLCommonHandler.instance()
+            .getEffectiveSide()
+            .isClient()) {
             this.screen = new DrawGameScreen(1.0F, 1.0F, this);
             GalacticraftCore.packetPipeline.sendToServer(
-                    new PacketSimple(
-                            EnumSimplePacket.S_UPDATE_VIEWSCREEN_REQUEST,
-                            new Object[] { this.worldObj.provider.dimensionId, this.xCoord, this.yCoord,
-                                    this.zCoord }));
+                new PacketSimple(
+                    EnumSimplePacket.S_UPDATE_VIEWSCREEN_REQUEST,
+                    new Object[] { this.worldObj.provider.dimensionId, this.xCoord, this.yCoord, this.zCoord }));
         }
     }
 
@@ -67,10 +67,10 @@ public class TileEntityScreen extends TileEntity {
             connectedFlags += 1;
         }
         GalacticraftCore.packetPipeline.sendToDimension(
-                new PacketSimple(
-                        EnumSimplePacket.C_UPDATE_VIEWSCREEN,
-                        new Object[] { this.xCoord, this.yCoord, this.zCoord, this.imageType, connectedFlags }),
-                this.worldObj.provider.dimensionId);
+            new PacketSimple(
+                EnumSimplePacket.C_UPDATE_VIEWSCREEN,
+                new Object[] { this.xCoord, this.yCoord, this.zCoord, this.imageType, connectedFlags }),
+            this.worldObj.provider.dimensionId);
     }
 
     @Override
@@ -105,8 +105,9 @@ public class TileEntityScreen extends TileEntity {
                 if (x == 0 && z == 0) {
                     this.resetToSingle();
                 } else {
-                    final BlockVec3 newVec = vec.clone().modifyPositionFromSide(ForgeDirection.getOrientation(side), x)
-                            .modifyPositionFromSide(ForgeDirection.DOWN, z);
+                    final BlockVec3 newVec = vec.clone()
+                        .modifyPositionFromSide(ForgeDirection.getOrientation(side), x)
+                        .modifyPositionFromSide(ForgeDirection.DOWN, z);
                     tile = newVec.getTileEntity(this.worldObj);
                     if (tile instanceof TileEntityScreen && tile.getBlockMetadata() == meta) {
                         ((TileEntityScreen) tile).resetToSingle();
@@ -199,27 +200,27 @@ public class TileEntityScreen extends TileEntity {
         if (this.connectedUp) {
             tileUp = vec.getTileEntityOnSide(this.worldObj, 1);
             this.connectedUp = tileUp instanceof TileEntityScreen && tileUp.getBlockMetadata() == meta
-                    && !tileUp.isInvalid();
+                && !tileUp.isInvalid();
         }
 
         if (this.connectedDown) {
             tileDown = vec.getTileEntityOnSide(this.worldObj, 0);
             this.connectedDown = tileDown instanceof TileEntityScreen && tileDown.getBlockMetadata() == meta
-                    && !tileDown.isInvalid();
+                && !tileDown.isInvalid();
         }
 
         if (this.connectedLeft) {
             final int side = this.getLeft(meta);
             tileLeft = vec.getTileEntityOnSide(this.worldObj, side);
             this.connectedLeft = tileLeft instanceof TileEntityScreen && tileLeft.getBlockMetadata() == meta
-                    && !tileLeft.isInvalid();
+                && !tileLeft.isInvalid();
         }
 
         if (this.connectedRight) {
             final int side = this.getRight(meta);
             tileRight = vec.getTileEntityOnSide(this.worldObj, side);
             this.connectedRight = tileRight instanceof TileEntityScreen && tileRight.getBlockMetadata() == meta
-                    && !tileRight.isInvalid();
+                && !tileRight.isInvalid();
         }
 
         // Now test whether a connection can be sustained with that other tile
@@ -501,8 +502,9 @@ public class TileEntityScreen extends TileEntity {
 
         for (int x = -left; x <= right; x++) {
             for (int z = -up; z <= down; z++) {
-                final BlockVec3 newVec = vec.clone().modifyPositionFromSide(ForgeDirection.getOrientation(side), x)
-                        .modifyPositionFromSide(ForgeDirection.DOWN, z);
+                final BlockVec3 newVec = vec.clone()
+                    .modifyPositionFromSide(ForgeDirection.getOrientation(side), x)
+                    .modifyPositionFromSide(ForgeDirection.DOWN, z);
                 final TileEntity tile = newVec.getTileEntity(this.worldObj);
                 if (tile instanceof TileEntityScreen && tile.getBlockMetadata() == meta && !tile.isInvalid()) {
                     TileEntityScreen screenTile = (TileEntityScreen) tile;
@@ -526,7 +528,7 @@ public class TileEntityScreen extends TileEntity {
                             existingScreen = true;
                         }
                     }
-            } else {
+                } else {
                     screenWhole = false;
                 }
             }
@@ -546,8 +548,10 @@ public class TileEntityScreen extends TileEntity {
 
         DrawGameScreen newScreen = null;
         boolean serverside = true;
-        final TileEntity bottomLeft = vec.clone().modifyPositionFromSide(ForgeDirection.getOrientation(side), -left)
-                .modifyPositionFromSide(ForgeDirection.DOWN, down).getTileEntity(this.worldObj);
+        final TileEntity bottomLeft = vec.clone()
+            .modifyPositionFromSide(ForgeDirection.getOrientation(side), -left)
+            .modifyPositionFromSide(ForgeDirection.DOWN, down)
+            .getTileEntity(this.worldObj);
         if (this.worldObj.isRemote) {
             if (bottomLeft instanceof TileEntityScreen) // It always will be if reached this far
             {
@@ -729,7 +733,8 @@ public class TileEntityScreen extends TileEntity {
 
         for (int z = -this.connectionsUp; z <= this.connectionsDown; z++) {
             TileEntity tile;
-            final BlockVec3 newVec = vec.clone().modifyPositionFromSide(ForgeDirection.DOWN, z);
+            final BlockVec3 newVec = vec.clone()
+                .modifyPositionFromSide(ForgeDirection.DOWN, z);
 
             if (z == 0) {
                 tile = this;
@@ -757,7 +762,8 @@ public class TileEntityScreen extends TileEntity {
 
         for (int z = -this.connectionsUp; z <= this.connectionsDown; z++) {
             TileEntity tile;
-            final BlockVec3 newVec = vec.clone().modifyPositionFromSide(ForgeDirection.DOWN, z);
+            final BlockVec3 newVec = vec.clone()
+                .modifyPositionFromSide(ForgeDirection.DOWN, z);
 
             if (z == 0) {
                 tile = this;
@@ -785,7 +791,8 @@ public class TileEntityScreen extends TileEntity {
 
         for (int x = -this.connectionsLeft; x <= this.connectionsRight; x++) {
             TileEntity tile;
-            final BlockVec3 newVec = vec.clone().modifyPositionFromSide(side, x);
+            final BlockVec3 newVec = vec.clone()
+                .modifyPositionFromSide(side, x);
 
             if (x == 0) {
                 tile = this;
@@ -813,7 +820,8 @@ public class TileEntityScreen extends TileEntity {
 
         for (int x = -this.connectionsLeft; x <= this.connectionsRight; x++) {
             TileEntity tile;
-            final BlockVec3 newVec = vec.clone().modifyPositionFromSide(side, x);
+            final BlockVec3 newVec = vec.clone()
+                .modifyPositionFromSide(side, x);
 
             if (x == 0) {
                 tile = this;

@@ -1,7 +1,12 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityRefinery;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -17,13 +22,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityRefinery;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.Random;
 
 public class BlockRefinery extends BlockAdvancedTile implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -106,14 +105,14 @@ public class BlockRefinery extends BlockAdvancedTile implements ItemBlockDesc.IB
 
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         entityPlayer.openGui(GalacticraftCore.instance, -1, world, x, y, z);
         return true;
     }
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         int change = 0;
 
         // Re-orient the block
@@ -168,14 +167,17 @@ public class BlockRefinery extends BlockAdvancedTile implements ItemBlockDesc.IB
 
                         var9.stackSize -= var13;
                         final EntityItem var14 = new EntityItem(
-                                par1World,
-                                par2 + var10,
-                                par3 + var11,
-                                par4 + var12,
-                                new ItemStack(var9.getItem(), var13, var9.getItemDamage()));
+                            par1World,
+                            par2 + var10,
+                            par3 + var11,
+                            par4 + var12,
+                            new ItemStack(var9.getItem(), var13, var9.getItemDamage()));
 
                         if (var9.hasTagCompound()) {
-                            var14.getEntityItem().setTagCompound((NBTTagCompound) var9.getTagCompound().copy());
+                            var14.getEntityItem()
+                                .setTagCompound(
+                                    (NBTTagCompound) var9.getTagCompound()
+                                        .copy());
                         }
 
                         final float var15 = 0.05F;
@@ -196,7 +198,9 @@ public class BlockRefinery extends BlockAdvancedTile implements ItemBlockDesc.IB
         if (side == metadata + 2) {
             return this.iconOilInput;
         }
-        if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
+        if (side == ForgeDirection.getOrientation(metadata + 2)
+            .getOpposite()
+            .ordinal()) {
             return this.iconFuelOutput;
         }
 
@@ -209,8 +213,8 @@ public class BlockRefinery extends BlockAdvancedTile implements ItemBlockDesc.IB
         }
 
         if (metadata == 0 && side == 4 || metadata == 1 && side == 5
-                || metadata == 2 && side == 3
-                || metadata == 3 && side == 2) {
+            || metadata == 2 && side == 3
+            || metadata == 3 && side == 2) {
             return this.iconFront;
         }
 

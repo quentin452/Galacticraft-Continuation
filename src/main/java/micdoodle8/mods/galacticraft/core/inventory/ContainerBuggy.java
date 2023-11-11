@@ -23,7 +23,7 @@ public class ContainerBuggy extends Container {
             for (var4 = 0; var4 < type * 2; ++var4) {
                 for (var5 = 0; var5 < 9; ++var5) {
                     this.addSlotToContainer(
-                            new Slot(this.spaceshipInv, var5 + var4 * 9, 8 + var5 * 18, 50 + var4 * 18));
+                        new Slot(this.spaceshipInv, var5 + var4 * 9, 8 + var5 * 18, 50 + var4 * 18));
                 }
             }
         }
@@ -31,11 +31,11 @@ public class ContainerBuggy extends Container {
         for (var4 = 0; var4 < 3; ++var4) {
             for (var5 = 0; var5 < 9; ++var5) {
                 this.addSlotToContainer(
-                        new Slot(
-                                this.lowerChestInventory,
-                                var5 + var4 * 9 + 9,
-                                8 + var5 * 18,
-                                49 + var4 * 18 + 14 + type * 36));
+                    new Slot(
+                        this.lowerChestInventory,
+                        var5 + var4 * 9 + 9,
+                        8 + var5 * 18,
+                        49 + var4 * 18 + 14 + type * 36));
             }
         }
 

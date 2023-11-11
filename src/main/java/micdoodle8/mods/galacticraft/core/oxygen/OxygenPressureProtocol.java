@@ -1,24 +1,5 @@
 package micdoodle8.mods.galacticraft.core.oxygen;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEnchantmentTable;
-import net.minecraft.block.BlockFarmland;
-import net.minecraft.block.BlockGlass;
-import net.minecraft.block.BlockGravel;
-import net.minecraft.block.BlockLeavesBase;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockSponge;
-import net.minecraft.block.BlockStainedGlass;
-import net.minecraft.block.material.Material;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
 import micdoodle8.mods.galacticraft.api.vector.BlockTuple;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
@@ -26,6 +7,14 @@ import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenSealer;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OxygenPressureProtocol {
 
@@ -55,8 +44,8 @@ public class OxygenPressureProtocol {
                 }
             } catch (final Exception e) {
                 GCLog.severe(
-                        "[config] External Sealable IDs: error parsing '" + s
-                                + "'. Must be in the form Blockname or BlockName:metadata");
+                    "[config] External Sealable IDs: error parsing '" + s
+                        + "'. Must be in the form Blockname or BlockName:metadata");
             }
         }
     }
@@ -82,7 +71,7 @@ public class OxygenPressureProtocol {
 
         if (block instanceof IPartialSealableBlock) {
             return !((IPartialSealableBlock) block)
-                    .isSealed(world, vec.x, vec.y, vec.z, ForgeDirection.getOrientation(side));
+                .isSealed(world, vec.x, vec.y, vec.z, ForgeDirection.getOrientation(side));
         }
 
         // Check leaves first, because their isOpaqueCube() test depends on graphics
@@ -94,7 +83,7 @@ public class OxygenPressureProtocol {
 
         if (block.isOpaqueCube()) {
             return block instanceof BlockGravel || block.getMaterial() == Material.cloth
-                    || block instanceof BlockSponge;
+                || block instanceof BlockSponge;
         }
 
         if (block instanceof BlockGlass || block instanceof BlockStainedGlass) {
@@ -112,7 +101,7 @@ public class OxygenPressureProtocol {
         // Half slab seals on the top side or the bottom side according to its metadata
         if (block instanceof BlockSlab) {
             return (side != 0 || (vec.getBlockMetadata(world) & 8) != 8)
-                    && (side != 1 || (vec.getBlockMetadata(world) & 8) != 0);
+                && (side != 1 || (vec.getBlockMetadata(world) & 8) != 0);
         }
 
         // Farmland etc only seals on the solid underside

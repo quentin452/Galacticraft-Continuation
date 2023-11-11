@@ -1,15 +1,14 @@
 package micdoodle8.mods.galacticraft.core.client.sounds;
 
+import micdoodle8.mods.galacticraft.api.prefab.entity.EntityAutoRocket;
+import micdoodle8.mods.galacticraft.api.prefab.entity.EntitySpaceshipBase.EnumLaunchPhase;
+import micdoodle8.mods.galacticraft.core.Constants;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-
-import micdoodle8.mods.galacticraft.api.prefab.entity.EntityAutoRocket;
-import micdoodle8.mods.galacticraft.api.prefab.entity.EntitySpaceshipBase.EnumLaunchPhase;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 
 /**
  * This file is part of the Galacticraft project
@@ -72,7 +71,7 @@ public class SoundUpdaterRocket extends MovingSound {
                     }
                 } else if (this.theRocket.posY > Constants.OVERWORLD_SKYPROVIDER_STARTHEIGHT) {
                     this.volume = (1000F + Constants.OVERWORLD_SKYPROVIDER_STARTHEIGHT - (float) this.theRocket.posY)
-                            * 0.001F;
+                        * 0.001F;
                 } else {
                     this.volume = 1.0F;
                 }

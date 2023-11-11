@@ -1,12 +1,5 @@
 package micdoodle8.mods.galacticraft.core.energy.tile;
 
-import java.lang.reflect.Constructor;
-
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.common.Optional.InterfaceList;
@@ -20,13 +13,19 @@ import micdoodle8.mods.galacticraft.api.transmission.tile.IElectrical;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
 import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.lang.reflect.Constructor;
 
 @InterfaceList({ @Interface(modid = "IC2API", iface = "ic2.api.energy.tile.IEnergySink"),
-        @Interface(modid = "IC2API", iface = "ic2.api.energy.tile.IEnergyEmitter"),
-        @Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyHandler"),
-        @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.IStrictEnergyAcceptor"), })
+    @Interface(modid = "IC2API", iface = "ic2.api.energy.tile.IEnergyEmitter"),
+    @Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyHandler"),
+    @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.IStrictEnergyAcceptor"), })
 public abstract class TileBaseUniversalConductor extends TileBaseConductor
-        implements IEnergySink, IEnergyEmitter, IEnergyHandler, IStrictEnergyAcceptor {
+    implements IEnergySink, IEnergyEmitter, IEnergyHandler, IStrictEnergyAcceptor {
 
     protected boolean isAddedToEnergyNet;
     protected Object powerHandlerBC;
@@ -125,13 +124,16 @@ public abstract class TileBaseUniversalConductor extends TileBaseConductor
 
         if (this.IC2surplusJoules < 0.001F) {
             this.IC2surplusJoules = 0F;
-            return this.getNetwork().getRequest(this) / EnergyConfigHandler.IC2_RATIO;
+            return this.getNetwork()
+                .getRequest(this) / EnergyConfigHandler.IC2_RATIO;
         }
 
-        this.IC2surplusJoules = this.getNetwork().produce(this.IC2surplusJoules, true, 1, this);
+        this.IC2surplusJoules = this.getNetwork()
+            .produce(this.IC2surplusJoules, true, 1, this);
         if (this.IC2surplusJoules < 0.001F) {
             this.IC2surplusJoules = 0F;
-            return this.getNetwork().getRequest(this) / EnergyConfigHandler.IC2_RATIO;
+            return this.getNetwork()
+                .getRequest(this) / EnergyConfigHandler.IC2_RATIO;
         }
         return 0D;
     }
@@ -144,7 +146,8 @@ public abstract class TileBaseUniversalConductor extends TileBaseConductor
             tier = 2;
         }
         final float convertedEnergy = (float) amount * EnergyConfigHandler.IC2_RATIO;
-        final float surplus = this.getNetwork().produce(convertedEnergy, true, tier, this, tile);
+        final float surplus = this.getNetwork()
+            .produce(convertedEnergy, true, tier, this, tile);
 
         if (surplus >= 0.001F) {
             this.IC2surplusJoules = surplus;
@@ -210,7 +213,8 @@ public abstract class TileBaseUniversalConductor extends TileBaseConductor
             return 0;
         }
         final float receiveGC = maxReceive * EnergyConfigHandler.RF_RATIO;
-        final float sentGC = receiveGC - this.getNetwork().produce(receiveGC, !simulate, 1);
+        final float sentGC = receiveGC - this.getNetwork()
+            .produce(receiveGC, !simulate, 1);
         return MathHelper.floor_float(sentGC / EnergyConfigHandler.RF_RATIO);
     }
 
@@ -242,7 +246,9 @@ public abstract class TileBaseUniversalConductor extends TileBaseConductor
             return 0;
         }
 
-        return MathHelper.floor_float(this.getNetwork().getRequest(this) / EnergyConfigHandler.RF_RATIO);
+        return MathHelper.floor_float(
+            this.getNetwork()
+                .getRequest(this) / EnergyConfigHandler.RF_RATIO);
     }
 
     @Override
@@ -251,8 +257,9 @@ public abstract class TileBaseUniversalConductor extends TileBaseConductor
             return 0;
         }
 
-        return amount - this.getNetwork().produce((float) amount * EnergyConfigHandler.MEKANISM_RATIO, true, 1, this)
-                / EnergyConfigHandler.MEKANISM_RATIO;
+        return amount - this.getNetwork()
+            .produce((float) amount * EnergyConfigHandler.MEKANISM_RATIO, true, 1, this)
+            / EnergyConfigHandler.MEKANISM_RATIO;
     }
 
     @Override
@@ -263,7 +270,8 @@ public abstract class TileBaseUniversalConductor extends TileBaseConductor
 
         final TileEntity te = new BlockVec3(this).getTileEntityOnSide(this.worldObj, side);
         try {
-            if (Class.forName("codechicken.multipart.TileMultipart").isInstance(te)) {
+            if (Class.forName("codechicken.multipart.TileMultipart")
+                .isInstance(te)) {
                 return false;
             }
         } catch (final Exception e) {
@@ -286,6 +294,7 @@ public abstract class TileBaseUniversalConductor extends TileBaseConductor
         if (this.getNetwork() == null) {
             return 0;
         }
-        return this.getNetwork().getRequest(this) / EnergyConfigHandler.MEKANISM_RATIO;
+        return this.getNetwork()
+            .getRequest(this) / EnergyConfigHandler.MEKANISM_RATIO;
     }
 }

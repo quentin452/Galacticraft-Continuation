@@ -1,17 +1,16 @@
 package micdoodle8.mods.galacticraft.api.transmission.grid;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
 import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkConnection;
 import micdoodle8.mods.galacticraft.api.transmission.tile.ITransmitter;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Check if a conductor connects with another.
@@ -21,7 +20,7 @@ import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 public class PathfinderChecker extends Pathfinder {
 
     public PathfinderChecker(final World world, final INetworkConnection targetConnector, final NetworkType networkType,
-            final INetworkConnection... ignoreConnector) {
+        final INetworkConnection... ignoreConnector) {
         super(new IPathCallBack() {
 
             @Override
@@ -30,12 +29,14 @@ public class PathfinderChecker extends Pathfinder {
 
                 for (int i = 0; i < 6; i++) {
                     final ForgeDirection direction = ForgeDirection.getOrientation(i);
-                    final BlockVec3 position = currentNode.clone().modifyPositionFromSide(direction);
+                    final BlockVec3 position = currentNode.clone()
+                        .modifyPositionFromSide(direction);
                     final TileEntity connectedBlock = position.getTileEntity(world);
 
                     if (connectedBlock instanceof ITransmitter) {
                         ITransmitter transmitter = (ITransmitter) connectedBlock;
-                        if (!Arrays.asList(ignoreConnector).contains(transmitter) && transmitter.canConnect(direction.getOpposite(), networkType)) {
+                        if (!Arrays.asList(ignoreConnector)
+                            .contains(transmitter) && transmitter.canConnect(direction.getOpposite(), networkType)) {
                             neighbors.add(position);
                         }
                     }

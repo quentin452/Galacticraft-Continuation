@@ -1,7 +1,17 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.transmission.tile.IConductor;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
+import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
+import micdoodle8.mods.galacticraft.core.energy.tile.EnergyStorageTile;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityBeamReceiver;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -16,18 +26,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IConductor;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
-import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
-import micdoodle8.mods.galacticraft.core.energy.tile.EnergyStorageTile;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityBeamReceiver;
+import java.util.List;
 
 public class BlockBeamReceiver extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -47,8 +46,14 @@ public class BlockBeamReceiver extends BlockTileGC implements ItemBlockDesc.IBlo
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
         final int oldMeta = world.getBlockMetadata(x, y, z);
-        final int meta = this
-                .getMetadataFromAngle(world, x, y, z, ForgeDirection.getOrientation(oldMeta).getOpposite().ordinal());
+        final int meta = this.getMetadataFromAngle(
+            world,
+            x,
+            y,
+            z,
+            ForgeDirection.getOrientation(oldMeta)
+                .getOpposite()
+                .ordinal());
 
         if (meta == -1) {
             world.func_147480_a(x, y, z, true);
@@ -74,7 +79,7 @@ public class BlockBeamReceiver extends BlockTileGC implements ItemBlockDesc.IBlo
         final TileEntity thisTile = world.getTileEntity(x, y, z);
         if (thisTile instanceof TileEntityBeamReceiver) {
             ((TileEntityBeamReceiver) thisTile)
-                    .setFacing(ForgeDirection.getOrientation(world.getBlockMetadata(x, y, z)));
+                .setFacing(ForgeDirection.getOrientation(world.getBlockMetadata(x, y, z)));
         }
     }
 
@@ -112,13 +117,14 @@ public class BlockBeamReceiver extends BlockTileGC implements ItemBlockDesc.IBlo
 
     @Override
     public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB axisalignedbb,
-            List<AxisAlignedBB> list, Entity entity) {
+        List<AxisAlignedBB> list, Entity entity) {
         this.setBlockBoundsBasedOnState(world, x, y, z);
         super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
     }
 
     private int getMetadataFromAngle(World world, int x, int y, int z, int side) {
-        final ForgeDirection direction = ForgeDirection.getOrientation(side).getOpposite();
+        final ForgeDirection direction = ForgeDirection.getOrientation(side)
+            .getOpposite();
 
         TileEntity tileAt = world.getTileEntity(x + direction.offsetX, y + direction.offsetY, z + direction.offsetZ);
 
@@ -144,8 +150,8 @@ public class BlockBeamReceiver extends BlockTileGC implements ItemBlockDesc.IBlo
             }
 
             if (tileAt instanceof EnergyStorageTile
-                    && ((EnergyStorageTile) tileAt).getModeFromDirection(adjacentDir.getOpposite()) != null
-                    || EnergyUtil.otherModCanReceive(tileAt, adjacentDir.getOpposite())) {
+                && ((EnergyStorageTile) tileAt).getModeFromDirection(adjacentDir.getOpposite()) != null
+                || EnergyUtil.otherModCanReceive(tileAt, adjacentDir.getOpposite())) {
                 return adjacentDir.ordinal();
             }
         }
@@ -173,7 +179,8 @@ public class BlockBeamReceiver extends BlockTileGC implements ItemBlockDesc.IBlo
 
     @SideOnly(Side.CLIENT)
     private void sendIncorrectSideMessage() {
-        FMLClientHandler.instance().getClient().thePlayer.addChatMessage(
+        FMLClientHandler.instance()
+            .getClient().thePlayer.addChatMessage(
                 new ChatComponentText(EnumColor.RED + GCCoreUtil.translate("gui.receiver.cannotAttach")));
     }
 
@@ -210,12 +217,12 @@ public class BlockBeamReceiver extends BlockTileGC implements ItemBlockDesc.IBlo
 
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         final TileEntity tile = world.getTileEntity(x, y, z);
 
         if (tile instanceof TileEntityBeamReceiver) {
             return ((TileEntityBeamReceiver) tile)
-                    .onMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
+                .onMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
         }
 
         return false;

@@ -1,22 +1,20 @@
 package micdoodle8.mods.galacticraft.core.client.gui.element;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiElementTurnPageButton extends GuiButton {
 
     private final boolean nextPage;
     private static final ResourceLocation background = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/bookleft.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/bookleft.png");
 
     public GuiElementTurnPageButton(int par1, int par2, int par3, boolean par4) {
         super(par1, par2, par3, 23, 13, "");
@@ -27,10 +25,11 @@ public class GuiElementTurnPageButton extends GuiButton {
     public void drawButton(Minecraft par1Minecraft, int par2, int par3) {
         if (this.visible) {
             final boolean var4 = par2 >= this.xPosition && par3 >= this.yPosition
-                    && par2 < this.xPosition + this.width
-                    && par3 < this.yPosition + this.height;
+                && par2 < this.xPosition + this.width
+                && par3 < this.yPosition + this.height;
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            par1Minecraft.getTextureManager().bindTexture(GuiElementTurnPageButton.background);
+            par1Minecraft.getTextureManager()
+                .bindTexture(GuiElementTurnPageButton.background);
             int var5 = 0;
             int var6 = 192;
 

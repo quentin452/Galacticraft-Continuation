@@ -1,5 +1,10 @@
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityArclamp;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -9,31 +14,25 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityArclamp;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityArclampRenderer extends TileEntitySpecialRenderer {
 
     public static final ResourceLocation lampTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/underoil.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/underoil.png");
     public static final ResourceLocation lightTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/light.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/light.png");
     public static final IModelCustom lampMetal = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/arclampMetal.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/arclampMetal.obj"));
     public static final IModelCustom lampLight = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/arclampLight.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/arclampLight.obj"));
     public static final IModelCustom lampBase = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/arclampBase.obj"));
-    private final TextureManager renderEngine = FMLClientHandler.instance().getClient().renderEngine;
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/arclampBase.obj"));
+    private final TextureManager renderEngine = FMLClientHandler.instance()
+        .getClient().renderEngine;
 
     public void renderModelAt(TileEntityArclamp tileEntity, double d, double d1, double d2, float f) {
         final int side = tileEntity.getBlockMetadata();

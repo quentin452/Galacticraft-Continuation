@@ -1,22 +1,22 @@
 package micdoodle8.mods.galacticraft.core.energy;
 
-import java.util.List;
-
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
+
+import java.util.List;
 
 public class EnergyDisplayHelper {
 
     public static void getEnergyDisplayTooltip(float energyVal, float maxEnergy, List<String> strList) {
         strList.add(
-                EnumChatFormatting.GREEN + StatCollector.translateToLocal("gui.message.energy")
-                        + ": "
-                        + getEnergyDisplayS(energyVal));
+            EnumChatFormatting.GREEN + StatCollector.translateToLocal("gui.message.energy")
+                + ": "
+                + getEnergyDisplayS(energyVal));
         strList.add(
-                EnumChatFormatting.RED + StatCollector.translateToLocal("gui.message.maxEnergy")
-                        + ": "
-                        + getEnergyDisplayS(maxEnergy));
+            EnumChatFormatting.RED + StatCollector.translateToLocal("gui.message.maxEnergy")
+                + ": "
+                + getEnergyDisplayS(maxEnergy));
     }
 
     public static String getEnergyDisplayS(float energyVal) {
@@ -41,7 +41,8 @@ public class EnergyDisplayHelper {
             }
         }
 
-        return newVal.append(" gJ").toString();
+        return newVal.append(" gJ")
+            .toString();
     }
 
     public static String getEnergyDisplayIC2(float energyVal) {
@@ -55,7 +56,8 @@ public class EnergyDisplayHelper {
             }
         }
 
-        return newVal.append(" EU").toString();
+        return newVal.append(" EU")
+            .toString();
     }
 
     public static String getEnergyDisplayBC(float energyVal) {
@@ -89,8 +91,8 @@ public class EnergyDisplayHelper {
 
     public static String getEnergyDisplay1DP(float energyVal) {
         return "" + MathHelper.floor_float(energyVal)
-                + "."
-                + MathHelper.floor_float(energyVal * 10) % 10
-                + MathHelper.floor_float(energyVal * 100) % 10;
+            + "."
+            + MathHelper.floor_float(energyVal * 10) % 10
+            + MathHelper.floor_float(energyVal * 100) % 10;
     }
 }

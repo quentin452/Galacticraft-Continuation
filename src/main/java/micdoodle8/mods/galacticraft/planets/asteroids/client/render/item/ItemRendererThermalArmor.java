@@ -1,17 +1,15 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.util.VersionUtil;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.util.VersionUtil;
 
 import java.util.Objects;
 
@@ -26,7 +24,8 @@ public class ItemRendererThermalArmor implements IItemRenderer {
             GL11.glPushMatrix();
 
             if (i == 1) {
-                final float time = FMLClientHandler.instance().getClientPlayerEntity().ticksExisted / 15.0F;
+                final float time = FMLClientHandler.instance()
+                    .getClientPlayerEntity().ticksExisted / 15.0F;
                 float r = (float) Math.max(Math.cos(time), 0.0F);
                 float b = (float) Math.max(Math.cos(time) * -1, 0.0F);
 
@@ -38,16 +37,23 @@ public class ItemRendererThermalArmor implements IItemRenderer {
                 GL11.glColor4f(r, b / 2.0F, b, r + b / 1.5F);
             }
 
-            final IIcon iicon = FMLClientHandler.instance().getClientPlayerEntity().getItemIcon(item, i);
+            final IIcon iicon = FMLClientHandler.instance()
+                .getClientPlayerEntity()
+                .getItemIcon(item, i);
 
             if (iicon == null) {
                 GL11.glPopMatrix();
                 return;
             }
 
-            FMLClientHandler.instance().getClient().getTextureManager().bindTexture(
-                    FMLClientHandler.instance().getClient().getTextureManager()
-                            .getResourceLocation(item.getItemSpriteNumber()));
+            FMLClientHandler.instance()
+                .getClient()
+                .getTextureManager()
+                .bindTexture(
+                    FMLClientHandler.instance()
+                        .getClient()
+                        .getTextureManager()
+                        .getResourceLocation(item.getItemSpriteNumber()));
             VersionUtil.setMipMap(false, false);
             final Tessellator tessellator = Tessellator.instance;
             final float f = iicon.getMinU();
@@ -62,7 +68,7 @@ public class ItemRendererThermalArmor implements IItemRenderer {
             GL11.glScalef(f6, f6, f6);
             GL11.glTranslatef(-f4, -f5, 0.0F);
             ItemRenderer
-                    .renderItemIn2D(tessellator, f1, f2, f, f3, iicon.getIconWidth(), iicon.getIconHeight(), 0.0625F);
+                .renderItemIn2D(tessellator, f1, f2, f, f3, iicon.getIconWidth(), iicon.getIconHeight(), 0.0625F);
             GL11.glPopMatrix();
         }
 

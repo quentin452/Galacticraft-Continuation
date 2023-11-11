@@ -1,5 +1,11 @@
 package micdoodle8.mods.galacticraft.core.items;
 
+import buildcraft.api.tools.IToolWrench;
+import cpw.mods.fml.common.Optional.Interface;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.creativetab.CreativeTabs;
@@ -10,13 +16,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import buildcraft.api.tools.IToolWrench;
-import cpw.mods.fml.common.Optional.Interface;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
 
 @Interface(modid = "BuildCraftAPI|tools", iface = "buildcraft.api.tools.IToolWrench")
 public class ItemUniversalWrench extends Item implements IToolWrench {
@@ -63,7 +62,7 @@ public class ItemUniversalWrench extends Item implements IToolWrench {
 
     @Override
     public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer player, World world, int x, int y, int z, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         return false;
     }
 
@@ -81,18 +80,18 @@ public class ItemUniversalWrench extends Item implements IToolWrench {
 
     @Override
     public boolean onItemUseFirst(ItemStack stack, EntityPlayer entityPlayer, World world, int x, int y, int z,
-            int side, float hitX, float hitY, float hitZ) {
+        int side, float hitX, float hitY, float hitZ) {
         if (world.isRemote) {
             return false;
         }
         final Block blockID = world.getBlock(x, y, z);
 
         if (blockID == Blocks.furnace || blockID == Blocks.lit_furnace
-                || blockID == Blocks.dropper
-                || blockID == Blocks.hopper
-                || blockID == Blocks.dispenser
-                || blockID == Blocks.piston
-                || blockID == Blocks.sticky_piston) {
+            || blockID == Blocks.dropper
+            || blockID == Blocks.hopper
+            || blockID == Blocks.dispenser
+            || blockID == Blocks.piston
+            || blockID == Blocks.sticky_piston) {
             final int metadata = world.getBlockMetadata(x, y, z);
 
             int[] rotationMatrix = { 1, 2, 3, 4, 5, 0 };
@@ -102,11 +101,12 @@ public class ItemUniversalWrench extends Item implements IToolWrench {
             }
 
             world.setBlockMetadataWithNotify(
-                    x,
-                    y,
-                    z,
-                    ForgeDirection.getOrientation(rotationMatrix[metadata]).ordinal(),
-                    3);
+                x,
+                y,
+                z,
+                ForgeDirection.getOrientation(rotationMatrix[metadata])
+                    .ordinal(),
+                3);
             this.wrenchUsed(entityPlayer, x, y, z);
 
             return true;

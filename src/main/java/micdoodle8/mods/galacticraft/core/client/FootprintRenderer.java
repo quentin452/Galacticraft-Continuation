@@ -1,36 +1,34 @@
 package micdoodle8.mods.galacticraft.core.client;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FootprintRenderer {
 
     public Map<Long, List<Footprint>> footprints = new HashMap<>();
     private static final ResourceLocation footprintTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/footprint.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/footprint.png");
 
     public void renderFootprints(EntityPlayer player, float partialTicks) {
         GL11.glPushMatrix();
         final double interpPosX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
         final double interpPosY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
         final double interpPosZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(FootprintRenderer.footprintTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(FootprintRenderer.footprintTexture);
 
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glDepthMask(true);
@@ -65,29 +63,29 @@ public class FootprintRenderer {
                     GL11.glColor4f(1 - ageScale, 1 - ageScale, 1 - ageScale, 1 - ageScale);
                     final double footprintScale = 0.5F;
                     tessellator.addVertexWithUV(
-                            0 + Math.sin((45 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
-                            0,
-                            0 + Math.cos((45 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
-                            f7,
-                            f9);
+                        0 + Math.sin((45 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                        0,
+                        0 + Math.cos((45 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                        f7,
+                        f9);
                     tessellator.addVertexWithUV(
-                            0 + Math.sin((135 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
-                            0,
-                            0 + Math.cos((135 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
-                            f7,
-                            f8);
+                        0 + Math.sin((135 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                        0,
+                        0 + Math.cos((135 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                        f7,
+                        f8);
                     tessellator.addVertexWithUV(
-                            0 + Math.sin((225 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
-                            0,
-                            0 + Math.cos((225 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
-                            f6,
-                            f8);
+                        0 + Math.sin((225 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                        0,
+                        0 + Math.cos((225 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                        f6,
+                        f8);
                     tessellator.addVertexWithUV(
-                            0 + Math.sin((315 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
-                            0,
-                            0 + Math.cos((315 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
-                            f6,
-                            f9);
+                        0 + Math.sin((315 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                        0,
+                        0 + Math.cos((315 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                        f6,
+                        f9);
 
                     tessellator.draw();
                     GL11.glPopMatrix();
@@ -122,7 +120,10 @@ public class FootprintRenderer {
             footprintList = new ArrayList<>();
         }
 
-        footprintList.removeIf(print -> !print.owner.equals(FMLClientHandler.instance().getClient().thePlayer.getCommandSenderName()));
+        footprintList.removeIf(
+            print -> !print.owner.equals(
+                FMLClientHandler.instance()
+                    .getClient().thePlayer.getCommandSenderName()));
 
         footprintList.addAll(prints);
         this.footprints.put(chunkKey, footprintList);

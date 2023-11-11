@@ -1,7 +1,12 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import java.util.HashMap;
-
+import cpw.mods.fml.common.registry.GameRegistry;
+import ic2.api.item.IC2Items;
+import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
+import micdoodle8.mods.galacticraft.api.recipe.INasaWorkbenchRecipe;
+import micdoodle8.mods.galacticraft.core.inventory.InventoryBuggyBench;
+import micdoodle8.mods.galacticraft.core.inventory.InventoryRocketBench;
+import micdoodle8.mods.galacticraft.core.recipe.NasaWorkbenchRecipe;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -10,13 +15,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import ic2.api.item.IC2Items;
-import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
-import micdoodle8.mods.galacticraft.api.recipe.INasaWorkbenchRecipe;
-import micdoodle8.mods.galacticraft.core.inventory.InventoryBuggyBench;
-import micdoodle8.mods.galacticraft.core.inventory.InventoryRocketBench;
-import micdoodle8.mods.galacticraft.core.recipe.NasaWorkbenchRecipe;
+import java.util.HashMap;
 
 public class RecipeUtil {
 
@@ -41,23 +40,28 @@ public class RecipeUtil {
     }
 
     public static void addRecipe(ItemStack result, Object[] obj) {
-        CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(result, obj));
+        CraftingManager.getInstance()
+            .getRecipeList()
+            .add(new ShapedOreRecipe(result, obj));
     }
 
     public static void addBlockRecipe(ItemStack result, String oreDictIngot, ItemStack gcIngot) {
-        if (OreDictionary.getOres(oreDictIngot).size() > 1) {
-            CraftingManager.getInstance().getRecipeList().add(
+        if (OreDictionary.getOres(oreDictIngot)
+            .size() > 1) {
+            CraftingManager.getInstance()
+                .getRecipeList()
+                .add(
                     new ShapelessOreRecipe(
-                            result,
-                            gcIngot,
-                            oreDictIngot,
-                            oreDictIngot,
-                            oreDictIngot,
-                            oreDictIngot,
-                            oreDictIngot,
-                            oreDictIngot,
-                            oreDictIngot,
-                            oreDictIngot));
+                        result,
+                        gcIngot,
+                        oreDictIngot,
+                        oreDictIngot,
+                        oreDictIngot,
+                        oreDictIngot,
+                        oreDictIngot,
+                        oreDictIngot,
+                        oreDictIngot,
+                        oreDictIngot));
         } else {
             RecipeUtil.addRecipe(result, new Object[] { "XXX", "XXX", "XXX", 'X', gcIngot });
         }

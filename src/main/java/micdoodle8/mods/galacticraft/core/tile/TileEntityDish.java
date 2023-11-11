@@ -1,18 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -24,9 +11,21 @@ import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
 import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
 import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
 import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.EnumSet;
 
 public class TileEntityDish extends TileBaseUniversalElectrical
-        implements IMultiBlock, IDisableableMachine, IInventory, ISidedInventory, IConnector {
+    implements IMultiBlock, IDisableableMachine, IInventory, ISidedInventory, IConnector {
 
     public float targetAngle;
     public float currentAngle;
@@ -85,7 +84,8 @@ public class TileEntityDish extends TileBaseUniversalElectrical
 
     @Override
     public boolean onActivated(EntityPlayer entityPlayer) {
-        return this.getBlockType().onBlockActivated(
+        return this.getBlockType()
+            .onBlockActivated(
                 this.worldObj,
                 this.xCoord,
                 this.yCoord,
@@ -118,12 +118,12 @@ public class TileEntityDish extends TileBaseUniversalElectrical
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
                 final BlockVec3 vecToAdd = new BlockVec3(
-                        placedPosition.x + x,
-                        placedPosition.y + 2,
-                        placedPosition.z + z);
+                    placedPosition.x + x,
+                    placedPosition.y + 2,
+                    placedPosition.z + z);
 
                 ((BlockMulti) GCBlocks.fakeBlock)
-                        .makeFakeBlock(this.worldObj, vecToAdd, placedPosition, this.getTierGC() == 1 ? 4 : 0);
+                    .makeFakeBlock(this.worldObj, vecToAdd, placedPosition, this.getTierGC() == 1 ? 4 : 0);
             }
         }
     }
@@ -136,7 +136,8 @@ public class TileEntityDish extends TileBaseUniversalElectrical
             for (int x = -1; x < 2; x++) {
                 for (int z = -1; z < 2; z++) {
                     if (this.worldObj.isRemote && this.worldObj.rand.nextDouble() < 0.1D) {
-                        FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(
+                        FMLClientHandler.instance()
+                            .getClient().effectRenderer.addBlockDestroyEffects(
                                 thisBlock.x + (y == 2 ? x : 0),
                                 thisBlock.y + y,
                                 thisBlock.z + (y == 2 ? z : 0),
@@ -144,10 +145,8 @@ public class TileEntityDish extends TileBaseUniversalElectrical
                                 Block.getIdFromBlock(GCBlocks.radioTelescope) >> 12 & 255);
                     }
 
-                    this.worldObj.setBlockToAir(
-                            thisBlock.x + (y == 2 ? x : 0),
-                            thisBlock.y + y,
-                            thisBlock.z + (y == 2 ? z : 0));
+                    this.worldObj
+                        .setBlockToAir(thisBlock.x + (y == 2 ? x : 0), thisBlock.y + y, thisBlock.z + (y == 2 ? z : 0));
                 }
             }
         }
@@ -211,12 +210,12 @@ public class TileEntityDish extends TileBaseUniversalElectrical
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
         return AxisAlignedBB.getBoundingBox(
-                this.xCoord - 1,
-                this.yCoord,
-                this.zCoord - 1,
-                this.xCoord + 2,
-                this.yCoord + 4,
-                this.zCoord + 2);
+            this.xCoord - 1,
+            this.yCoord,
+            this.zCoord - 1,
+            this.xCoord + 2,
+            this.yCoord + 4,
+            this.zCoord + 2);
     }
 
     @Override
@@ -304,7 +303,7 @@ public class TileEntityDish extends TileBaseUniversalElectrical
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override

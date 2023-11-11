@@ -72,10 +72,10 @@ public class BlockVec3 implements Cloneable {
      */
     public Block getBlockID(World world) {
         if (this.y < 0 || this.y >= 256
-                || this.x < -30000000
-                || this.z < -30000000
-                || this.x >= 30000000
-                || this.z >= 30000000) {
+            || this.x < -30000000
+            || this.z < -30000000
+            || this.x >= 30000000
+            || this.z >= 30000000) {
             return null;
         }
 
@@ -85,8 +85,8 @@ public class BlockVec3 implements Cloneable {
             // In a typical inner loop, 80% of the time consecutive calls to
             // this will be within the same chunk
             if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz
-                    && BlockVec3.chunkCacheDim == world.provider.dimensionId
-                    && BlockVec3.chunkCached.isChunkLoaded) {
+                && BlockVec3.chunkCacheDim == world.provider.dimensionId
+                && BlockVec3.chunkCached.isChunkLoaded) {
                 return BlockVec3.chunkCached.getBlock(this.x & 15, this.y, this.z & 15);
             }
             Chunk chunk = world.getChunkFromChunkCoords(chunkx, chunkz);
@@ -97,10 +97,10 @@ public class BlockVec3 implements Cloneable {
             return chunk.getBlock(this.x & 15, this.y, this.z & 15);
         } catch (final Throwable throwable) {
             final CrashReport crashreport = CrashReport
-                    .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
+                .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
             final CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
             crashreportcategory
-                    .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
+                .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
             throw new ReportedException(crashreport);
         }
     }
@@ -114,22 +114,23 @@ public class BlockVec3 implements Cloneable {
      */
     public Block getBlockID_noChunkLoad(World world) {
         if (this.y < 0 || this.y >= 256
-                || this.x < -30000000
-                || this.z < -30000000
-                || this.x >= 30000000
-                || this.z >= 30000000) {
+            || this.x < -30000000
+            || this.z < -30000000
+            || this.x >= 30000000
+            || this.z >= 30000000) {
             return null;
         }
 
         final int chunkx = this.x >> 4;
         final int chunkz = this.z >> 4;
         try {
-            if (world.getChunkProvider().chunkExists(chunkx, chunkz)) {
+            if (world.getChunkProvider()
+                .chunkExists(chunkx, chunkz)) {
                 // In a typical inner loop, 80% of the time consecutive calls to
                 // this will be within the same chunk
                 if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz
-                        && BlockVec3.chunkCacheDim == world.provider.dimensionId
-                        && BlockVec3.chunkCached.isChunkLoaded) {
+                    && BlockVec3.chunkCacheDim == world.provider.dimensionId
+                    && BlockVec3.chunkCached.isChunkLoaded) {
                     return BlockVec3.chunkCached.getBlock(this.x & 15, this.y, this.z & 15);
                 }
                 Chunk chunk = world.getChunkFromChunkCoords(chunkx, chunkz);
@@ -143,10 +144,10 @@ public class BlockVec3 implements Cloneable {
             return Blocks.bedrock;
         } catch (final Throwable throwable) {
             final CrashReport crashreport = CrashReport
-                    .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
+                .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
             final CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
             crashreportcategory
-                    .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
+                .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
             throw new ReportedException(crashreport);
         }
     }
@@ -171,12 +172,13 @@ public class BlockVec3 implements Cloneable {
         final int chunkx = this.x >> 4;
         final int chunkz = this.z >> 4;
         try {
-            if (world.getChunkProvider().chunkExists(chunkx, chunkz)) {
+            if (world.getChunkProvider()
+                .chunkExists(chunkx, chunkz)) {
                 // In a typical inner loop, 80% of the time consecutive calls to
                 // this will be within the same chunk
                 if (BlockVec3.chunkCacheX == chunkx && BlockVec3.chunkCacheZ == chunkz
-                        && BlockVec3.chunkCacheDim == world.provider.dimensionId
-                        && BlockVec3.chunkCached.isChunkLoaded) {
+                    && BlockVec3.chunkCacheDim == world.provider.dimensionId
+                    && BlockVec3.chunkCached.isChunkLoaded) {
                     return BlockVec3.chunkCached.getBlock(this.x & 15, this.y, this.z & 15);
                 }
                 Chunk chunk = world.getChunkFromChunkCoords(chunkx, chunkz);
@@ -190,10 +192,10 @@ public class BlockVec3 implements Cloneable {
             return Blocks.bedrock;
         } catch (final Throwable throwable) {
             final CrashReport crashreport = CrashReport
-                    .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
+                .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
             final CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
             crashreportcategory
-                    .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
+                .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
             throw new ReportedException(crashreport);
         }
     }
@@ -421,7 +423,8 @@ public class BlockVec3 implements Cloneable {
             default:
                 return false;
         }
-        return world.getBlock(x, y, z).isSideSolid(world, x, y, z, ForgeDirection.getOrientation(side ^ 1));
+        return world.getBlock(x, y, z)
+            .isSideSolid(world, x, y, z, ForgeDirection.getOrientation(side ^ 1));
     }
 
     /**
@@ -536,7 +539,8 @@ public class BlockVec3 implements Cloneable {
         final int chunkx = this.x >> 4;
         final int chunkz = this.z >> 4;
 
-        if (world.getChunkProvider().chunkExists(chunkx, chunkz)) {
+        if (world.getChunkProvider()
+            .chunkExists(chunkx, chunkz)) {
             return world.getTileEntity(this.x, this.y, this.z);
         }
 

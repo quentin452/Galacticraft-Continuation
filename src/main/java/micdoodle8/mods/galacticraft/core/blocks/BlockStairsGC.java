@@ -1,15 +1,14 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Arrays;
-import java.util.List;
-
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.IIcon;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import java.util.Arrays;
+import java.util.List;
 
 public class BlockStairsGC extends BlockStairs {
 
@@ -45,10 +44,10 @@ public class BlockStairsGC extends BlockStairs {
     @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         if (this.category == StairsCategoryGC.TIN1 || this.category == StairsCategoryGC.TIN2
-                || this.category == StairsCategoryGC.MOON_STONE
-                || this.category == StairsCategoryGC.MARS_COBBLESTONE
-                || this.category == StairsCategoryGC.MOON_BRICKS
-                || this.category == StairsCategoryGC.MARS_BRICKS) {
+            || this.category == StairsCategoryGC.MOON_STONE
+            || this.category == StairsCategoryGC.MARS_COBBLESTONE
+            || this.category == StairsCategoryGC.MOON_BRICKS
+            || this.category == StairsCategoryGC.MARS_BRICKS) {
             return GalacticraftCore.galacticraftBlocksTab;
         }
         return null;
@@ -73,7 +72,8 @@ public class BlockStairsGC extends BlockStairs {
         if (GalacticraftCore.isPlanetsLoaded) {
             try {
                 final String prefix = (String) Class.forName("micdoodle8.mods.galacticraft.planets.mars.MarsModule")
-                        .getField("TEXTURE_PREFIX").get(null);
+                    .getField("TEXTURE_PREFIX")
+                    .get(null);
                 if (this.category == StairsCategoryGC.MARS_COBBLESTONE) // Mars Cobblestone
                 {
                     this.blockIcon = par1IconRegister.registerIcon(prefix + "cobblestone");

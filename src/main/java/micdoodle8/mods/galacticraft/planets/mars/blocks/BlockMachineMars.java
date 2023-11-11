@@ -1,25 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.ForgeChunkManager.Type;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
@@ -40,6 +20,25 @@ import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityCryogenicChamber;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityLaunchController;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTerraformer;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeChunkManager;
+import net.minecraftforge.common.ForgeChunkManager.Type;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.List;
 
 public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc, IPartialSealableBlock {
 
@@ -111,11 +110,12 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
         }
         if (side == ForgeDirection.UP.ordinal() || side == ForgeDirection.DOWN.ordinal()) {
             return this.iconMachineSide;
-        } else if (side == ForgeDirection.getOrientation(metadata + 2).ordinal()) {
-            return this.iconInput;
-        } else {
-            return this.iconTerraformer;
-        }
+        } else if (side == ForgeDirection.getOrientation(metadata + 2)
+            .ordinal()) {
+                return this.iconInput;
+            } else {
+                return this.iconTerraformer;
+            }
     }
 
     /**
@@ -165,15 +165,15 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
                 if (entityLiving instanceof EntityPlayer) {
                     if (!world.isRemote) {
                         ((EntityPlayer) entityLiving).addChatMessage(
-                                new ChatComponentText(EnumColor.RED + GCCoreUtil.translate("gui.warning.noroom")));
+                            new ChatComponentText(EnumColor.RED + GCCoreUtil.translate("gui.warning.noroom")));
                     }
 
                     world.setBlockToAir(x, y, z);
                     ((EntityPlayer) entityLiving).inventory.addItemStackToInventory(
-                            new ItemStack(
-                                    Item.getItemFromBlock(MarsBlocks.machine),
-                                    1,
-                                    BlockMachineMars.CRYOGENIC_CHAMBER_METADATA));
+                        new ItemStack(
+                            Item.getItemFromBlock(MarsBlocks.machine),
+                            1,
+                            BlockMachineMars.CRYOGENIC_CHAMBER_METADATA));
                     return;
                 }
             } else {
@@ -217,20 +217,24 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
         }
 
         if (var8 instanceof IChunkLoader && !var8.getWorldObj().isRemote
-                && ConfigManagerMars.launchControllerChunkLoad
-                && entityLiving instanceof EntityPlayer) {
-            ((IChunkLoader) var8).setOwnerName(((EntityPlayer) entityLiving).getGameProfile().getName());
+            && ConfigManagerMars.launchControllerChunkLoad
+            && entityLiving instanceof EntityPlayer) {
+            ((IChunkLoader) var8).setOwnerName(
+                ((EntityPlayer) entityLiving).getGameProfile()
+                    .getName());
             ((IChunkLoader) var8).onTicketLoaded(
-                    ForgeChunkManager.requestTicket(GalacticraftCore.instance, var8.getWorldObj(), Type.NORMAL),
-                    true);
+                ForgeChunkManager.requestTicket(GalacticraftCore.instance, var8.getWorldObj(), Type.NORMAL),
+                true);
         } else if (var8 instanceof TileEntityLaunchController && entityLiving instanceof EntityPlayer) {
-            ((TileEntityLaunchController) var8).setOwnerName(((EntityPlayer) entityLiving).getGameProfile().getName());
+            ((TileEntityLaunchController) var8).setOwnerName(
+                ((EntityPlayer) entityLiving).getGameProfile()
+                    .getName());
         }
     }
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
         int original = metadata;
 
@@ -263,7 +267,7 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
         }
 
         if (metadata >= BlockMachineMars.LAUNCH_CONTROLLER_METADATA
-                || metadata < BlockMachineMars.CRYOGENIC_CHAMBER_METADATA) {
+            || metadata < BlockMachineMars.CRYOGENIC_CHAMBER_METADATA) {
             final TileEntity te = par1World.getTileEntity(x, y, z);
             if (te instanceof TileBaseUniversalElectrical) {
                 ((TileBaseUniversalElectrical) te).updateFacing();
@@ -279,11 +283,11 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
      */
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
 
         if (metadata >= BlockMachineMars.LAUNCH_CONTROLLER_METADATA
-                || metadata < BlockMachineMars.CRYOGENIC_CHAMBER_METADATA) {
+            || metadata < BlockMachineMars.CRYOGENIC_CHAMBER_METADATA) {
             par5EntityPlayer.openGui(GalacticraftPlanets.instance, GuiIdsPlanets.MACHINE_MARS, world, x, y, z);
             return true;
         }
@@ -354,11 +358,12 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
             final int metaAt = world.getBlockMetadata(x0, y0 + y, z0);
 
             if (y == 0 && blockAt == MarsBlocks.machine
-                    && metaAt >= BlockMachineMars.CRYOGENIC_CHAMBER_METADATA
-                    && metaAt < BlockMachineMars.LAUNCH_CONTROLLER_METADATA) {
+                && metaAt >= BlockMachineMars.CRYOGENIC_CHAMBER_METADATA
+                && metaAt < BlockMachineMars.LAUNCH_CONTROLLER_METADATA) {
                 continue;
             }
-            if (!blockAt.getMaterial().isReplaceable()) {
+            if (!blockAt.getMaterial()
+                .isReplaceable()) {
                 return false;
             }
         }
@@ -401,7 +406,7 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
     }
 
     public static ChunkCoordinates getNearestEmptyChunkCoordinates(World par0World, int par1, int par2, int par3,
-            int par4) {
+        int par4) {
         for (int k1 = 0; k1 <= 1; ++k1) {
             final int l1 = par1 - 1;
             final int i2 = par3 - 1;
@@ -411,8 +416,12 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
             for (int l2 = l1; l2 <= j2; ++l2) {
                 for (int i3 = i2; i3 <= k2; ++i3) {
                     if (World.doesBlockHaveSolidTopSurface(par0World, l2, par2 - 1, i3)
-                            && !par0World.getBlock(l2, par2, i3).getMaterial().isOpaque()
-                            && !par0World.getBlock(l2, par2 + 1, i3).getMaterial().isOpaque()) {
+                        && !par0World.getBlock(l2, par2, i3)
+                            .getMaterial()
+                            .isOpaque()
+                        && !par0World.getBlock(l2, par2 + 1, i3)
+                            .getMaterial()
+                            .isOpaque()) {
                         if (par4 <= 0) {
                             return new ChunkCoordinates(l2, par2, i3);
                         }

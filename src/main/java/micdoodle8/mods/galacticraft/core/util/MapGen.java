@@ -1,12 +1,8 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -14,12 +10,14 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.minecraft.world.gen.layer.GenLayer;
-
 import org.apache.commons.io.FileUtils;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 
 public class MapGen {
 
@@ -73,7 +71,7 @@ public class MapGen {
         // this.biomeMapWorld = new WeakReference<World>(world);
         try {
             final Field bil = this.biomeMapWCM.getClass()
-                    .getDeclaredField(VersionUtil.getNameDynamic(VersionUtil.KEY_FIELD_BIOMEINDEXLAYER));
+                .getDeclaredField(VersionUtil.getNameDynamic(VersionUtil.KEY_FIELD_BIOMEINDEXLAYER));
             bil.setAccessible(true);
             MapGen.biomeMapGenLayer = (GenLayer) bil.get(this.biomeMapWCM);
         } catch (final Exception e) {}
@@ -84,12 +82,13 @@ public class MapGen {
         }
 
         GCLog.debug(
-                "Starting map generation " + file.getName()
-                        + " top left "
-                        + (this.biomeMapCx - limitX) * 16
-                        + ","
-                        + (this.biomeMapCz - limitZ) * 16);
-        this.field_147435_p = world.getWorldInfo().getTerrainType();
+            "Starting map generation " + file.getName()
+                + " top left "
+                + (this.biomeMapCx - limitX) * 16
+                + ","
+                + (this.biomeMapCz - limitZ) * 16);
+        this.field_147435_p = world.getWorldInfo()
+            .getTerrainType();
         this.initialise(world.getSeed());
     }
 
@@ -112,9 +111,9 @@ public class MapGen {
     private void sendToClient(byte[] toSend) {
         try {
             GalacticraftCore.packetPipeline.sendToAll(
-                    new PacketSimple(
-                            EnumSimplePacket.C_SEND_OVERWORLD_IMAGE,
-                            new Object[] { this.biomeMapCx << 4, this.biomeMapCz << 4, toSend }));
+                new PacketSimple(
+                    EnumSimplePacket.C_SEND_OVERWORLD_IMAGE,
+                    new Object[] { this.biomeMapCx << 4, this.biomeMapCz << 4, toSend }));
         } catch (final Exception ex) {
             System.err.println("Error sending map image to player.");
             ex.printStackTrace();
@@ -138,23 +137,23 @@ public class MapGen {
             imagefactor = 1;
         }
         this.biomeMapOneChunk(
-                this.biomeMapCx + this.biomeMapx0,
-                this.biomeMapCz + this.biomeMapz0,
-                this.ix,
-                this.iz,
-                this.biomeMapFactor,
-                limit);
+            this.biomeMapCx + this.biomeMapx0,
+            this.biomeMapCz + this.biomeMapz0,
+            this.ix,
+            this.iz,
+            this.biomeMapFactor,
+            limit);
         this.biomeMapz0 += multifactor;
         this.iz += imagefactor;
         if (this.iz > this.biomeMapSizeZ - imagefactor) {
             this.iz = 0;
             if (this.ix % 25 == 8) {
                 GCLog.debug(
-                        "Finished map column " + this.ix
-                                + " at "
-                                + (this.biomeMapCx + this.biomeMapx0)
-                                + ","
-                                + (this.biomeMapCz + this.biomeMapz0));
+                    "Finished map column " + this.ix
+                        + " at "
+                        + (this.biomeMapCx + this.biomeMapx0)
+                        + ","
+                        + (this.biomeMapCz + this.biomeMapz0));
             }
             this.ix += imagefactor;
             this.biomeMapz0 = this.biomeMapz00;
@@ -241,7 +240,7 @@ public class MapGen {
     public void getHeightMap(int cx, int cz) {
         this.rand.setSeed(cx * 341873128712L + cz * 132897987541L);
         this.biomesGridHeights = this.biomeMapWCM
-                .getBiomesForGeneration(this.biomesGridHeights, cx * 4 - 2, cz * 4 - 2, 10, 10);
+            .getBiomesForGeneration(this.biomesGridHeights, cx * 4 - 2, cz * 4 - 2, 10, 10);
         this.func_147423_a(cx * 4, 0, cz * 4);
 
         final double d0 = 0.125D;
@@ -320,20 +319,20 @@ public class MapGen {
     private void func_147423_a(int cx, int cy, int cz) {
         noiseField4 = this.noiseGen4.generateNoiseOctaves(noiseField4, cx, cz, 5, 5, 200.0D, 200.0D, 0.5D);
         noiseField3 = this.noiseGen3.generateNoiseOctaves(
-                noiseField3,
-                cx,
-                cy,
-                cz,
-                5,
-                33,
-                5,
-                8.555150000000001D,
-                4.277575000000001D,
-                8.555150000000001D);
+            noiseField3,
+            cx,
+            cy,
+            cz,
+            5,
+            33,
+            5,
+            8.555150000000001D,
+            4.277575000000001D,
+            8.555150000000001D);
         noiseField1 = this.noiseGen1
-                .generateNoiseOctaves(noiseField1, cx, cy, cz, 5, 33, 5, 684.412D, 684.412D, 684.412D);
+            .generateNoiseOctaves(noiseField1, cx, cy, cz, 5, 33, 5, 684.412D, 684.412D, 684.412D);
         noiseField2 = this.noiseGen2
-                .generateNoiseOctaves(noiseField2, cx, cy, cz, 5, 33, 5, 684.412D, 684.412D, 684.412D);
+            .generateNoiseOctaves(noiseField2, cx, cy, cz, 5, 33, 5, 684.412D, 684.412D, 684.412D);
         int l = 2;
         int i1 = 0;
         final boolean amplified = this.field_147435_p == WorldType.AMPLIFIED;

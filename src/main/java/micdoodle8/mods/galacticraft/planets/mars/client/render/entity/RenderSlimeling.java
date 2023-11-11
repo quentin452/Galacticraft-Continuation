@@ -1,15 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.entity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -18,13 +8,21 @@ import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiSlimeling;
 import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiSlimelingInventory;
 import micdoodle8.mods.galacticraft.planets.mars.client.model.ModelSlimeling;
 import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderLiving;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class RenderSlimeling extends RenderLiving {
 
     private static final ResourceLocation landerTexture = new ResourceLocation(
-            MarsModule.ASSET_PREFIX,
-            "textures/model/slimeling/green.png");
+        MarsModule.ASSET_PREFIX,
+        "textures/model/slimeling/green.png");
 
     public RenderSlimeling() {
         super(new ModelSlimeling(16), 0.5F);
@@ -75,23 +73,23 @@ public class RenderSlimeling extends RenderLiving {
 
     @Override
     protected void passSpecialRender(EntityLivingBase par1EntityLivingBase, double par2, double par4, double par6) {
-        final Minecraft mc = FMLClientHandler.instance().getClient();
+        final Minecraft mc = FMLClientHandler.instance()
+            .getClient();
 
         if (!mc.gameSettings.hideGUI && !par1EntityLivingBase.isInvisible()
-                && (mc.currentScreen == null
-                        || !(mc.currentScreen instanceof GuiSlimeling)
-                                && !(mc.currentScreen instanceof GuiSlimelingInventory)
-                        || !GuiSlimeling.renderingOnGui)) {
+            && (mc.currentScreen == null
+                || !(mc.currentScreen instanceof GuiSlimeling) && !(mc.currentScreen instanceof GuiSlimelingInventory)
+                || !GuiSlimeling.renderingOnGui)) {
             this.renderLivingLabelWithColor(
-                    par1EntityLivingBase,
-                    ((EntitySlimeling) par1EntityLivingBase).getName(),
-                    par2,
-                    par4 + 0.33,
-                    par6,
-                    64,
-                    0,
-                    0,
-                    0);
+                par1EntityLivingBase,
+                ((EntitySlimeling) par1EntityLivingBase).getName(),
+                par2,
+                par4 + 0.33,
+                par6,
+                64,
+                0,
+                0,
+                0);
             int health = (int) Math.floor(par1EntityLivingBase.getHealth() + 0.6D);
             final int maxHealth = (int) par1EntityLivingBase.getMaxHealth();
             if (health > maxHealth) {
@@ -101,37 +99,37 @@ public class RenderSlimeling extends RenderLiving {
 
             if (difference < 0.33333F) {
                 this.renderLivingLabelWithColor(
-                        par1EntityLivingBase,
-                        "" + health + " / " + maxHealth,
-                        par2,
-                        par4,
-                        par6,
-                        64,
-                        1,
-                        0,
-                        0);
+                    par1EntityLivingBase,
+                    "" + health + " / " + maxHealth,
+                    par2,
+                    par4,
+                    par6,
+                    64,
+                    1,
+                    0,
+                    0);
             } else if (difference < 0.66666F) {
                 this.renderLivingLabelWithColor(
-                        par1EntityLivingBase,
-                        "" + health + " / " + maxHealth,
-                        par2,
-                        par4,
-                        par6,
-                        64,
-                        1,
-                        1,
-                        0);
+                    par1EntityLivingBase,
+                    "" + health + " / " + maxHealth,
+                    par2,
+                    par4,
+                    par6,
+                    64,
+                    1,
+                    1,
+                    0);
             } else {
                 this.renderLivingLabelWithColor(
-                        par1EntityLivingBase,
-                        "" + health + " / " + maxHealth,
-                        par2,
-                        par4,
-                        par6,
-                        64,
-                        0,
-                        1,
-                        0);
+                    par1EntityLivingBase,
+                    "" + health + " / " + maxHealth,
+                    par2,
+                    par4,
+                    par6,
+                    64,
+                    0,
+                    1,
+                    0);
             }
         }
 
@@ -141,7 +139,7 @@ public class RenderSlimeling extends RenderLiving {
     }
 
     protected void renderLivingLabelWithColor(EntityLivingBase par1EntityLivingBase, String par2Str, double par3,
-            double par5, double par7, int par9, float cR, float cG, float cB) {
+        double par5, double par7, int par9, float cR, float cG, float cB) {
         final double d3 = par1EntityLivingBase.getDistanceSqToEntity(this.renderManager.livingPlayer);
 
         if (d3 <= par9 * par9) {

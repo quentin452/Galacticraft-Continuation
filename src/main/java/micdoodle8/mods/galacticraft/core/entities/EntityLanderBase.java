@@ -1,10 +1,14 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import io.netty.buffer.ByteBuf;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
+import micdoodle8.mods.galacticraft.core.inventory.IInventorySettable;
+import micdoodle8.mods.galacticraft.core.network.PacketDynamic;
+import micdoodle8.mods.galacticraft.core.network.PacketDynamicInventory;
+import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -18,15 +22,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import io.netty.buffer.ByteBuf;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.inventory.IInventorySettable;
-import micdoodle8.mods.galacticraft.core.network.PacketDynamic;
-import micdoodle8.mods.galacticraft.core.network.PacketDynamicInventory;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class EntityLanderBase extends EntityAdvancedMotion implements IInventorySettable, IScaleableFuelLevel {
 
@@ -49,9 +48,9 @@ public abstract class EntityLanderBase extends EntityAdvancedMotion implements I
     public void updateRiderPosition() {
         if (this.riddenByEntity != null) {
             this.riddenByEntity.setPosition(
-                    this.posX,
-                    this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(),
-                    this.posZ);
+                this.posX,
+                this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(),
+                this.posZ);
         }
     }
 
@@ -318,15 +317,20 @@ public abstract class EntityLanderBase extends EntityAdvancedMotion implements I
                 final int shouldBeMountedId = buffer.readInt();
                 if (this.riddenByEntity == null) {
                     if (shouldBeMountedId > -1) {
-                        Entity e = FMLClientHandler.instance().getWorldClient().getEntityByID(shouldBeMountedId);
+                        Entity e = FMLClientHandler.instance()
+                            .getWorldClient()
+                            .getEntityByID(shouldBeMountedId);
                         if (e != null) {
                             if (e.dimension != this.dimension) {
                                 if (e instanceof EntityPlayer) {
                                     e = WorldUtil.forceRespawnClient(
-                                            this.dimension,
-                                            e.worldObj.difficultySetting.getDifficultyId(),
-                                            e.worldObj.getWorldInfo().getTerrainType().getWorldTypeName(),
-                                            ((EntityPlayerMP) e).theItemInWorldManager.getGameType().getID());
+                                        this.dimension,
+                                        e.worldObj.difficultySetting.getDifficultyId(),
+                                        e.worldObj.getWorldInfo()
+                                            .getTerrainType()
+                                            .getWorldTypeName(),
+                                        ((EntityPlayerMP) e).theItemInWorldManager.getGameType()
+                                            .getID());
                                     e.mountEntity(this);
                                 }
                             } else {
@@ -338,15 +342,20 @@ public abstract class EntityLanderBase extends EntityAdvancedMotion implements I
                     if (shouldBeMountedId == -1) {
                         this.riddenByEntity.mountEntity(null);
                     } else {
-                        Entity e = FMLClientHandler.instance().getWorldClient().getEntityByID(shouldBeMountedId);
+                        Entity e = FMLClientHandler.instance()
+                            .getWorldClient()
+                            .getEntityByID(shouldBeMountedId);
                         if (e != null) {
                             if (e.dimension != this.dimension) {
                                 if (e instanceof EntityPlayer) {
                                     e = WorldUtil.forceRespawnClient(
-                                            this.dimension,
-                                            e.worldObj.difficultySetting.getDifficultyId(),
-                                            e.worldObj.getWorldInfo().getTerrainType().getWorldTypeName(),
-                                            ((EntityPlayerMP) e).theItemInWorldManager.getGameType().getID());
+                                        this.dimension,
+                                        e.worldObj.difficultySetting.getDifficultyId(),
+                                        e.worldObj.getWorldInfo()
+                                            .getTerrainType()
+                                            .getWorldTypeName(),
+                                        ((EntityPlayerMP) e).theItemInWorldManager.getGameType()
+                                            .getID());
                                     e.mountEntity(this);
                                 }
                             } else {

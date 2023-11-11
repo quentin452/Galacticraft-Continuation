@@ -1,25 +1,23 @@
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.client.model.ModelAlienVillager;
 import micdoodle8.mods.galacticraft.core.entities.EntityAlienVillager;
+import net.minecraft.client.renderer.entity.RenderLiving;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class RenderAlienVillager extends RenderLiving {
 
     private static final ResourceLocation villagerTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/villager.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/villager.png");
 
     protected ModelAlienVillager villagerModel;
 
@@ -33,7 +31,7 @@ public class RenderAlienVillager extends RenderLiving {
     }
 
     public void renderVillager(EntityAlienVillager par1EntityVillager, double par2, double par4, double par6,
-            float par8, float par9) {
+        float par8, float par9) {
         super.doRender(par1EntityVillager, par2, par4, par6, par8, par9);
     }
 
@@ -76,7 +74,7 @@ public class RenderAlienVillager extends RenderLiving {
 
     @Override
     public void doRender(EntityLivingBase par1EntityLivingBase, double par2, double par4, double par6, float par8,
-            float par9) {
+        float par9) {
         this.renderVillager((EntityAlienVillager) par1EntityLivingBase, par2, par4, par6, par8, par9);
     }
 

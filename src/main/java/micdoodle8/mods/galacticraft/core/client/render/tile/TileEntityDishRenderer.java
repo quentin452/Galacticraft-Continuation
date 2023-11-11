@@ -1,5 +1,8 @@
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityDish;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
@@ -7,32 +10,28 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityDish;
 
 public class TileEntityDishRenderer extends TileEntitySpecialRenderer {
 
     private static final ResourceLocation textureSupport = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/telesupport.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/telesupport.png");
     private static final ResourceLocation textureFork = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/telefork.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/telefork.png");
     private static final ResourceLocation textureDish = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/teledish.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/teledish.png");
     private static final IModelCustom modelSupport = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/telesupport.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/telesupport.obj"));
     private static final IModelCustom modelFork = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/telefork.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/telefork.obj"));
     private static final IModelCustom modelDish = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/teledish.obj"));
-    private final TextureManager renderEngine = FMLClientHandler.instance().getClient().renderEngine;
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/teledish.obj"));
+    private final TextureManager renderEngine = FMLClientHandler.instance()
+        .getClient().renderEngine;
 
     @Override
     public void renderTileEntityAt(TileEntity var1, double par2, double par4, double par6, float partialTickTime) {

@@ -1,7 +1,10 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -13,19 +16,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S2BPacketChangeGameState;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import java.util.List;
 
 public class EntityMeteorChunk extends Entity implements IProjectile {
 
@@ -60,7 +54,7 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
     }
 
     public EntityMeteorChunk(World world, EntityLivingBase shootingEntity, EntityLivingBase target, float speed,
-            float randMod) {
+        float randMod) {
         super(world);
         this.renderDistanceWeight = 10.0D;
         this.shootingEntity = shootingEntity;
@@ -98,20 +92,20 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
 
         this.setSize(0.5F, 0.5F);
         this.setLocationAndAngles(
-                par2EntityLivingBase.posX,
-                par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight(),
-                par2EntityLivingBase.posZ,
-                par2EntityLivingBase.rotationYaw,
-                par2EntityLivingBase.rotationPitch);
+            par2EntityLivingBase.posX,
+            par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight(),
+            par2EntityLivingBase.posZ,
+            par2EntityLivingBase.rotationYaw,
+            par2EntityLivingBase.rotationPitch);
         this.posX -= MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
         this.posY -= 0.10000000149011612D;
         this.posZ -= MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
         this.setPosition(this.posX, this.posY, this.posZ);
         this.yOffset = 0.0F;
         this.motionX = -MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI)
-                * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI);
+            * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI);
         this.motionZ = MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI)
-                * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI);
+            * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI);
         this.motionY = -MathHelper.sin(this.rotationPitch / 180.0F * (float) Math.PI);
         this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, speed * 1.5F, 1.0F);
     }
@@ -171,7 +165,7 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
             final float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
             this.prevRotationYaw = this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D
-                    / Math.PI);
+                / Math.PI);
             this.prevRotationPitch = this.rotationPitch = (float) (Math.atan2(this.motionY, f) * 180.0D / Math.PI);
         }
 
@@ -180,10 +174,10 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
         if (block != null && !block.isAir(this.worldObj, this.xTile, this.yTile, this.zTile)) {
             block.setBlockBoundsBasedOnState(this.worldObj, this.xTile, this.yTile, this.zTile);
             final AxisAlignedBB axisalignedbb = block
-                    .getCollisionBoundingBoxFromPool(this.worldObj, this.xTile, this.yTile, this.zTile);
+                .getCollisionBoundingBoxFromPool(this.worldObj, this.xTile, this.yTile, this.zTile);
 
             if (axisalignedbb != null
-                    && axisalignedbb.isVecInside(Vec3.createVectorHelper(this.posX, this.posY, this.posZ))) {
+                && axisalignedbb.isVecInside(Vec3.createVectorHelper(this.posX, this.posY, this.posZ))) {
                 this.inGround = true;
             }
         }
@@ -210,25 +204,26 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
             ++this.ticksInAir;
             Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
             Vec3 vec31 = Vec3
-                    .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+                .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
             MovingObjectPosition movingobjectposition = this.worldObj.func_147447_a(vec3, vec31, false, true, false);
             vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
             vec31 = Vec3
-                    .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+                .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
             if (movingobjectposition != null) {
                 vec31 = Vec3.createVectorHelper(
-                        movingobjectposition.hitVec.xCoord,
-                        movingobjectposition.hitVec.yCoord,
-                        movingobjectposition.hitVec.zCoord);
+                    movingobjectposition.hitVec.xCoord,
+                    movingobjectposition.hitVec.yCoord,
+                    movingobjectposition.hitVec.zCoord);
             }
 
             this.rotationPitch += 1F;
 
             Entity entity = null;
             final List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity(
-                    this,
-                    this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+                this,
+                this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ)
+                    .expand(1.0D, 1.0D, 1.0D));
             double d0 = 0.0D;
             int l;
             float f1;
@@ -274,7 +269,7 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
             if (movingobjectposition != null) {
                 if (movingobjectposition.entityHit != null) {
                     f2 = MathHelper.sqrt_double(
-                            this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+                        this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
                     final int i1 = MathHelper.ceiling_double_int(f2 * damage);
 
                     DamageSource damagesource = null;
@@ -283,7 +278,7 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
                         damagesource = new EntityDamageSourceIndirect("meteorChunk", this, this).setProjectile();
                     } else {
                         damagesource = new EntityDamageSourceIndirect("meteorChunk", this, this.shootingEntity)
-                                .setProjectile();
+                            .setProjectile();
                     }
 
                     if (this.isBurning() && !(movingobjectposition.entityHit instanceof EntityEnderman)) {
@@ -302,23 +297,23 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
 
                                 if (f3 > 0.0F) {
                                     movingobjectposition.entityHit.addVelocity(
-                                            this.motionX * this.knockbackStrength * 0.6000000238418579D / f3,
-                                            0.1D,
-                                            this.motionZ * this.knockbackStrength * 0.6000000238418579D / f3);
+                                        this.motionX * this.knockbackStrength * 0.6000000238418579D / f3,
+                                        0.1D,
+                                        this.motionZ * this.knockbackStrength * 0.6000000238418579D / f3);
                                 }
                             }
 
                             if (this.shootingEntity != null) {
                                 EnchantmentHelper.func_151384_a(entitylivingbase, this.shootingEntity);
                                 EnchantmentHelper
-                                        .func_151385_b((EntityLivingBase) this.shootingEntity, entitylivingbase);
+                                    .func_151385_b((EntityLivingBase) this.shootingEntity, entitylivingbase);
                             }
 
                             if (this.shootingEntity != null && movingobjectposition.entityHit != this.shootingEntity
-                                    && movingobjectposition.entityHit instanceof EntityPlayer
-                                    && this.shootingEntity instanceof EntityPlayerMP) {
+                                && movingobjectposition.entityHit instanceof EntityPlayer
+                                && this.shootingEntity instanceof EntityPlayerMP) {
                                 ((EntityPlayerMP) this.shootingEntity).playerNetServerHandler
-                                        .sendPacket(new S2BPacketChangeGameState(6, 0.0F));
+                                    .sendPacket(new S2BPacketChangeGameState(6, 0.0F));
                             }
                         }
 
@@ -343,7 +338,7 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
                     this.motionY = (float) (movingobjectposition.hitVec.yCoord - this.posY);
                     this.motionZ = (float) (movingobjectposition.hitVec.zCoord - this.posZ);
                     f2 = MathHelper.sqrt_double(
-                            this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+                        this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
                     this.posX -= this.motionX / f2 * 0.05000000074505806D;
                     this.posY -= this.motionY / f2 * 0.05000000074505806D;
                     this.posZ -= this.motionZ / f2 * 0.05000000074505806D;
@@ -372,13 +367,13 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
                 for (int j1 = 0; j1 < 4; ++j1) {
                     f3 = 0.25F;
                     this.worldObj.spawnParticle(
-                            "bubble",
-                            this.posX - this.motionX * f3,
-                            this.posY - this.motionY * f3,
-                            this.posZ - this.motionZ * f3,
-                            this.motionX,
-                            this.motionY,
-                            this.motionZ);
+                        "bubble",
+                        this.posX - this.motionX * f3,
+                        this.posY - this.motionY * f3,
+                        this.posZ - this.motionZ * f3,
+                        this.motionX,
+                        this.motionY,
+                        this.motionZ);
                 }
 
                 f4 = 0.8F;
@@ -416,18 +411,18 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
     public void onCollideWithPlayer(EntityPlayer par1EntityPlayer) {
         if (!this.worldObj.isRemote && this.inGround) {
             boolean flag = this.canBePickedUp == 1
-                    || this.canBePickedUp == 2 && par1EntityPlayer.capabilities.isCreativeMode;
+                || this.canBePickedUp == 2 && par1EntityPlayer.capabilities.isCreativeMode;
 
             if (this.canBePickedUp == 1
-                    && !par1EntityPlayer.inventory.addItemStackToInventory(new ItemStack(GCItems.meteorChunk, 1, 0))) {
+                && !par1EntityPlayer.inventory.addItemStackToInventory(new ItemStack(GCItems.meteorChunk, 1, 0))) {
                 flag = false;
             }
 
             if (flag) {
                 this.playSound(
-                        "random.pop",
-                        0.2F,
-                        ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                    "random.pop",
+                    0.2F,
+                    ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 par1EntityPlayer.onItemPickup(this, 1);
                 this.setDead();
             }

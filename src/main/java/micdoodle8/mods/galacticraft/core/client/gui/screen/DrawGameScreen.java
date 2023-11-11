@@ -1,5 +1,9 @@
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
+import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
+import micdoodle8.mods.galacticraft.api.client.IScreenManager;
+import micdoodle8.mods.galacticraft.core.util.GCLog;
+import micdoodle8.mods.galacticraft.core.util.MapUtil;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -7,13 +11,7 @@ import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldProvider;
-
 import org.lwjgl.opengl.GL11;
-
-import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
-import micdoodle8.mods.galacticraft.api.client.IScreenManager;
-import micdoodle8.mods.galacticraft.core.util.GCLog;
-import micdoodle8.mods.galacticraft.core.util.MapUtil;
 
 public class DrawGameScreen extends IScreenManager {
 
@@ -61,10 +59,10 @@ public class DrawGameScreen extends IScreenManager {
         }
         this.localMap = new int[MapUtil.SIZE_STD2 * MapUtil.SIZE_STD2];
         final boolean result = MapUtil
-                .getMap(this.localMap, this.driver.getWorldObj(), this.driver.xCoord, this.driver.zCoord);
+            .getMap(this.localMap, this.driver.getWorldObj(), this.driver.xCoord, this.driver.zCoord);
         if (result) {
             TextureUtil
-                    .uploadTexture(reusableMap.getGlTextureId(), this.localMap, MapUtil.SIZE_STD2, MapUtil.SIZE_STD2);
+                .uploadTexture(reusableMap.getGlTextureId(), this.localMap, MapUtil.SIZE_STD2, MapUtil.SIZE_STD2);
             this.mapDone = true;
             GCLog.debug("Created texture no:" + texCount++);
         }
@@ -152,7 +150,8 @@ public class DrawGameScreen extends IScreenManager {
             GL11.glDisable(GL11.GL_LIGHTING);
         }
 
-        GalacticraftRegistry.getGameScreen(type).render(type, ticks, this.scaleX, this.scaleZ, this);
+        GalacticraftRegistry.getGameScreen(type)
+            .render(type, ticks, this.scaleX, this.scaleZ, this);
 
         if (type > 0) {
             GL11.glEnable(GL11.GL_LIGHTING);

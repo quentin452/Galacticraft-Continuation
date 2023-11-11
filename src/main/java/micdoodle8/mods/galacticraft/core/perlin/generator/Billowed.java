@@ -1,9 +1,9 @@
 package micdoodle8.mods.galacticraft.core.perlin.generator;
 
-import java.util.Random;
-
 import micdoodle8.mods.galacticraft.core.perlin.FishyNoise;
 import micdoodle8.mods.galacticraft.core.perlin.NoiseModule;
+
+import java.util.Random;
 
 public class Billowed extends NoiseModule {
 
@@ -43,8 +43,7 @@ public class Billowed extends NoiseModule {
         j *= this.frequencyY;
         if (this.numOctaves == 2) {
             return Math.abs(this.noiseGen.noise2d(i + this.offsetX, j + this.offsetY) * this.amplitude) + Math.abs(
-                    this.noiseGen.noise2d(i + i + this.offsetX, j + j + this.offsetY) * this.amplitude
-                            * this.persistance);
+                this.noiseGen.noise2d(i + i + this.offsetX, j + j + this.offsetY) * this.amplitude * this.persistance);
         }
 
         float val = 0;
@@ -66,7 +65,7 @@ public class Billowed extends NoiseModule {
         float val = 0;
         for (int n = 0; n < this.numOctaves; n++) {
             val += Math
-                    .abs(this.noiseGen.noise3d(i + this.offsetX, j + this.offsetY, k + this.offsetZ) * this.amplitude);
+                .abs(this.noiseGen.noise3d(i + this.offsetX, j + this.offsetY, k + this.offsetZ) * this.amplitude);
             i *= 2;
             j *= 2;
             k *= 2;

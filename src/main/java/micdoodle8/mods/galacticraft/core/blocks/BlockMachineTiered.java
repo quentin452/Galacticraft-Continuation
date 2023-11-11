@@ -1,7 +1,11 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricFurnace;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityEnergyStorageModule;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -16,12 +20,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricFurnace;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityEnergyStorageModule;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class BlockMachineTiered extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -70,7 +69,7 @@ public class BlockMachineTiered extends BlockTileGC implements ItemBlockDesc.IBl
 
         for (int i = 0; i < this.iconEnergyStorageModule.length; i++) {
             this.iconEnergyStorageModule[i] = iconRegister
-                    .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "energyStorageModule_" + i);
+                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "energyStorageModule_" + i);
         }
 
         this.iconElectricFurnace = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "electricFurnace");
@@ -78,8 +77,9 @@ public class BlockMachineTiered extends BlockTileGC implements ItemBlockDesc.IBl
         if (GalacticraftCore.isPlanetsLoaded) {
             try {
                 final String prefix = (String) Class
-                        .forName("micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule")
-                        .getField("TEXTURE_PREFIX").get(null);
+                    .forName("micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule")
+                    .getField("TEXTURE_PREFIX")
+                    .get(null);
                 this.iconTier2 = iconRegister.registerIcon(prefix + "machine");
                 this.iconInputT2 = iconRegister.registerIcon(prefix + "machine_input");
                 this.iconOutputT2 = iconRegister.registerIcon(prefix + "machine_output");
@@ -197,8 +197,8 @@ public class BlockMachineTiered extends BlockTileGC implements ItemBlockDesc.IBl
             return this.iconInput;
         }
         if (metaside == 2 && side == 4 || metaside == 3 && side == 5
-                || metaside == 4 && side == 3
-                || metaside == 5 && side == 2) {
+            || metaside == 4 && side == 3
+            || metaside == 5 && side == 2) {
             if (metadata >= 8) {
                 return this.iconElectricFurnaceT2;
             }
@@ -241,7 +241,7 @@ public class BlockMachineTiered extends BlockTileGC implements ItemBlockDesc.IBl
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
         final int original = metadata & 3;
         int change = 0;
@@ -276,7 +276,7 @@ public class BlockMachineTiered extends BlockTileGC implements ItemBlockDesc.IBl
      */
     @Override
     public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         if (!par1World.isRemote) {
             par5EntityPlayer.openGui(GalacticraftCore.instance, -1, par1World, x, y, z);
         }

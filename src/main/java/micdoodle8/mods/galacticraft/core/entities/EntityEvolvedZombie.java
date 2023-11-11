@@ -1,16 +1,11 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
+import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackOnCollide;
-import net.minecraft.entity.ai.EntityAIBreakDoor;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAIMoveThroughVillage;
-import net.minecraft.entity.ai.EntityAIMoveTowardsRestriction;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
+import net.minecraft.entity.ai.*;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
@@ -23,17 +18,13 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
-import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
-
 public class EntityEvolvedZombie extends EntityZombie implements IEntityBreathable {
 
     public EntityEvolvedZombie(World par1World) {
         super(par1World);
         this.tasks.taskEntries.clear();
-        this.getNavigator().setBreakDoors(true);
+        this.getNavigator()
+            .setBreakDoors(true);
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(1, new EntityAIBreakDoor(this));
         this.tasks.addTask(2, new EntityAIAttackOnCollide(this, EntityPlayer.class, 0.36F, false));
@@ -51,13 +42,14 @@ public class EntityEvolvedZombie extends EntityZombie implements IEntityBreathab
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(30.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
+            .setBaseValue(30.0D);
         this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
-                .setBaseValue(ConfigManagerCore.hardMode ? 1.06F : 0.96F);
+            .setBaseValue(ConfigManagerCore.hardMode ? 1.06F : 0.96F);
         this.getEntityAttribute(SharedMonsterAttributes.attackDamage)
-                .setBaseValue(ConfigManagerCore.hardMode ? 5.0D : 3.0D);
+            .setBaseValue(ConfigManagerCore.hardMode ? 5.0D : 3.0D);
         this.getEntityAttribute(SharedMonsterAttributes.followRange)
-                .setBaseValue(ConfigManagerCore.hardMode ? 20.0D : 16.0D);
+            .setBaseValue(ConfigManagerCore.hardMode ? 20.0D : 16.0D);
     }
 
     @Override
@@ -77,7 +69,8 @@ public class EntityEvolvedZombie extends EntityZombie implements IEntityBreathab
         }
 
         if (this.isPotionActive(Potion.jump)) {
-            this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
+            this.motionY += (this.getActivePotionEffect(Potion.jump)
+                .getAmplifier() + 1) * 0.1F;
         }
 
         if (this.isSprinting()) {

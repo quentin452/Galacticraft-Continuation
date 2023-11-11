@@ -1,22 +1,21 @@
 package micdoodle8.mods.galacticraft.planets.mars.entities;
 
+import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
+import micdoodle8.mods.galacticraft.core.util.ColorUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.core.util.VersionUtil;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModuleClient;
+import micdoodle8.mods.galacticraft.planets.mars.inventory.InventorySlimeling;
+import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackOnCollide;
-import net.minecraft.entity.ai.EntityAIFollowOwner;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILeapAtTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAIMate;
-import net.minecraft.entity.ai.EntityAIOwnerHurtByTarget;
-import net.minecraft.entity.ai.EntityAIOwnerHurtTarget;
-import net.minecraft.entity.ai.EntityAISit;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAITargetNonTamed;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
+import net.minecraft.entity.ai.*;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -39,18 +38,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
-import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.util.ColorUtil;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.VersionUtil;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModuleClient;
-import micdoodle8.mods.galacticraft.planets.mars.inventory.InventorySlimeling;
-import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
-
 public class EntitySlimeling extends EntityTameable implements IEntityBreathable {
 
     public InventorySlimeling slimelingInventory = new InventorySlimeling(this);
@@ -69,7 +56,8 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
     public EntitySlimeling(World par1World) {
         super(par1World);
         this.setSize(0.45F, 0.7F);
-        this.getNavigator().setAvoidsWater(true);
+        this.getNavigator()
+            .setAvoidsWater(true);
         this.tasks.addTask(1, new EntityAISwimming(this));
         this.aiSit = new EntityAISitGC(this);
         this.tasks.addTask(2, this.aiSit);
@@ -182,8 +170,10 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896D);
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(this.getMaxHealthSlimeling());
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
+            .setBaseValue(0.30000001192092896D);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
+            .setBaseValue(this.getMaxHealthSlimeling());
     }
 
     @Override
@@ -303,9 +293,11 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
         }
 
         if (!this.worldObj.isRemote) {
-            this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(this.getMaxHealthSlimeling());
+            this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
+                .setBaseValue(this.getMaxHealthSlimeling());
 
-            if (this.getOwnerUsername().isEmpty()) {
+            if (this.getOwnerUsername()
+                .isEmpty()) {
                 final EntityLivingBase owner = this.getOwner();
 
                 if (owner != null) {
@@ -355,7 +347,8 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
     @Override
     public void setTamed(boolean par1) {
         super.setTamed(par1);
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(this.getMaxHealthSlimeling());
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
+            .setBaseValue(this.getMaxHealthSlimeling());
     }
 
     @Override
@@ -369,7 +362,7 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
 
                     if (itemstack.stackSize <= 0) {
                         par1EntityPlayer.inventory
-                                .setInventorySlotContents(par1EntityPlayer.inventory.currentItem, null);
+                            .setInventorySlotContents(par1EntityPlayer.inventory.currentItem, null);
                     }
 
                     if (this.worldObj.isRemote) {
@@ -384,7 +377,7 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
                         final GCPlayerStats stats = GCPlayerStats.get((EntityPlayerMP) par1EntityPlayer);
                         if (stats.chatCooldown == 0) {
                             par1EntityPlayer.addChatMessage(
-                                    new ChatComponentText(GCCoreUtil.translate("gui.slimeling.chat.wrongPlayer")));
+                                new ChatComponentText(GCCoreUtil.translate("gui.slimeling.chat.wrongPlayer")));
                             stats.chatCooldown = 100;
                         }
                     }
@@ -412,9 +405,9 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
                     this.setSittingAI(true);
                     this.setHealth(20.0F);
                     VersionUtil.setSlimelingOwner(
-                            this,
-                            VersionUtil.mcVersion1_7_10 ? par1EntityPlayer.getUniqueID().toString()
-                                    : VersionUtil.mcVersion1_7_2 ? par1EntityPlayer.getCommandSenderName() : "");
+                        this,
+                        VersionUtil.mcVersion1_7_10 ? par1EntityPlayer.getUniqueID()
+                            .toString() : VersionUtil.mcVersion1_7_2 ? par1EntityPlayer.getCommandSenderName() : "");
                     this.setOwnerUsername(par1EntityPlayer.getCommandSenderName());
                     this.playTameEffect(true);
                     this.worldObj.setEntityState(this, (byte) 7);
@@ -468,13 +461,15 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
 
             String s = VersionUtil.getSlimelingOwner(this);
 
-            if (s != null && s.trim().length() > 0) {
+            if (s != null && s.trim()
+                .length() > 0) {
                 VersionUtil.setSlimelingOwner(newSlimeling, s);
                 newSlimeling.setOwnerUsername(this.getOwnerUsername());
                 newSlimeling.setTamed(true);
             } else {
                 s = VersionUtil.getSlimelingOwner(otherSlimeling);
-                if (s != null && s.trim().length() > 0) {
+                if (s != null && s.trim()
+                    .length() > 0) {
                     VersionUtil.setSlimelingOwner(newSlimeling, s);
                     newSlimeling.setOwnerUsername(this.getOwnerUsername());
                     newSlimeling.setTamed(true);
@@ -510,8 +505,8 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
         }
 
         return (!(par1EntityLivingBase instanceof EntityPlayer) || !(par2EntityLivingBase instanceof EntityPlayer)
-                || ((EntityPlayer) par2EntityLivingBase).canAttackPlayer((EntityPlayer) par1EntityLivingBase))
-                && (!(par1EntityLivingBase instanceof EntityHorse) || !((EntityHorse) par1EntityLivingBase).isTame());
+            || ((EntityPlayer) par2EntityLivingBase).canAttackPlayer((EntityPlayer) par1EntityLivingBase))
+            && (!(par1EntityLivingBase instanceof EntityHorse) || !((EntityHorse) par1EntityLivingBase).isTame());
     }
 
     @Override
@@ -641,12 +636,13 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
             }
             final EntityLivingBase entitylivingbase = this.theEntity.getOwner();
             return entitylivingbase == null || (this.theEntity.getDistanceSqToEntity(entitylivingbase) >= 144.0D
-                    || entitylivingbase.getAITarget() == null) && this.isSitting;
+                || entitylivingbase.getAITarget() == null) && this.isSitting;
         }
 
         @Override
         public void startExecuting() {
-            this.theEntity.getNavigator().clearPathEntity();
+            this.theEntity.getNavigator()
+                .clearPathEntity();
             this.theEntity.setSitting(true);
         }
 
@@ -669,7 +665,8 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
         }
 
         if (this.isPotionActive(Potion.jump)) {
-            this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
+            this.motionY += (this.getActivePotionEffect(Potion.jump)
+                .getAmplifier() + 1) * 0.1F;
         }
 
         if (this.isSprinting()) {

@@ -1,8 +1,6 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -14,7 +12,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import java.util.List;
+import java.util.Random;
 
 public class BlockSlabGC extends BlockSlab {
 
@@ -42,7 +41,8 @@ public class BlockSlabGC extends BlockSlab {
         if (GalacticraftCore.isPlanetsLoaded) {
             try {
                 final String prefix = (String) Class.forName("micdoodle8.mods.galacticraft.planets.mars.MarsModule")
-                        .getField("TEXTURE_PREFIX").get(null);
+                    .getField("TEXTURE_PREFIX")
+                    .get(null);
                 this.textures[4] = par1IconRegister.registerIcon(prefix + "cobblestone");
                 this.textures[5] = par1IconRegister.registerIcon(prefix + "brick");
             } catch (final Exception e) {
@@ -96,7 +96,9 @@ public class BlockSlabGC extends BlockSlab {
 
     @Override
     public String func_150002_b(int meta) {
-        return new StringBuilder().append(woodTypes[this.getWoodType(meta)]).append("Slab").toString();
+        return new StringBuilder().append(woodTypes[this.getWoodType(meta)])
+            .append("Slab")
+            .toString();
     }
 
     @Override
@@ -126,7 +128,7 @@ public class BlockSlabGC extends BlockSlab {
         int type = getTypeFromMeta(meta);
 
         float hardness;
-        if(type == 2 || type == 3) {
+        if (type == 2 || type == 3) {
             hardness = 1.5F;
         } else {
             hardness = 2.0F;
@@ -137,7 +139,7 @@ public class BlockSlabGC extends BlockSlab {
 
     @Override
     public float getExplosionResistance(Entity par1Entity, World world, int x, int y, int z, double explosionX,
-            double explosionY, double explosionZ) {
+        double explosionY, double explosionZ) {
         return super.getBlockHardness(world, x, y, z);
     }
 

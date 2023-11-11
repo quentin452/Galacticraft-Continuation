@@ -1,51 +1,68 @@
 package micdoodle8.mods.galacticraft.core.mixins;
 
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
-
 public enum Mixins {
 
     INJECT_ORIENT_CAMERA_EVENT(new Builder("Inject OrientCameraEvent").setPhase(Phase.EARLY)
-            .addMixinClasses("forge.ForgeHooksClientMixin").addTargetedMod(TargetedMod.FORGE)),
+        .addMixinClasses("forge.ForgeHooksClientMixin")
+        .addTargetedMod(TargetedMod.FORGE)),
     CHECK_OTHER_MOD_PREVENTS_GENERATION(
-            new Builder("Only generate the world if no mod prevents it").setPhase(Phase.EARLY)
-                    .addMixinClasses("minecraft.ChunkProviderServerMixin").addTargetedMod(TargetedMod.VANILLA)),
-    RENDER_FOOTPRINTS(new Builder("Render footprints").setPhase(Phase.EARLY).setSide(Side.CLIENT)
-            .addMixinClasses("minecraft.EffectRendererMixin").addTargetedMod(TargetedMod.VANILLA)),
-    MODIFY_ENTITY_GRAVITY(new Builder("Entities respect changing gravity").setPhase(Phase.EARLY)
-            .addMixinClasses(
-                    "minecraft.EntityArrowMixin",
-                    "minecraft.EntityItemMixin",
-                    "minecraft.EntityLivingBaseMixin")
+        new Builder("Only generate the world if no mod prevents it").setPhase(Phase.EARLY)
+            .addMixinClasses("minecraft.ChunkProviderServerMixin")
             .addTargetedMod(TargetedMod.VANILLA)),
+    RENDER_FOOTPRINTS(new Builder("Render footprints").setPhase(Phase.EARLY)
+        .setSide(Side.CLIENT)
+        .addMixinClasses("minecraft.EffectRendererMixin")
+        .addTargetedMod(TargetedMod.VANILLA)),
+    MODIFY_ENTITY_GRAVITY(new Builder("Entities respect changing gravity").setPhase(Phase.EARLY)
+        .addMixinClasses("minecraft.EntityArrowMixin", "minecraft.EntityItemMixin", "minecraft.EntityLivingBaseMixin")
+        .addTargetedMod(TargetedMod.VANILLA)),
     ALLOW_GOLEM_BREATHING(new Builder("Golems don't need oxygen to breath").setPhase(Phase.EARLY)
-            .addMixinClasses("minecraft.EntityGolemMixin").addTargetedMod(TargetedMod.VANILLA)),
+        .addMixinClasses("minecraft.EntityGolemMixin")
+        .addTargetedMod(TargetedMod.VANILLA)),
     PREVENT_FIRE_RENDERING_WITHOUT_O2(
-            new Builder("No 'onFire' animation is rendered if there is no oxygen").setPhase(Phase.EARLY)
-                    .setSide(Side.CLIENT).addMixinClasses("minecraft.EntityMixin").addTargetedMod(TargetedMod.VANILLA)),
+        new Builder("No 'onFire' animation is rendered if there is no oxygen").setPhase(Phase.EARLY)
+            .setSide(Side.CLIENT)
+            .addMixinClasses("minecraft.EntityMixin")
+            .addTargetedMod(TargetedMod.VANILLA)),
     ADAPT_ENTITY_RENDERER(new Builder("Adapt lightmap, fogcolor and cameraorientation").setPhase(Phase.EARLY)
-            .setSide(Side.CLIENT).addMixinClasses("minecraft.EntityRendererMixin").addTargetedMod(TargetedMod.VANILLA)),
+        .setSide(Side.CLIENT)
+        .addMixinClasses("minecraft.EntityRendererMixin")
+        .addTargetedMod(TargetedMod.VANILLA)),
     ADAPT_ENTITY_RENDERER_NO_OF(
-            new Builder("Adapt lightmap, fogcolor and cameraorientation (Optifine incompatible part)")
-                    .setPhase(Phase.EARLY).setSide(Side.CLIENT)
-                    .addMixinClasses("minecraft.EntityRendererWithoutOptifineMixin").addTargetedMod(TargetedMod.VANILLA)
-                    .addExcludedMod(TargetedMod.OPTIFINE)),
-    INJECT_SLEEP_CANCELLED_EVENT(new Builder("Inject SleepCancelledEvent").setPhase(Phase.EARLY).setSide(Side.CLIENT)
-            .addMixinClasses("minecraft.GuiSleepMPMxin").addTargetedMod(TargetedMod.VANILLA)),
-    RENDER_LIQUID_OVERLAYS(new Builder("Render liquid overlays").setPhase(Phase.EARLY).setSide(Side.CLIENT)
-            .addMixinClasses("minecraft.ItemRendererMixin").addTargetedMod(TargetedMod.VANILLA)),
-    REPLACE_ENTITY_CLIENT_PLAYER_MP(new Builder("Replace EntityClientPlayerMP with GCEntityClientPlayerMP")
-            .setPhase(Phase.EARLY).setSide(Side.CLIENT).addMixinClasses("minecraft.PlayerControllerMPMixin")
-            .addTargetedMod(TargetedMod.VANILLA).addExcludedMod(TargetedMod.PLAYERAPI)),
-    RENDER_THERMAL_PADDING(new Builder("Render thermal padding").setPhase(Phase.EARLY).setSide(Side.CLIENT)
-            .addMixinClasses("minecraft.RendererLivingEntityMixin").addTargetedMod(TargetedMod.VANILLA)),
+        new Builder("Adapt lightmap, fogcolor and cameraorientation (Optifine incompatible part)").setPhase(Phase.EARLY)
+            .setSide(Side.CLIENT)
+            .addMixinClasses("minecraft.EntityRendererWithoutOptifineMixin")
+            .addTargetedMod(TargetedMod.VANILLA)
+            .addExcludedMod(TargetedMod.OPTIFINE)),
+    INJECT_SLEEP_CANCELLED_EVENT(new Builder("Inject SleepCancelledEvent").setPhase(Phase.EARLY)
+        .setSide(Side.CLIENT)
+        .addMixinClasses("minecraft.GuiSleepMPMxin")
+        .addTargetedMod(TargetedMod.VANILLA)),
+    RENDER_LIQUID_OVERLAYS(new Builder("Render liquid overlays").setPhase(Phase.EARLY)
+        .setSide(Side.CLIENT)
+        .addMixinClasses("minecraft.ItemRendererMixin")
+        .addTargetedMod(TargetedMod.VANILLA)),
+    REPLACE_ENTITY_CLIENT_PLAYER_MP(
+        new Builder("Replace EntityClientPlayerMP with GCEntityClientPlayerMP").setPhase(Phase.EARLY)
+            .setSide(Side.CLIENT)
+            .addMixinClasses("minecraft.PlayerControllerMPMixin")
+            .addTargetedMod(TargetedMod.VANILLA)
+            .addExcludedMod(TargetedMod.PLAYERAPI)),
+    RENDER_THERMAL_PADDING(new Builder("Render thermal padding").setPhase(Phase.EARLY)
+        .setSide(Side.CLIENT)
+        .addMixinClasses("minecraft.RendererLivingEntityMixin")
+        .addTargetedMod(TargetedMod.VANILLA)),
     MODIFY_RAIN_STRENGTH(new Builder("Modify rain strenght").setPhase(Phase.EARLY)
-            .addMixinClasses("minecraft.WorldMixin").addTargetedMod(TargetedMod.VANILLA));
+        .addMixinClasses("minecraft.WorldMixin")
+        .addTargetedMod(TargetedMod.VANILLA));
 
     public final String name;
     public final List<String> mixinClasses;
@@ -112,8 +129,10 @@ public enum Mixins {
     }
 
     private boolean shouldLoadSide() {
-        return this.side == Side.BOTH || this.side == Side.SERVER && FMLLaunchHandler.side().isServer()
-                || this.side == Side.CLIENT && FMLLaunchHandler.side().isClient();
+        return this.side == Side.BOTH || this.side == Side.SERVER && FMLLaunchHandler.side()
+            .isServer()
+            || this.side == Side.CLIENT && FMLLaunchHandler.side()
+                .isClient();
     }
 
     private boolean allModsLoaded(List<TargetedMod> targetedMods, Set<String> loadedCoreMods, Set<String> loadedMods) {
@@ -128,7 +147,7 @@ public enum Mixins {
 
             // Check coremod first
             if (!loadedCoreMods.isEmpty() && target.coreModClass != null
-                    && !loadedCoreMods.contains(target.coreModClass)) {
+                && !loadedCoreMods.contains(target.coreModClass)) {
                 return false;
             }
             if (!loadedMods.isEmpty() && target.modId != null && !loadedMods.contains(target.modId)) {
@@ -151,7 +170,7 @@ public enum Mixins {
 
             // Check coremod first
             if (!loadedCoreMods.isEmpty() && target.coreModClass != null
-                    && loadedCoreMods.contains(target.coreModClass)) {
+                && loadedCoreMods.contains(target.coreModClass)) {
                 return false;
             }
             if (!loadedMods.isEmpty() && target.modId != null && loadedMods.contains(target.modId)) {
@@ -164,8 +183,8 @@ public enum Mixins {
 
     public boolean shouldLoad(Set<String> loadedCoreMods, Set<String> loadedMods) {
         return this.shouldLoadSide() && this.applyIf.get()
-                && this.allModsLoaded(this.targetedMods, loadedCoreMods, loadedMods)
-                && this.noModsLoaded(this.excludedMods, loadedCoreMods, loadedMods);
+            && this.allModsLoaded(this.targetedMods, loadedCoreMods, loadedMods)
+            && this.noModsLoaded(this.excludedMods, loadedCoreMods, loadedMods);
     }
 
     enum Side {

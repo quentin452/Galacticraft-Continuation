@@ -1,7 +1,12 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,13 +23,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import java.util.List;
 
 public class ItemOilExtractor extends Item {
 
@@ -98,8 +97,8 @@ public class ItemOilExtractor extends Item {
     private ItemStack openCanister(EntityPlayer player) {
         for (final ItemStack stack : player.inventory.mainInventory) {
             if (stack != null && stack.getItem() instanceof ItemOilCanister
-                    && stack.getMaxDamage() - stack.getItemDamage() >= 0
-                    && stack.getMaxDamage() - stack.getItemDamage() < GCItems.oilCanister.getMaxDamage() - 1) {
+                && stack.getMaxDamage() - stack.getItemDamage() >= 0
+                && stack.getMaxDamage() - stack.getItemDamage() < GCItems.oilCanister.getMaxDamage() - 1) {
                 return stack;
             }
         }
@@ -158,7 +157,8 @@ public class ItemOilExtractor extends Item {
             } else {
                 final Fluid fluidHit = FluidRegistry.lookupFluidForBlock(block);
 
-                if (fluidHit != null && fluidHit.getName().startsWith("oil")) {
+                if (fluidHit != null && fluidHit.getName()
+                    .startsWith("oil")) {
                     flag = true;
                 }
             }
@@ -175,13 +175,13 @@ public class ItemOilExtractor extends Item {
     private Vector3 getNearestOilBlock(EntityPlayer par1EntityPlayer) {
         final float var4 = 1.0F;
         final float var5 = par1EntityPlayer.prevRotationPitch
-                + (par1EntityPlayer.rotationPitch - par1EntityPlayer.prevRotationPitch) * var4;
+            + (par1EntityPlayer.rotationPitch - par1EntityPlayer.prevRotationPitch) * var4;
         final float var6 = par1EntityPlayer.prevRotationYaw
-                + (par1EntityPlayer.rotationYaw - par1EntityPlayer.prevRotationYaw) * var4;
+            + (par1EntityPlayer.rotationYaw - par1EntityPlayer.prevRotationYaw) * var4;
         final double var7 = par1EntityPlayer.prevPosX + (par1EntityPlayer.posX - par1EntityPlayer.prevPosX) * var4;
         final double var9 = par1EntityPlayer.prevPosY + (par1EntityPlayer.posY - par1EntityPlayer.prevPosY) * var4
-                + 1.62D
-                - par1EntityPlayer.yOffset;
+            + 1.62D
+            - par1EntityPlayer.yOffset;
         final double var11 = par1EntityPlayer.prevPosZ + (par1EntityPlayer.posZ - par1EntityPlayer.prevPosZ) * var4;
         final Vector3 var13 = new Vector3(var7, var9, var11);
         final float var14 = MathHelper.cos(-var6 * 0.017453292F - (float) Math.PI);
@@ -200,11 +200,11 @@ public class ItemOilExtractor extends Item {
             final Vector3 var23 = var13.translate(new Vector3(var18 * dist, var17 * dist, var20 * dist));
 
             if (this.isOilBlock(
-                    par1EntityPlayer.worldObj,
-                    MathHelper.floor_double(var23.x),
-                    MathHelper.floor_double(var23.y),
-                    MathHelper.floor_double(var23.z),
-                    false)) {
+                par1EntityPlayer.worldObj,
+                MathHelper.floor_double(var23.x),
+                MathHelper.floor_double(var23.y),
+                MathHelper.floor_double(var23.z),
+                false)) {
                 return var23;
             }
         }

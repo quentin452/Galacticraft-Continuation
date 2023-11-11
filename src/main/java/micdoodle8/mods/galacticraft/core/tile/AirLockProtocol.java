@@ -1,9 +1,9 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
-
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
 
 class AirLockProtocol {
 
@@ -38,7 +38,7 @@ class AirLockProtocol {
                         if (x != 0 || y != 0 || z != 0) {
                             if (tile2.xCoord + x == this.head.xCoord || tile2.zCoord + z == this.head.zCoord) {
                                 final TileEntity tile = this.worldObj
-                                        .getTileEntity(tile2.xCoord + x, tile2.yCoord + y, tile2.zCoord + z);
+                                    .getTileEntity(tile2.xCoord + x, tile2.yCoord + y, tile2.zCoord + z);
                                 if (tile instanceof TileEntityAirLock && !this.adjacentAirLocks.contains(tile)) {
                                     this.adjacentAirLocks.add((TileEntityAirLock) tile);
                                     this.loopThrough(tile, loops - 1);
@@ -58,7 +58,7 @@ class AirLockProtocol {
                     for (int z = -1; z <= 1; z++) {
                         if ((x != 0 || y != 0 || z != 0) && tile2.yCoord + y == this.head.yCoord) {
                             final TileEntity tile = this.worldObj
-                                    .getTileEntity(tile2.xCoord + x, tile2.yCoord + y, tile2.zCoord + z);
+                                .getTileEntity(tile2.xCoord + x, tile2.yCoord + y, tile2.zCoord + z);
                             if (tile instanceof TileEntityAirLock && !this.adjacentAirLocks.contains(tile)) {
                                 this.adjacentAirLocks.add((TileEntityAirLock) tile);
                                 this.loopThroughHorizontal(tile, loops - 1);
@@ -119,7 +119,7 @@ class AirLockProtocol {
         final int count = this.maxX - this.minX + this.maxZ - this.minZ + this.maxY - this.minY;
 
         if (count > 24 || this.maxX - this.minX <= 1 && this.maxZ - this.minZ <= 1
-                || !horizontal && this.maxY - this.minY <= 1) {
+            || !horizontal && this.maxY - this.minY <= 1) {
             return null;
         }
 
@@ -183,9 +183,9 @@ class AirLockProtocol {
         }
 
         if (this.airLocksHorizontalMax == 0 || this.airLocksHorizontalMin == 0
-                || !this.horizontal && (airLocksVerticalMin == 0 || airLocksVerticalMax == 0)
-                || this.airLocksHorizontalMax != this.airLocksHorizontalMin
-                || airLocksVerticalMax != airLocksVerticalMin) {
+            || !this.horizontal && (airLocksVerticalMin == 0 || airLocksVerticalMax == 0)
+            || this.airLocksHorizontalMax != this.airLocksHorizontalMin
+            || airLocksVerticalMax != airLocksVerticalMin) {
             return null;
         }
 

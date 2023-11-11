@@ -1,8 +1,7 @@
 package micdoodle8.mods.galacticraft.api.transmission.tile;
 
-import net.minecraftforge.common.util.ForgeDirection;
-
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * Applied to TileEntities that can connect to an electrical OR oxygen network.

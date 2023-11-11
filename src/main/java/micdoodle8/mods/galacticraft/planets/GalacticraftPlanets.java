@@ -1,14 +1,5 @@
 package micdoodle8.mods.galacticraft.planets;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.block.Block;
-import net.minecraftforge.common.config.ConfigElement;
-
 import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -28,15 +19,23 @@ import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.asteroids.ConfigManagerAsteroids;
 import micdoodle8.mods.galacticraft.planets.mars.ConfigManagerMars;
 import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import net.minecraft.block.Block;
+import net.minecraftforge.common.config.ConfigElement;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Mod(
-        modid = Constants.MOD_ID_PLANETS,
-        name = GalacticraftPlanets.NAME,
-        version = Constants.VERSION,
-        acceptedMinecraftVersions = "[1.7.2],[1.7.10]",
-        useMetadata = true,
-        dependencies = "required-after:" + Constants.MOD_ID_CORE + ";",
-        guiFactory = "micdoodle8.mods.galacticraft.planets.ConfigGuiFactoryPlanets")
+    modid = Constants.MOD_ID_PLANETS,
+    name = GalacticraftPlanets.NAME,
+    version = Constants.VERSION,
+    acceptedMinecraftVersions = "[1.7.2],[1.7.10]",
+    useMetadata = true,
+    dependencies = "required-after:" + Constants.MOD_ID_CORE + ";",
+    guiFactory = "micdoodle8.mods.galacticraft.planets.ConfigGuiFactoryPlanets")
 public class GalacticraftPlanets {
 
     public static final String NAME = "Galacticraft Planets";
@@ -51,13 +50,15 @@ public class GalacticraftPlanets {
     public static final String MODULE_KEY_ASTEROIDS = "AsteroidsModule";
 
     @SidedProxy(
-            clientSide = "micdoodle8.mods.galacticraft.planets.PlanetsProxyClient",
-            serverSide = "micdoodle8.mods.galacticraft.planets.PlanetsProxy")
+        clientSide = "micdoodle8.mods.galacticraft.planets.PlanetsProxyClient",
+        serverSide = "micdoodle8.mods.galacticraft.planets.PlanetsProxy")
     public static PlanetsProxy proxy;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        FMLCommonHandler.instance().bus().register(this);
+        FMLCommonHandler.instance()
+            .bus()
+            .register(this);
 
         // Initialise configs, converting mars.conf + asteroids.conf to planets.conf if
         // necessary
@@ -118,20 +119,25 @@ public class GalacticraftPlanets {
         // the same planets.conf config file
         final IPlanetsModule module = GalacticraftPlanets.commonModules.get(MODULE_KEY_ASTEROIDS);
         list.addAll(
-                new ConfigElement(module.getConfiguration().getCategory(Constants.CONFIG_CATEGORY_DIMENSIONS))
-                        .getChildElements());
+            new ConfigElement(
+                module.getConfiguration()
+                    .getCategory(Constants.CONFIG_CATEGORY_DIMENSIONS)).getChildElements());
         list.addAll(
-                new ConfigElement(module.getConfiguration().getCategory(Constants.CONFIG_CATEGORY_ENTITIES))
-                        .getChildElements());
+            new ConfigElement(
+                module.getConfiguration()
+                    .getCategory(Constants.CONFIG_CATEGORY_ENTITIES)).getChildElements());
         list.addAll(
-                new ConfigElement(module.getConfiguration().getCategory(Constants.CONFIG_CATEGORY_ACHIEVEMENTS))
-                        .getChildElements());
+            new ConfigElement(
+                module.getConfiguration()
+                    .getCategory(Constants.CONFIG_CATEGORY_ACHIEVEMENTS)).getChildElements());
         list.addAll(
-                new ConfigElement(module.getConfiguration().getCategory(Constants.CONFIG_CATEGORY_ENTITIES))
-                        .getChildElements());
+            new ConfigElement(
+                module.getConfiguration()
+                    .getCategory(Constants.CONFIG_CATEGORY_ENTITIES)).getChildElements());
         list.addAll(
-                new ConfigElement(module.getConfiguration().getCategory(Constants.CONFIG_CATEGORY_GENERAL))
-                        .getChildElements());
+            new ConfigElement(
+                module.getConfiguration()
+                    .getCategory(Constants.CONFIG_CATEGORY_GENERAL)).getChildElements());
 
         return list;
     }

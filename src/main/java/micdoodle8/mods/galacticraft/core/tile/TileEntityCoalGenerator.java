@@ -1,7 +1,11 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectricalSource;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -13,15 +17,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectricalSource;
-import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.EnumSet;
 
 public class TileEntityCoalGenerator extends TileBaseUniversalElectricalSource
-        implements IInventory, ISidedInventory, IConnector {
+    implements IInventory, ISidedInventory, IConnector {
     // New energy rates:
     //
     // Tier 1 machine typically consumes 600 gJ/s = 30 gJ/t
@@ -58,7 +57,7 @@ public class TileEntityCoalGenerator extends TileBaseUniversalElectricalSource
 
     public TileEntityCoalGenerator() {
         this.storage.setMaxExtract(
-                TileEntityCoalGenerator.MAX_GENERATE_GJ_PER_TICK - TileEntityCoalGenerator.MIN_GENERATE_GJ_PER_TICK);
+            TileEntityCoalGenerator.MAX_GENERATE_GJ_PER_TICK - TileEntityCoalGenerator.MIN_GENERATE_GJ_PER_TICK);
     }
 
     @Override
@@ -74,9 +73,9 @@ public class TileEntityCoalGenerator extends TileBaseUniversalElectricalSource
                 this.itemCookTime--;
 
                 this.heatGJperTick = Math.min(
-                        this.heatGJperTick
-                                + Math.max(this.heatGJperTick * 0.005F, TileEntityCoalGenerator.BASE_ACCELERATION),
-                        TileEntityCoalGenerator.MAX_GENERATE_GJ_PER_TICK);
+                    this.heatGJperTick
+                        + Math.max(this.heatGJperTick * 0.005F, TileEntityCoalGenerator.BASE_ACCELERATION),
+                    TileEntityCoalGenerator.MAX_GENERATE_GJ_PER_TICK);
             }
 
             if (this.itemCookTime <= 0 && this.containingItems[0] != null) {
@@ -84,10 +83,10 @@ public class TileEntityCoalGenerator extends TileBaseUniversalElectricalSource
                     this.itemCookTime = 320;
                     this.decrStackSize(0, 1);
                 } else if (this.containingItems[0].getItem() == Item.getItemFromBlock(Blocks.coal_block)
-                        && this.containingItems[0].stackSize > 0) {
-                            this.itemCookTime = 320 * 10;
-                            this.decrStackSize(0, 1);
-                        }
+                    && this.containingItems[0].stackSize > 0) {
+                        this.itemCookTime = 320 * 10;
+                        this.decrStackSize(0, 1);
+                    }
             }
 
             this.produce();
@@ -211,7 +210,7 @@ public class TileEntityCoalGenerator extends TileBaseUniversalElectricalSource
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override

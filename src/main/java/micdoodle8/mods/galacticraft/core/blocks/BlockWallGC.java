@@ -1,7 +1,8 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
@@ -15,9 +16,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import java.util.List;
 
 public class BlockWallGC extends BlockWall {
 
@@ -41,7 +40,8 @@ public class BlockWallGC extends BlockWall {
         if (GalacticraftCore.isPlanetsLoaded) {
             try {
                 final Class<?> c = Class.forName("micdoodle8.mods.galacticraft.planets.mars.MarsModule");
-                final String texturePrefix = (String) c.getField("TEXTURE_PREFIX").get(null);
+                final String texturePrefix = (String) c.getField("TEXTURE_PREFIX")
+                    .get(null);
                 this.wallBlockIcon[4] = par1IconRegister.registerIcon(texturePrefix + "cobblestone");
                 this.wallBlockIcon[5] = par1IconRegister.registerIcon(texturePrefix + "brick");
             } catch (final Exception e) {
@@ -152,9 +152,8 @@ public class BlockWallGC extends BlockWall {
         final Block block = par1IBlockAccess.getBlock(par2, par3, par4);
 
         if (block != this && block != Blocks.fence_gate) {
-            return block != null && block.getMaterial().isOpaque()
-                    && block.renderAsNormalBlock()
-                    && block.getMaterial() != Material.gourd;
+            return block != null && block.getMaterial()
+                .isOpaque() && block.renderAsNormalBlock() && block.getMaterial() != Material.gourd;
         }
         return true;
     }

@@ -1,41 +1,39 @@
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.AdvancedModelLoader;
-import net.minecraftforge.client.model.IModelCustom;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityAluminumWire;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.AdvancedModelLoader;
+import net.minecraftforge.client.model.IModelCustom;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityAluminumWireRenderer extends TileEntitySpecialRenderer {
 
     private static final ResourceLocation aluminumWireTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/aluminumWire.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/aluminumWire.png");
 
     public final IModelCustom model;
     public final IModelCustom model2;
 
     public TileEntityAluminumWireRenderer() {
         this.model = AdvancedModelLoader
-                .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/aluminumWire.obj"));
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/aluminumWire.obj"));
         this.model2 = AdvancedModelLoader
-                .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/aluminumWireHeavy.obj"));
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/aluminumWireHeavy.obj"));
     }
 
     public void renderModelAt(TileEntityAluminumWire tileEntity, double d, double d1, double d2, float f) {
         // Texture file
-        FMLClientHandler.instance().getClient().renderEngine
-                .bindTexture(TileEntityAluminumWireRenderer.aluminumWireTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(TileEntityAluminumWireRenderer.aluminumWireTexture);
         GL11.glPushMatrix();
         GL11.glTranslatef((float) d + 0.5F, (float) d1 + 0.5F, (float) d2 + 0.5F);
         GL11.glScalef(1.0F, -1F, -1F);
@@ -43,7 +41,7 @@ public class TileEntityAluminumWireRenderer extends TileEntitySpecialRenderer {
         final TileEntity[] adjecentConnections = EnergyUtil.getAdjacentPowerConnections(tileEntity);
 
         final int metadata = tileEntity.getWorldObj()
-                .getBlockMetadata(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
+            .getBlockMetadata(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord);
 
         IModelCustom model = null;
 

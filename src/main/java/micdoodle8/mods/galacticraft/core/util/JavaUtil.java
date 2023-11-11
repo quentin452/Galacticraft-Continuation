@@ -38,7 +38,8 @@ public class JavaUtil extends SecurityManager {
 
         final int imax = Math.min(context.length, 6);
         for (int i = 2; i < imax; i++) {
-            if (context[i].getName().equals(name)) {
+            if (context[i].getName()
+                .equals(name)) {
                 return true;
             }
         }

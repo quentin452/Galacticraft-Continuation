@@ -1,22 +1,7 @@
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-
 import micdoodle8.mods.galacticraft.api.galaxies.CelestialBody;
 import micdoodle8.mods.galacticraft.api.galaxies.GalaxyRegistry;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
@@ -27,6 +12,19 @@ import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
 import micdoodle8.mods.galacticraft.core.wrappers.FlagData;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SpaceRaceManager {
 
@@ -46,16 +44,21 @@ public class SpaceRaceManager {
         for (final SpaceRace race : SpaceRaceManager.spaceRaces) {
             boolean playerOnline = false;
 
-            for (final EntityPlayer o : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
-                if (o != null && (race.getPlayerNames().contains(o.getGameProfile().getName()))) {
-                        final CelestialBody body = GalaxyRegistry
-                            .getCelestialBodyFromDimensionID(o.worldObj.provider.dimensionId);
+            for (final EntityPlayer o : MinecraftServer.getServer()
+                .getConfigurationManager().playerEntityList) {
+                if (o != null && (race.getPlayerNames()
+                    .contains(
+                        o.getGameProfile()
+                            .getName()))) {
+                    final CelestialBody body = GalaxyRegistry
+                        .getCelestialBodyFromDimensionID(o.worldObj.provider.dimensionId);
 
-                        if ((body != null) && !race.getCelestialBodyStatusList().containsKey(body)) {
-                            race.setCelestialBodyReached(body);
-                        }
+                    if ((body != null) && !race.getCelestialBodyStatusList()
+                        .containsKey(body)) {
+                        race.setCelestialBodyReached(body);
+                    }
 
-                        playerOnline = true;
+                    playerOnline = true;
 
                 }
             }
@@ -91,7 +94,8 @@ public class SpaceRaceManager {
 
     public static SpaceRace getSpaceRaceFromPlayer(String username) {
         for (final SpaceRace race : SpaceRaceManager.spaceRaces) {
-            if (race.getPlayerNames().contains(username)) {
+            if (race.getPlayerNames()
+                .contains(username)) {
                 return race;
             }
         }
@@ -116,14 +120,16 @@ public class SpaceRaceManager {
             objList.add(spaceRace.getTeamName());
             objList.add(spaceRace.getFlagData());
             objList.add(spaceRace.getTeamColor());
-            objList.add(spaceRace.getPlayerNames().toArray(new String[0]));
+            objList.add(
+                spaceRace.getPlayerNames()
+                    .toArray(new String[0]));
 
             if (toPlayer != null) {
                 GalacticraftCore.packetPipeline
-                        .sendTo(new PacketSimple(EnumSimplePacket.C_UPDATE_SPACE_RACE_DATA, objList), toPlayer);
+                    .sendTo(new PacketSimple(EnumSimplePacket.C_UPDATE_SPACE_RACE_DATA, objList), toPlayer);
             } else {
                 GalacticraftCore.packetPipeline
-                        .sendToAll(new PacketSimple(EnumSimplePacket.C_UPDATE_SPACE_RACE_DATA, objList));
+                    .sendToAll(new PacketSimple(EnumSimplePacket.C_UPDATE_SPACE_RACE_DATA, objList));
             }
         }
     }
@@ -135,22 +141,22 @@ public class SpaceRaceManager {
     public static void onPlayerRemoval(String player, SpaceRace race) {
         for (final String member : race.getPlayerNames()) {
             final EntityPlayerMP memberObj = PlayerUtil
-                    .getPlayerForUsernameVanilla(MinecraftServer.getServer(), member);
+                .getPlayerForUsernameVanilla(MinecraftServer.getServer(), member);
 
             if (memberObj != null) {
                 memberObj.addChatMessage(
-                        new ChatComponentText(
-                                EnumColor.DARK_AQUA + GCCoreUtil.translateWithFormat(
-                                        "gui.spaceRace.chat.removeSuccess",
-                                        EnumColor.RED + player + EnumColor.DARK_AQUA))
-                                                .setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_AQUA)));
+                    new ChatComponentText(
+                        EnumColor.DARK_AQUA + GCCoreUtil.translateWithFormat(
+                            "gui.spaceRace.chat.removeSuccess",
+                            EnumColor.RED + player + EnumColor.DARK_AQUA))
+                                .setChatStyle(new ChatStyle().setColor(EnumChatFormatting.DARK_AQUA)));
             }
         }
 
         final List<String> playerList = new ArrayList<>();
         playerList.add(player);
         final SpaceRace newRace = SpaceRaceManager.addSpaceRace(
-                new SpaceRace(playerList, SpaceRace.DEFAULT_NAME, new FlagData(48, 32), new Vector3(1, 1, 1)));
+            new SpaceRace(playerList, SpaceRace.DEFAULT_NAME, new FlagData(48, 32), new Vector3(1, 1, 1)));
         final EntityPlayerMP playerToRemove = PlayerUtil.getPlayerBaseServerFromPlayerUsername(player, true);
 
         if (playerToRemove != null) {

@@ -1,21 +1,19 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMars;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMars;
 
 public class ItemRendererMachine implements IItemRenderer {
 
     private static final ResourceLocation chamberTexture0 = new ResourceLocation(
-            MarsModule.ASSET_PREFIX,
-            "textures/model/chamber_dark.png");
+        MarsModule.ASSET_PREFIX,
+        "textures/model/chamber_dark.png");
 
     private final IModelCustom model;
 
@@ -28,7 +26,8 @@ public class ItemRendererMachine implements IItemRenderer {
 
         this.transform(type);
 
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(ItemRendererMachine.chamberTexture0);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(ItemRendererMachine.chamberTexture0);
         this.model.renderPart("Main_Cylinder");
 
         GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -104,7 +103,6 @@ public class ItemRendererMachine implements IItemRenderer {
         return result;
     }
 
-
     @Override
     public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
         return true;
@@ -113,7 +111,7 @@ public class ItemRendererMachine implements IItemRenderer {
     @Override
     public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         if (item.getItemDamage() >= BlockMachineMars.CRYOGENIC_CHAMBER_METADATA
-                && item.getItemDamage() < BlockMachineMars.LAUNCH_CONTROLLER_METADATA) {
+            && item.getItemDamage() < BlockMachineMars.LAUNCH_CONTROLLER_METADATA) {
             switch (type) {
                 case EQUIPPED:
                     this.renderCryogenicChamber(type);

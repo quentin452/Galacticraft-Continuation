@@ -1,10 +1,10 @@
 package micdoodle8.mods.galacticraft.planets.mars.world.gen;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
+
+import java.util.Random;
 
 public class WorldGenEggs extends WorldGenerator {
 
@@ -25,7 +25,7 @@ public class WorldGenEggs extends WorldGenerator {
         }
 
         if (par1World.isAirBlock(i1, j1, k1) && (!par1World.provider.hasNoSky || j1 < 127)
-                && this.eggBlock.canBlockStay(par1World, i1, j1, k1)) {
+            && this.eggBlock.canBlockStay(par1World, i1, j1, k1)) {
             par1World.setBlock(i1, j1, k1, this.eggBlock, par2Random.nextInt(3), 2);
         }
 

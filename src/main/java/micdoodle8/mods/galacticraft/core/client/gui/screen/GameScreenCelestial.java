@@ -1,31 +1,23 @@
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
-import java.nio.DoubleBuffer;
-
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.world.WorldProvider;
-import net.minecraftforge.common.MinecraftForge;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector3f;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import micdoodle8.mods.galacticraft.api.client.IGameScreen;
 import micdoodle8.mods.galacticraft.api.client.IScreenManager;
 import micdoodle8.mods.galacticraft.api.event.client.CelestialBodyRenderEvent;
-import micdoodle8.mods.galacticraft.api.galaxies.CelestialBody;
-import micdoodle8.mods.galacticraft.api.galaxies.GalaxyRegistry;
-import micdoodle8.mods.galacticraft.api.galaxies.Moon;
-import micdoodle8.mods.galacticraft.api.galaxies.Planet;
-import micdoodle8.mods.galacticraft.api.galaxies.Satellite;
-import micdoodle8.mods.galacticraft.api.galaxies.SolarSystem;
-import micdoodle8.mods.galacticraft.api.galaxies.Star;
+import micdoodle8.mods.galacticraft.api.galaxies.*;
 import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.client.render.RenderPlanet;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.world.WorldProvider;
+import net.minecraftforge.common.MinecraftForge;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector3f;
+
+import java.nio.DoubleBuffer;
 
 public class GameScreenCelestial implements IGameScreen {
 
@@ -45,8 +37,11 @@ public class GameScreenCelestial implements IGameScreen {
     private DoubleBuffer planes;
 
     public GameScreenCelestial() {
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-            this.renderEngine = FMLClientHandler.instance().getClient().renderEngine;
+        if (FMLCommonHandler.instance()
+            .getEffectiveSide()
+            .isClient()) {
+            this.renderEngine = FMLClientHandler.instance()
+                .getClient().renderEngine;
             this.planes = BufferUtils.createDoubleBuffer(4 * Double.SIZE);
         }
     }
@@ -127,9 +122,11 @@ public class GameScreenCelestial implements IGameScreen {
         if (body instanceof Planet) {
             solarSystem = ((Planet) body).getParentSolarSystem();
         } else if (body instanceof Moon) {
-            solarSystem = ((Moon) body).getParentPlanet().getParentSolarSystem();
+            solarSystem = ((Moon) body).getParentPlanet()
+                .getParentSolarSystem();
         } else if (body instanceof Satellite) {
-            solarSystem = ((Satellite) body).getParentPlanet().getParentSolarSystem();
+            solarSystem = ((Satellite) body).getParentPlanet()
+                .getParentSolarSystem();
         }
 
         if (solarSystem == null) {
@@ -142,16 +139,19 @@ public class GameScreenCelestial implements IGameScreen {
         }
 
         final String mainSolarSystem = solarSystem.getUnlocalizedName();
-        for (final Planet planet : GalaxyRegistry.getRegisteredPlanets().values()) {
+        for (final Planet planet : GalaxyRegistry.getRegisteredPlanets()
+            .values()) {
             if (planet.getParentSolarSystem() != null && planet.getBodyIcon() != null
-                    && planet.getParentSolarSystem().getUnlocalizedName().equalsIgnoreCase(mainSolarSystem)) {
+                && planet.getParentSolarSystem()
+                    .getUnlocalizedName()
+                    .equalsIgnoreCase(mainSolarSystem)) {
                 final Vector3f pos = this.getCelestialBodyPosition(planet, ticks);
                 this.drawCircle(planet);
                 this.drawCelestialBody(
-                        planet,
-                        pos.x,
-                        pos.y,
-                        planet.getRelativeDistanceFromCenter().unScaledDistance < 1.5F ? 2F : 2.8F);
+                    planet,
+                    pos.x,
+                    pos.y,
+                    planet.getRelativeDistanceFromCenter().unScaledDistance < 1.5F ? 2F : 2.8F);
             }
         }
     }
@@ -159,7 +159,8 @@ public class GameScreenCelestial implements IGameScreen {
     private void drawCelestialBodiesZ(CelestialBody planet, float ticks) {
         this.drawCelestialBody(planet, 0F, 0F, 11F);
 
-        for (final Moon moon : GalaxyRegistry.getRegisteredMoons().values()) {
+        for (final Moon moon : GalaxyRegistry.getRegisteredMoons()
+            .values()) {
             if (moon.getParentPlanet() == planet && moon.getBodyIcon() != null) {
                 final Vector3f pos = this.getCelestialBodyPosition(moon, ticks);
                 this.drawCircle(moon);
@@ -167,7 +168,8 @@ public class GameScreenCelestial implements IGameScreen {
             }
         }
 
-        for (final Satellite satellite : GalaxyRegistry.getRegisteredSatellites().values()) {
+        for (final Satellite satellite : GalaxyRegistry.getRegisteredSatellites()
+            .values()) {
             if (satellite.getParentPlanet() == planet) {
                 final Vector3f pos = this.getCelestialBodyPosition(satellite, ticks);
                 this.drawCircle(satellite);
@@ -188,8 +190,8 @@ public class GameScreenCelestial implements IGameScreen {
 
     private void drawCelestialBody(CelestialBody planet, float xPos, float yPos, float relSize) {
         if (xPos + this.centreX > this.frameBx || xPos + this.centreX < this.frameA
-                || yPos + this.centreY > this.frameBy
-                || yPos + this.centreY < this.frameA) {
+            || yPos + this.centreY > this.frameBy
+            || yPos + this.centreY < this.frameA) {
             return;
         }
 
@@ -199,9 +201,9 @@ public class GameScreenCelestial implements IGameScreen {
         final float alpha = 1.0F;
 
         final CelestialBodyRenderEvent.Pre preEvent = new CelestialBodyRenderEvent.Pre(
-                planet,
-                planet.getBodyIcon(),
-                12);
+            planet,
+            planet.getBodyIcon(),
+            12);
         MinecraftForge.EVENT_BUS.post(preEvent);
 
         GL11.glColor4f(1, 1, 1, alpha);
@@ -236,8 +238,8 @@ public class GameScreenCelestial implements IGameScreen {
 
         GL11.glScalef(sd, sd, sd);
         final CelestialBodyRenderEvent.CelestialRingRenderEvent.Pre preEvent = new CelestialBodyRenderEvent.CelestialRingRenderEvent.Pre(
-                cBody,
-                new Vector3f(0.0F, 0.0F, 0.0F));
+            cBody,
+            new Vector3f(0.0F, 0.0F, 0.0F));
         MinecraftForge.EVENT_BUS.post(preEvent);
 
         if (!preEvent.isCanceled()) {
@@ -256,7 +258,7 @@ public class GameScreenCelestial implements IGameScreen {
         }
 
         final CelestialBodyRenderEvent.CelestialRingRenderEvent.Post postEvent = new CelestialBodyRenderEvent.CelestialRingRenderEvent.Post(
-                cBody);
+            cBody);
         MinecraftForge.EVENT_BUS.post(postEvent);
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -267,11 +269,11 @@ public class GameScreenCelestial implements IGameScreen {
         final float timeScale = cBody instanceof Planet ? 200.0F : 2.0F;
         final float distanceFromCenter = this.getScale(cBody) * this.scale;
         return new Vector3f(
-                (float) Math.sin(ticks / (timeScale * cBody.getRelativeOrbitTime()) + cBody.getPhaseShift())
-                        * distanceFromCenter,
-                (float) Math.cos(ticks / (timeScale * cBody.getRelativeOrbitTime()) + cBody.getPhaseShift())
-                        * distanceFromCenter,
-                0);
+            (float) Math.sin(ticks / (timeScale * cBody.getRelativeOrbitTime()) + cBody.getPhaseShift())
+                * distanceFromCenter,
+            (float) Math.cos(ticks / (timeScale * cBody.getRelativeOrbitTime()) + cBody.getPhaseShift())
+                * distanceFromCenter,
+            0);
     }
 
     private float getScale(CelestialBody celestialBody) {
@@ -287,7 +289,7 @@ public class GameScreenCelestial implements IGameScreen {
     }
 
     private void planeEquation(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3,
-            float z3) {
+        float z3) {
         final double[] result = new double[4];
         result[0] = y1 * (z2 - z3) + y2 * (z3 - z1) + y3 * (z1 - z2);
         result[1] = z1 * (x2 - x3) + z2 * (x3 - x1) + z3 * (x1 - x2);

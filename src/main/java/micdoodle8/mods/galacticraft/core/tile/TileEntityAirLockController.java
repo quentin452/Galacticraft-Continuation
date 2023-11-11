@@ -1,19 +1,18 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 
-import cpw.mods.fml.relauncher.Side;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileEntityAirLockController extends TileEntityAirLock {
 
@@ -89,15 +88,16 @@ public class TileEntityAirLockController extends TileEntityAirLock {
                 final Vector3 minPos = new Vector3(thisPos).translate(-distance);
                 final Vector3 maxPos = new Vector3(thisPos).translate(distance);
                 final AxisAlignedBB matchingRegion = AxisAlignedBB
-                        .getBoundingBox(minPos.x, minPos.y, minPos.z, maxPos.x, maxPos.y, maxPos.z);
+                    .getBoundingBox(minPos.x, minPos.y, minPos.z, maxPos.x, maxPos.y, maxPos.z);
                 final List<EntityPlayer> playersWithin = this.worldObj
-                        .getEntitiesWithinAABB(EntityPlayer.class, matchingRegion);
+                    .getEntitiesWithinAABB(EntityPlayer.class, matchingRegion);
 
                 boolean foundPlayer = false;
 
                 for (final Object o : playersWithin) {
-                    if (o instanceof EntityPlayer && (!this.playerNameMatches
-                            || ((EntityPlayer) o).getGameProfile().getName().equalsIgnoreCase(this.playerToOpenFor))) {
+                    if (o instanceof EntityPlayer && (!this.playerNameMatches || ((EntityPlayer) o).getGameProfile()
+                        .getName()
+                        .equalsIgnoreCase(this.playerToOpenFor))) {
                         foundPlayer = true;
                         break;
                     }
@@ -121,14 +121,14 @@ public class TileEntityAirLockController extends TileEntityAirLock {
                     this.otherAirLocks = this.protocol.calculate(this.horizontalModeEnabled);
 
                     if (this.active && (this.otherAirLocks != null
-                            || this.lastOtherAirLocks != null && this.otherAirLocks != this.lastOtherAirLocks
-                            || this.lastOtherAirLocks != null
-                                    && this.otherAirLocks.size() != this.lastOtherAirLocks.size())) {
+                        || this.lastOtherAirLocks != null && this.otherAirLocks != this.lastOtherAirLocks
+                        || this.lastOtherAirLocks != null
+                            && this.otherAirLocks.size() != this.lastOtherAirLocks.size())) {
                         this.sealAirLock();
                     } else if (!this.active && this.lastActive
-                            || this.otherAirLocks == null && this.lastOtherAirLocks != null) {
-                                this.unsealAirLock();
-                            }
+                        || this.otherAirLocks == null && this.lastOtherAirLocks != null) {
+                            this.unsealAirLock();
+                        }
                 }
 
                 if (this.active != this.lastActive) {
@@ -154,7 +154,7 @@ public class TileEntityAirLockController extends TileEntityAirLock {
 
         if (this.horizontalModeEnabled) {
             if (this.protocol.minY == this.protocol.maxY && this.protocol.minX != this.protocol.maxX
-                    && this.protocol.minZ != this.protocol.maxZ) {
+                && this.protocol.minZ != this.protocol.maxZ) {
                 for (x = this.protocol.minX + 1; x <= this.protocol.maxX - 1; x++) {
                     for (z = this.protocol.minZ + 1; z <= this.protocol.maxZ - 1; z++) {
                         final Block blockAt = this.worldObj.getBlock(x, y, z);
@@ -197,13 +197,14 @@ public class TileEntityAirLockController extends TileEntityAirLock {
         int y = this.lastProtocol.minY + (this.lastProtocol.maxY - this.lastProtocol.minY) / 2;
         int z = this.lastProtocol.minZ + (this.lastProtocol.maxZ - this.lastProtocol.minZ) / 2;
 
-        if (this.worldObj.getBlock(x, y, z).getMaterial() != Material.air) {
+        if (this.worldObj.getBlock(x, y, z)
+            .getMaterial() != Material.air) {
             this.worldObj.playSoundEffect(x, y, z, GalacticraftCore.TEXTURE_PREFIX + "player.closeairlock", 1.0F, 1.0F);
         }
 
         if (this.lastHorizontalModeEnabled) {
             if (this.protocol.minY == this.protocol.maxY && this.protocol.minX != this.protocol.maxX
-                    && this.protocol.minZ != this.protocol.maxZ) {
+                && this.protocol.minZ != this.protocol.maxZ) {
                 for (x = this.protocol.minX + 1; x <= this.protocol.maxX - 1; x++) {
                     for (z = this.protocol.minZ + 1; z <= this.protocol.maxZ - 1; z++) {
                         final Block blockAt = this.worldObj.getBlock(x, y, z);

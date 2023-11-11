@@ -1,7 +1,14 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntitySolar;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -17,15 +24,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntitySolar;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class BlockSolar extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc, IPartialSealableBlock {
 
@@ -73,7 +72,9 @@ public class BlockSolar extends BlockTileGC implements ItemBlockDesc.IBlockShift
         if (meta >= BlockSolar.ADVANCED_METADATA) {
             final int shiftedMeta = meta -= BlockSolar.ADVANCED_METADATA;
 
-            if (side == ForgeDirection.getOrientation(shiftedMeta + 2).getOpposite().ordinal()) {
+            if (side == ForgeDirection.getOrientation(shiftedMeta + 2)
+                .getOpposite()
+                .ordinal()) {
                 return this.icons[5];
             }
             if (side == ForgeDirection.UP.ordinal()) {
@@ -87,7 +88,9 @@ public class BlockSolar extends BlockTileGC implements ItemBlockDesc.IBlockShift
         if (meta >= BlockSolar.BASIC_METADATA) {
             final int shiftedMeta = meta -= BlockSolar.BASIC_METADATA;
 
-            if (side == ForgeDirection.getOrientation(shiftedMeta + 2).getOpposite().ordinal()) {
+            if (side == ForgeDirection.getOrientation(shiftedMeta + 2)
+                .getOpposite()
+                .ordinal()) {
                 return this.icons[5];
             }
             if (side == ForgeDirection.UP.ordinal()) {
@@ -116,7 +119,8 @@ public class BlockSolar extends BlockTileGC implements ItemBlockDesc.IBlockShift
             }
         }
 
-        return new BlockVec3(x1, y1, z1).newVecSide(side ^ 1).getBlock(world) != GCBlocks.fakeBlock;
+        return new BlockVec3(x1, y1, z1).newVecSide(side ^ 1)
+            .getBlock(world) != GCBlocks.fakeBlock;
     }
 
     @Override
@@ -167,7 +171,7 @@ public class BlockSolar extends BlockTileGC implements ItemBlockDesc.IBlockShift
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
         int original = metadata;
 
@@ -207,7 +211,7 @@ public class BlockSolar extends BlockTileGC implements ItemBlockDesc.IBlockShift
 
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         entityPlayer.openGui(GalacticraftCore.instance, -1, world, x, y, z);
         return true;
     }

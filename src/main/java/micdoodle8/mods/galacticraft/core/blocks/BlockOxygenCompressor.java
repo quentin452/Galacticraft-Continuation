@@ -1,7 +1,13 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenCompressor;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenDecompressor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -17,14 +23,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenCompressor;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenDecompressor;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -64,16 +63,16 @@ public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBloc
         this.iconCompressor1 = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_compressor_1");
         this.iconCompressor2 = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_compressor_2");
         this.iconDecompressor = par1IconRegister
-                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_decompressor_1");
+            .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_decompressor_1");
         this.iconOxygenInput = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_oxygen_input");
         this.iconOxygenOutput = par1IconRegister
-                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_oxygen_output");
+            .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_oxygen_output");
         this.iconInput = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_input");
     }
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
         int original = metadata;
 
@@ -118,7 +117,7 @@ public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBloc
 
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         entityPlayer.openGui(GalacticraftCore.instance, -1, world, x, y, z);
         return true;
     }
@@ -146,15 +145,17 @@ public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBloc
             if (side == metadata + 2) {
                 return this.iconInput;
             }
-            if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
+            if (side == ForgeDirection.getOrientation(metadata + 2)
+                .getOpposite()
+                .ordinal()) {
                 return this.iconOxygenOutput;
             } else if (metadata == 0 && side == 5 || metadata == 3 && side == 3
-                    || metadata == 1 && side == 4
-                    || metadata == 2 && side == 2) {
-                        return this.iconCompressor2;
-                    } else {
-                        return this.iconDecompressor;
-                    }
+                || metadata == 1 && side == 4
+                || metadata == 2 && side == 2) {
+                    return this.iconCompressor2;
+                } else {
+                    return this.iconDecompressor;
+                }
         }
         if (metadata < BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA) {
             return this.iconMachineSide;
@@ -163,9 +164,11 @@ public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBloc
 
         if (side == metadata + 2) {
             return this.iconInput;
-        } else if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
-            return this.iconOxygenInput;
-        } else if (metadata == 0 && side == 5 || metadata == 3 && side == 3
+        } else if (side == ForgeDirection.getOrientation(metadata + 2)
+            .getOpposite()
+            .ordinal()) {
+                return this.iconOxygenInput;
+            } else if (metadata == 0 && side == 5 || metadata == 3 && side == 3
                 || metadata == 1 && side == 4
                 || metadata == 2 && side == 2) {
                     return this.iconCompressor2;

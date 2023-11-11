@@ -1,23 +1,21 @@
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.IBubbleProvider;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.IBubbleProvider;
 
 public class TileEntityBubbleProviderRenderer extends TileEntitySpecialRenderer {
 
     private static final ResourceLocation oxygenBubbleTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/bubble.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/bubble.png");
 
     private static IModelCustom sphere;
 
@@ -27,7 +25,7 @@ public class TileEntityBubbleProviderRenderer extends TileEntitySpecialRenderer 
 
     public TileEntityBubbleProviderRenderer(float colorRed, float colorGreen, float colorBlue) {
         sphere = AdvancedModelLoader
-                .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/sphere.obj"));
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/sphere.obj"));
         this.colorRed = colorRed;
         this.colorGreen = colorGreen;
         this.colorBlue = colorBlue;

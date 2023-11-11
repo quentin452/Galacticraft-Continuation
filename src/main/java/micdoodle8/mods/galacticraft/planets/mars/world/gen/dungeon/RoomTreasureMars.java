@@ -1,18 +1,17 @@
 package micdoodle8.mods.galacticraft.planets.mars.world.gen.dungeon;
 
-import java.util.HashSet;
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import micdoodle8.mods.galacticraft.core.world.gen.dungeon.DungeonBoundingBox;
 import micdoodle8.mods.galacticraft.core.world.gen.dungeon.DungeonRoom;
 import micdoodle8.mods.galacticraft.core.world.gen.dungeon.MapGenDungeon;
 import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTreasureChestMars;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.HashSet;
+import java.util.Random;
 
 public class RoomTreasureMars extends DungeonRoom {
 
@@ -38,26 +37,26 @@ public class RoomTreasureMars extends DungeonRoom {
             for (int k = this.posZ - 1; k <= this.posZ + this.sizeZ; k++) {
                 for (int j = this.posY - 1; j <= this.posY + this.sizeY; j++) {
                     if (i == this.posX - 1 || i == this.posX + this.sizeX
-                            || j == this.posY - 1
-                            || j == this.posY + this.sizeY
-                            || k == this.posZ - 1
-                            || k == this.posZ + this.sizeZ) {
+                        || j == this.posY - 1
+                        || j == this.posY + this.sizeY
+                        || k == this.posZ - 1
+                        || k == this.posZ + this.sizeZ) {
                         this.placeBlock(
-                                chunk,
-                                meta,
-                                i,
-                                j,
-                                k,
-                                cx,
-                                cz,
-                                this.dungeonInstance.DUNGEON_WALL_ID,
-                                this.dungeonInstance.DUNGEON_WALL_META);
+                            chunk,
+                            meta,
+                            i,
+                            j,
+                            k,
+                            cx,
+                            cz,
+                            this.dungeonInstance.DUNGEON_WALL_ID,
+                            this.dungeonInstance.DUNGEON_WALL_META);
                     } else if ((i == this.posX || i == this.posX + this.sizeX - 1)
-                            && (k == this.posZ || k == this.posZ + this.sizeZ - 1)) {
-                                this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.glowstone, 0);
-                            } else {
-                                this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.air, 0);
-                            }
+                        && (k == this.posZ || k == this.posZ + this.sizeZ - 1)) {
+                            this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.glowstone, 0);
+                        } else {
+                            this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.air, 0);
+                        }
                 }
             }
         }

@@ -1,5 +1,7 @@
 package micdoodle8.mods.galacticraft.planets.mars.inventory;
 
+import micdoodle8.mods.galacticraft.core.inventory.SlotRocketBenchResult;
+import micdoodle8.mods.galacticraft.planets.mars.util.RecipeUtilMars;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -8,9 +10,6 @@ import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.core.inventory.SlotRocketBenchResult;
-import micdoodle8.mods.galacticraft.planets.mars.util.RecipeUtilMars;
 
 public class ContainerSchematicCargoRocket extends Container {
 
@@ -23,7 +22,7 @@ public class ContainerSchematicCargoRocket extends Container {
 
         // OUT
         this.addSlotToContainer(
-                new SlotRocketBenchResult(inventory.player, this.craftMatrix, this.craftResult, 0, 134, 73));
+            new SlotRocketBenchResult(inventory.player, this.craftMatrix, this.craftResult, 0, 134, 73));
 
         // GEAR
         this.addSlotToContainer(new SlotSchematicCargoRocket(this.craftMatrix, 1, 134, 10, x, y, z, inventory.player));
@@ -31,15 +30,15 @@ public class ContainerSchematicCargoRocket extends Container {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 this.addSlotToContainer(
-                        new SlotSchematicCargoRocket(
-                                this.craftMatrix,
-                                3 + i * 2 + j,
-                                116 + j * 36,
-                                19 + i * 18,
-                                x,
-                                y,
-                                z,
-                                inventory.player));
+                    new SlotSchematicCargoRocket(
+                        this.craftMatrix,
+                        3 + i * 2 + j,
+                        116 + j * 36,
+                        19 + i * 18,
+                        x,
+                        y,
+                        z,
+                        inventory.player));
             }
         }
         this.addSlotToContainer(new SlotSchematicCargoRocket(this.craftMatrix, 21, 134, 46, x, y, z, inventory.player));
@@ -51,15 +50,15 @@ public class ContainerSchematicCargoRocket extends Container {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 2; j++) {
                 this.addSlotToContainer(
-                        new SlotSchematicCargoRocket(
-                                this.craftMatrix,
-                                8 + i * 2 + j,
-                                44 + j * 18,
-                                37 + i * 18,
-                                x,
-                                y,
-                                z,
-                                inventory.player));
+                    new SlotSchematicCargoRocket(
+                        this.craftMatrix,
+                        8 + i * 2 + j,
+                        44 + j * 18,
+                        37 + i * 18,
+                        x,
+                        y,
+                        z,
+                        inventory.player));
             }
         }
         // engine
@@ -68,15 +67,15 @@ public class ContainerSchematicCargoRocket extends Container {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 this.addSlotToContainer(
-                        new SlotSchematicCargoRocket(
-                                this.craftMatrix,
-                                17 + i * 2 + j,
-                                26 + j * 54,
-                                91 + i * 18,
-                                x,
-                                y,
-                                z,
-                                inventory.player));
+                    new SlotSchematicCargoRocket(
+                        this.craftMatrix,
+                        17 + i * 2 + j,
+                        26 + j * 54,
+                        91 + i * 18,
+                        x,
+                        y,
+                        z,
+                        inventory.player));
             }
         }
 

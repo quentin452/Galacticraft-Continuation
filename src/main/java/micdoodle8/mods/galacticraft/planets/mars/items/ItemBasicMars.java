@@ -1,7 +1,11 @@
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,17 +14,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import java.util.List;
 
 public class ItemBasicMars extends Item {
 
     public static String[] names = { "rawDesh", "deshStick", "ingotDesh", "reinforcedPlateT2", "slimelingCargo",
-            "compressedDesh", "fluidManip" };
+        "compressedDesh", "fluidManip" };
     protected IIcon[] icons = new IIcon[ItemBasicMars.names.length];
 
     public ItemBasicMars() {
@@ -79,7 +78,7 @@ public class ItemBasicMars extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List<String> par3List,
-            boolean par4) {
+        boolean par4) {
         if (par1ItemStack != null && par1ItemStack.getItemDamage() == 3) {
             par3List.add(GCCoreUtil.translate("item.tier2.desc"));
         }

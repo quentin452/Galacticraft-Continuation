@@ -1,10 +1,20 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
+import cpw.mods.fml.relauncher.Side;
+import io.netty.buffer.ByteBuf;
+import micdoodle8.mods.galacticraft.api.entity.IDockable;
+import micdoodle8.mods.galacticraft.api.tile.IFuelDock;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.network.*;
+import micdoodle8.mods.galacticraft.core.network.PacketEntityUpdate.IEntityFullSync;
+import micdoodle8.mods.galacticraft.core.tick.KeyHandlerClient;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityBuggyFueler;
+import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
@@ -15,37 +25,18 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
-import cpw.mods.fml.relauncher.Side;
-import io.netty.buffer.ByteBuf;
-import micdoodle8.mods.galacticraft.api.entity.IDockable;
-import micdoodle8.mods.galacticraft.api.tile.IFuelDock;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.network.IPacketReceiver;
-import micdoodle8.mods.galacticraft.core.network.NetworkUtil;
-import micdoodle8.mods.galacticraft.core.network.PacketControllableEntity;
-import micdoodle8.mods.galacticraft.core.network.PacketDynamic;
-import micdoodle8.mods.galacticraft.core.network.PacketEntityUpdate;
-import micdoodle8.mods.galacticraft.core.network.PacketEntityUpdate.IEntityFullSync;
-import micdoodle8.mods.galacticraft.core.tick.KeyHandlerClient;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityBuggyFueler;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class EntityBuggy extends Entity
-        implements IInventory, IPacketReceiver, IDockable, IControllableEntity, IEntityFullSync {
+    implements IInventory, IPacketReceiver, IDockable, IControllableEntity, IEntityFullSync {
 
     public static final int tankCapacity = 1000;
     public FluidTank buggyFuelTank = new FluidTank(tankCapacity);
@@ -156,13 +147,13 @@ public class EntityBuggy extends Entity
             final double var1 = Math.cos(this.rotationYaw * Math.PI / 180.0D + 114.8) * -0.5D;
             final double var3 = Math.sin(this.rotationYaw * Math.PI / 180.0D + 114.8) * -0.5D;
             this.riddenByEntity
-                    .setPosition(this.posX + var1, this.posY - 2 + this.riddenByEntity.getYOffset(), this.posZ + var3);
+                .setPosition(this.posX + var1, this.posY - 2 + this.riddenByEntity.getYOffset(), this.posZ + var3);
         }
     }
 
     @Override
     public void setPositionRotationAndMotion(double x, double y, double z, float yaw, float pitch, double motX,
-            double motY, double motZ, boolean onGround) {
+        double motY, double motZ, boolean onGround) {
         if (this.worldObj.isRemote) {
             this.boatX = x;
             this.boatY = y;
@@ -185,12 +176,12 @@ public class EntityBuggy extends Entity
     @Override
     public void performHurtAnimation() {
         this.dataWatcher.updateObject(
-                this.rockDirection,
-                Integer.valueOf(-this.dataWatcher.getWatchableObjectInt(this.rockDirection)));
+            this.rockDirection,
+            Integer.valueOf(-this.dataWatcher.getWatchableObjectInt(this.rockDirection)));
         this.dataWatcher.updateObject(this.timeSinceHit, Integer.valueOf(10));
         this.dataWatcher.updateObject(
-                this.currentDamage,
-                Integer.valueOf(this.dataWatcher.getWatchableObjectInt(this.currentDamage) * 5));
+            this.currentDamage,
+            Integer.valueOf(this.dataWatcher.getWatchableObjectInt(this.currentDamage) * 5));
     }
 
     @Override
@@ -200,18 +191,18 @@ public class EntityBuggy extends Entity
         }
         final Entity e = var1.getEntity();
         final boolean flag = var1.getEntity() instanceof EntityPlayer
-                && ((EntityPlayer) var1.getEntity()).capabilities.isCreativeMode;
+            && ((EntityPlayer) var1.getEntity()).capabilities.isCreativeMode;
 
         if (this.isEntityInvulnerable() || e instanceof EntityLivingBase && !(e instanceof EntityPlayer)) {
             return false;
         }
         this.dataWatcher.updateObject(
-                this.rockDirection,
-                Integer.valueOf(-this.dataWatcher.getWatchableObjectInt(this.rockDirection)));
+            this.rockDirection,
+            Integer.valueOf(-this.dataWatcher.getWatchableObjectInt(this.rockDirection)));
         this.dataWatcher.updateObject(this.timeSinceHit, Integer.valueOf(10));
         this.dataWatcher.updateObject(
-                this.currentDamage,
-                Integer.valueOf((int) (this.dataWatcher.getWatchableObjectInt(this.currentDamage) + var2 * 10)));
+            this.currentDamage,
+            Integer.valueOf((int) (this.dataWatcher.getWatchableObjectInt(this.currentDamage) + var2 * 10)));
         this.setBeenAttacked();
 
         if (e instanceof EntityPlayer && ((EntityPlayer) e).capabilities.isCreativeMode) {
@@ -251,7 +242,10 @@ public class EntityBuggy extends Entity
             final EntityItem entityItem = this.entityDropItem(item, 0);
 
             if (item.hasTagCompound()) {
-                entityItem.getEntityItem().setTagCompound((NBTTagCompound) item.getTagCompound().copy());
+                entityItem.getEntityItem()
+                    .setTagCompound(
+                        (NBTTagCompound) item.getTagCompound()
+                            .copy());
             }
         }
     }
@@ -261,7 +255,8 @@ public class EntityBuggy extends Entity
 
         final ItemStack buggy = new ItemStack(GCItems.buggy, 1, this.buggyType);
         buggy.setTagCompound(new NBTTagCompound());
-        buggy.getTagCompound().setInteger("BuggyFuel", this.buggyFuelTank.getFluidAmount());
+        buggy.getTagCompound()
+            .setInteger("BuggyFuel", this.buggyFuelTank.getFluidAmount());
         items.add(buggy);
 
         for (final ItemStack item : this.cargoItems) {
@@ -276,8 +271,8 @@ public class EntityBuggy extends Entity
     @Override
     public void setPositionAndRotation2(double d, double d1, double d2, float f, float f1, int i) {
         if (this.riddenByEntity != null) {
-            if (this.riddenByEntity instanceof EntityPlayer
-                    && FMLClientHandler.instance().getClient().thePlayer.equals(this.riddenByEntity)) {} else {
+            if (this.riddenByEntity instanceof EntityPlayer && FMLClientHandler.instance()
+                .getClient().thePlayer.equals(this.riddenByEntity)) {} else {
                 this.boatPosRotationIncrements = i + 5;
                 this.boatX = d;
                 this.boatY = d1 + (this.riddenByEntity == null ? 1 : 0);
@@ -300,13 +295,13 @@ public class EntityBuggy extends Entity
 
         if (this.worldObj.isRemote) {
             this.wheelRotationX += Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ) * 150.0F
-                    * (this.speed < 0 ? 1 : -1);
+                * (this.speed < 0 ? 1 : -1);
             this.wheelRotationX %= 360;
             this.wheelRotationZ = Math.max(-30.0F, Math.min(30.0F, this.wheelRotationZ * 0.9F));
         }
 
-        if (this.worldObj.isRemote && !FMLClientHandler.instance().getClient().thePlayer
-                .equals(this.worldObj.getClosestPlayerToEntity(this, -1))) {
+        if (this.worldObj.isRemote && !FMLClientHandler.instance()
+            .getClient().thePlayer.equals(this.worldObj.getClosestPlayerToEntity(this, -1))) {
             double x;
             double y;
             double var12;
@@ -318,7 +313,7 @@ public class EntityBuggy extends Entity
                 var12 = MathHelper.wrapAngleTo180_double(this.boatYaw - this.rotationYaw);
                 this.rotationYaw = (float) (this.rotationYaw + var12 / this.boatPosRotationIncrements);
                 this.rotationPitch = (float) (this.rotationPitch
-                        + (this.boatPitch - this.rotationPitch) / this.boatPosRotationIncrements);
+                    + (this.boatPitch - this.rotationPitch) / this.boatPosRotationIncrements);
                 --this.boatPosRotationIncrements;
                 this.setPosition(x, y, z);
                 this.setRotation(this.rotationYaw, this.rotationPitch);
@@ -345,14 +340,14 @@ public class EntityBuggy extends Entity
 
         if (this.dataWatcher.getWatchableObjectInt(this.timeSinceHit) > 0) {
             this.dataWatcher.updateObject(
-                    this.timeSinceHit,
-                    Integer.valueOf(this.dataWatcher.getWatchableObjectInt(this.timeSinceHit) - 1));
+                this.timeSinceHit,
+                Integer.valueOf(this.dataWatcher.getWatchableObjectInt(this.timeSinceHit) - 1));
         }
 
         if (this.dataWatcher.getWatchableObjectInt(this.currentDamage) > 0) {
             this.dataWatcher.updateObject(
-                    this.currentDamage,
-                    Integer.valueOf(this.dataWatcher.getWatchableObjectInt(this.currentDamage) - 1));
+                this.currentDamage,
+                Integer.valueOf(this.dataWatcher.getWatchableObjectInt(this.currentDamage) - 1));
         }
 
         if (!this.onGround) {
@@ -361,12 +356,12 @@ public class EntityBuggy extends Entity
 
         if (this.inWater && this.speed > 0.2D) {
             this.worldObj.playSoundEffect(
-                    (float) this.posX,
-                    (float) this.posY,
-                    (float) this.posZ,
-                    "random.fizz",
-                    0.5F,
-                    2.6F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.8F);
+                (float) this.posX,
+                (float) this.posY,
+                (float) this.posZ,
+                "random.fizz",
+                0.5F,
+                2.6F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.8F);
         }
 
         this.speed *= 0.98D;
@@ -389,7 +384,7 @@ public class EntityBuggy extends Entity
         }
 
         if (this.worldObj.isRemote && this.buggyFuelTank.getFluid() != null
-                && this.buggyFuelTank.getFluid().amount > 0) {
+            && this.buggyFuelTank.getFluid().amount > 0) {
             this.motionX = -(this.speed * Math.cos((this.rotationYaw - 90F) * Math.PI / 180.0D));
             this.motionZ = -(this.speed * Math.sin((this.rotationYaw - 90F) * Math.PI / 180.0D));
         }
@@ -414,11 +409,11 @@ public class EntityBuggy extends Entity
             GalacticraftCore.packetPipeline.sendToServer(new PacketEntityUpdate(this));
         } else if (this.ticks % 5 == 0) {
             GalacticraftCore.packetPipeline.sendToAllAround(
-                    new PacketEntityUpdate(this),
-                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 50.0D));
+                new PacketEntityUpdate(this),
+                new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 50.0D));
             GalacticraftCore.packetPipeline.sendToAllAround(
-                    new PacketDynamic(this),
-                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 50.0D));
+                new PacketDynamic(this),
+                new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 50.0D));
         }
     }
 
@@ -564,26 +559,23 @@ public class EntityBuggy extends Entity
         if (this.worldObj.isRemote) {
             if (this.riddenByEntity == null) {
                 var1.addChatMessage(
-                        new ChatComponentText(
-                                GameSettings.getKeyDisplayString(KeyHandlerClient.leftKey.getKeyCode()) + " / "
-                                        + GameSettings.getKeyDisplayString(KeyHandlerClient.rightKey.getKeyCode())
-                                        + "  - "
-                                        + GCCoreUtil.translate("gui.buggy.turn.name")));
+                    new ChatComponentText(
+                        GameSettings.getKeyDisplayString(KeyHandlerClient.leftKey.getKeyCode()) + " / "
+                            + GameSettings.getKeyDisplayString(KeyHandlerClient.rightKey.getKeyCode())
+                            + "  - "
+                            + GCCoreUtil.translate("gui.buggy.turn.name")));
                 var1.addChatMessage(
-                        new ChatComponentText(
-                                GameSettings.getKeyDisplayString(KeyHandlerClient.accelerateKey.getKeyCode())
-                                        + "       - "
-                                        + GCCoreUtil.translate("gui.buggy.accel.name")));
+                    new ChatComponentText(
+                        GameSettings.getKeyDisplayString(KeyHandlerClient.accelerateKey.getKeyCode()) + "       - "
+                            + GCCoreUtil.translate("gui.buggy.accel.name")));
                 var1.addChatMessage(
-                        new ChatComponentText(
-                                GameSettings.getKeyDisplayString(KeyHandlerClient.decelerateKey.getKeyCode())
-                                        + "       - "
-                                        + GCCoreUtil.translate("gui.buggy.decel.name")));
+                    new ChatComponentText(
+                        GameSettings.getKeyDisplayString(KeyHandlerClient.decelerateKey.getKeyCode()) + "       - "
+                            + GCCoreUtil.translate("gui.buggy.decel.name")));
                 var1.addChatMessage(
-                        new ChatComponentText(
-                                GameSettings.getKeyDisplayString(KeyHandlerClient.openFuelGui.getKeyCode())
-                                        + "       - "
-                                        + GCCoreUtil.translate("gui.buggy.inv.name")));
+                    new ChatComponentText(
+                        GameSettings.getKeyDisplayString(KeyHandlerClient.openFuelGui.getKeyCode()) + "       - "
+                            + GCCoreUtil.translate("gui.buggy.inv.name")));
             }
 
             return true;
@@ -658,8 +650,8 @@ public class EntityBuggy extends Entity
             final ItemStack stackAt = this.cargoItems[count];
 
             if (stackAt != null && stackAt.getItem() == stack.getItem()
-                    && stackAt.getItemDamage() == stack.getItemDamage()
-                    && stackAt.stackSize < stackAt.getMaxStackSize()) {
+                && stackAt.getItemDamage() == stack.getItemDamage()
+                && stackAt.stackSize < stackAt.getMaxStackSize()) {
                 if (stackAt.stackSize + stack.stackSize <= stackAt.getMaxStackSize()) {
                     if (doAdd) {
                         this.cargoItems[count].stackSize += stack.stackSize;

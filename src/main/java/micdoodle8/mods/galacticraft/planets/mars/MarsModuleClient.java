@@ -1,22 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars;
 
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.particle.EntityDropParticleFX;
-import net.minecraft.client.particle.EntityFX;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.model.AdvancedModelLoader;
-import net.minecraftforge.client.model.IModelCustom;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -39,45 +22,34 @@ import micdoodle8.mods.galacticraft.planets.IPlanetsModuleClient;
 import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import micdoodle8.mods.galacticraft.planets.mars.client.SkyProviderMars;
 import micdoodle8.mods.galacticraft.planets.mars.client.fx.EntityBacterialDripFX;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiGasLiquefier;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiLaunchController;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiMethaneSynthesizer;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiSlimeling;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiSlimelingFeed;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiTerraformer;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiWaterElectrolyzer;
+import micdoodle8.mods.galacticraft.planets.mars.client.gui.*;
 import micdoodle8.mods.galacticraft.planets.mars.client.model.ModelTier2Rocket;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.block.BlockRendererCavernousVines;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.block.BlockRendererEgg;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.block.BlockRendererHydrogenPipe;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.block.BlockRendererMachine;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.block.BlockRendererTier2TreasureChest;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.entity.RenderCargoRocket;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.entity.RenderCreeperBoss;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.entity.RenderLandingBalloons;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.entity.RenderProjectileTNT;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.entity.RenderSlimeling;
-import micdoodle8.mods.galacticraft.planets.mars.client.render.entity.RenderSludgeling;
+import micdoodle8.mods.galacticraft.planets.mars.client.render.block.*;
+import micdoodle8.mods.galacticraft.planets.mars.client.render.entity.*;
 import micdoodle8.mods.galacticraft.planets.mars.client.render.item.ItemRendererMachine;
 import micdoodle8.mods.galacticraft.planets.mars.client.render.item.ItemRendererTier2Rocket;
 import micdoodle8.mods.galacticraft.planets.mars.client.render.tile.TileEntityCryogenicChamberRenderer;
 import micdoodle8.mods.galacticraft.planets.mars.client.render.tile.TileEntityTreasureChestRenderer;
 import micdoodle8.mods.galacticraft.planets.mars.dimension.WorldProviderMars;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntityCargoRocket;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntityCreeperBoss;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntityLandingBalloons;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntityProjectileTNT;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySludgeling;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntityTier2Rocket;
+import micdoodle8.mods.galacticraft.planets.mars.entities.*;
 import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityCryogenicChamber;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityElectrolyzer;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityGasLiquefier;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityLaunchController;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityMethaneSynthesizer;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTerraformer;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTreasureChestMars;
+import micdoodle8.mods.galacticraft.planets.mars.tile.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.particle.EntityDropParticleFX;
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.model.AdvancedModelLoader;
+import net.minecraftforge.client.model.IModelCustom;
+
+import java.util.List;
 
 public class MarsModuleClient implements IPlanetsModuleClient {
 
@@ -92,7 +64,9 @@ public class MarsModuleClient implements IPlanetsModuleClient {
 
     @Override
     public void init(FMLInitializationEvent event) {
-        FMLCommonHandler.instance().bus().register(new TickHandlerClient());
+        FMLCommonHandler.instance()
+            .bus()
+            .register(new TickHandlerClient());
         MarsModuleClient.vineRenderID = RenderingRegistry.getNextAvailableRenderId();
         RenderingRegistry.registerBlockHandler(new BlockRendererCavernousVines(MarsModuleClient.vineRenderID));
         MarsModuleClient.eggRenderID = RenderingRegistry.getNextAvailableRenderId();
@@ -108,28 +82,27 @@ public class MarsModuleClient implements IPlanetsModuleClient {
     @Override
     public void postInit(FMLPostInitializationEvent event) {
         final IModelCustom chamberModel = AdvancedModelLoader
-                .loadModel(new ResourceLocation(MarsModule.ASSET_PREFIX, "models/chamber.obj"));
+            .loadModel(new ResourceLocation(MarsModule.ASSET_PREFIX, "models/chamber.obj"));
         final IModelCustom cargoRocketModel = AdvancedModelLoader
-                .loadModel(new ResourceLocation(MarsModule.ASSET_PREFIX, "models/cargoRocket.obj"));
+            .loadModel(new ResourceLocation(MarsModule.ASSET_PREFIX, "models/cargoRocket.obj"));
 
         // Tile Entity Renderers
+        ClientRegistry
+            .bindTileEntitySpecialRenderer(TileEntityTreasureChestMars.class, new TileEntityTreasureChestRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(
-                TileEntityTreasureChestMars.class,
-                new TileEntityTreasureChestRenderer());
+            TileEntityCryogenicChamber.class,
+            new TileEntityCryogenicChamberRenderer(chamberModel));
         ClientRegistry.bindTileEntitySpecialRenderer(
-                TileEntityCryogenicChamber.class,
-                new TileEntityCryogenicChamberRenderer(chamberModel));
-        ClientRegistry.bindTileEntitySpecialRenderer(
-                TileEntityTerraformer.class,
-                new TileEntityBubbleProviderRenderer(0.25F, 1.0F, 0.25F));
+            TileEntityTerraformer.class,
+            new TileEntityBubbleProviderRenderer(0.25F, 1.0F, 0.25F));
 
         // Entities
         RenderingRegistry.registerEntityRenderingHandler(EntitySludgeling.class, new RenderSludgeling());
         RenderingRegistry.registerEntityRenderingHandler(EntitySlimeling.class, new RenderSlimeling());
         RenderingRegistry.registerEntityRenderingHandler(EntityCreeperBoss.class, new RenderCreeperBoss());
         RenderingRegistry.registerEntityRenderingHandler(
-                EntityTier2Rocket.class,
-                new RenderTier1Rocket(new ModelTier2Rocket(), MarsModule.ASSET_PREFIX, "rocketT2"));
+            EntityTier2Rocket.class,
+            new RenderTier1Rocket(new ModelTier2Rocket(), MarsModule.ASSET_PREFIX, "rocketT2"));
         // RenderingRegistry.registerEntityRenderingHandler(EntityTerraformBubble.class,
         // new RenderBubble(0.25F,
         // 1.0F, 0.25F));
@@ -137,7 +110,7 @@ public class MarsModuleClient implements IPlanetsModuleClient {
         RenderingRegistry.registerEntityRenderingHandler(EntityLandingBalloons.class, new RenderLandingBalloons());
         RenderingRegistry.registerEntityRenderingHandler(EntityLandingBalloons.class, new RenderLandingBalloons());
         RenderingRegistry
-                .registerEntityRenderingHandler(EntityCargoRocket.class, new RenderCargoRocket(cargoRocketModel));
+            .registerEntityRenderingHandler(EntityCargoRocket.class, new RenderCargoRocket(cargoRocketModel));
 
         // Add Armor Renderer Prefix
         RenderingRegistry.addNewArmourRendererPrefix("desh");
@@ -145,10 +118,10 @@ public class MarsModuleClient implements IPlanetsModuleClient {
         // Item Renderers
         MinecraftForgeClient.registerItemRenderer(MarsItems.spaceship, new ItemRendererTier2Rocket(cargoRocketModel));
         MinecraftForgeClient.registerItemRenderer(
-                MarsItems.key,
-                new ItemRendererKey(new ResourceLocation(MarsModule.ASSET_PREFIX, "textures/model/treasure.png")));
+            MarsItems.key,
+            new ItemRendererKey(new ResourceLocation(MarsModule.ASSET_PREFIX, "textures/model/treasure.png")));
         MinecraftForgeClient
-                .registerItemRenderer(Item.getItemFromBlock(MarsBlocks.machine), new ItemRendererMachine(chamberModel));
+            .registerItemRenderer(Item.getItemFromBlock(MarsBlocks.machine), new ItemRendererMachine(chamberModel));
     }
 
     @Override
@@ -197,7 +170,8 @@ public class MarsModuleClient implements IPlanetsModuleClient {
 
     @Override
     public void spawnParticle(String particleID, Vector3 position, Vector3 motion, Object... extraData) {
-        final Minecraft mc = FMLClientHandler.instance().getClient();
+        final Minecraft mc = FMLClientHandler.instance()
+            .getClient();
 
         if (mc != null && mc.renderViewEntity != null && mc.effectRenderer != null) {
             final double dPosX = mc.renderViewEntity.posX - position.x;
@@ -209,11 +183,11 @@ public class MarsModuleClient implements IPlanetsModuleClient {
             if (dPosX * dPosX + dPosY * dPosY + dPosZ * dPosZ < maxDistSqrd * maxDistSqrd) {
                 if ("sludgeDrip".equals(particleID)) {
                     particle = new EntityDropParticleFX(
-                            mc.theWorld,
-                            position.x,
-                            position.y,
-                            position.z,
-                            Material.water);
+                        mc.theWorld,
+                        position.x,
+                        position.y,
+                        position.z,
+                        Material.water);
                 } else if ("bacterialDrip".equals(particleID)) {
                     particle = new EntityBacterialDripFX(mc.theWorld, position.x, position.y, position.z);
                 }
@@ -236,10 +210,14 @@ public class MarsModuleClient implements IPlanetsModuleClient {
     public static void openSlimelingGui(EntitySlimeling slimeling, int gui) {
         switch (gui) {
             case 0:
-                FMLClientHandler.instance().getClient().displayGuiScreen(new GuiSlimeling(slimeling));
+                FMLClientHandler.instance()
+                    .getClient()
+                    .displayGuiScreen(new GuiSlimeling(slimeling));
                 break;
             case 1:
-                FMLClientHandler.instance().getClient().displayGuiScreen(new GuiSlimelingFeed(slimeling));
+                FMLClientHandler.instance()
+                    .getClient()
+                    .displayGuiScreen(new GuiSlimelingFeed(slimeling));
                 break;
         }
     }
@@ -249,7 +227,8 @@ public class MarsModuleClient implements IPlanetsModuleClient {
         @SideOnly(Side.CLIENT)
         @SubscribeEvent
         public void onClientTick(ClientTickEvent event) {
-            final Minecraft minecraft = FMLClientHandler.instance().getClient();
+            final Minecraft minecraft = FMLClientHandler.instance()
+                .getClient();
 
             final WorldClient world = minecraft.theWorld;
 

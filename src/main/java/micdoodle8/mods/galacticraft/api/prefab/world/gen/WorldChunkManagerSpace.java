@@ -1,15 +1,15 @@
 package micdoodle8.mods.galacticraft.api.prefab.world.gen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.biome.BiomeCache;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.gen.layer.IntCache;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Do not include this prefab class in your released mod download.
@@ -54,7 +54,7 @@ public abstract class WorldChunkManagerSpace extends WorldChunkManager {
 
     @Override
     public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] par1ArrayOfBiomeGenBase, int par2, int par3, int par4,
-            int par5) {
+        int par5) {
         IntCache.resetIntCache();
 
         if (par1ArrayOfBiomeGenBase == null || par1ArrayOfBiomeGenBase.length < par4 * par5) {
@@ -70,13 +70,13 @@ public abstract class WorldChunkManagerSpace extends WorldChunkManager {
 
     @Override
     public BiomeGenBase[] loadBlockGeneratorData(BiomeGenBase[] par1ArrayOfBiomeGenBase, int par2, int par3, int par4,
-            int par5) {
+        int par5) {
         return this.getBiomeGenAt(par1ArrayOfBiomeGenBase, par2, par3, par4, par5, true);
     }
 
     @Override
     public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] par1ArrayOfBiomeGenBase, int par2, int par3, int par4, int par5,
-            boolean par6) {
+        boolean par6) {
         IntCache.resetIntCache();
 
         if (par1ArrayOfBiomeGenBase == null || par1ArrayOfBiomeGenBase.length < par4 * par5) {
@@ -102,7 +102,7 @@ public abstract class WorldChunkManagerSpace extends WorldChunkManager {
 
     @Override
     public ChunkPosition findBiomePosition(int par1, int par2, int par3, List<BiomeGenBase> par4List,
-            Random par5Random) {
+        Random par5Random) {
         final int var6 = par1 - par3 >> 2;
         final int var7 = par2 - par3 >> 2;
         final int var8 = par1 + par3 >> 2;

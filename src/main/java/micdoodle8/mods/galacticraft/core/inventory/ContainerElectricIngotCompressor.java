@@ -1,5 +1,7 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
+import micdoodle8.mods.galacticraft.api.item.IItemElectric;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricIngotCompressor;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -8,22 +10,19 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
 
-import micdoodle8.mods.galacticraft.api.item.IItemElectric;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricIngotCompressor;
-
 public class ContainerElectricIngotCompressor extends Container {
 
     private final TileEntityElectricIngotCompressor tileEntity;
 
     public ContainerElectricIngotCompressor(InventoryPlayer par1InventoryPlayer,
-            TileEntityElectricIngotCompressor tileEntity) {
+        TileEntityElectricIngotCompressor tileEntity) {
         this.tileEntity = tileEntity;
         tileEntity.compressingCraftMatrix.eventHandler = this;
 
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 this.addSlotToContainer(
-                        new Slot(tileEntity.compressingCraftMatrix, y + x * 3, 19 + y * 18, 18 + x * 18));
+                    new Slot(tileEntity.compressingCraftMatrix, y + x * 3, 19 + y * 18, 18 + x * 18));
             }
         }
 
@@ -39,7 +38,7 @@ public class ContainerElectricIngotCompressor extends Container {
         for (var3 = 0; var3 < 3; ++var3) {
             for (int var4 = 0; var4 < 9; ++var4) {
                 this.addSlotToContainer(
-                        new Slot(par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 117 + var3 * 18));
+                    new Slot(par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 117 + var3 * 18));
             }
         }
 

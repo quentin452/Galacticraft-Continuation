@@ -1,18 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -28,6 +15,18 @@ import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.planets.mars.entities.EntityCargoRocket;
 import micdoodle8.mods.galacticraft.planets.mars.entities.EntityTier2Rocket;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidStack;
+
+import java.util.List;
 
 public class ItemTier2Rocket extends Item implements IHoldableItem {
 
@@ -51,7 +50,7 @@ public class ItemTier2Rocket extends Item implements IHoldableItem {
 
     @Override
     public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4,
-            int par5, int par6, int par7, float par8, float par9, float par10) {
+        int par5, int par6, int par7, float par8, float par9, float par10) {
         boolean padFound = false;
         TileEntity tile = null;
 
@@ -100,27 +99,31 @@ public class ItemTier2Rocket extends Item implements IHoldableItem {
 
         if (par1ItemStack.getItemDamage() < 10) {
             rocket = new EntityTier2Rocket(
-                    par3World,
-                    centerX,
-                    centerY,
-                    centerZ,
-                    EnumRocketType.values()[par1ItemStack.getItemDamage()]);
+                par3World,
+                centerX,
+                centerY,
+                centerZ,
+                EnumRocketType.values()[par1ItemStack.getItemDamage()]);
         } else {
             rocket = new EntityCargoRocket(
-                    par3World,
-                    centerX,
-                    centerY,
-                    centerZ,
-                    EnumRocketType.values()[par1ItemStack.getItemDamage() - 10]);
+                par3World,
+                centerX,
+                centerY,
+                centerZ,
+                EnumRocketType.values()[par1ItemStack.getItemDamage() - 10]);
         }
 
         rocket.setPosition(rocket.posX, rocket.posY + rocket.getOnPadYOffset(), rocket.posZ);
         par3World.spawnEntityInWorld(rocket);
 
-        if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound().hasKey("RocketFuel")) {
+        if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound()
+            .hasKey("RocketFuel")) {
             rocket.fuelTank.fill(
-                    new FluidStack(GalacticraftCore.fluidFuel, par1ItemStack.getTagCompound().getInteger("RocketFuel")),
-                    true);
+                new FluidStack(
+                    GalacticraftCore.fluidFuel,
+                    par1ItemStack.getTagCompound()
+                        .getInteger("RocketFuel")),
+                true);
         }
 
         if (!par2EntityPlayer.capabilities.isCreativeMode) {
@@ -131,7 +134,8 @@ public class ItemTier2Rocket extends Item implements IHoldableItem {
             }
         }
 
-        if (((IRocketType) rocket).getType().getPreFueled()) {
+        if (((IRocketType) rocket).getType()
+            .getPreFueled()) {
             rocket.fuelTank.fill(new FluidStack(GalacticraftCore.fluidFuel, rocket.getMaxFuel()), true);
         }
         return true;
@@ -159,7 +163,8 @@ public class ItemTier2Rocket extends Item implements IHoldableItem {
             type = EnumRocketType.values()[par1ItemStack.getItemDamage() - 10];
         }
 
-        if (!type.getTooltip().isEmpty()) {
+        if (!type.getTooltip()
+            .isEmpty()) {
             par2List.add(type.getTooltip());
         }
 
@@ -167,30 +172,34 @@ public class ItemTier2Rocket extends Item implements IHoldableItem {
             par2List.add(EnumColor.RED + "\u00a7o" + GCCoreUtil.translate("gui.creativeOnly.desc"));
         }
 
-        if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound().hasKey("RocketFuel")) {
+        if (par1ItemStack.hasTagCompound() && par1ItemStack.getTagCompound()
+            .hasKey("RocketFuel")) {
             EntityAutoRocket rocket;
 
             if (par1ItemStack.getItemDamage() < 10) {
                 rocket = new EntityTier2Rocket(
-                        FMLClientHandler.instance().getWorldClient(),
-                        0,
-                        0,
-                        0,
-                        EnumRocketType.values()[par1ItemStack.getItemDamage()]);
+                    FMLClientHandler.instance()
+                        .getWorldClient(),
+                    0,
+                    0,
+                    0,
+                    EnumRocketType.values()[par1ItemStack.getItemDamage()]);
             } else {
                 rocket = new EntityCargoRocket(
-                        FMLClientHandler.instance().getWorldClient(),
-                        0,
-                        0,
-                        0,
-                        EnumRocketType.values()[par1ItemStack.getItemDamage() - 10]);
+                    FMLClientHandler.instance()
+                        .getWorldClient(),
+                    0,
+                    0,
+                    0,
+                    EnumRocketType.values()[par1ItemStack.getItemDamage() - 10]);
             }
 
             par2List.add(
-                    GCCoreUtil.translate("gui.message.fuel.name") + ": "
-                            + par1ItemStack.getTagCompound().getInteger("RocketFuel")
-                            + " / "
-                            + rocket.fuelTank.getCapacity());
+                GCCoreUtil.translate("gui.message.fuel.name") + ": "
+                    + par1ItemStack.getTagCompound()
+                        .getInteger("RocketFuel")
+                    + " / "
+                    + rocket.fuelTank.getCapacity());
         }
 
         if (par1ItemStack.getItemDamage() >= 10) {
@@ -201,7 +210,7 @@ public class ItemTier2Rocket extends Item implements IHoldableItem {
     @Override
     public String getUnlocalizedName(ItemStack par1ItemStack) {
         return super.getUnlocalizedName(par1ItemStack)
-                + (par1ItemStack.getItemDamage() < 10 ? ".t2Rocket" : ".cargoRocket");
+            + (par1ItemStack.getItemDamage() < 10 ? ".t2Rocket" : ".cargoRocket");
     }
 
     @Override

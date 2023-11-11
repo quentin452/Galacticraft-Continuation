@@ -1,18 +1,5 @@
 package micdoodle8.mods.galacticraft.core.energy.grid;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyReceiver;
 import cpw.mods.fml.common.FMLLog;
@@ -26,6 +13,11 @@ import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
 import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.*;
 
 // import buildcraft.api.power.PowerHandler.Type;
 
@@ -39,7 +31,7 @@ public class EnergyNetwork implements IElectricityNetwork {
     private final boolean isRF1Loaded = EnergyConfigHandler.isRFAPIv1Loaded() && !EnergyConfigHandler.disableRFOutput;
     private final boolean isRF2Loaded = EnergyConfigHandler.isRFAPIv2Loaded() && !EnergyConfigHandler.disableRFOutput;
     private final boolean isIC2Loaded = EnergyConfigHandler.isIndustrialCraft2Loaded()
-            && !EnergyConfigHandler.disableIC2Output;
+        && !EnergyConfigHandler.disableIC2Output;
 
     /*
      * Re-written by radfast for better performance Imagine a 30 producer, 80 acceptor network... Before: it would have
@@ -251,10 +243,10 @@ public class EnergyNetwork implements IElectricityNetwork {
                         e = (float) result / EnergyConfigHandler.TO_IC2_RATIO;
                     } else if (this.isRF2Loaded && acceptor instanceof IEnergyReceiver) {
                         e = ((IEnergyReceiver) acceptor).receiveEnergy(sideFrom, Integer.MAX_VALUE, true)
-                                / EnergyConfigHandler.TO_RF_RATIO;
+                            / EnergyConfigHandler.TO_RF_RATIO;
                     } else if (this.isRF1Loaded && acceptor instanceof IEnergyHandler) {
                         e = ((IEnergyHandler) acceptor).receiveEnergy(sideFrom, Integer.MAX_VALUE, true)
-                                / EnergyConfigHandler.TO_RF_RATIO;
+                            / EnergyConfigHandler.TO_RF_RATIO;
                     }
 
                     if (e > 0.0F) {
@@ -326,7 +318,7 @@ public class EnergyNetwork implements IElectricityNetwork {
                     // is less than 1
                     if (currentSending > EnergyNetwork.ENERGY_STORAGE_LEVEL) {
                         currentSending = EnergyNetwork.ENERGY_STORAGE_LEVEL
-                                + (currentSending - EnergyNetwork.ENERGY_STORAGE_LEVEL) * energyStorageReducor;
+                            + (currentSending - EnergyNetwork.ENERGY_STORAGE_LEVEL) * energyStorageReducor;
                     }
 
                     // Reduce everything proportionately if there is not enough energy for all needs
@@ -340,7 +332,7 @@ public class EnergyNetwork implements IElectricityNetwork {
 
                     if (tileEntity instanceof IElectrical) {
                         sentToAcceptor = ((IElectrical) tileEntity)
-                                .receiveElectricity(sideFrom, currentSending, tierProduced, true);
+                            .receiveElectricity(sideFrom, currentSending, tierProduced, true);
                     } else if (this.isIC2Loaded && tileEntity instanceof IEnergySink) {
                         final double energySendingIC2 = currentSending * EnergyConfigHandler.TO_IC2_RATIO;
                         if (energySendingIC2 >= 1D) {
@@ -348,10 +340,10 @@ public class EnergyNetwork implements IElectricityNetwork {
                             try {
                                 if (EnergyUtil.voltageParameterIC2) {
                                     result = (Double) EnergyUtil.injectEnergyIC2
-                                            .invoke(tileEntity, sideFrom, energySendingIC2, 120D);
+                                        .invoke(tileEntity, sideFrom, energySendingIC2, 120D);
                                 } else {
                                     result = (Double) EnergyUtil.injectEnergyIC2
-                                            .invoke(tileEntity, sideFrom, energySendingIC2);
+                                        .invoke(tileEntity, sideFrom, energySendingIC2);
                                 }
                             } catch (final Exception ex) {
                                 if (ConfigManagerCore.enableDebug) {
@@ -367,16 +359,16 @@ public class EnergyNetwork implements IElectricityNetwork {
                         }
                     } else if (this.isRF2Loaded && tileEntity instanceof IEnergyReceiver) {
                         final int currentSendinginRF = currentSending
-                                >= Integer.MAX_VALUE / EnergyConfigHandler.TO_RF_RATIO ? Integer.MAX_VALUE
-                                        : (int) (currentSending * EnergyConfigHandler.TO_RF_RATIO);
+                            >= Integer.MAX_VALUE / EnergyConfigHandler.TO_RF_RATIO ? Integer.MAX_VALUE
+                                : (int) (currentSending * EnergyConfigHandler.TO_RF_RATIO);
                         sentToAcceptor = ((IEnergyReceiver) tileEntity)
-                                .receiveEnergy(sideFrom, currentSendinginRF, false) / EnergyConfigHandler.TO_RF_RATIO;
+                            .receiveEnergy(sideFrom, currentSendinginRF, false) / EnergyConfigHandler.TO_RF_RATIO;
                     } else if (this.isRF1Loaded && tileEntity instanceof IEnergyHandler) {
                         final int currentSendinginRF = currentSending
-                                >= Integer.MAX_VALUE / EnergyConfigHandler.TO_RF_RATIO ? Integer.MAX_VALUE
-                                        : (int) (currentSending * EnergyConfigHandler.TO_RF_RATIO);
+                            >= Integer.MAX_VALUE / EnergyConfigHandler.TO_RF_RATIO ? Integer.MAX_VALUE
+                                : (int) (currentSending * EnergyConfigHandler.TO_RF_RATIO);
                         sentToAcceptor = ((IEnergyHandler) tileEntity)
-                                .receiveEnergy(sideFrom, currentSendinginRF, false) / EnergyConfigHandler.TO_RF_RATIO;
+                            .receiveEnergy(sideFrom, currentSendinginRF, false) / EnergyConfigHandler.TO_RF_RATIO;
                     } else {
                         sentToAcceptor = 0F;
                     }
@@ -384,11 +376,11 @@ public class EnergyNetwork implements IElectricityNetwork {
                     if (sentToAcceptor / currentSending > 1.002F && sentToAcceptor > 0.01F) {
                         if (!this.spamstop) {
                             FMLLog.info(
-                                    "Energy network: acceptor took too much energy, offered " + currentSending
-                                            + ", took "
-                                            + sentToAcceptor
-                                            + ". "
-                                            + tileEntity.toString());
+                                "Energy network: acceptor took too much energy, offered " + currentSending
+                                    + ", took "
+                                    + sentToAcceptor
+                                    + ". "
+                                    + tileEntity.toString());
                             this.spamstop = true;
                         }
                         sentToAcceptor = currentSending;
@@ -400,15 +392,16 @@ public class EnergyNetwork implements IElectricityNetwork {
                 GCLog.severe("DEBUG Energy network loop issue, please report this");
                 if (debugTE != null) {
                     GCLog.severe(
-                            "Problem was likely caused by tile in dim " + debugTE.getWorldObj().provider.dimensionId
-                                    + " at "
-                                    + debugTE.xCoord
-                                    + ","
-                                    + debugTE.yCoord
-                                    + ","
-                                    + debugTE.zCoord
-                                    + " Type:"
-                                    + debugTE.getClass().getSimpleName());
+                        "Problem was likely caused by tile in dim " + debugTE.getWorldObj().provider.dimensionId
+                            + " at "
+                            + debugTE.xCoord
+                            + ","
+                            + debugTE.yCoord
+                            + ","
+                            + debugTE.zCoord
+                            + " Type:"
+                            + debugTE.getClass()
+                                .getSimpleName());
                 }
             }
         }
@@ -445,8 +438,8 @@ public class EnergyNetwork implements IElectricityNetwork {
             final World world = tile.getWorldObj();
             // Remove any conductors in unloaded chunks
             if (tile.isInvalid() || world == null
-                    || !world.blockExists(tile.xCoord, tile.yCoord, tile.zCoord)
-                    || conductor != world.getTileEntity(tile.xCoord, tile.yCoord, tile.zCoord)) {
+                || !world.blockExists(tile.xCoord, tile.yCoord, tile.zCoord)
+                || conductor != world.getTileEntity(tile.xCoord, tile.yCoord, tile.zCoord)) {
                 it.remove();
                 continue;
             }
@@ -515,9 +508,9 @@ public class EnergyNetwork implements IElectricityNetwork {
             // (Chunk loading can change the network if new conductors are found)
             for (final IConductor conductor : conductorsCopy) {
                 EnergyUtil.setAdjacentPowerConnections(
-                        (TileEntity) conductor,
-                        this.connectedAcceptors,
-                        this.connectedDirections);
+                    (TileEntity) conductor,
+                    this.connectedAcceptors,
+                    this.connectedDirections);
             }
         } catch (final Exception e) {
             FMLLog.severe("GC Aluminium Wire: Error when testing whether another mod's tileEntity can accept energy.");
@@ -560,7 +553,8 @@ public class EnergyNetwork implements IElectricityNetwork {
         this.totalRequested = 0F;
         try {
             final Class<?> clazz = Class.forName("micdoodle8.mods.galacticraft.core.tick.TickHandlerServer");
-            clazz.getMethod("removeNetworkTick", this.getClass()).invoke(null, this);
+            clazz.getMethod("removeNetworkTick", this.getClass())
+                .invoke(null, this);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -569,14 +563,17 @@ public class EnergyNetwork implements IElectricityNetwork {
     @Override
     public void split(IConductor splitPoint) {
         if (splitPoint instanceof TileEntity) {
-            this.getTransmitters().remove(splitPoint);
+            this.getTransmitters()
+                .remove(splitPoint);
             splitPoint.setNetwork(null);
 
             // If the size of the residual network is 1, it should simply be preserved
-            if (this.getTransmitters().size() > 1) {
+            if (this.getTransmitters()
+                .size() > 1) {
                 final World world = ((TileEntity) splitPoint).getWorldObj();
 
-                if (this.getTransmitters().size() > 0) {
+                if (this.getTransmitters()
+                    .size() > 0) {
                     final TileEntity[] nextToSplit = new TileEntity[6];
                     final boolean[] toDo = { true, true, true, true, true, true };
                     TileEntity tileEntity;
@@ -622,9 +619,9 @@ public class EnergyNetwork implements IElectricityNetwork {
                         if (toDo[i1]) {
                             final TileEntity connectedBlockA = nextToSplit[i1];
                             final NetworkFinder finder = new NetworkFinder(
-                                    world,
-                                    new BlockVec3(connectedBlockA),
-                                    new BlockVec3((TileEntity) splitPoint));
+                                world,
+                                new BlockVec3(connectedBlockA),
+                                new BlockVec3((TileEntity) splitPoint));
                             final List<IConductor> partNetwork = finder.exploreNetwork();
 
                             // Mark any others still to do in the nextToSplit array which are connected to
@@ -640,7 +637,8 @@ public class EnergyNetwork implements IElectricityNetwork {
 
                             // Now make the new network from partNetwork
                             final EnergyNetwork newNetwork = new EnergyNetwork();
-                            newNetwork.getTransmitters().addAll(partNetwork);
+                            newNetwork.getTransmitters()
+                                .addAll(partNetwork);
                             newNetwork.refreshWithChecks();
                         }
                     }
@@ -649,19 +647,21 @@ public class EnergyNetwork implements IElectricityNetwork {
                 }
             }
             // Splitting a 1-block network leaves nothing
-            else if (this.getTransmitters().size() == 0) {
-                this.destroy();
-            }
+            else if (this.getTransmitters()
+                .size() == 0) {
+                    this.destroy();
+                }
         }
     }
 
     @Override
     public String toString() {
         return "EnergyNetwork[" + this.hashCode()
-                + "|Wires:"
-                + this.getTransmitters().size()
-                + "|Acceptors:"
-                + this.connectedAcceptors.size()
-                + "]";
+            + "|Wires:"
+            + this.getTransmitters()
+                .size()
+            + "|Acceptors:"
+            + this.connectedAcceptors.size()
+            + "]";
     }
 }

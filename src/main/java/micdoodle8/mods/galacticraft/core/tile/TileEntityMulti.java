@@ -1,15 +1,14 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
-
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import java.util.ArrayList;
 
 public class TileEntityMulti extends TileEntityAdvanced {
 
@@ -40,7 +39,7 @@ public class TileEntityMulti extends TileEntityAdvanced {
     public boolean onBlockActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer) {
         if (this.mainBlockPosition != null) {
             final TileEntity tileEntity = this.worldObj
-                    .getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
+                .getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
 
             if (tileEntity instanceof IMultiBlock) {
                 return ((IMultiBlock) tileEntity).onActivated(par5EntityPlayer);
@@ -53,7 +52,7 @@ public class TileEntityMulti extends TileEntityAdvanced {
     public TileEntity getMainBlockTile() {
         if (this.mainBlockPosition != null) {
             return this.worldObj
-                    .getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
+                .getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
         }
 
         return null;

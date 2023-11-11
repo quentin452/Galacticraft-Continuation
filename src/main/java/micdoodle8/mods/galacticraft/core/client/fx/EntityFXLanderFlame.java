@@ -1,14 +1,12 @@
 package micdoodle8.mods.galacticraft.core.client.fx;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class EntityFXLanderFlame extends EntityFX {
@@ -17,7 +15,7 @@ public class EntityFXLanderFlame extends EntityFX {
     private final EntityLivingBase ridingEntity;
 
     public EntityFXLanderFlame(World world, double x, double y, double z, double mX, double mY, double mZ,
-            EntityLivingBase ridingEntity) {
+        EntityLivingBase ridingEntity) {
         super(world, x, y, z, mX, mY, mZ);
         this.motionX *= 0.10000000149011612D;
         this.motionZ *= 0.10000000149011612D;
@@ -36,7 +34,7 @@ public class EntityFXLanderFlame extends EntityFX {
 
     @Override
     public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4, float par5, float par6,
-            float par7) {
+        float par7) {
         GL11.glDepthMask(false);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         float var8 = (this.particleAge + par2) / this.particleMaxAge * 32.0F;

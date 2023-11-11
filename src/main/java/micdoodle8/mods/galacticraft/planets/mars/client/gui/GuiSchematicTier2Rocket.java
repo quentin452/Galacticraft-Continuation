@@ -1,25 +1,23 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.gui;
 
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import micdoodle8.mods.galacticraft.api.recipe.ISchematicResultPage;
 import micdoodle8.mods.galacticraft.api.recipe.SchematicRegistry;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
 import micdoodle8.mods.galacticraft.planets.mars.inventory.ContainerSchematicTier2Rocket;
 import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 public class GuiSchematicTier2Rocket extends GuiContainer implements ISchematicResultPage {
 
     private static final ResourceLocation tier2SchematicTexture = new ResourceLocation(
-            MarsModule.ASSET_PREFIX,
-            "textures/gui/schematic_rocket_T2.png");
+        MarsModule.ASSET_PREFIX,
+        "textures/gui/schematic_rocket_T2.png");
 
     private int pageIndex;
 
@@ -33,21 +31,21 @@ public class GuiSchematicTier2Rocket extends GuiContainer implements ISchematicR
         super.initGui();
         this.buttonList.clear();
         this.buttonList.add(
-                new GuiButton(
-                        0,
-                        this.width / 2 - 130,
-                        this.height / 2 - 30 + 27 - 12,
-                        40,
-                        20,
-                        GCCoreUtil.translate("gui.button.back.name")));
+            new GuiButton(
+                0,
+                this.width / 2 - 130,
+                this.height / 2 - 30 + 27 - 12,
+                40,
+                20,
+                GCCoreUtil.translate("gui.button.back.name")));
         this.buttonList.add(
-                new GuiButton(
-                        1,
-                        this.width / 2 - 130,
-                        this.height / 2 - 30 + 27 + 12,
-                        40,
-                        20,
-                        GCCoreUtil.translate("gui.button.next.name")));
+            new GuiButton(
+                1,
+                this.width / 2 - 130,
+                this.height / 2 - 30 + 27 + 12,
+                40,
+                20,
+                GCCoreUtil.translate("gui.button.next.name")));
     }
 
     @Override
@@ -67,10 +65,10 @@ public class GuiSchematicTier2Rocket extends GuiContainer implements ISchematicR
     @Override
     protected void drawGuiContainerForegroundLayer(int par1, int par2) {
         this.fontRendererObj.drawString(
-                MarsItems.spaceship.getItemStackDisplayName(new ItemStack(MarsItems.spaceship, 1, 0)),
-                7,
-                -20 + 27,
-                4210752);
+            MarsItems.spaceship.getItemStackDisplayName(new ItemStack(MarsItems.spaceship, 1, 0)),
+            7,
+            -20 + 27,
+            4210752);
         this.fontRendererObj.drawString(GCCoreUtil.translate("container.inventory"), 8, 220 - 104 + 2 + 27, 4210752);
     }
 

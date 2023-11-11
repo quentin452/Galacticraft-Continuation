@@ -1,18 +1,16 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
+import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIArrowAttack;
-import net.minecraft.entity.ai.EntityAIFleeSun;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAIRestrictSun;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
+import net.minecraft.entity.ai.*;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -23,12 +21,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-
-import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 
 public class EntityEvolvedSkeleton extends EntitySkeleton implements IEntityBreathable {
 
@@ -49,8 +41,10 @@ public class EntityEvolvedSkeleton extends EntitySkeleton implements IEntityBrea
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(25);
-        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.35F);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
+            .setBaseValue(25);
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
+            .setBaseValue(0.35F);
     }
 
     @Override
@@ -61,16 +55,15 @@ public class EntityEvolvedSkeleton extends EntitySkeleton implements IEntityBrea
     @Override
     public void attackEntityWithRangedAttack(EntityLivingBase par1EntityLivingBase, float par2) {
         final EntityArrow entityarrow = new EntityArrow(
-                this.worldObj,
-                this,
-                par1EntityLivingBase,
-                0.4F,
-                17 - this.worldObj.difficultySetting.getDifficultyId() * 4);
+            this.worldObj,
+            this,
+            par1EntityLivingBase,
+            0.4F,
+            17 - this.worldObj.difficultySetting.getDifficultyId() * 4);
         final int i = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, this.getHeldItem());
         final int j = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, this.getHeldItem());
         entityarrow.setDamage(
-                par2 * 2.0F + this.rand.nextGaussian() * 0.25D
-                        + this.worldObj.difficultySetting.getDifficultyId() * 0.11F);
+            par2 * 2.0F + this.rand.nextGaussian() * 0.25D + this.worldObj.difficultySetting.getDifficultyId() * 0.11F);
 
         if (i > 0) {
             entityarrow.setDamage(entityarrow.getDamage() + i * 0.5D + 0.5D);
@@ -81,11 +74,15 @@ public class EntityEvolvedSkeleton extends EntitySkeleton implements IEntityBrea
         }
 
         if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, this.getHeldItem()) > 0
-                || this.getSkeletonType() == 1) {
+            || this.getSkeletonType() == 1) {
             entityarrow.setFire(100);
         }
 
-        this.playSound("random.bow", 1.0F, 1.0F / (this.getRNG().nextFloat() * 0.4F + 0.8F));
+        this.playSound(
+            "random.bow",
+            1.0F,
+            1.0F / (this.getRNG()
+                .nextFloat() * 0.4F + 0.8F));
         this.worldObj.spawnEntityInWorld(entityarrow);
     }
 
@@ -97,7 +94,8 @@ public class EntityEvolvedSkeleton extends EntitySkeleton implements IEntityBrea
         }
 
         if (this.isPotionActive(Potion.jump)) {
-            this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
+            this.motionY += (this.getActivePotionEffect(Potion.jump)
+                .getAmplifier() + 1) * 0.1F;
         }
 
         if (this.isSprinting()) {

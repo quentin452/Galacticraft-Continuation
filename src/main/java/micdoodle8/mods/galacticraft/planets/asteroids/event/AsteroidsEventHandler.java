@@ -14,7 +14,7 @@ public class AsteroidsEventHandler {
         }
 
         if (event.armorStack.getItem() == AsteroidsItems.thermalPadding
-                && event.armorStack.getItemDamage() == event.armorIndex) {
+            && event.armorStack.getItemDamage() == event.armorIndex) {
             event.setArmorAddResult(ThermalArmorEvent.ArmorAddResult.ADD);
             return;
         }

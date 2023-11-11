@@ -1,13 +1,5 @@
 package micdoodle8.mods.galacticraft.core.client.gui.container;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
@@ -16,13 +8,19 @@ import micdoodle8.mods.galacticraft.core.inventory.ContainerIngotCompressor;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityIngotCompressor;
 import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiIngotCompressor extends GuiContainerGC {
 
     private static final ResourceLocation electricFurnaceTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/ingotCompressor.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/ingotCompressor.png");
     private final GuiElementInfoRegion processInfoRegion = new GuiElementInfoRegion(0, 0, 52, 25, null, 0, 0, this);
 
     private final TileEntityIngotCompressor tileEntity;
@@ -52,7 +50,7 @@ public class GuiIngotCompressor extends GuiContainerGC {
         this.fontRendererObj.drawString(this.tileEntity.getInventoryName(), 10, 6, 4210752);
         String displayText = GCCoreUtil.translate("gui.message.fuel.name") + ":";
         this.fontRendererObj
-                .drawString(displayText, 50 - this.fontRendererObj.getStringWidth(displayText), 79, 4210752);
+            .drawString(displayText, 50 - this.fontRendererObj.getStringWidth(displayText), 79, 4210752);
 
         if (this.tileEntity.processTicks > 0) {
             displayText = EnumColor.BRIGHT_GREEN + GCCoreUtil.translate("gui.status.compressing.name");
@@ -62,10 +60,10 @@ public class GuiIngotCompressor extends GuiContainerGC {
 
         String str = GCCoreUtil.translate("gui.message.status.name") + ":";
         this.fontRendererObj.drawString(
-                GCCoreUtil.translate("gui.message.status.name") + ":",
-                120 - this.fontRendererObj.getStringWidth(str) / 2,
-                70,
-                4210752);
+            GCCoreUtil.translate("gui.message.status.name") + ":",
+            120 - this.fontRendererObj.getStringWidth(str) / 2,
+            70,
+            4210752);
         str = displayText;
         this.fontRendererObj.drawString(displayText, 120 - this.fontRendererObj.getStringWidth(str) / 2, 80, 4210752);
         this.fontRendererObj.drawString(GCCoreUtil.translate("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
@@ -86,8 +84,8 @@ public class GuiIngotCompressor extends GuiContainerGC {
 
         if (this.tileEntity.processTicks > 0) {
             process = (int) ((double) this.tileEntity.processTicks
-                    / (double) TileEntityIngotCompressor.PROCESS_TIME_REQUIRED
-                    * 100);
+                / (double) TileEntityIngotCompressor.PROCESS_TIME_REQUIRED
+                * 100);
         } else {
             process = 0;
         }
@@ -99,22 +97,22 @@ public class GuiIngotCompressor extends GuiContainerGC {
 
         if (this.tileEntity.processTicks > 0) {
             final int scale = (int) ((double) this.tileEntity.processTicks
-                    / (double) TileEntityIngotCompressor.PROCESS_TIME_REQUIRED
-                    * 54);
+                / (double) TileEntityIngotCompressor.PROCESS_TIME_REQUIRED
+                * 54);
             this.drawTexturedModalRect(containerWidth + 77, containerHeight + 36, 176, 13, scale, 17);
         }
 
         if (this.tileEntity.furnaceBurnTime > 0) {
             final int scale = (int) ((double) this.tileEntity.furnaceBurnTime
-                    / (double) this.tileEntity.currentItemBurnTime
-                    * 14);
+                / (double) this.tileEntity.currentItemBurnTime
+                * 14);
             this.drawTexturedModalRect(
-                    containerWidth + 81,
-                    containerHeight + 27 + 14 - scale,
-                    176,
-                    30 + 14 - scale,
-                    14,
-                    scale);
+                containerWidth + 81,
+                containerHeight + 27 + 14 - scale,
+                176,
+                30 + 14 - scale,
+                14,
+                scale);
         }
 
         if (this.tileEntity.processTicks > TileEntityIngotCompressor.PROCESS_TIME_REQUIRED / 2) {

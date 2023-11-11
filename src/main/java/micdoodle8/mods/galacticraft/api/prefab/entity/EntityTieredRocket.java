@@ -1,18 +1,5 @@
 package micdoodle8.mods.galacticraft.api.prefab.entity;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldServer;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import io.netty.buffer.ByteBuf;
 import micdoodle8.mods.galacticraft.api.entity.ICameraZoomEntity;
@@ -33,12 +20,24 @@ import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
 import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldServer;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Do not include this prefab class in your released mod download.
  */
 public abstract class EntityTieredRocket extends EntityAutoRocket
-        implements IRocketType, IDockable, IInventory, IWorldTransferCallback, ICameraZoomEntity {
+    implements IRocketType, IDockable, IInventory, IWorldTransferCallback, ICameraZoomEntity {
 
     public EnumRocketType rocketType;
     public float rumble;
@@ -66,7 +65,7 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
 
     public void igniteCheckingCooldown() {
         if (!this.worldObj.isRemote && this.launchCooldown <= 0
-                && this.launchPhase != EnumLaunchPhase.IGNITED.ordinal()) {
+            && this.launchPhase != EnumLaunchPhase.IGNITED.ordinal()) {
             this.setFrequency();
             this.initiatePlanetsPreGen(this.chunkCoordX, this.chunkCoordZ);
             this.ignite();
@@ -103,7 +102,8 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
         // probably OK
         if (this.destinationFrequency == -1 && !EntityTieredRocket.preGenInProgress) {
             final ArrayList<Integer> toPreGen = new ArrayList<>();
-            for (final Planet planet : GalaxyRegistry.getRegisteredPlanets().values()) {
+            for (final Planet planet : GalaxyRegistry.getRegisteredPlanets()
+                .values()) {
                 if (planet.getDimensionID() == this.dimension) {
                     continue;
                 }
@@ -117,11 +117,11 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
                     this.preGenList.add(new BlockVec3(cx, dimID, cz));
                     if (ConfigManagerCore.enableDebug) {
                         GCLog.info(
-                                "Starting terrain pregen for dimension " + dimID
-                                        + " at "
-                                        + (cx * 16 + 8)
-                                        + ", "
-                                        + (cz * 16 + 8));
+                            "Starting terrain pregen for dimension " + dimID
+                                + " at "
+                                + (cx * 16 + 8)
+                                + ", "
+                                + (cz * 16 + 8));
                     }
                 }
                 for (int r = 1; r < 12; r++) {
@@ -180,7 +180,8 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
 
             if (this.preGenIterator != null) {
                 if (this.preGenIterator.hasNext()) {
-                    final MinecraftServer mcserver = FMLCommonHandler.instance().getMinecraftServerInstance();
+                    final MinecraftServer mcserver = FMLCommonHandler.instance()
+                        .getMinecraftServerInstance();
                     // mcserver can be null if client switches to a LAN server
                     if (mcserver != null) {
                         BlockVec3 coords = this.preGenIterator.next();
@@ -189,7 +190,7 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
                             w.getChunkFromChunkCoords(coords.x, coords.z);
                             // Pregen a second chunk if still on launchpad (low strain on server)
                             if (this.launchPhase != EnumLaunchPhase.LAUNCHED.ordinal()
-                                    && this.preGenIterator.hasNext()) {
+                                && this.preGenIterator.hasNext()) {
                                 coords = this.preGenIterator.next();
                                 w = mcserver.worldServerForDimension(coords.y);
                                 w.getChunkFromChunkCoords(coords.x, coords.z);
@@ -253,7 +254,7 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
         super.getNetworkedData(list);
 
         final boolean sendPosUpdates = this.ticks < 25 || this.launchPhase != EnumLaunchPhase.LAUNCHED.ordinal()
-                || this.landing;
+            || this.landing;
         list.add(sendPosUpdates);
 
         if (sendPosUpdates) {
@@ -279,13 +280,13 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
                 // Launch controlled launch but no valid target frequency = rocket loss
                 // [INVESTIGATE]
                 GCLog.info(
-                        "Error: the launch controlled rocket failed to find a valid landing spot when it reached space.");
+                    "Error: the launch controlled rocket failed to find a valid landing spot when it reached space.");
                 this.fuelTank.drain(Integer.MAX_VALUE, true);
                 this.posY = Math.max(
-                        255,
-                        (this.worldObj.provider instanceof IExitHeight
-                                ? ((IExitHeight) this.worldObj.provider).getYCoordinateToTeleport()
-                                : 1200) - 200);
+                    255,
+                    (this.worldObj.provider instanceof IExitHeight
+                        ? ((IExitHeight) this.worldObj.provider).getYCoordinateToTeleport()
+                        : 1200) - 200);
                 return;
             }
             if (this.targetDimension == this.worldObj.provider.dimensionId) {
@@ -303,10 +304,10 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
                 this.motionY = 0.1D;
                 if (this.riddenByEntity != null) {
                     WorldUtil.forceMoveEntityToPos(
-                            this.riddenByEntity,
-                            (WorldServer) this.worldObj,
-                            new Vector3(this.targetVec.x + 0.5F, this.targetVec.y + 800, this.targetVec.z + 0.5F),
-                            false);
+                        this.riddenByEntity,
+                        (WorldServer) this.worldObj,
+                        new Vector3(this.targetVec.x + 0.5F, this.targetVec.y + 800, this.targetVec.z + 0.5F),
+                        false);
                     this.setWaitForPlayer(true);
                     if (ConfigManagerCore.enableDebug) {
                         GCLog.info("Rocket repositioned, waiting for player");
@@ -322,7 +323,7 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
 
                 if (targetDim instanceof IGalacticraftWorldProvider) {
                     dimensionAllowed = ((IGalacticraftWorldProvider) targetDim)
-                            .canSpaceshipTierPass(this.getRocketTier());
+                        .canSpaceshipTierPass(this.getRocketTier());
                 } else
                     // No rocket flight to non-Galacticraft dimensions other than the Overworld
                     // allowed unless
@@ -330,8 +331,9 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
                     if (this.targetDimension > 1 || this.targetDimension < -1) {
                         try {
                             final Class<?> marsConfig = Class
-                                    .forName("micdoodle8.mods.galacticraft.planets.mars.ConfigManagerMars");
-                            if (marsConfig.getField("launchControllerAllDims").getBoolean(null)) {
+                                .forName("micdoodle8.mods.galacticraft.planets.mars.ConfigManagerMars");
+                            if (marsConfig.getField("launchControllerAllDims")
+                                .getBoolean(null)) {
                                 dimensionAllowed = true;
                             }
                         } catch (final Exception e) {
@@ -342,18 +344,18 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
                 if (dimensionAllowed) {
                     if (this.riddenByEntity != null) {
                         WorldUtil.transferEntityToDimension(
-                                this.riddenByEntity,
-                                this.targetDimension,
-                                (WorldServer) targetDim.worldObj,
-                                false,
-                                this);
+                            this.riddenByEntity,
+                            this.targetDimension,
+                            (WorldServer) targetDim.worldObj,
+                            false,
+                            this);
                     } else {
                         final Entity e = WorldUtil.transferEntityToDimension(
-                                this,
-                                this.targetDimension,
-                                (WorldServer) targetDim.worldObj,
-                                false,
-                                null);
+                            this,
+                            this.targetDimension,
+                            (WorldServer) targetDim.worldObj,
+                            false,
+                            null);
                         if (e instanceof EntityAutoRocket) {
                             int fromSky = 800;
                             if (this.destinationFrequency != 1) {
@@ -364,7 +366,7 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
                             ((EntityAutoRocket) e).setWaitForPlayer(false);
                         } else {
                             GCLog.info(
-                                    "Error: failed to recreate the unmanned rocket in landing mode on target planet.");
+                                "Error: failed to recreate the unmanned rocket in landing mode on target planet.");
                             e.setDead();
                             this.setDead();
                         }
@@ -383,11 +385,8 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
                 EntityPlayerMP player = (EntityPlayerMP) this.riddenByEntity;
                 this.onTeleport(player);
                 final GCPlayerStats stats = GCPlayerStats.get(player);
-                WorldUtil.toCelestialSelection(
-                    player,
-                    stats,
-                    this.getRocketTier(),
-                    GuiCelestialSelection.MapMode.TRAVEL);
+                WorldUtil
+                    .toCelestialSelection(player, stats, this.getRocketTier(), GuiCelestialSelection.MapMode.TRAVEL);
             }
 
             // Destroy any rocket which reached the top of the atmosphere and is not
@@ -433,8 +432,8 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
         if (this.riddenByEntity instanceof EntityPlayerMP) {
             if (!this.worldObj.isRemote && this.riddenByEntity == par1EntityPlayer) {
                 GalacticraftCore.packetPipeline.sendTo(
-                        new PacketSimple(EnumSimplePacket.C_RESET_THIRD_PERSON, new Object[] {}),
-                        (EntityPlayerMP) par1EntityPlayer);
+                    new PacketSimple(EnumSimplePacket.C_RESET_THIRD_PERSON, new Object[] {}),
+                    (EntityPlayerMP) par1EntityPlayer);
                 final GCPlayerStats stats = GCPlayerStats.get((EntityPlayerMP) par1EntityPlayer);
                 stats.chatCooldown = 0;
                 par1EntityPlayer.mountEntity(null);
@@ -445,8 +444,8 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
         if (par1EntityPlayer instanceof EntityPlayerMP) {
             if (!this.worldObj.isRemote) {
                 GalacticraftCore.packetPipeline.sendTo(
-                        new PacketSimple(EnumSimplePacket.C_DISPLAY_ROCKET_CONTROLS, new Object[] {}),
-                        (EntityPlayerMP) par1EntityPlayer);
+                    new PacketSimple(EnumSimplePacket.C_DISPLAY_ROCKET_CONTROLS, new Object[] {}),
+                    (EntityPlayerMP) par1EntityPlayer);
                 final GCPlayerStats stats = GCPlayerStats.get((EntityPlayerMP) par1EntityPlayer);
                 stats.chatCooldown = 0;
                 par1EntityPlayer.mountEntity(this);
@@ -503,9 +502,9 @@ public abstract class EntityTieredRocket extends EntityAutoRocket
     public void updateRiderPosition() {
         if (this.riddenByEntity != null) {
             this.riddenByEntity.setPosition(
-                    this.posX,
-                    this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(),
-                    this.posZ);
+                this.posX,
+                this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(),
+                this.posZ);
         }
     }
 

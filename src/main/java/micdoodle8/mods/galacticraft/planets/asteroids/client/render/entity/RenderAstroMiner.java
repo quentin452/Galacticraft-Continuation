@@ -1,8 +1,11 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.entity;
 
-import java.util.ArrayList;
-import java.util.Random;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.perlin.NoiseModule;
+import micdoodle8.mods.galacticraft.core.perlin.generator.Gradient;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
@@ -11,16 +14,11 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.perlin.NoiseModule;
-import micdoodle8.mods.galacticraft.core.perlin.generator.Gradient;
-import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class RenderAstroMiner extends Render {
 
@@ -48,17 +46,17 @@ public class RenderAstroMiner extends Render {
 
     static {
         modelObj = AdvancedModelLoader
-                .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMiner.obj"));
+            .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMiner.obj"));
         modellaser1 = AdvancedModelLoader
-                .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerLaserFront.obj"));
+            .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerLaserFront.obj"));
         modellaser2 = AdvancedModelLoader
-                .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerLaserBottom.obj"));
+            .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerLaserBottom.obj"));
         modellaser3 = AdvancedModelLoader
-                .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerLaserCenter.obj"));
+            .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerLaserCenter.obj"));
         modellasergl = AdvancedModelLoader
-                .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerLeftGuard.obj"));
+            .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerLeftGuard.obj"));
         modellasergr = AdvancedModelLoader
-                .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerRightGuard.obj"));
+            .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/astroMinerRightGuard.obj"));
         modelTexture = new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "textures/model/astroMiner.png");
         modelTextureFX = new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "textures/model/astroMinerFX.png");
         modelTextureOff = new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "textures/model/astroMiner_off.png");
@@ -116,7 +114,7 @@ public class RenderAstroMiner extends Render {
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         GL11.glPushMatrix();
         final float rotPitch = entity.prevRotationPitch
-                + (entity.rotationPitch - entity.prevRotationPitch) * partialTickTime;
+            + (entity.rotationPitch - entity.prevRotationPitch) * partialTickTime;
         final float rotYaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTickTime;
 
         GL11.glTranslatef((float) x, (float) y + 1.4F, (float) z);
@@ -164,26 +162,27 @@ public class RenderAstroMiner extends Render {
         GL11.glTranslatef(wx, wy, wz);
 
         if (active) {
-            FMLClientHandler.instance().getClient().renderEngine.bindTexture(RenderAstroMiner.modelTexture);
+            FMLClientHandler.instance()
+                .getClient().renderEngine.bindTexture(RenderAstroMiner.modelTexture);
             RenderAstroMiner.modelObj.renderAllExcept(
-                    "Hoverpad_Front_Left_Top",
-                    "Hoverpad_Front_Right_Top",
-                    "Hoverpad_Front_Left_Bottom",
-                    "Hoverpad_Front_Right_Bottom",
-                    "Hoverpad_Rear_Right",
-                    "Hoverpad_Rear_Left",
-                    "Hoverpad_Heavy_Right",
-                    "Hoverpad_Heavy_Left",
-                    "Hoverpad_Heavy_Rear",
-                    "Hoverpad_Front_Left_Top_Glow",
-                    "Hoverpad_Front_Right_Top_Glow",
-                    "Hoverpad_Front_Left_Bottom_Glow",
-                    "Hoverpad_Front_Right_Bottom_Glow",
-                    "Hoverpad_Rear_Right_Glow",
-                    "Hoverpad_Rear_Left_Glow",
-                    "Hoverpad_Heavy___Glow002",
-                    "Hoverpad_Heavy___Glow001",
-                    "Hoverpad_Heavy___Glow003");
+                "Hoverpad_Front_Left_Top",
+                "Hoverpad_Front_Right_Top",
+                "Hoverpad_Front_Left_Bottom",
+                "Hoverpad_Front_Right_Bottom",
+                "Hoverpad_Rear_Right",
+                "Hoverpad_Rear_Left",
+                "Hoverpad_Heavy_Right",
+                "Hoverpad_Heavy_Left",
+                "Hoverpad_Heavy_Rear",
+                "Hoverpad_Front_Left_Top_Glow",
+                "Hoverpad_Front_Right_Top_Glow",
+                "Hoverpad_Front_Left_Bottom_Glow",
+                "Hoverpad_Front_Right_Bottom_Glow",
+                "Hoverpad_Rear_Right_Glow",
+                "Hoverpad_Rear_Left_Glow",
+                "Hoverpad_Heavy___Glow002",
+                "Hoverpad_Heavy___Glow001",
+                "Hoverpad_Heavy___Glow003");
 
             this.renderLaserModel(astroMiner.retraction);
 
@@ -193,17 +192,18 @@ public class RenderAstroMiner extends Render {
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glColor4f(sinOfTheTime, sinOfTheTime, sinOfTheTime, 1.0F);
             RenderAstroMiner.modelObj.renderOnly(
-                    "Hoverpad_Front_Left_Top",
-                    "Hoverpad_Front_Right_Top",
-                    "Hoverpad_Front_Left_Bottom",
-                    "Hoverpad_Front_Right_Bottom",
-                    "Hoverpad_Rear_Right",
-                    "Hoverpad_Rear_Left",
-                    "Hoverpad_Heavy_Right",
-                    "Hoverpad_Heavy_Left",
-                    "Hoverpad_Heavy_Rear");
+                "Hoverpad_Front_Left_Top",
+                "Hoverpad_Front_Right_Top",
+                "Hoverpad_Front_Left_Bottom",
+                "Hoverpad_Front_Right_Bottom",
+                "Hoverpad_Rear_Right",
+                "Hoverpad_Rear_Left",
+                "Hoverpad_Heavy_Right",
+                "Hoverpad_Heavy_Left",
+                "Hoverpad_Heavy_Rear");
 
-            FMLClientHandler.instance().getClient().renderEngine.bindTexture(RenderAstroMiner.modelTextureFX);
+            FMLClientHandler.instance()
+                .getClient().renderEngine.bindTexture(RenderAstroMiner.modelTextureFX);
             GL11.glDisable(GL11.GL_CULL_FACE);
             GL11.glDisable(GL11.GL_ALPHA_TEST);
             GL11.glDepthMask(false);
@@ -213,18 +213,19 @@ public class RenderAstroMiner extends Render {
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
             GL11.glColor4f(sinOfTheTime, sinOfTheTime, sinOfTheTime, 0.6F);
             RenderAstroMiner.modelObj.renderOnly(
-                    "Hoverpad_Front_Left_Top_Glow",
-                    "Hoverpad_Front_Right_Top_Glow",
-                    "Hoverpad_Front_Left_Bottom_Glow",
-                    "Hoverpad_Front_Right_Bottom_Glow",
-                    "Hoverpad_Rear_Right_Glow",
-                    "Hoverpad_Rear_Left_Glow",
-                    "Hoverpad_Heavy___Glow002",
-                    "Hoverpad_Heavy___Glow001",
-                    "Hoverpad_Heavy___Glow003");
+                "Hoverpad_Front_Left_Top_Glow",
+                "Hoverpad_Front_Right_Top_Glow",
+                "Hoverpad_Front_Left_Bottom_Glow",
+                "Hoverpad_Front_Right_Bottom_Glow",
+                "Hoverpad_Rear_Right_Glow",
+                "Hoverpad_Rear_Left_Glow",
+                "Hoverpad_Heavy___Glow002",
+                "Hoverpad_Heavy___Glow001",
+                "Hoverpad_Heavy___Glow003");
 
             if (ais < EntityAstroMiner.AISTATE_DOCKING) {
-                FMLClientHandler.instance().getClient().renderEngine.bindTexture(RenderAstroMiner.scanTexture);
+                FMLClientHandler.instance()
+                    .getClient().renderEngine.bindTexture(RenderAstroMiner.scanTexture);
                 final Tessellator tess = Tessellator.instance;
                 GL11.glColor4f(0, 0.6F, 1.0F, 0.2F);
                 tess.startDrawingQuads();
@@ -245,9 +246,9 @@ public class RenderAstroMiner extends Render {
                 GL11.glPopMatrix();
                 GL11.glPushMatrix();
                 GL11.glTranslatef(
-                        (float) (x - astroMiner.posX),
-                        (float) (y - astroMiner.posY),
-                        (float) (z - astroMiner.posZ));
+                    (float) (x - astroMiner.posX),
+                    (float) (y - astroMiner.posY),
+                    (float) (z - astroMiner.posZ));
                 for (final Integer blockTime : new ArrayList<>(astroMiner.laserTimes)) {
                     if (blockTime < astroMiner.ticksExisted - 19) {
                         removeCount++;
@@ -297,15 +298,15 @@ public class RenderAstroMiner extends Render {
         } else {
             this.bindEntityTexture(astroMiner);
             RenderAstroMiner.modelObj.renderAllExcept(
-                    "Hoverpad_Front_Left_Top_Glow",
-                    "Hoverpad_Front_Right_Top_Glow",
-                    "Hoverpad_Front_Left_Bottom_Glow",
-                    "Hoverpad_Front_Right_Bottom_Glow",
-                    "Hoverpad_Rear_Right_Glow",
-                    "Hoverpad_Rear_Left_Glow",
-                    "Hoverpad_Heavy___Glow002",
-                    "Hoverpad_Heavy___Glow001",
-                    "Hoverpad_Heavy___Glow003");
+                "Hoverpad_Front_Left_Top_Glow",
+                "Hoverpad_Front_Right_Top_Glow",
+                "Hoverpad_Front_Left_Bottom_Glow",
+                "Hoverpad_Front_Right_Bottom_Glow",
+                "Hoverpad_Rear_Right_Glow",
+                "Hoverpad_Rear_Left_Glow",
+                "Hoverpad_Heavy___Glow002",
+                "Hoverpad_Heavy___Glow001",
+                "Hoverpad_Heavy___Glow003");
             this.renderLaserModel(astroMiner.retraction);
             if (astroMiner.retraction < 1F) {
                 astroMiner.retraction += RETRACTIONSPEED * partTime;

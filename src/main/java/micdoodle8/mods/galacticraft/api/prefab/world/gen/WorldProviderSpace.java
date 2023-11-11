@@ -1,9 +1,12 @@
 package micdoodle8.mods.galacticraft.api.prefab.world.gen;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.MathHelper;
@@ -15,13 +18,9 @@ import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public abstract class WorldProviderSpace extends WorldProvider implements IGalacticraftWorldProvider {
 
@@ -33,7 +32,7 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
     static {
         try {
             tickCounter = VillageCollection.class
-                    .getDeclaredField(GCCoreUtil.isDeobfuscated() ? "tickCounter" : "field_75553_e");
+                .getDeclaredField(GCCoreUtil.isDeobfuscated() ? "tickCounter" : "field_75553_e");
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -78,7 +77,8 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
 
     @Override
     public String getDimensionName() {
-        return this.getCelestialBody().getLocalizedName();
+        return this.getCelestialBody()
+            .getLocalizedName();
     }
 
     @Override
@@ -93,7 +93,8 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
     @Override
     public void updateWeather() {
         if (!this.worldObj.isRemote) {
-            final long newTime = this.worldObj.getWorldInfo().getWorldTime();
+            final long newTime = this.worldObj.getWorldInfo()
+                .getWorldTime();
             if (this.preTickTime == Long.MIN_VALUE) {
                 // First tick: get the timeCurrentOffset from saved ticks in villages.dat :)
                 int savedTick = 0;
@@ -121,10 +122,14 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
         if (this.canRainOrSnow()) {
             super.updateWeather();
         } else {
-            this.worldObj.getWorldInfo().setRainTime(0);
-            this.worldObj.getWorldInfo().setRaining(false);
-            this.worldObj.getWorldInfo().setThunderTime(0);
-            this.worldObj.getWorldInfo().setThundering(false);
+            this.worldObj.getWorldInfo()
+                .setRainTime(0);
+            this.worldObj.getWorldInfo()
+                .setRaining(false);
+            this.worldObj.getWorldInfo()
+                .setThunderTime(0);
+            this.worldObj.getWorldInfo()
+                .setThundering(false);
             this.worldObj.rainingStrength = 0.0F;
             this.worldObj.thunderingStrength = 0.0F;
         }
@@ -132,17 +137,20 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
 
     @Override
     public String getSaveFolder() {
-        return "DIM" + this.getCelestialBody().getDimensionID();
+        return "DIM" + this.getCelestialBody()
+            .getDimensionID();
     }
 
     @Override
     public String getWelcomeMessage() {
-        return "Entering " + this.getCelestialBody().getLocalizedName();
+        return "Entering " + this.getCelestialBody()
+            .getLocalizedName();
     }
 
     @Override
     public String getDepartMessage() {
-        return "Leaving " + this.getCelestialBody().getLocalizedName();
+        return "Leaving " + this.getCelestialBody()
+            .getLocalizedName();
     }
 
     @Override
@@ -167,7 +175,8 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
 
     @Override
     public float calculateCelestialAngle(long par1, float par3) {
-        par1 = this.worldObj.getWorldInfo().getWorldTime() + this.timeCurrentOffset;
+        par1 = this.worldObj.getWorldInfo()
+            .getWorldTime() + this.timeCurrentOffset;
         final int j = (int) (par1 % this.getDayLength());
         float f1 = (j + par3) / this.getDayLength() - 0.25F;
 
@@ -272,11 +281,12 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
             final Constructor<?>[] constructors = chunkProviderClass.getConstructors();
             for (final Constructor<?> constr : constructors) {
                 if (Arrays
-                        .equals(constr.getParameterTypes(), new Object[] { World.class, long.class, boolean.class })) {
+                    .equals(constr.getParameterTypes(), new Object[] { World.class, long.class, boolean.class })) {
                     return (IChunkProvider) constr.newInstance(
-                            this.worldObj,
-                            this.worldObj.getSeed(),
-                            this.worldObj.getWorldInfo().isMapFeaturesEnabled());
+                        this.worldObj,
+                        this.worldObj.getSeed(),
+                        this.worldObj.getWorldInfo()
+                            .isMapFeaturesEnabled());
                 }
                 if (constr.getParameterTypes().length == 0) {
                     return (IChunkProvider) constr.newInstance();
@@ -318,7 +328,8 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
 
     @Override
     public float getSolarSize() {
-        return 1.0F / this.getCelestialBody().getRelativeDistanceFromCenter().unScaledDistance;
+        return 1.0F / this.getCelestialBody()
+            .getRelativeDistanceFromCenter().unScaledDistance;
     }
 
     // Work around vanilla feature: worlds which are not the Overworld cannot change
@@ -327,9 +338,11 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
     // Therefore each Galacticraft dimension maintains its own timeCurrentOffset
     @Override
     public void setWorldTime(long time) {
-        this.worldObj.getWorldInfo().setWorldTime(time);
+        this.worldObj.getWorldInfo()
+            .setWorldTime(time);
         long diff = -this.timeCurrentOffset;
-        this.timeCurrentOffset = time - this.worldObj.getWorldInfo().getWorldTime();
+        this.timeCurrentOffset = time - this.worldObj.getWorldInfo()
+            .getWorldTime();
         diff += this.timeCurrentOffset;
         if (diff != 0L) {
             this.saveTime();
@@ -340,11 +353,13 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
 
     @Override
     public long getWorldTime() {
-        return this.worldObj.getWorldInfo().getWorldTime() + this.timeCurrentOffset;
+        return this.worldObj.getWorldInfo()
+            .getWorldTime() + this.timeCurrentOffset;
     }
 
     public void setWorldTimeCommand(long time) {
-        this.worldObj.getWorldInfo().setWorldTime(time);
+        this.worldObj.getWorldInfo()
+            .setWorldTime(time);
         this.timeCurrentOffset = this.saveTCO;
         this.saveTime();
         this.preTickTime = time;
@@ -353,7 +368,8 @@ public abstract class WorldProviderSpace extends WorldProvider implements IGalac
 
     public long getWorldTimeCommand() {
         this.saveTCO = this.timeCurrentOffset;
-        return this.worldObj.getWorldInfo().getWorldTime() + this.timeCurrentOffset;
+        return this.worldObj.getWorldInfo()
+            .getWorldTime() + this.timeCurrentOffset;
     }
 
     /**

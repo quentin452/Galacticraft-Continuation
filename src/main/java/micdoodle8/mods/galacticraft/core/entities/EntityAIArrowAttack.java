@@ -60,7 +60,8 @@ public class EntityAIArrowAttack extends EntityAIBase {
      */
     @Override
     public boolean continueExecuting() {
-        return this.shouldExecute() || !this.entityHost.getNavigator().noPath();
+        return this.shouldExecute() || !this.entityHost.getNavigator()
+            .noPath();
     }
 
     /**
@@ -78,12 +79,15 @@ public class EntityAIArrowAttack extends EntityAIBase {
     @Override
     public void updateTask() {
         final double d0 = this.entityHost
-                .getDistanceSq(this.attackTarget.posX, this.attackTarget.boundingBox.minY, this.attackTarget.posZ);
-        final boolean flag = this.entityHost.getEntitySenses().canSee(this.attackTarget);
+            .getDistanceSq(this.attackTarget.posX, this.attackTarget.boundingBox.minY, this.attackTarget.posZ);
+        final boolean flag = this.entityHost.getEntitySenses()
+            .canSee(this.attackTarget);
 
-        this.entityHost.getNavigator().tryMoveToEntityLiving(this.attackTarget, this.entityMoveSpeed);
+        this.entityHost.getNavigator()
+            .tryMoveToEntityLiving(this.attackTarget, this.entityMoveSpeed);
 
-        this.entityHost.getLookHelper().setLookPositionWithEntity(this.attackTarget, 30.0F, 30.0F);
+        this.entityHost.getLookHelper()
+            .setLookPositionWithEntity(this.attackTarget, 30.0F, 30.0F);
         float f;
 
         if (--this.rangedAttackTime == 0) {
@@ -104,11 +108,11 @@ public class EntityAIArrowAttack extends EntityAIBase {
 
             this.rangedAttackEntityHost.attackEntityWithRangedAttack(this.attackTarget, f1);
             this.rangedAttackTime = MathHelper
-                    .floor_float(f * (this.maxRangedAttackTime - this.field_96561_g) + this.field_96561_g);
+                .floor_float(f * (this.maxRangedAttackTime - this.field_96561_g) + this.field_96561_g);
         } else if (this.rangedAttackTime < 0) {
             f = MathHelper.sqrt_double(d0) / this.field_96562_i;
             this.rangedAttackTime = MathHelper
-                    .floor_float(f * (this.maxRangedAttackTime - this.field_96561_g) + this.field_96561_g);
+                .floor_float(f * (this.maxRangedAttackTime - this.field_96561_g) + this.field_96561_g);
         }
     }
 }

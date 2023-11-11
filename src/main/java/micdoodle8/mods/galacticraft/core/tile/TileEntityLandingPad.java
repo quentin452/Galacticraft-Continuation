@@ -1,8 +1,17 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.HashSet;
-import java.util.List;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.entity.*;
+import micdoodle8.mods.galacticraft.api.prefab.entity.EntityTieredRocket;
+import micdoodle8.mods.galacticraft.api.tile.IFuelDock;
+import micdoodle8.mods.galacticraft.api.tile.ILandingPadAttachable;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.BlockMulti;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityLaunchController;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,25 +21,11 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fluids.FluidStack;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.entity.ICargoEntity;
-import micdoodle8.mods.galacticraft.api.entity.IDockable;
-import micdoodle8.mods.galacticraft.api.entity.IFuelable;
-import micdoodle8.mods.galacticraft.api.entity.IFuelableTiered;
-import micdoodle8.mods.galacticraft.api.entity.ILandable;
-import micdoodle8.mods.galacticraft.api.prefab.entity.EntityTieredRocket;
-import micdoodle8.mods.galacticraft.api.tile.IFuelDock;
-import micdoodle8.mods.galacticraft.api.tile.ILandingPadAttachable;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMulti;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityLaunchController;
+import java.util.HashSet;
+import java.util.List;
 
 public class TileEntityLandingPad extends TileEntityMulti
-        implements IMultiBlock, IFuelableTiered, IFuelDock, ICargoEntity {
+    implements IMultiBlock, IFuelableTiered, IFuelDock, ICargoEntity {
 
     private IDockable dockedEntity;
 
@@ -40,14 +35,14 @@ public class TileEntityLandingPad extends TileEntityMulti
 
         if (!this.worldObj.isRemote) {
             final List<?> list = this.worldObj.getEntitiesWithinAABB(
-                    IFuelable.class,
-                    AxisAlignedBB.getBoundingBox(
-                            this.xCoord - 0.5D,
-                            this.yCoord,
-                            this.zCoord - 0.5D,
-                            this.xCoord + 0.5D,
-                            this.yCoord + 1.0D,
-                            this.zCoord + 0.5D));
+                IFuelable.class,
+                AxisAlignedBB.getBoundingBox(
+                    this.xCoord - 0.5D,
+                    this.yCoord,
+                    this.zCoord - 0.5D,
+                    this.xCoord + 0.5D,
+                    this.yCoord + 1.0D,
+                    this.zCoord + 0.5D));
 
             boolean docked = false;
 
@@ -110,7 +105,8 @@ public class TileEntityLandingPad extends TileEntityMulti
         for (int x = -1; x < 2; x++) {
             for (int z = -1; z < 2; z++) {
                 if (this.worldObj.isRemote && this.worldObj.rand.nextDouble() < 0.1D) {
-                    FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(
+                    FMLClientHandler.instance()
+                        .getClient().effectRenderer.addBlockDestroyEffects(
                             thisBlock.x + x,
                             thisBlock.y,
                             thisBlock.z + z,
@@ -179,7 +175,7 @@ public class TileEntityLandingPad extends TileEntityMulti
         final TileEntity tile = this.worldObj.getTileEntity(x, this.yCoord, z);
 
         if (tile instanceof ILandingPadAttachable && ((ILandingPadAttachable) tile)
-                .canAttachToLandingPad(this.worldObj, this.xCoord, this.yCoord, this.zCoord)) {
+            .canAttachToLandingPad(this.worldObj, this.xCoord, this.yCoord, this.zCoord)) {
             connectedTiles.add((ILandingPadAttachable) tile);
             if (GalacticraftCore.isPlanetsLoaded && tile instanceof TileEntityLaunchController) {
                 ((TileEntityLaunchController) tile).setAttachedPad(this);
@@ -209,12 +205,12 @@ public class TileEntityLandingPad extends TileEntityMulti
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
         return AxisAlignedBB.getBoundingBox(
-                this.xCoord - 1,
-                this.yCoord,
-                this.zCoord - 1,
-                this.xCoord + 2,
-                this.yCoord + 0.4D,
-                this.zCoord + 2);
+            this.xCoord - 1,
+            this.yCoord,
+            this.zCoord - 1,
+            this.xCoord + 2,
+            this.yCoord + 0.4D,
+            this.zCoord + 2);
     }
 
     @Override

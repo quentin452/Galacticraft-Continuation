@@ -1,8 +1,11 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Iterator;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.ITileEntityProvider;
@@ -22,12 +25,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.Iterator;
+import java.util.Random;
 
 public class BlockParaChest extends BlockContainer implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
 
@@ -69,7 +68,7 @@ public class BlockParaChest extends BlockContainer implements ITileEntityProvide
 
     @Override
     public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer,
-            int par6, float par7, float par8, float par9) {
+        int par6, float par7, float par8, float par9) {
         if (par1World.isRemote) {
             return true;
         }
@@ -84,7 +83,7 @@ public class BlockParaChest extends BlockContainer implements ITileEntityProvide
 
     @Override
     public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLivingBase,
-            ItemStack par6ItemStack) {
+        ItemStack par6ItemStack) {
         super.onBlockPlacedBy(par1World, par2, par3, par4, par5EntityLivingBase, par6ItemStack);
     }
 
@@ -116,7 +115,7 @@ public class BlockParaChest extends BlockContainer implements ITileEntityProvide
                     EntityItem entityitem;
 
                     for (final float f2 = this.random.nextFloat() * 0.8F + 0.1F; itemstack.stackSize > 0; par1World
-                            .spawnEntityInWorld(entityitem)) {
+                        .spawnEntityInWorld(entityitem)) {
                         int k1 = this.random.nextInt(21) + 10;
 
                         if (k1 > itemstack.stackSize) {
@@ -125,11 +124,11 @@ public class BlockParaChest extends BlockContainer implements ITileEntityProvide
 
                         itemstack.stackSize -= k1;
                         entityitem = new EntityItem(
-                                par1World,
-                                par2 + f,
-                                par3 + f1,
-                                par4 + f2,
-                                new ItemStack(itemstack.getItem(), k1, itemstack.getItemDamage()));
+                            par1World,
+                            par2 + f,
+                            par3 + f1,
+                            par4 + f2,
+                            new ItemStack(itemstack.getItem(), k1, itemstack.getItemDamage()));
                         final float f3 = 0.05F;
                         entityitem.motionX = (float) this.random.nextGaussian() * f3;
                         entityitem.motionY = (float) this.random.nextGaussian() * f3 + 0.2F;
@@ -137,7 +136,9 @@ public class BlockParaChest extends BlockContainer implements ITileEntityProvide
 
                         if (itemstack.hasTagCompound()) {
                             entityitem.getEntityItem()
-                                    .setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
+                                .setTagCompound(
+                                    (NBTTagCompound) itemstack.getTagCompound()
+                                        .copy());
                         }
                     }
                 }
@@ -153,16 +154,18 @@ public class BlockParaChest extends BlockContainer implements ITileEntityProvide
         final Object object = par1World.getTileEntity(par2, par3, par4);
 
         if (object == null || par1World.isSideSolid(par2, par3 + 1, par4, ForgeDirection.DOWN)
-                || BlockParaChest.isOcelotBlockingChest(par1World, par2, par3, par4)) {
+            || BlockParaChest.isOcelotBlockingChest(par1World, par2, par3, par4)) {
             return null;
         }
         return (IInventory) object;
     }
 
     public static boolean isOcelotBlockingChest(World par0World, int par1, int par2, int par3) {
-        final Iterator<?> iterator = par0World.getEntitiesWithinAABB(
+        final Iterator<?> iterator = par0World
+            .getEntitiesWithinAABB(
                 EntityOcelot.class,
-                AxisAlignedBB.getBoundingBox(par1, par2 + 1, par3, par1 + 1, par2 + 2, par3 + 1)).iterator();
+                AxisAlignedBB.getBoundingBox(par1, par2 + 1, par3, par1 + 1, par2 + 2, par3 + 1))
+            .iterator();
         EntityOcelot entityocelot;
 
         do {

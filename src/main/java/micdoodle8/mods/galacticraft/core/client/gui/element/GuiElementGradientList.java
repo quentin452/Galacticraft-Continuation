@@ -1,15 +1,13 @@
 package micdoodle8.mods.galacticraft.core.client.gui.element;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-
-import org.lwjgl.input.Mouse;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.core.util.ColorUtil;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
+import org.lwjgl.input.Mouse;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GuiElementGradientList extends Gui {
 
@@ -55,9 +53,9 @@ public class GuiElementGradientList extends Gui {
     public void draw(int mousePosX, int mousePosY) {
         if (this.sliderEnabled) {
             if (this.sliderGrabbed
-                    || mousePosX >= this.xPosition + this.width - 9 && mousePosX < this.xPosition + this.width
-                            && mousePosY >= this.yPosition
-                            && mousePosY < this.yPosition + this.height) {
+                || mousePosX >= this.xPosition + this.width - 9 && mousePosX < this.xPosition + this.width
+                    && mousePosY >= this.yPosition
+                    && mousePosY < this.yPosition + this.height) {
                 if (Mouse.isButtonDown(0)) {
                     this.sliderGrabbed = true;
 
@@ -81,12 +79,12 @@ public class GuiElementGradientList extends Gui {
 
         if (Mouse.isButtonDown(0)) {
             if (mousePosX >= this.xPosition && mousePosX < this.xPosition + this.width - 10
-                    && mousePosY >= this.yPosition
-                    && mousePosY < this.yPosition + this.height) {
+                && mousePosY >= this.yPosition
+                && mousePosY < this.yPosition + this.height) {
                 final int clickPosY = mousePosY - this.yPosition
-                        + (int) Math.floor(
-                                (this.listContents.size() * GuiElementGradientList.BUTTON_HEIGHT - this.height)
-                                        * this.getSliderPercentage());
+                    + (int) Math.floor(
+                        (this.listContents.size() * GuiElementGradientList.BUTTON_HEIGHT - this.height)
+                            * this.getSliderPercentage());
                 this.selectedIndex = clickPosY / GuiElementGradientList.BUTTON_HEIGHT;
 
                 if (this.selectedIndex < 0 || this.selectedIndex >= this.listContents.size()) {
@@ -98,92 +96,93 @@ public class GuiElementGradientList extends Gui {
         this.sliderPos = Math.min(Math.max(this.yPosition, this.sliderPos), this.yPosition + this.height - 15);
 
         this.drawGradientRect(
-                this.xPosition,
-                this.yPosition,
-                this.xPosition + this.width - 10,
-                this.yPosition + this.height,
-                ColorUtil.to32BitColor(255, 30, 30, 30),
-                ColorUtil.to32BitColor(255, 30, 30, 30));
+            this.xPosition,
+            this.yPosition,
+            this.xPosition + this.width - 10,
+            this.yPosition + this.height,
+            ColorUtil.to32BitColor(255, 30, 30, 30),
+            ColorUtil.to32BitColor(255, 30, 30, 30));
         this.drawGradientRect(
-                this.xPosition + this.width - 9,
-                this.yPosition,
-                this.xPosition + this.width,
-                this.yPosition + this.height,
-                ColorUtil.to32BitColor(255, 50, 50, 50),
-                ColorUtil.to32BitColor(255, 50, 50, 50));
+            this.xPosition + this.width - 9,
+            this.yPosition,
+            this.xPosition + this.width,
+            this.yPosition + this.height,
+            ColorUtil.to32BitColor(255, 50, 50, 50),
+            ColorUtil.to32BitColor(255, 50, 50, 50));
         int sliderColor = this.sliderEnabled ? ColorUtil.to32BitColor(255, 90, 90, 90)
-                : ColorUtil.to32BitColor(255, 40, 40, 40);
+            : ColorUtil.to32BitColor(255, 40, 40, 40);
         this.drawGradientRect(
-                this.xPosition + this.width - 9,
-                this.sliderPos,
-                this.xPosition + this.width,
-                this.sliderPos + 15,
-                sliderColor,
-                sliderColor);
+            this.xPosition + this.width - 9,
+            this.sliderPos,
+            this.xPosition + this.width,
+            this.sliderPos + 15,
+            sliderColor,
+            sliderColor);
 
         Gui.drawRect(
-                this.xPosition + this.width - 1,
-                this.yPosition,
-                this.xPosition + this.width,
-                this.yPosition + this.height,
-                ColorUtil.to32BitColor(255, 0, 0, 0));
+            this.xPosition + this.width - 1,
+            this.yPosition,
+            this.xPosition + this.width,
+            this.yPosition + this.height,
+            ColorUtil.to32BitColor(255, 0, 0, 0));
         Gui.drawRect(
-                this.xPosition + this.width - 10,
-                this.yPosition,
-                this.xPosition + this.width - 9,
-                this.yPosition + this.height,
-                ColorUtil.to32BitColor(255, 0, 0, 0));
+            this.xPosition + this.width - 10,
+            this.yPosition,
+            this.xPosition + this.width - 9,
+            this.yPosition + this.height,
+            ColorUtil.to32BitColor(255, 0, 0, 0));
         Gui.drawRect(
-                this.xPosition,
-                this.yPosition,
-                this.xPosition + 1,
-                this.yPosition + this.height,
-                ColorUtil.to32BitColor(255, 0, 0, 0));
+            this.xPosition,
+            this.yPosition,
+            this.xPosition + 1,
+            this.yPosition + this.height,
+            ColorUtil.to32BitColor(255, 0, 0, 0));
         Gui.drawRect(
-                this.xPosition,
-                this.yPosition,
-                this.xPosition + this.width,
-                this.yPosition + 1,
-                ColorUtil.to32BitColor(255, 0, 0, 0));
+            this.xPosition,
+            this.yPosition,
+            this.xPosition + this.width,
+            this.yPosition + 1,
+            ColorUtil.to32BitColor(255, 0, 0, 0));
         Gui.drawRect(
-                this.xPosition,
-                this.yPosition + this.height - 1,
-                this.xPosition + this.width,
-                this.yPosition + this.height,
-                ColorUtil.to32BitColor(255, 0, 0, 0));
+            this.xPosition,
+            this.yPosition + this.height - 1,
+            this.xPosition + this.width,
+            this.yPosition + this.height,
+            ColorUtil.to32BitColor(255, 0, 0, 0));
 
         sliderColor = this.sliderEnabled ? ColorUtil.to32BitColor(255, 120, 120, 120)
-                : ColorUtil.to32BitColor(255, 60, 60, 60);
+            : ColorUtil.to32BitColor(255, 60, 60, 60);
         Gui.drawRect(
-                this.xPosition + this.width - 9,
-                this.sliderPos + 1,
-                this.xPosition + this.width - 8,
-                this.sliderPos + 14,
-                sliderColor);
+            this.xPosition + this.width - 9,
+            this.sliderPos + 1,
+            this.xPosition + this.width - 8,
+            this.sliderPos + 14,
+            sliderColor);
         Gui.drawRect(
-                this.xPosition + this.width - 2,
-                this.sliderPos + 1,
-                this.xPosition + this.width - 1,
-                this.sliderPos + 14,
-                sliderColor);
+            this.xPosition + this.width - 2,
+            this.sliderPos + 1,
+            this.xPosition + this.width - 1,
+            this.sliderPos + 14,
+            sliderColor);
         Gui.drawRect(
-                this.xPosition + this.width - 9,
-                this.sliderPos,
-                this.xPosition + this.width - 1,
-                this.sliderPos + 1,
-                sliderColor);
+            this.xPosition + this.width - 9,
+            this.sliderPos,
+            this.xPosition + this.width - 1,
+            this.sliderPos + 1,
+            sliderColor);
         Gui.drawRect(
-                this.xPosition + this.width - 9,
-                this.sliderPos + 15,
-                this.xPosition + this.width - 1,
-                this.sliderPos + 14,
-                sliderColor);
+            this.xPosition + this.width - 9,
+            this.sliderPos + 15,
+            this.xPosition + this.width - 1,
+            this.sliderPos + 14,
+            sliderColor);
 
         int currentDrawHeight = this.yPosition + 1
-                - (int) Math.floor(
-                        (this.listContents.size() * GuiElementGradientList.BUTTON_HEIGHT - this.height)
-                                * this.getSliderPercentage());
-        final FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+            - (int) Math.floor(
+                (this.listContents.size() * GuiElementGradientList.BUTTON_HEIGHT - this.height)
+                    * this.getSliderPercentage());
+        final FontRenderer fontRenderer = FMLClientHandler.instance()
+            .getClient().fontRenderer;
 
         for (int i = 0; i < this.listContents.size(); i++) {
             final ListElement displayButton = this.listContents.get(i);
@@ -197,21 +196,20 @@ public class GuiElementGradientList extends Gui {
                     yCoord1 = Math.min(this.yPosition + this.height - 1, yCoord1);
 
                     final int color = i == this.selectedIndex ? ColorUtil.to32BitColor(255, 35, 35, 35)
-                            : ColorUtil.to32BitColor(255, 25, 25, 25);
+                        : ColorUtil.to32BitColor(255, 25, 25, 25);
 
                     Gui.drawRect(this.xPosition + 1, yCoord0, this.xPosition + this.width - 10, yCoord1, color);
 
                     if (currentDrawHeight + GuiElementGradientList.BUTTON_HEIGHT / 2 - fontRenderer.FONT_HEIGHT / 2
-                            > this.yPosition
-                            && currentDrawHeight + GuiElementGradientList.BUTTON_HEIGHT / 2
-                                    + fontRenderer.FONT_HEIGHT / 2 < this.yPosition + this.height) {
+                        > this.yPosition
+                        && currentDrawHeight + GuiElementGradientList.BUTTON_HEIGHT / 2 + fontRenderer.FONT_HEIGHT / 2
+                            < this.yPosition + this.height) {
                         fontRenderer.drawString(
-                                displayButton.value,
-                                this.xPosition + (this.width - 10) / 2
-                                        - fontRenderer.getStringWidth(displayButton.value) / 2,
-                                currentDrawHeight + GuiElementGradientList.BUTTON_HEIGHT / 2
-                                        - fontRenderer.FONT_HEIGHT / 2,
-                                displayButton.color);
+                            displayButton.value,
+                            this.xPosition + (this.width - 10) / 2
+                                - fontRenderer.getStringWidth(displayButton.value) / 2,
+                            currentDrawHeight + GuiElementGradientList.BUTTON_HEIGHT / 2 - fontRenderer.FONT_HEIGHT / 2,
+                            displayButton.color);
                     }
                 }
 

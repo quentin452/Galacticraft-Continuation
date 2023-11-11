@@ -1,11 +1,14 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.network.PacketEntityUpdate;
+import micdoodle8.mods.galacticraft.core.network.PacketEntityUpdate.IEntityFullSync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.entity.Entity;
@@ -17,15 +20,11 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import io.netty.buffer.ByteBuf;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.network.PacketEntityUpdate;
-import micdoodle8.mods.galacticraft.core.network.PacketEntityUpdate.IEntityFullSync;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 
 public abstract class EntityAdvancedMotion extends InventoryEntity implements IControllableEntity, IEntityFullSync {
 
@@ -92,15 +91,15 @@ public abstract class EntityAdvancedMotion extends InventoryEntity implements IC
             final double var1 = Math.cos(this.rotationYaw * Math.PI / 180.0D + 114.8) * -0.5D;
             final double var3 = Math.sin(this.rotationYaw * Math.PI / 180.0D + 114.8) * -0.5D;
             this.riddenByEntity.setPosition(
-                    this.posX + var1,
-                    this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(),
-                    this.posZ + var3);
+                this.posX + var1,
+                this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(),
+                this.posZ + var3);
         }
     }
 
     @Override
     public void setPositionRotationAndMotion(double x, double y, double z, float yaw, float pitch, double motX,
-            double motY, double motZ, boolean onGround) {
+        double motY, double motZ, boolean onGround) {
         if (this.worldObj.isRemote) {
             this.advancedPositionX = x;
             this.advancedPositionY = y;
@@ -141,7 +140,7 @@ public abstract class EntityAdvancedMotion extends InventoryEntity implements IC
         }
         final Entity e = var1.getEntity();
         if (this.isEntityInvulnerable() || this.posY > 300
-                || e instanceof EntityLivingBase && !(e instanceof EntityPlayer)) {
+            || e instanceof EntityLivingBase && !(e instanceof EntityPlayer)) {
             return false;
         }
         this.rockDirection = -this.rockDirection;
@@ -184,7 +183,7 @@ public abstract class EntityAdvancedMotion extends InventoryEntity implements IC
 
     @SideOnly(Side.CLIENT)
     public abstract EntityFX getParticle(Random rand, double x, double y, double z, double motX, double motY,
-            double motZ);
+        double motZ);
 
     public abstract void tickInAir();
 
@@ -229,8 +228,8 @@ public abstract class EntityAdvancedMotion extends InventoryEntity implements IC
     @Override
     public void setPositionAndRotation2(double d, double d1, double d2, float f, float f1, int i) {
         if (this.riddenByEntity != null) {
-            if (this.riddenByEntity instanceof EntityPlayer
-                    && FMLClientHandler.instance().getClient().thePlayer.equals(this.riddenByEntity)) {} else {
+            if (this.riddenByEntity instanceof EntityPlayer && FMLClientHandler.instance()
+                .getClient().thePlayer.equals(this.riddenByEntity)) {} else {
                 this.posRotIncrements = i + 5;
                 this.advancedPositionX = d;
                 this.advancedPositionY = d1 + (this.riddenByEntity == null ? 1 : 0);
@@ -263,8 +262,9 @@ public abstract class EntityAdvancedMotion extends InventoryEntity implements IC
         super.onUpdate();
 
         if (this.canSetPositionClient() && this.worldObj.isRemote
-                && (this.riddenByEntity == null || !(this.riddenByEntity instanceof EntityPlayer)
-                        || !FMLClientHandler.instance().getClient().thePlayer.equals(this.riddenByEntity))) {
+            && (this.riddenByEntity == null || !(this.riddenByEntity instanceof EntityPlayer)
+                || !FMLClientHandler.instance()
+                    .getClient().thePlayer.equals(this.riddenByEntity))) {
             double x;
             double y;
             double var12;
@@ -276,7 +276,7 @@ public abstract class EntityAdvancedMotion extends InventoryEntity implements IC
                 var12 = MathHelper.wrapAngleTo180_double(this.advancedYaw - this.rotationYaw);
                 this.rotationYaw = (float) (this.rotationYaw + var12 / this.posRotIncrements);
                 this.rotationPitch = (float) (this.rotationPitch
-                        + (this.advancedPitch - this.rotationPitch) / this.posRotIncrements);
+                    + (this.advancedPitch - this.rotationPitch) / this.posRotIncrements);
                 --this.posRotIncrements;
                 this.setPosition(x, y, z);
                 this.setRotation(this.rotationYaw, this.rotationPitch);
@@ -327,8 +327,8 @@ public abstract class EntityAdvancedMotion extends InventoryEntity implements IC
 
             if (!this.worldObj.isRemote && this.ticks % 5 == 0) {
                 GalacticraftCore.packetPipeline.sendToAllAround(
-                        new PacketEntityUpdate(this),
-                        new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 50.0D));
+                    new PacketEntityUpdate(this),
+                    new TargetPoint(this.worldObj.provider.dimensionId, this.posX, this.posY, this.posZ, 50.0D));
             }
         }
 
@@ -358,13 +358,14 @@ public abstract class EntityAdvancedMotion extends InventoryEntity implements IC
             final Vector3 motionVec = vec.getValue();
 
             this.spawnParticle(
-                    this.getParticle(this.rand, posVec.x, posVec.y, posVec.z, motionVec.x, motionVec.y, motionVec.z));
+                this.getParticle(this.rand, posVec.x, posVec.y, posVec.z, motionVec.x, motionVec.y, motionVec.z));
         }
     }
 
     @SideOnly(Side.CLIENT)
     public void spawnParticle(EntityFX fx) {
-        final Minecraft mc = FMLClientHandler.instance().getClient();
+        final Minecraft mc = FMLClientHandler.instance()
+            .getClient();
 
         if (mc != null && mc.renderViewEntity != null && mc.effectRenderer != null && fx != null) {
             mc.effectRenderer.addEffect(fx);

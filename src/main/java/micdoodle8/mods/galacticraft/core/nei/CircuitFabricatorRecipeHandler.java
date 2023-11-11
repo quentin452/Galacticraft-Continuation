@@ -1,29 +1,27 @@
 package micdoodle8.mods.galacticraft.core.nei;
 
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class CircuitFabricatorRecipeHandler extends TemplateRecipeHandler {
 
     private static final ResourceLocation circuitFabricatorTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/circuitFabricator.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/circuitFabricator.png");
     int ticksPassed;
 
     public String getRecipeId() {
@@ -39,10 +37,11 @@ public class CircuitFabricatorRecipeHandler extends TemplateRecipeHandler {
         final HashMap<ArrayList<PositionedStack>, PositionedStack> recipes = new HashMap<>();
 
         for (final Entry<HashMap<Integer, PositionedStack>, PositionedStack> stack : NEIGalacticraftConfig
-                .getCircuitFabricatorRecipes()) {
+            .getCircuitFabricatorRecipes()) {
             final ArrayList<PositionedStack> inputStacks = new ArrayList<>();
 
-            for (final Map.Entry<Integer, PositionedStack> input : stack.getKey().entrySet()) {
+            for (final Map.Entry<Integer, PositionedStack> input : stack.getKey()
+                .entrySet()) {
                 inputStacks.add(input.getValue());
             }
 
@@ -59,12 +58,12 @@ public class CircuitFabricatorRecipeHandler extends TemplateRecipeHandler {
         GuiDraw.drawTexturedModalRect(-2, 9, 3, 4, 168, 64);
         GuiDraw.drawTexturedModalRect(68, 73, 73, 68, 96, 35);
         GuiDraw.drawTexturedModalRect(
-                83,
-                25,
-                176,
-                17 + 10 * (Math.min(this.ticksPassed % 70, 51) / 3 % 3),
-                Math.min(this.ticksPassed % 70, 51),
-                10);
+            83,
+            25,
+            176,
+            17 + 10 * (Math.min(this.ticksPassed % 70, 51) / 3 % 3),
+            Math.min(this.ticksPassed % 70, 51),
+            10);
     }
 
     @Override
@@ -112,13 +111,15 @@ public class CircuitFabricatorRecipeHandler extends TemplateRecipeHandler {
 
     @Override
     public ArrayList<PositionedStack> getIngredientStacks(int recipe) {
-        return (ArrayList<PositionedStack>) this.arecipes.get(recipe).getIngredients();
+        return (ArrayList<PositionedStack>) this.arecipes.get(recipe)
+            .getIngredients();
     }
 
     @Override
     public PositionedStack getResultStack(int recipe) {
         if (this.ticksPassed % 70 >= 51) {
-            return this.arecipes.get(recipe).getResult();
+            return this.arecipes.get(recipe)
+                .getResult();
         }
 
         return null;
@@ -132,7 +133,7 @@ public class CircuitFabricatorRecipeHandler extends TemplateRecipeHandler {
         @Override
         public ArrayList<PositionedStack> getIngredients() {
             return (ArrayList<PositionedStack>) this
-                    .getCycledIngredients(CircuitFabricatorRecipeHandler.this.cycleticks / 20, this.input);
+                .getCycledIngredients(CircuitFabricatorRecipeHandler.this.cycleticks / 20, this.input);
         }
 
         @Override

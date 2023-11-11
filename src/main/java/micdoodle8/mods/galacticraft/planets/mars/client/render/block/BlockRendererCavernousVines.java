@@ -1,12 +1,11 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.block;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.IBlockAccess;
-
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class BlockRendererCavernousVines implements ISimpleBlockRenderingHandler {
 
@@ -18,7 +17,7 @@ public class BlockRendererCavernousVines implements ISimpleBlockRenderingHandler
 
     @Override
     public boolean renderWorldBlock(IBlockAccess var1, int var2, int var3, int var4, Block var5, int var6,
-            RenderBlocks var7) {
+        RenderBlocks var7) {
         this.renderBlockMeteor(var7, var5, var1, var2, var3, var4);
         return true;
     }
@@ -37,7 +36,7 @@ public class BlockRendererCavernousVines implements ISimpleBlockRenderingHandler
     public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {}
 
     public void renderBlockMeteor(RenderBlocks renderBlocks, Block par1Block, IBlockAccess var1, int par2, int par3,
-            int par4) {
+        int par4) {
         final Tessellator tessellator = Tessellator.instance;
         tessellator.setBrightness(par1Block.getMixedBrightnessForBlock(var1, par2, par3, par4));
         final float f = 1.0F;
@@ -57,11 +56,7 @@ public class BlockRendererCavernousVines implements ISimpleBlockRenderingHandler
 
         tessellator.setColorOpaque_F(f * f1, f * f2, f * f3);
 
-        renderBlocks.drawCrossedSquares(
-                par1Block.getIcon(0, var1.getBlockMetadata(par2, par3, par4)),
-                par2,
-                par3,
-                par4,
-                1.0F);
+        renderBlocks
+            .drawCrossedSquares(par1Block.getIcon(0, var1.getBlockMetadata(par2, par3, par4)), par2, par3, par4, 1.0F);
     }
 }

@@ -1,17 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.client.gui.container.GuiCargoLoader;
 import micdoodle8.mods.galacticraft.core.client.gui.container.GuiContainerGC;
@@ -25,25 +13,35 @@ import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
 import micdoodle8.mods.galacticraft.planets.asteroids.inventory.ContainerAstroMinerDock;
 import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GuiAstroMinerDock extends GuiContainerGC {
 
     private static final ResourceLocation dockGui = new ResourceLocation(
-            AsteroidsModule.ASSET_PREFIX,
-            "textures/gui/guiAstroMinerDock.png");
+        AsteroidsModule.ASSET_PREFIX,
+        "textures/gui/guiAstroMinerDock.png");
 
     private final TileEntityMinerBase tile;
 
     private GuiButton recallButton;
     private final GuiElementInfoRegion electricInfoRegion = new GuiElementInfoRegion(
-            (this.width - this.xSize) / 2 + 233,
-            (this.height - this.ySize) / 2 + 31,
-            10,
-            68,
-            new ArrayList<String>(),
-            this.width,
-            this.height,
-            this);
+        (this.width - this.xSize) / 2 + 233,
+        (this.height - this.ySize) / 2 + 31,
+        10,
+        68,
+        new ArrayList<String>(),
+        this.width,
+        this.height,
+        this);
 
     private boolean extraLines;
 
@@ -62,9 +60,9 @@ public class GuiAstroMinerDock extends GuiContainerGC {
         } else {
             final EntityAstroMiner miner = this.tile.linkedMiner;
             if (miner == null || miner.isDead
-                    || this.tile.linkCountDown == 0
-                    || miner.AIstate < EntityAstroMiner.AISTATE_TRAVELLING
-                    || miner.AIstate == EntityAstroMiner.AISTATE_DOCKING) {
+                || this.tile.linkCountDown == 0
+                || miner.AIstate < EntityAstroMiner.AISTATE_TRAVELLING
+                || miner.AIstate == EntityAstroMiner.AISTATE_DOCKING) {
                 this.recallButton.enabled = false;
             }
         }
@@ -81,9 +79,9 @@ public class GuiAstroMinerDock extends GuiContainerGC {
         final List<String> electricityDesc = new ArrayList<>();
         electricityDesc.add(GCCoreUtil.translate("gui.energyStorage.desc.0"));
         electricityDesc.add(
-                EnumColor.YELLOW + GCCoreUtil.translate("gui.energyStorage.desc.1")
-                        + ((int) Math.floor(this.tile.getEnergyStoredGC()) + " / "
-                                + (int) Math.floor(this.tile.getMaxEnergyStoredGC())));
+            EnumColor.YELLOW + GCCoreUtil.translate("gui.energyStorage.desc.1")
+                + ((int) Math.floor(this.tile.getEnergyStoredGC()) + " / "
+                    + (int) Math.floor(this.tile.getMaxEnergyStoredGC())));
         this.electricInfoRegion.tooltipStrings = electricityDesc;
         this.electricInfoRegion.xPosition = xPos + 233;
         this.electricInfoRegion.yPosition = yPos + 29;
@@ -94,23 +92,15 @@ public class GuiAstroMinerDock extends GuiContainerGC {
         batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.0"));
         batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.1"));
         this.infoRegions.add(
-                new GuiElementInfoRegion(
-                        xPos + 230,
-                        yPos + 108,
-                        18,
-                        18,
-                        batterySlotDesc,
-                        this.width,
-                        this.height,
-                        this));
+            new GuiElementInfoRegion(xPos + 230, yPos + 108, 18, 18, batterySlotDesc, this.width, this.height, this));
         this.buttonList.add(
-                this.recallButton = new GuiButton(
-                        0,
-                        xPos + 173,
-                        yPos + 195,
-                        76,
-                        20,
-                        GCCoreUtil.translate("gui.button.recall.name")));
+            this.recallButton = new GuiButton(
+                0,
+                xPos + 173,
+                yPos + 195,
+                76,
+                20,
+                GCCoreUtil.translate("gui.button.recall.name")));
     }
 
     @Override
@@ -124,9 +114,9 @@ public class GuiAstroMinerDock extends GuiContainerGC {
             switch (par1GuiButton.id) {
                 case 0:
                     GalacticraftCore.packetPipeline.sendToServer(
-                            new PacketSimple(
-                                    EnumSimplePacket.S_UPDATE_DISABLEABLE_BUTTON,
-                                    new Object[] { this.tile.xCoord, this.tile.yCoord, this.tile.zCoord, 0 }));
+                        new PacketSimple(
+                            EnumSimplePacket.S_UPDATE_DISABLEABLE_BUTTON,
+                            new Object[] { this.tile.xCoord, this.tile.yCoord, this.tile.zCoord, 0 }));
                     break;
                 default:
                     break;
@@ -144,34 +134,34 @@ public class GuiAstroMinerDock extends GuiContainerGC {
         this.fontRendererObj.drawString(this.getStatus(), 177, 141, 4210752);
         if (this.extraLines) {
             this.fontRendererObj.drawString(
-                    "\u0394x: " + this
-                            .getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posX) - this.tile.xCoord - 1),
-                    186,
-                    152,
-                    2536735);
+                "\u0394x: "
+                    + this.getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posX) - this.tile.xCoord - 1),
+                186,
+                152,
+                2536735);
         }
         if (this.extraLines) {
             this.fontRendererObj.drawString(
-                    "\u0394y: " + this
-                            .getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posY) - this.tile.yCoord),
-                    186,
-                    162,
-                    2536735);
+                "\u0394y: "
+                    + this.getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posY) - this.tile.yCoord),
+                186,
+                162,
+                2536735);
         }
         if (this.extraLines) {
             this.fontRendererObj.drawString(
-                    "\u0394z: " + this
-                            .getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posZ) - this.tile.zCoord - 1),
-                    186,
-                    172,
-                    2536735);
+                "\u0394z: "
+                    + this.getDeltaString(MathHelper.floor_double(this.tile.linkedMiner.posZ) - this.tile.zCoord - 1),
+                186,
+                172,
+                2536735);
         }
         if (this.extraLines) {
             this.fontRendererObj.drawString(
-                    GCCoreUtil.translate("gui.miner.mined") + ": " + this.tile.linkedMiner.mineCount,
-                    177,
-                    183,
-                    2536735);
+                GCCoreUtil.translate("gui.miner.mined") + ": " + this.tile.linkedMiner.mineCount,
+                177,
+                183,
+                2536735);
         }
         this.fontRendererObj.drawString(GCCoreUtil.translate("container.inventory"), 7, this.ySize - 92, 4210752);
     }
@@ -217,17 +207,17 @@ public class GuiAstroMinerDock extends GuiContainerGC {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         final int xPos = (this.width - this.xSize) / 2;
         final int yPos = (this.height - this.ySize) / 2;
-        this.mc.getTextureManager().bindTexture(GuiAstroMinerDock.dockGui);
+        this.mc.getTextureManager()
+            .bindTexture(GuiAstroMinerDock.dockGui);
         this.drawTexturedModalRect(xPos, yPos, 0, 0, this.xSize, this.ySize);
         final List<String> electricityDesc = new ArrayList<>();
         electricityDesc.add(GCCoreUtil.translate("gui.energyStorage.desc.0"));
-        EnergyDisplayHelper.getEnergyDisplayTooltip(
-                this.tile.getEnergyStoredGC(),
-                this.tile.getMaxEnergyStoredGC(),
-                electricityDesc);
+        EnergyDisplayHelper
+            .getEnergyDisplayTooltip(this.tile.getEnergyStoredGC(), this.tile.getMaxEnergyStoredGC(), electricityDesc);
         this.electricInfoRegion.tooltipStrings = electricityDesc;
 
-        this.mc.getTextureManager().bindTexture(GuiCargoLoader.loaderTexture);
+        this.mc.getTextureManager()
+            .bindTexture(GuiCargoLoader.loaderTexture);
         if (this.tile.getEnergyStoredGC() > 0) {
             this.drawTexturedModalRect(xPos + 233, yPos + 17, 176, 0, 11, 10);
         }

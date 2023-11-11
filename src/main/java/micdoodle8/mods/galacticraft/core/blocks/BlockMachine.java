@@ -1,8 +1,13 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricFurnace;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityEnergyStorageModule;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityIngotCompressor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -17,14 +22,8 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricFurnace;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityEnergyStorageModule;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityIngotCompressor;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
+import java.util.Random;
 
 public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -120,8 +119,8 @@ public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShi
             metadata -= BlockMachine.COMPRESSOR_METADATA;
 
             if (metadata == 0 && side == 4 || metadata == 1 && side == 5
-                    || metadata == 2 && side == 3
-                    || metadata == 3 && side == 2) {
+                || metadata == 2 && side == 3
+                || metadata == 3 && side == 2) {
                 return this.iconCompressor;
             }
         } else {
@@ -131,8 +130,8 @@ public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShi
             }
             // If it is the back side
             if (metadata == 0 && side == 4 || metadata == 1 && side == 5
-                    || metadata == 2 && side == 3
-                    || metadata == 3 && side == 2) {
+                || metadata == 2 && side == 3
+                || metadata == 3 && side == 2) {
                 return this.iconCoalGenerator;
             }
         }
@@ -170,7 +169,7 @@ public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShi
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
         final int original = metadata & 3;
         int change = 0;
@@ -207,7 +206,7 @@ public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShi
      */
     @Override
     public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
 
         if (!par1World.isRemote) {

@@ -26,7 +26,7 @@ public enum EnumGravity {
     private static final EnumGravity[] GDirections = { down, up, west, east, south, north };
 
     EnumGravity(int value, float pitchX, float pitchY, float yawX, float yawY, float yawZ, float thetaX, float thetaZ,
-            float sneakX, float sneakY, float sneakZ, float eyeX, float eyeY, float eyeZ) {
+        float sneakX, float sneakY, float sneakZ, float eyeX, float eyeY, float eyeZ) {
         this.intValue = value;
         this.pitchGravityX = pitchX;
         this.pitchGravityY = pitchY;

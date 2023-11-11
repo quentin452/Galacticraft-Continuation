@@ -1,12 +1,10 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.item;
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.IItemRenderer;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile.TileEntityShortRangeTelepadRenderer;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.IItemRenderer;
+import org.lwjgl.opengl.GL11;
 
 public class ItemRendererShortRangeTelepad implements IItemRenderer {
 
@@ -18,14 +16,14 @@ public class ItemRendererShortRangeTelepad implements IItemRenderer {
 
         GL11.glColor3f(1.0F, 1.0F, 1.0F);
 
-        FMLClientHandler.instance().getClient().renderEngine
-                .bindTexture(TileEntityShortRangeTelepadRenderer.telepadTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(TileEntityShortRangeTelepadRenderer.telepadTexture);
 
         TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("Base");
         TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("Top");
 
-        FMLClientHandler.instance().getClient().renderEngine
-                .bindTexture(TileEntityShortRangeTelepadRenderer.telepadTexture0);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(TileEntityShortRangeTelepadRenderer.telepadTexture0);
         TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopMidxNegz");
         TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopPosxNegz");
         TileEntityShortRangeTelepadRenderer.telepadModel.renderPart("TopNegxNegz");

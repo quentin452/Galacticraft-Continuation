@@ -1,8 +1,15 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import java.util.Arrays;
-import java.util.List;
-
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
+import micdoodle8.mods.galacticraft.core.inventory.ContainerBuggy;
+import micdoodle8.mods.galacticraft.core.inventory.ContainerParaChest;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -16,16 +23,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.StatCollector;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.registry.EntityRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
-import cpw.mods.fml.relauncher.Side;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
-import micdoodle8.mods.galacticraft.core.inventory.ContainerBuggy;
-import micdoodle8.mods.galacticraft.core.inventory.ContainerParaChest;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+import java.util.Arrays;
+import java.util.List;
 
 public class GCCoreUtil {
 
@@ -49,7 +48,7 @@ public class GCCoreUtil {
         player.closeContainer();
         final int id = player.currentWindowId;
         GalacticraftCore.packetPipeline
-                .sendTo(new PacketSimple(EnumSimplePacket.C_OPEN_PARACHEST_GUI, new Object[] { id, 0, 0 }), player);
+            .sendTo(new PacketSimple(EnumSimplePacket.C_OPEN_PARACHEST_GUI, new Object[] { id, 0, 0 }), player);
         player.openContainer = new ContainerBuggy(player.inventory, buggyInv, type);
         player.openContainer.windowId = id;
         player.openContainer.addCraftingToCrafters(player);
@@ -60,10 +59,10 @@ public class GCCoreUtil {
         player.closeContainer();
         final int windowId = player.currentWindowId;
         GalacticraftCore.packetPipeline.sendTo(
-                new PacketSimple(
-                        EnumSimplePacket.C_OPEN_PARACHEST_GUI,
-                        new Object[] { windowId, 1, landerInv.getEntityId() }),
-                player);
+            new PacketSimple(
+                EnumSimplePacket.C_OPEN_PARACHEST_GUI,
+                new Object[] { windowId, 1, landerInv.getEntityId() }),
+            player);
         player.openContainer = new ContainerParaChest(player.inventory, landerInv);
         player.openContainer.windowId = windowId;
         player.openContainer.addCraftingToCrafters(player);
@@ -100,20 +99,22 @@ public class GCCoreUtil {
 
     @SuppressWarnings("deprecation")
     public static void registerGalacticraftNonMobEntity(Class<? extends Entity> var0, String var1, int trackingDistance,
-            int updateFreq, boolean sendVel) {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            LanguageRegistry.instance().addStringLocalization(
+        int updateFreq, boolean sendVel) {
+        if (FMLCommonHandler.instance()
+            .getEffectiveSide() == Side.CLIENT) {
+            LanguageRegistry.instance()
+                .addStringLocalization(
                     "entity.GalacticraftCore." + var1 + ".name",
                     GCCoreUtil.translate("entity." + var1 + ".name"));
         }
         EntityRegistry.registerModEntity(
-                var0,
-                var1,
-                nextInternalID(),
-                GalacticraftCore.instance,
-                trackingDistance,
-                updateFreq,
-                sendVel);
+            var0,
+            var1,
+            nextInternalID(),
+            GalacticraftCore.instance,
+            trackingDistance,
+            updateFreq,
+            sendVel);
     }
 
     public static void registerGalacticraftItem(String key, Item item) {
@@ -143,20 +144,23 @@ public class GCCoreUtil {
     public static String translate(String key) {
         final String result = StatCollector.translateToLocal(key);
         final int comment = result.indexOf('#');
-        return comment > 0 ? result.substring(0, comment).trim() : result;
+        return comment > 0 ? result.substring(0, comment)
+            .trim() : result;
     }
 
     public static List<String> translateWithSplit(String key) {
         String translated = translate(key);
         final int comment = translated.indexOf('#');
-        translated = comment > 0 ? translated.substring(0, comment).trim() : translated;
+        translated = comment > 0 ? translated.substring(0, comment)
+            .trim() : translated;
         return Arrays.asList(translated.split("\\$"));
     }
 
     public static String translateWithFormat(String key, Object... values) {
         final String result = StatCollector.translateToLocalFormatted(key, values);
         final int comment = result.indexOf('#');
-        return comment > 0 ? result.substring(0, comment).trim() : result;
+        return comment > 0 ? result.substring(0, comment)
+            .trim() : result;
     }
 
     public static void drawStringRightAligned(String string, int x, int y, int color, FontRenderer fontRendererObj) {
@@ -168,10 +172,13 @@ public class GCCoreUtil {
     }
 
     public static String lowerCaseNoun(String string) {
-        final Language l = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage();
+        final Language l = Minecraft.getMinecraft()
+            .getLanguageManager()
+            .getCurrentLanguage();
         if ("de_DE".equals(l.getLanguageCode())) {
             return string;
         }
-        return GCCoreUtil.translate(string).toLowerCase();
+        return GCCoreUtil.translate(string)
+            .toLowerCase();
     }
 }

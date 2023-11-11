@@ -24,7 +24,7 @@ public class WorldDataSpaceRaces extends WorldSavedData {
 
     public static WorldDataSpaceRaces initWorldData(World world) {
         WorldDataSpaceRaces worldData = (WorldDataSpaceRaces) world
-                .loadItemData(WorldDataSpaceRaces.class, WorldDataSpaceRaces.saveDataID);
+            .loadItemData(WorldDataSpaceRaces.class, WorldDataSpaceRaces.saveDataID);
 
         if (worldData == null) {
             worldData = new WorldDataSpaceRaces(WorldDataSpaceRaces.saveDataID);

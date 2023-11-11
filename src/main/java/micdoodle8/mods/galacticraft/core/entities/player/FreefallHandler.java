@@ -1,5 +1,14 @@
 package micdoodle8.mods.galacticraft.core.entities.player;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.event.ZeroGravityEvent;
+import micdoodle8.mods.galacticraft.api.prefab.entity.EntitySpaceshipBase;
+import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.dimension.SpinManager;
+import micdoodle8.mods.galacticraft.core.dimension.WorldProviderSpaceStation;
+import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -12,16 +21,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.MinecraftForge;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.event.ZeroGravityEvent;
-import micdoodle8.mods.galacticraft.api.prefab.entity.EntitySpaceshipBase;
-import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.dimension.SpinManager;
-import micdoodle8.mods.galacticraft.core.dimension.WorldProviderSpaceStation;
-import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
 
 public class FreefallHandler {
 
@@ -57,7 +56,7 @@ public class FreefallHandler {
                     player.boundingBox.offset(0, blockYmax - player.boundingBox.minY, 0);
                 } else if (b.canCollideCheck(player.worldObj.getBlockMetadata(xx, playerFeetOnY, zz), false)) {
                     final AxisAlignedBB collisionBox = b
-                            .getCollisionBoundingBoxFromPool(player.worldObj, xx, playerFeetOnY, zz);
+                        .getCollisionBoundingBoxFromPool(player.worldObj, xx, playerFeetOnY, zz);
                     if (collisionBox != null && collisionBox.intersectsWith(player.boundingBox)) {
                         player.posY -= player.boundingBox.minY - blockYmax;
                         player.boundingBox.offset(0, blockYmax - player.boundingBox.minY, 0);
@@ -120,11 +119,11 @@ public class FreefallHandler {
         if (worldProvider instanceof WorldProviderSpaceStation) {
             final SpinManager spinManager = ((WorldProviderSpaceStation) worldProvider).getSpinManager();
             checkBlockWithinReach = playerReach.maxX >= spinManager.ssBoundsMinX
-                    && playerReach.minX <= spinManager.ssBoundsMaxX
-                    && playerReach.maxY >= spinManager.ssBoundsMinY
-                    && playerReach.minY <= spinManager.ssBoundsMaxY
-                    && playerReach.maxZ >= spinManager.ssBoundsMinZ
-                    && playerReach.minZ <= spinManager.ssBoundsMaxZ;
+                && playerReach.minX <= spinManager.ssBoundsMaxX
+                && playerReach.maxY >= spinManager.ssBoundsMinY
+                && playerReach.minY <= spinManager.ssBoundsMaxY
+                && playerReach.maxZ >= spinManager.ssBoundsMinZ
+                && playerReach.minZ <= spinManager.ssBoundsMaxZ;
             // Player is somewhere within the space station boundaries
         } else {
             checkBlockWithinReach = true;

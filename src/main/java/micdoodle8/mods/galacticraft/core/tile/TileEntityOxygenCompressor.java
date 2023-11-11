@@ -1,7 +1,10 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-
+import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.items.ItemOxygenTank;
+import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -10,11 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.items.ItemOxygenTank;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.EnumSet;
 
 public class TileEntityOxygenCompressor extends TileEntityOxygen implements IInventory, ISidedInventory {
 
@@ -155,7 +154,7 @@ public class TileEntityOxygenCompressor extends TileEntityOxygen implements IInv
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -179,7 +178,8 @@ public class TileEntityOxygenCompressor extends TileEntityOxygen implements IInv
             } else if (slotID == 1) {
                 return ItemElectricBase.isElectricItemCharged(itemstack);
             } else if (slotID == 2) {
-                return itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
+                return itemstack.getItemDamage() < itemstack.getItem()
+                    .getMaxDamage();
             }
         }
         return false;
@@ -238,7 +238,9 @@ public class TileEntityOxygenCompressor extends TileEntityOxygen implements IInv
 
     @Override
     public EnumSet<ForgeDirection> getOxygenInputDirections() {
-        return EnumSet.of(this.getElectricInputDirection().getOpposite());
+        return EnumSet.of(
+            this.getElectricInputDirection()
+                .getOpposite());
     }
 
     @Override

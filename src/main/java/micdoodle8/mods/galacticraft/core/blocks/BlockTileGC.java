@@ -1,7 +1,5 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -11,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import java.util.Random;
 
 /**
  * An advanced block class that is to be extended for wrenching capabilities.
@@ -76,14 +76,17 @@ public abstract class BlockTileGC extends BlockAdvanced implements ITileEntityPr
 
                         var7.stackSize -= var11;
                         final EntityItem var12 = new EntityItem(
-                                world,
-                                x + var8,
-                                y + var9,
-                                z + var10,
-                                new ItemStack(var7.getItem(), var11, var7.getItemDamage()));
+                            world,
+                            x + var8,
+                            y + var9,
+                            z + var10,
+                            new ItemStack(var7.getItem(), var11, var7.getItemDamage()));
 
                         if (var7.hasTagCompound()) {
-                            var12.getEntityItem().setTagCompound((NBTTagCompound) var7.getTagCompound().copy());
+                            var12.getEntityItem()
+                                .setTagCompound(
+                                    (NBTTagCompound) var7.getTagCompound()
+                                        .copy());
                         }
 
                         final float var13 = 0.05F;

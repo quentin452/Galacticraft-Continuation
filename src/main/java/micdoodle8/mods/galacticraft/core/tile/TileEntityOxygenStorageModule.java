@@ -1,9 +1,12 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-
+import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
+import micdoodle8.mods.galacticraft.core.Constants;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.BlockMachine2;
+import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -15,13 +18,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockMachine2;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TileEntityOxygenStorageModule extends TileEntityOxygen implements ISidedInventory, IFluidHandler {
 
@@ -64,8 +63,8 @@ public class TileEntityOxygenStorageModule extends TileEntityOxygen implements I
         this.lastScaledOxygenLevel = this.scaledOxygenLevel;
 
         this.produceOxygen(
-                ForgeDirection.getOrientation(
-                        this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2 ^ 1));
+            ForgeDirection
+                .getOrientation(this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2 ^ 1));
 
         // if (!this.worldObj.isRemote)
         // {
@@ -181,27 +180,26 @@ public class TileEntityOxygenStorageModule extends TileEntityOxygen implements I
     @Override
     public float getOxygenProvide(ForgeDirection direction) {
         return this.getOxygenOutputDirection() == direction
-                ? Math.min(TileEntityOxygenStorageModule.OUTPUT_PER_TICK, this.getOxygenStored())
-                : 0.0F;
+            ? Math.min(TileEntityOxygenStorageModule.OUTPUT_PER_TICK, this.getOxygenStored())
+            : 0.0F;
     }
 
     @Override
     public EnumSet<ForgeDirection> getOxygenInputDirections() {
         return EnumSet.of(
-                ForgeDirection
-                        .getOrientation(this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2));
+            ForgeDirection.getOrientation(this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2));
     }
 
     @Override
     public EnumSet<ForgeDirection> getOxygenOutputDirections() {
         return EnumSet.of(
-                ForgeDirection.getOrientation(
-                        this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2 ^ 1));
+            ForgeDirection
+                .getOrientation(this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2 ^ 1));
     }
 
     public ForgeDirection getOxygenOutputDirection() {
         return ForgeDirection
-                .getOrientation(this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2 ^ 1);
+            .getOrientation(this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2 ^ 1);
     }
 
     @Override
@@ -266,7 +264,7 @@ public class TileEntityOxygenStorageModule extends TileEntityOxygen implements I
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -294,7 +292,8 @@ public class TileEntityOxygenStorageModule extends TileEntityOxygen implements I
     @Override
     public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
         if (slotID == 0 && this.isItemValidForSlot(slotID, itemstack)) {
-            return itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
+            return itemstack.getItemDamage() < itemstack.getItem()
+                .getMaxDamage();
         }
         return false;
     }
@@ -326,9 +325,10 @@ public class TileEntityOxygenStorageModule extends TileEntityOxygen implements I
     @Override
     public boolean canFill(ForgeDirection from, Fluid fluid) {
         if (from.ordinal() == this.getBlockMetadata() - BlockMachine2.OXYGEN_STORAGE_MODULE_METADATA + 2
-                && GalacticraftCore.isPlanetsLoaded) {
+            && GalacticraftCore.isPlanetsLoaded) {
             // Can fill with LOX only
-            return fluid != null && fluid.getName().equals(AsteroidsModule.fluidLiquidOxygen.getName());
+            return fluid != null && fluid.getName()
+                .equals(AsteroidsModule.fluidLiquidOxygen.getName());
         }
 
         return false;
@@ -340,7 +340,7 @@ public class TileEntityOxygenStorageModule extends TileEntityOxygen implements I
 
         if (resource != null && this.canFill(from, resource.getFluid())) {
             used = (int) (this.receiveOxygen(resource.amount / Constants.LOX_GAS_RATIO, doFill)
-                    * Constants.LOX_GAS_RATIO);
+                * Constants.LOX_GAS_RATIO);
         }
 
         return used;
@@ -354,10 +354,10 @@ public class TileEntityOxygenStorageModule extends TileEntityOxygen implements I
 
         if (metaside == side && GalacticraftCore.isPlanetsLoaded) {
             tankInfo = new FluidTankInfo[] { new FluidTankInfo(
-                    new FluidStack(
-                            AsteroidsModule.fluidLiquidOxygen,
-                            (int) (this.getOxygenStored() * Constants.LOX_GAS_RATIO)),
-                    (int) (OXYGEN_CAPACITY * Constants.LOX_GAS_RATIO)) };
+                new FluidStack(
+                    AsteroidsModule.fluidLiquidOxygen,
+                    (int) (this.getOxygenStored() * Constants.LOX_GAS_RATIO)),
+                (int) (OXYGEN_CAPACITY * Constants.LOX_GAS_RATIO)) };
         }
         return tankInfo;
     }

@@ -1,9 +1,11 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.IntStream;
-
+import micdoodle8.mods.galacticraft.api.item.IKeyable;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.BlockT1TreasureChest;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerChest;
@@ -15,12 +17,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.AxisAlignedBB;
 
-import micdoodle8.mods.galacticraft.api.item.IKeyable;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockT1TreasureChest;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class TileEntityTreasureChest extends TileEntityAdvanced implements IInventory, IKeyable, ISidedInventory {
 
@@ -210,7 +209,7 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     /**
@@ -267,22 +266,22 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
 
             if (this.func_94044_a(this.xCoord - 1, this.yCoord, this.zCoord)) {
                 this.adjacentChestXNeg = (TileEntityTreasureChest) this.worldObj
-                        .getTileEntity(this.xCoord - 1, this.yCoord, this.zCoord);
+                    .getTileEntity(this.xCoord - 1, this.yCoord, this.zCoord);
             }
 
             if (this.func_94044_a(this.xCoord + 1, this.yCoord, this.zCoord)) {
                 this.adjacentChestXPos = (TileEntityTreasureChest) this.worldObj
-                        .getTileEntity(this.xCoord + 1, this.yCoord, this.zCoord);
+                    .getTileEntity(this.xCoord + 1, this.yCoord, this.zCoord);
             }
 
             if (this.func_94044_a(this.xCoord, this.yCoord, this.zCoord - 1)) {
                 this.adjacentChestZNeg = (TileEntityTreasureChest) this.worldObj
-                        .getTileEntity(this.xCoord, this.yCoord, this.zCoord - 1);
+                    .getTileEntity(this.xCoord, this.yCoord, this.zCoord - 1);
             }
 
             if (this.func_94044_a(this.xCoord, this.yCoord, this.zCoord + 1)) {
                 this.adjacentChestZPos = (TileEntityTreasureChest) this.worldObj
-                        .getTileEntity(this.xCoord, this.yCoord, this.zCoord + 1);
+                    .getTileEntity(this.xCoord, this.yCoord, this.zCoord + 1);
             }
 
             if (this.adjacentChestZNeg != null) {
@@ -320,18 +319,18 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
         float f;
 
         if (!this.worldObj.isRemote && this.numUsingPlayers != 0
-                && (this.ticksSinceSync + this.xCoord + this.yCoord + this.zCoord) % 200 == 0) {
+            && (this.ticksSinceSync + this.xCoord + this.yCoord + this.zCoord) % 200 == 0) {
             this.numUsingPlayers = 0;
             f = 5.0F;
             final List<?> list = this.worldObj.getEntitiesWithinAABB(
-                    EntityPlayer.class,
-                    AxisAlignedBB.getBoundingBox(
-                            this.xCoord - f,
-                            this.yCoord - f,
-                            this.zCoord - f,
-                            this.xCoord + 1 + f,
-                            this.yCoord + 1 + f,
-                            this.zCoord + 1 + f));
+                EntityPlayer.class,
+                AxisAlignedBB.getBoundingBox(
+                    this.xCoord - f,
+                    this.yCoord - f,
+                    this.zCoord - f,
+                    this.xCoord + 1 + f,
+                    this.yCoord + 1 + f,
+                    this.zCoord + 1 + f));
             final Iterator<?> iterator = list.iterator();
 
             while (iterator.hasNext()) {
@@ -339,10 +338,10 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
 
                 if (entityplayer.openContainer instanceof ContainerChest) {
                     final IInventory iinventory = ((ContainerChest) entityplayer.openContainer)
-                            .getLowerChestInventory();
+                        .getLowerChestInventory();
 
                     if (iinventory == this || iinventory instanceof InventoryLargeChest
-                            && ((InventoryLargeChest) iinventory).isPartOfLargeChest(this)) {
+                        && ((InventoryLargeChest) iinventory).isPartOfLargeChest(this)) {
                         ++this.numUsingPlayers;
                     }
                 }
@@ -354,8 +353,8 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
         double d0;
 
         if (this.numUsingPlayers > 0 && this.lidAngle == 0.0F
-                && this.adjacentChestZNeg == null
-                && this.adjacentChestXNeg == null) {
+            && this.adjacentChestZNeg == null
+            && this.adjacentChestXNeg == null) {
             double d1 = this.xCoord + 0.5D;
             d0 = this.zCoord + 0.5D;
 
@@ -368,12 +367,12 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
             }
 
             this.worldObj.playSoundEffect(
-                    d1,
-                    this.yCoord + 0.5D,
-                    d0,
-                    "random.chestopen",
-                    0.5F,
-                    this.worldObj.rand.nextFloat() * 0.1F + 0.6F);
+                d1,
+                this.yCoord + 0.5D,
+                d0,
+                "random.chestopen",
+                0.5F,
+                this.worldObj.rand.nextFloat() * 0.1F + 0.6F);
         }
 
         if (this.numUsingPlayers == 0 && this.lidAngle > 0.0F || this.numUsingPlayers > 0 && this.lidAngle < 1.0F) {
@@ -404,12 +403,12 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
                 }
 
                 this.worldObj.playSoundEffect(
-                        d0,
-                        this.yCoord + 0.5D,
-                        d2,
-                        "random.chestclosed",
-                        0.5F,
-                        this.worldObj.rand.nextFloat() * 0.1F + 0.6F);
+                    d0,
+                    this.yCoord + 0.5D,
+                    d2,
+                    "random.chestclosed",
+                    0.5F,
+                    this.worldObj.rand.nextFloat() * 0.1F + 0.6F);
             }
 
             if (this.lidAngle < 0.0F) {
@@ -438,7 +437,7 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
 
         ++this.numUsingPlayers;
         this.worldObj
-                .addBlockEvent(this.xCoord, this.yCoord, this.zCoord, this.getBlockType(), 1, this.numUsingPlayers);
+            .addBlockEvent(this.xCoord, this.yCoord, this.zCoord, this.getBlockType(), 1, this.numUsingPlayers);
         this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord, this.zCoord, this.getBlockType());
         this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord - 1, this.zCoord, this.getBlockType());
     }
@@ -448,7 +447,7 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
         if (this.getBlockType() != null && this.getBlockType() instanceof BlockT1TreasureChest) {
             --this.numUsingPlayers;
             this.worldObj
-                    .addBlockEvent(this.xCoord, this.yCoord, this.zCoord, this.getBlockType(), 1, this.numUsingPlayers);
+                .addBlockEvent(this.xCoord, this.yCoord, this.zCoord, this.getBlockType(), 1, this.numUsingPlayers);
             this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord, this.zCoord, this.getBlockType());
             this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord - 1, this.zCoord, this.getBlockType());
         }
@@ -519,9 +518,9 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
         if (this.locked) {
             if (player.worldObj.isRemote) {
                 GalacticraftCore.packetPipeline.sendToServer(
-                        new PacketSimple(
-                                EnumSimplePacket.S_ON_FAILED_CHEST_UNLOCK,
-                                new Object[] { this.getTierOfKeyRequired() }));
+                    new PacketSimple(
+                        EnumSimplePacket.S_ON_FAILED_CHEST_UNLOCK,
+                        new Object[] { this.getTierOfKeyRequired() }));
             }
             return true;
         }
@@ -551,7 +550,8 @@ public class TileEntityTreasureChest extends TileEntityAdvanced implements IInve
 
     @Override
     public int[] getAccessibleSlotsFromSide(int slot) {
-        return IntStream.range(0, this.getSizeInventory()).toArray();
+        return IntStream.range(0, this.getSizeInventory())
+            .toArray();
     }
 
     @Override

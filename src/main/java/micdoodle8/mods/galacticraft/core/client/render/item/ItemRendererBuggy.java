@@ -1,37 +1,37 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.EntityBuggy;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.EntityBuggy;
 
 public class ItemRendererBuggy implements IItemRenderer {
 
     private static final ResourceLocation buggyTextureBody = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/buggyMain.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/buggyMain.png");
     private static final ResourceLocation buggyTextureWheel = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/buggyWheels.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/buggyWheels.png");
     private static final ResourceLocation buggyTextureStorage = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/buggyStorage.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/buggyStorage.png");
 
-    EntityBuggy spaceship = new EntityBuggy(FMLClientHandler.instance().getClient().theWorld);
+    EntityBuggy spaceship = new EntityBuggy(
+        FMLClientHandler.instance()
+            .getClient().theWorld);
 
     private final IModelCustom modelBuggy = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggy.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggy.obj"));
     private final IModelCustom modelBuggyWheelRight = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggyWheelRight.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggyWheelRight.obj"));
     private final IModelCustom modelBuggyWheelLeft = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggyWheelLeft.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggyWheelLeft.obj"));
 
     private void renderPipeItem(ItemRenderType type, ItemStack item) {
         GL11.glPushMatrix();
@@ -68,7 +68,10 @@ public class ItemRendererBuggy implements IItemRenderer {
 
         GL11.glRotatef(180, 0, 0, 1);
 
-        FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ItemRendererBuggy.buggyTextureWheel);
+        FMLClientHandler.instance()
+            .getClient()
+            .getTextureManager()
+            .bindTexture(ItemRendererBuggy.buggyTextureWheel);
 
         // Front wheel covers
         GL11.glPushMatrix();
@@ -106,7 +109,10 @@ public class ItemRendererBuggy implements IItemRenderer {
         this.modelBuggyWheelLeft.renderPart("WheelLeft_Wheel");
         GL11.glPopMatrix();
 
-        FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ItemRendererBuggy.buggyTextureBody);
+        FMLClientHandler.instance()
+            .getClient()
+            .getTextureManager()
+            .bindTexture(ItemRendererBuggy.buggyTextureBody);
         this.modelBuggy.renderPart("MainBody");
 
         // Radar Dish
@@ -115,7 +121,10 @@ public class ItemRendererBuggy implements IItemRenderer {
         this.modelBuggy.renderPart("RadarDish_Dish");
         GL11.glPopMatrix();
 
-        FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ItemRendererBuggy.buggyTextureStorage);
+        FMLClientHandler.instance()
+            .getClient()
+            .getTextureManager()
+            .bindTexture(ItemRendererBuggy.buggyTextureStorage);
 
         if (item.getItemDamage() > 0) {
             this.modelBuggy.renderPart("CargoLeft");

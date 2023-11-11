@@ -1,16 +1,15 @@
 package micdoodle8.mods.galacticraft.core.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayerMP;
-
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.command.WrongUsageException;
+import net.minecraft.entity.player.EntityPlayerMP;
 
 public class CommandGCEnergyUnits extends CommandBase {
 
@@ -27,7 +26,9 @@ public class CommandGCEnergyUnits extends CommandBase {
             options.append("|J");
         }
         options.append("|RF");
-        return "/" + this.getCommandName() + options.append("]").toString();
+        return "/" + this.getCommandName()
+            + options.append("]")
+                .toString();
     }
 
     @Override
@@ -48,7 +49,7 @@ public class CommandGCEnergyUnits extends CommandBase {
     @Override
     public void processCommand(ICommandSender icommandsender, String[] astring) {
         final EntityPlayerMP playerBase = PlayerUtil
-                .getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
+            .getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
         if (playerBase == null) {
             return;
         }
@@ -71,20 +72,19 @@ public class CommandGCEnergyUnits extends CommandBase {
 
                 if (paramvalue > 0) {
                     GalacticraftCore.packetPipeline.sendTo(
-                            new PacketSimple(EnumSimplePacket.C_UPDATE_ENERGYUNITS, new Object[] { paramvalue }),
-                            playerBase);
+                        new PacketSimple(EnumSimplePacket.C_UPDATE_ENERGYUNITS, new Object[] { paramvalue }),
+                        playerBase);
                     return;
                 }
             }
 
             throw new WrongUsageException(
-                    GCCoreUtil.translateWithFormat(
-                            "commands.gcenergyunits.invalidUnits",
-                            this.getCommandUsage(icommandsender)));
+                GCCoreUtil
+                    .translateWithFormat("commands.gcenergyunits.invalidUnits", this.getCommandUsage(icommandsender)));
         }
 
         throw new WrongUsageException(
-                GCCoreUtil.translateWithFormat("commands.gcenergyunits.noUnits", this.getCommandUsage(icommandsender)));
+            GCCoreUtil.translateWithFormat("commands.gcenergyunits.noUnits", this.getCommandUsage(icommandsender)));
     }
 
     public static void handleParamClientside(int param) {

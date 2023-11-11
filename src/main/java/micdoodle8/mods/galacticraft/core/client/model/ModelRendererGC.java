@@ -1,15 +1,13 @@
 package micdoodle8.mods.galacticraft.core.client.model;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class ModelRendererGC extends ModelRenderer {
 
@@ -37,26 +35,28 @@ public class ModelRendererGC extends ModelRenderer {
 
                     if (this.childModels != null) {
                         for (i = 0; i < this.childModels.size(); ++i) {
-                            this.childModels.get(i).render(par1);
+                            this.childModels.get(i)
+                                .render(par1);
                         }
                     }
                 } else {
                     GL11.glTranslatef(
-                            this.rotationPointX * par1,
-                            this.rotationPointY * par1,
-                            this.rotationPointZ * par1);
+                        this.rotationPointX * par1,
+                        this.rotationPointY * par1,
+                        this.rotationPointZ * par1);
                     GL11.glCallList(this.displayList);
 
                     if (this.childModels != null) {
                         for (i = 0; i < this.childModels.size(); ++i) {
-                            this.childModels.get(i).render(par1);
+                            this.childModels.get(i)
+                                .render(par1);
                         }
                     }
 
                     GL11.glTranslatef(
-                            -this.rotationPointX * par1,
-                            -this.rotationPointY * par1,
-                            -this.rotationPointZ * par1);
+                        -this.rotationPointX * par1,
+                        -this.rotationPointY * par1,
+                        -this.rotationPointZ * par1);
                 }
             } else {
                 GL11.glPushMatrix();
@@ -78,7 +78,8 @@ public class ModelRendererGC extends ModelRenderer {
 
                 if (this.childModels != null) {
                     for (i = 0; i < this.childModels.size(); ++i) {
-                        this.childModels.get(i).render(par1);
+                        this.childModels.get(i)
+                            .render(par1);
                     }
                 }
 

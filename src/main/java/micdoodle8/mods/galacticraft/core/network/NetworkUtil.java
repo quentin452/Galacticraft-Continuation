@@ -1,11 +1,16 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
-
+import com.google.common.math.DoubleMath;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import io.netty.buffer.ByteBuf;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.energy.tile.EnergyStorage;
+import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import micdoodle8.mods.galacticraft.core.util.GCLog;
+import micdoodle8.mods.galacticraft.core.util.VersionUtil;
+import micdoodle8.mods.galacticraft.core.wrappers.FlagData;
+import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,18 +22,11 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 
-import com.google.common.math.DoubleMath;
-
-import cpw.mods.fml.common.network.ByteBufUtils;
-import io.netty.buffer.ByteBuf;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.energy.tile.EnergyStorage;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-import micdoodle8.mods.galacticraft.core.util.GCLog;
-import micdoodle8.mods.galacticraft.core.util.VersionUtil;
-import micdoodle8.mods.galacticraft.core.wrappers.FlagData;
-import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
 
 public class NetworkUtil {
 
@@ -159,9 +157,9 @@ public class NetworkUtil {
                 objList.add(bytes);
             } else if (clazz.equals(EnergyStorage.class)) {
                 final EnergyStorage storage = new EnergyStorage(
-                        buffer.readFloat(),
-                        buffer.readFloat(),
-                        buffer.readFloat());
+                    buffer.readFloat(),
+                    buffer.readFloat(),
+                    buffer.readFloat());
                 storage.setEnergyStored(buffer.readFloat());
                 objList.add(storage);
             } else if (clazz.equals(NBTTagCompound.class)) {
@@ -184,9 +182,9 @@ public class NetworkUtil {
                 for (int i = 0; i < width; i++) {
                     for (int j = 0; j < height; j++) {
                         flagData.setColorAt(
-                                i,
-                                j,
-                                new Vector3(buffer.readByte() + 128, buffer.readByte() + 128, buffer.readByte() + 128));
+                            i,
+                            j,
+                            new Vector3(buffer.readByte() + 128, buffer.readByte() + 128, buffer.readByte() + 128));
                     }
                 }
 
@@ -208,12 +206,12 @@ public class NetworkUtil {
 
                 for (int i = 0; i < size; i++) {
                     objList.add(
-                            new Footprint(
-                                    buffer.readInt(),
-                                    new Vector3(buffer.readFloat(), buffer.readFloat(), buffer.readFloat()),
-                                    buffer.readFloat(),
-                                    buffer.readShort(),
-                                    ByteBufUtils.readUTF8String(buffer)));
+                        new Footprint(
+                            buffer.readInt(),
+                            new Vector3(buffer.readFloat(), buffer.readFloat(), buffer.readFloat()),
+                            buffer.readFloat(),
+                            buffer.readShort(),
+                            ByteBufUtils.readUTF8String(buffer)));
                 }
             }
         }
@@ -277,7 +275,9 @@ public class NetworkUtil {
             }
         }
 
-        throw new NullPointerException("Field type not found: " + field.getType().getSimpleName());
+        throw new NullPointerException(
+            "Field type not found: " + field.getType()
+                .getSimpleName());
     }
 
     public static ItemStack readItemStack(ByteBuf buffer) throws IOException {
@@ -303,7 +303,10 @@ public class NetworkUtil {
             buffer.writeShort(itemStack.getItemDamage());
             NBTTagCompound nbttagcompound = null;
 
-            if (itemStack.getItem().isDamageable() || itemStack.getItem().getShareTag()) {
+            if (itemStack.getItem()
+                .isDamageable()
+                || itemStack.getItem()
+                    .getShareTag()) {
                 nbttagcompound = itemStack.stackTagCompound;
             }
 
@@ -393,8 +396,8 @@ public class NetworkUtil {
             final FluidStack fluidB = bTank.getFluid();
             return fuzzyEquals(aTank.getCapacity(), bTank.getCapacity())
                 && fuzzyEquals(
-                fluidA != null ? FluidUtil.getFluidID(fluidA) : -1,
-                fluidB != null ? FluidUtil.getFluidID(fluidB) : -1)
+                    fluidA != null ? FluidUtil.getFluidID(fluidA) : -1,
+                    fluidB != null ? FluidUtil.getFluidID(fluidB) : -1)
                 && fuzzyEquals(aTank.getFluidAmount(), bTank.getFluidAmount());
         } else {
             return a.equals(b);

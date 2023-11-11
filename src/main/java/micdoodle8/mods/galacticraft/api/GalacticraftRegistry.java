@@ -1,16 +1,5 @@
 package micdoodle8.mods.galacticraft.api;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldProviderSurface;
-import net.minecraftforge.common.DimensionManager;
-
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -19,6 +8,16 @@ import micdoodle8.mods.galacticraft.api.recipe.INasaWorkbenchRecipe;
 import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
 import micdoodle8.mods.galacticraft.api.world.ITeleportType;
 import micdoodle8.mods.galacticraft.api.world.SpaceStationType;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldProviderSurface;
+import net.minecraftforge.common.DimensionManager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GalacticraftRegistry {
 
@@ -116,7 +115,7 @@ public class GalacticraftRegistry {
         for (final SpaceStationType type1 : GalacticraftRegistry.spaceStations) {
             if (type1.getWorldToOrbitID() == type.getWorldToOrbitID()) {
                 throw new RuntimeException(
-                        "Two space station types registered with the same home planet ID: " + type.getWorldToOrbitID());
+                    "Two space station types registered with the same home planet ID: " + type.getWorldToOrbitID());
             }
         }
 
@@ -177,7 +176,7 @@ public class GalacticraftRegistry {
      * @return <boolean> success
      */
     public static boolean registerProvider(int id, Class<? extends WorldProvider> provider, boolean keepLoaded,
-            int defaultID) {
+        int defaultID) {
         final boolean flag = DimensionManager.registerProviderType(id, provider, keepLoaded);
         if (flag) {
             GalacticraftRegistry.worldProviderIDs.add(id);
@@ -187,7 +186,7 @@ public class GalacticraftRegistry {
         // for network compatibility between GC
         // versions
         FMLLog.severe(
-                "Could not register dimension " + id + " - does it clash with another mod?  Change the ID in config.");
+            "Could not register dimension " + id + " - does it clash with another mod?  Change the ID in config.");
         return false;
     }
 

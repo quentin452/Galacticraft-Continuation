@@ -1,7 +1,10 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.items.ItemCanisterGeneric;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,11 +15,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.items.ItemCanisterGeneric;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import java.util.List;
 
 public class ItemCanisterLiquidNitrogen extends ItemCanisterGeneric {
 
@@ -63,11 +62,11 @@ public class ItemCanisterLiquidNitrogen extends ItemCanisterGeneric {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List<String> par3List,
-            boolean par4) {
+        boolean par4) {
         if (par1ItemStack.getMaxDamage() - par1ItemStack.getItemDamage() > 0) {
             par3List.add(
-                    GCCoreUtil.translate("item.canister.liquidNitrogen.name") + ": "
-                            + (par1ItemStack.getMaxDamage() - par1ItemStack.getItemDamage()));
+                GCCoreUtil.translate("item.canister.liquidNitrogen.name") + ": "
+                    + (par1ItemStack.getMaxDamage() - par1ItemStack.getItemDamage()));
         }
     }
 
@@ -89,7 +88,7 @@ public class ItemCanisterLiquidNitrogen extends ItemCanisterGeneric {
         }
 
         final MovingObjectPosition movingobjectposition = this
-                .getMovingObjectPositionFromPlayer(par2World, par3EntityPlayer, true);
+            .getMovingObjectPositionFromPlayer(par2World, par3EntityPlayer, true);
 
         if (movingobjectposition == null) {
             return itemStack;
@@ -100,7 +99,7 @@ public class ItemCanisterLiquidNitrogen extends ItemCanisterGeneric {
             final int z = movingobjectposition.blockZ;
 
             if (!par2World.canMineBlock(par3EntityPlayer, x, y, z)
-                    || !par3EntityPlayer.canPlayerEdit(x, y, z, movingobjectposition.sideHit, itemStack)) {
+                || !par3EntityPlayer.canPlayerEdit(x, y, z, movingobjectposition.sideHit, itemStack)) {
                 return itemStack;
             }
 
@@ -112,12 +111,12 @@ public class ItemCanisterLiquidNitrogen extends ItemCanisterGeneric {
             if (result != null) {
                 this.setNewDamage(itemStack, damage);
                 par2World.playSoundEffect(
-                        x + 0.5D,
-                        y + 0.5D,
-                        z + 0.5D,
-                        "fire.ignite",
-                        1.0F,
-                        Item.itemRand.nextFloat() * 0.4F + 0.8F);
+                    x + 0.5D,
+                    y + 0.5D,
+                    z + 0.5D,
+                    "fire.ignite",
+                    1.0F,
+                    Item.itemRand.nextFloat() * 0.4F + 0.8F);
                 par2World.setBlock(x, y, z, result, 0, 3);
             }
         }

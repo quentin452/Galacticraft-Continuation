@@ -1,12 +1,19 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import com.google.common.collect.Maps;
+import com.mojang.authlib.GameProfile;
+import cpw.mods.fml.common.Optional;
+import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
+import cpw.mods.fml.common.versioning.VersionParser;
+import cpw.mods.fml.relauncher.FMLInjectionData;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.Constants;
+import micdoodle8.mods.galacticraft.core.obfuscation.FieldObfuscationEntry;
+import micdoodle8.mods.galacticraft.core.obfuscation.MethodObfuscationEntry;
+import micdoodle8.mods.galacticraft.core.obfuscation.ObfuscationEntry;
+import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntitySlimelingEgg;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -24,21 +31,12 @@ import net.minecraft.world.ChunkCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import com.google.common.collect.Maps;
-import com.mojang.authlib.GameProfile;
-
-import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
-import cpw.mods.fml.common.versioning.VersionParser;
-import cpw.mods.fml.relauncher.FMLInjectionData;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.obfuscation.FieldObfuscationEntry;
-import micdoodle8.mods.galacticraft.core.obfuscation.MethodObfuscationEntry;
-import micdoodle8.mods.galacticraft.core.obfuscation.ObfuscationEntry;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntitySlimelingEgg;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class VersionUtil {
 
@@ -112,20 +110,19 @@ public class VersionUtil {
             // nodemap.put(KEY_CLASS_SCALED_RES, new
             // ObfuscationEntry("net/minecraft/client/gui/ScaledResolution", "bca"));
             nodemap.put(
-                    KEY_CLASS_COMPRESSED_STREAM_TOOLS,
-                    new ObfuscationEntry("net/minecraft/nbt/CompressedStreamTools"));
+                KEY_CLASS_COMPRESSED_STREAM_TOOLS,
+                new ObfuscationEntry("net/minecraft/nbt/CompressedStreamTools"));
             nodemap.put(KEY_CLASS_NBT_SIZE_TRACKER, new ObfuscationEntry("net/minecraft/nbt/NBTSizeTracker"));
             nodemap.put(
-                    KEY_CLASS_YGG_CONVERTER,
-                    new ObfuscationEntry("net/minecraft/server/management/PreYggdrasilConverter"));
-            nodemap.put(
-                    KEY_CLASS_TEXTURE_UTIL,
-                    new ObfuscationEntry("net/minecraft/client/renderer/texture/TextureUtil"));
+                KEY_CLASS_YGG_CONVERTER,
+                new ObfuscationEntry("net/minecraft/server/management/PreYggdrasilConverter"));
+            nodemap
+                .put(KEY_CLASS_TEXTURE_UTIL, new ObfuscationEntry("net/minecraft/client/renderer/texture/TextureUtil"));
             nodemap.put(KEY_CLASS_COMMAND_BASE, new ObfuscationEntry("net/minecraft/command/CommandBase"));
             nodemap.put(KEY_CLASS_SCALED_RES, new ObfuscationEntry("net/minecraft/client/gui/ScaledResolution"));
             nodemap.put(
-                    KEY_CLASS_RENDER_PLAYER,
-                    new ObfuscationEntry("net/minecraft/client/renderer/entity/RenderPlayer"));
+                KEY_CLASS_RENDER_PLAYER,
+                new ObfuscationEntry("net/minecraft/client/renderer/entity/RenderPlayer"));
             nodemap.put(KEY_CLASS_ENTITYLIST, new ObfuscationEntry("net/minecraft/entity/EntityList"));
 
             // Method descriptions are empty, since they are not needed for reflection.
@@ -155,18 +152,17 @@ public class VersionUtil {
             // nodemap.put(KEY_CLASS_SCALED_RES, new
             // ObfuscationEntry("net/minecraft/client/gui/ScaledResolution", "bam"));
             nodemap.put(
-                    KEY_CLASS_COMPRESSED_STREAM_TOOLS,
-                    new ObfuscationEntry("net/minecraft/nbt/CompressedStreamTools"));
+                KEY_CLASS_COMPRESSED_STREAM_TOOLS,
+                new ObfuscationEntry("net/minecraft/nbt/CompressedStreamTools"));
             nodemap.put(KEY_CLASS_NBT_SIZE_TRACKER, new ObfuscationEntry("", "")); // Not part of 1.7.2
             nodemap.put(KEY_CLASS_YGG_CONVERTER, new ObfuscationEntry("", "")); // Not part of 1.7.2
-            nodemap.put(
-                    KEY_CLASS_TEXTURE_UTIL,
-                    new ObfuscationEntry("net/minecraft/client/renderer/texture/TextureUtil"));
+            nodemap
+                .put(KEY_CLASS_TEXTURE_UTIL, new ObfuscationEntry("net/minecraft/client/renderer/texture/TextureUtil"));
             nodemap.put(KEY_CLASS_COMMAND_BASE, new ObfuscationEntry("net/minecraft/command/CommandBase"));
             nodemap.put(KEY_CLASS_SCALED_RES, new ObfuscationEntry("net/minecraft/client/gui/ScaledResolution"));
             nodemap.put(
-                    KEY_CLASS_RENDER_PLAYER,
-                    new ObfuscationEntry("net/minecraft/client/renderer/entity/RenderPlayer"));
+                KEY_CLASS_RENDER_PLAYER,
+                new ObfuscationEntry("net/minecraft/client/renderer/entity/RenderPlayer"));
             nodemap.put(KEY_CLASS_ENTITYLIST, new ObfuscationEntry("net/minecraft/entity/EntityList"));
 
             nodemap.put(KEY_METHOD_SET_OWNER, new MethodObfuscationEntry("setOwner", "func_70910_a", ""));
@@ -176,8 +172,8 @@ public class VersionUtil {
             nodemap.put(KEY_METHOD_SET_MIPMAP, new MethodObfuscationEntry("func_147950_a", "func_147950_a", ""));
             nodemap.put(KEY_METHOD_NOTIFY_ADMINS, new MethodObfuscationEntry("notifyAdmins", "func_71522_a", ""));
             nodemap.put(
-                    KEY_METHOD_PLAYER_FOR_NAME,
-                    new MethodObfuscationEntry("getPlayerForUsername", "func_72361_f", ""));
+                KEY_METHOD_PLAYER_FOR_NAME,
+                new MethodObfuscationEntry("getPlayerForUsername", "func_72361_f", ""));
             nodemap.put(KEY_METHOD_PLAYER_IS_OPPED, new MethodObfuscationEntry("isPlayerOpped", "func_72353_e", ""));
             nodemap.put(KEY_METHOD_PLAYER_TEXTURE, new MethodObfuscationEntry("getEntityTexture", "func_110775_a", ""));
 
@@ -204,7 +200,8 @@ public class VersionUtil {
     }
 
     public static boolean mcVersionMatches(String version) {
-        return VersionParser.parseRange("[" + version + "]").containsVersion(mcVersion);
+        return VersionParser.parseRange("[" + version + "]")
+            .containsVersion(mcVersion);
     }
 
     @Optional.Method(modid = Constants.MOD_ID_PLANETS)
@@ -213,7 +210,9 @@ public class VersionUtil {
             Method m = (Method) reflectionCache.get(0);
 
             if (m == null) {
-                m = slimeling.getClass().getSuperclass().getMethod(getNameDynamic(KEY_METHOD_SET_OWNER), String.class);
+                m = slimeling.getClass()
+                    .getSuperclass()
+                    .getMethod(getNameDynamic(KEY_METHOD_SET_OWNER), String.class);
                 reflectionCache.put(0, m);
             }
 
@@ -228,7 +227,8 @@ public class VersionUtil {
             Method m = (Method) reflectionCache.get(1);
 
             if (m == null) {
-                m = slimeling.getClass().getMethod(getNameDynamic(KEY_METHOD_GET_OWNER));
+                m = slimeling.getClass()
+                    .getMethod(getNameDynamic(KEY_METHOD_GET_OWNER));
                 reflectionCache.put(1, m);
             }
 
@@ -279,12 +279,13 @@ public class VersionUtil {
 
                 if (m == null) {
                     final Class<?> c = Class
-                            .forName(getNameDynamic(KEY_CLASS_COMPRESSED_STREAM_TOOLS).replace('/', '.'));
+                        .forName(getNameDynamic(KEY_CLASS_COMPRESSED_STREAM_TOOLS).replace('/', '.'));
                     m = c.getMethod(getNameDynamic(KEY_METHOD_DECOMPRESS_NBT), byte[].class, c0);
                     reflectionCache.put(6, m);
                 }
 
-                final Object nbtSizeTracker = c0.getConstructor(long.class).newInstance(2097152L);
+                final Object nbtSizeTracker = c0.getConstructor(long.class)
+                    .newInstance(2097152L);
                 return (NBTTagCompound) m.invoke(null, compressedNBT, nbtSizeTracker);
             }
             if (mcVersion1_7_2) {
@@ -292,7 +293,7 @@ public class VersionUtil {
 
                 if (m == null) {
                     final Class<?> c = Class
-                            .forName(getNameDynamic(KEY_CLASS_COMPRESSED_STREAM_TOOLS).replace('/', '.'));
+                        .forName(getNameDynamic(KEY_CLASS_COMPRESSED_STREAM_TOOLS).replace('/', '.'));
                     m = c.getMethod(getNameDynamic(KEY_METHOD_DECOMPRESS_NBT), byte[].class);
                     reflectionCache.put(6, m);
                 }
@@ -342,11 +343,11 @@ public class VersionUtil {
                 if (m == null) {
                     final Class<?> c = Class.forName(getNameDynamic(KEY_CLASS_COMMAND_BASE).replace('/', '.'));
                     m = c.getMethod(
-                            getNameDynamic(KEY_METHOD_NOTIFY_ADMINS),
-                            ICommandSender.class,
-                            ICommand.class,
-                            String.class,
-                            Object[].class);
+                        getNameDynamic(KEY_METHOD_NOTIFY_ADMINS),
+                        ICommandSender.class,
+                        ICommand.class,
+                        String.class,
+                        Object[].class);
                     reflectionCache.put(10, m);
                 }
 
@@ -357,10 +358,10 @@ public class VersionUtil {
                 if (m == null) {
                     final Class<?> c = Class.forName(getNameDynamic(KEY_CLASS_COMMAND_BASE).replace('/', '.'));
                     m = c.getMethod(
-                            getNameDynamic(KEY_METHOD_NOTIFY_ADMINS),
-                            ICommandSender.class,
-                            String.class,
-                            Object[].class);
+                        getNameDynamic(KEY_METHOD_NOTIFY_ADMINS),
+                        ICommandSender.class,
+                        String.class,
+                        Object[].class);
                     reflectionCache.put(10, m);
                 }
 
@@ -376,7 +377,8 @@ public class VersionUtil {
             Method m = (Method) reflectionCache.get(12);
 
             if (m == null) {
-                final Class<?> c = server.getConfigurationManager().getClass();
+                final Class<?> c = server.getConfigurationManager()
+                    .getClass();
                 m = c.getMethod(getNameDynamic(KEY_METHOD_PLAYER_FOR_NAME), String.class);
                 reflectionCache.put(12, m);
             }
@@ -395,7 +397,8 @@ public class VersionUtil {
                 Method m = (Method) reflectionCache.get(14);
 
                 if (m == null) {
-                    final Class<?> c = player.mcServer.getConfigurationManager().getClass();
+                    final Class<?> c = player.mcServer.getConfigurationManager()
+                        .getClass();
                     m = c.getMethod(getNameDynamic(KEY_METHOD_PLAYER_IS_OPPED), GameProfile.class);
                     reflectionCache.put(14, m);
                 }
@@ -406,12 +409,16 @@ public class VersionUtil {
                 Method m = (Method) reflectionCache.get(14);
 
                 if (m == null) {
-                    final Class<?> c = player.mcServer.getConfigurationManager().getClass();
+                    final Class<?> c = player.mcServer.getConfigurationManager()
+                        .getClass();
                     m = c.getMethod(getNameDynamic(KEY_METHOD_PLAYER_IS_OPPED), String.class);
                     reflectionCache.put(14, m);
                 }
 
-                return (Boolean) m.invoke(player.mcServer.getConfigurationManager(), player.getGameProfile().getName());
+                return (Boolean) m.invoke(
+                    player.mcServer.getConfigurationManager(),
+                    player.getGameProfile()
+                        .getName());
             }
         } catch (final Throwable t) {
             t.printStackTrace();
@@ -534,12 +541,16 @@ public class VersionUtil {
             }
 
             if (mcVersion1_7_10) {
-                return (GameProfile) c.getConstructor(UUID.class, String.class).newInstance(uuid, strName);
+                return (GameProfile) c.getConstructor(UUID.class, String.class)
+                    .newInstance(uuid, strName);
             }
 
             if (mcVersion1_7_2) {
                 return (GameProfile) c.getConstructor(String.class, String.class)
-                        .newInstance(uuid.toString().replace("-", ""), strName);
+                    .newInstance(
+                        uuid.toString()
+                            .replace("-", ""),
+                        strName);
             }
         } catch (final Throwable t) {
             t.printStackTrace();

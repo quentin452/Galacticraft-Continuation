@@ -12,8 +12,8 @@ public class RedstoneUtil {
             return false;
         }
         if (isBlockProvidingPowerTo(w, x, y - 1, z, 0) > 0 || isBlockProvidingPowerTo(w, x, y + 1, z, 1) > 0
-                || isBlockProvidingPowerTo_NoChunkLoad(w, x, y, z - 1, 2) > 0
-                || isBlockProvidingPowerTo_NoChunkLoad(w, x, y, z + 1, 3) > 0) {
+            || isBlockProvidingPowerTo_NoChunkLoad(w, x, y, z - 1, 2) > 0
+            || isBlockProvidingPowerTo_NoChunkLoad(w, x, y, z + 1, 3) > 0) {
             return true;
         }
         if (isBlockProvidingPowerTo_NoChunkLoad(w, x - 1, y, z, 4) > 0) {
@@ -26,13 +26,15 @@ public class RedstoneUtil {
      * Is this block powering in the specified direction Args: x, y, z, direction
      */
     public static int isBlockProvidingPowerTo(World w, int x, int y, int z, int side) {
-        return w.getBlock(x, y, z).isProvidingStrongPower(w, x, y, z, side);
+        return w.getBlock(x, y, z)
+            .isProvidingStrongPower(w, x, y, z, side);
     }
 
     public static int isBlockProvidingPowerTo_NoChunkLoad(World w, int x, int y, int z, int side) {
         if (!w.blockExists(x, y, z)) {
             return 0;
         }
-        return w.getBlock(x, y, z).isProvidingStrongPower(w, x, y, z, side);
+        return w.getBlock(x, y, z)
+            .isProvidingStrongPower(w, x, y, z, side);
     }
 }

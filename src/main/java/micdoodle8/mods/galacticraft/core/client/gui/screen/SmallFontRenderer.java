@@ -1,5 +1,17 @@
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,21 +20,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-
-import javax.imageio.ImageIO;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class SmallFontRenderer implements IResourceManagerReloadListener {
@@ -130,7 +127,7 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
     private boolean strikethroughStyle;
 
     public SmallFontRenderer(GameSettings par1GameSettings, ResourceLocation par2ResourceLocation,
-            TextureManager par3TextureManager, boolean par4) {
+        TextureManager par3TextureManager, boolean par4) {
         this.field_111273_g = par2ResourceLocation;
         this.renderEngine = par3TextureManager;
         this.unicodeFlag = true;
@@ -171,7 +168,10 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
 
         try {
             bufferedimage = ImageIO.read(
-                    Minecraft.getMinecraft().getResourceManager().getResource(this.field_111273_g).getInputStream());
+                Minecraft.getMinecraft()
+                    .getResourceManager()
+                    .getResource(this.field_111273_g)
+                    .getInputStream());
         } catch (final IOException ioexception) {
             throw new RuntimeException(ioexception);
         }
@@ -226,8 +226,10 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
 
     private void readGlyphSizes() {
         try {
-            final InputStream inputstream = Minecraft.getMinecraft().getResourceManager()
-                    .getResource(new ResourceLocation("font/glyph_sizes.bin")).getInputStream();
+            final InputStream inputstream = Minecraft.getMinecraft()
+                .getResourceManager()
+                .getResource(new ResourceLocation("font/glyph_sizes.bin"))
+                .getInputStream();
             inputstream.read(this.glyphWidth);
         } catch (final IOException ioexception) {
             throw new RuntimeException(ioexception);
@@ -239,8 +241,8 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
      */
     private float renderCharAtPos(int par1, char par2, boolean par3) {
         return par2 == 32 ? 4.0F
-                : par1 > 0 && !this.unicodeFlag ? this.renderDefaultChar(par1 + 32, par3)
-                        : this.renderUnicodeChar(par2, par3);
+            : par1 > 0 && !this.unicodeFlag ? this.renderDefaultChar(par1 + 32, par3)
+                : this.renderUnicodeChar(par2, par3);
     }
 
     /**
@@ -268,7 +270,7 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
     private ResourceLocation func_111271_a(int par1) {
         if (SmallFontRenderer.field_111274_c[par1] == null) {
             SmallFontRenderer.field_111274_c[par1] = new ResourceLocation(
-                    String.format("textures/font/unicode_page_%02x.png", Integer.valueOf(par1)));
+                String.format("textures/font/unicode_page_%02x.png", Integer.valueOf(par1)));
         }
 
         return SmallFontRenderer.field_111274_c[par1];
@@ -431,7 +433,9 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
             int k;
 
             if (c0 == 167 && i + 1 < par1Str.length()) {
-                j = "0123456789abcdefklmnor".indexOf(par1Str.toLowerCase().charAt(i + 1));
+                j = "0123456789abcdefklmnor".indexOf(
+                    par1Str.toLowerCase()
+                        .charAt(i + 1));
 
                 if (j < 16) {
                     this.randomStyle = false;
@@ -484,7 +488,7 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
                 ++i;
             } else {
                 j = "\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000"
-                        .indexOf(c0);
+                    .indexOf(c0);
 
                 if (this.randomStyle && j != -1) {
                     do {
@@ -649,7 +653,7 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
             return 4;
         }
         final int i = "\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000"
-                .indexOf(par1);
+            .indexOf(par1);
 
         if (par1 > 0 && i != -1 && !this.unicodeFlag) {
             return this.charWidth[i];
@@ -763,7 +767,8 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
      * Returns the width of the wordwrapped String (maximum length is parameter k)
      */
     public int splitStringWidth(String par1Str, int par2) {
-        return this.FONT_HEIGHT * this.listFormattedStringToWidth(par1Str, par2).size();
+        return this.FONT_HEIGHT * this.listFormattedStringToWidth(par1Str, par2)
+            .size();
     }
 
     /**
@@ -793,7 +798,9 @@ public class SmallFontRenderer implements IResourceManagerReloadListener {
      * Breaks a string into a list of pieces that will fit a specified width.
      */
     public List<String> listFormattedStringToWidth(String par1Str, int par2) {
-        return Arrays.asList(this.wrapFormattedStringToWidth(par1Str, par2).split("\n"));
+        return Arrays.asList(
+            this.wrapFormattedStringToWidth(par1Str, par2)
+                .split("\n"));
     }
 
     /**

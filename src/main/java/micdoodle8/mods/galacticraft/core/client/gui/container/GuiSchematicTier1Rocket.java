@@ -1,22 +1,20 @@
 package micdoodle8.mods.galacticraft.core.client.gui.container;
 
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import micdoodle8.mods.galacticraft.api.recipe.ISchematicResultPage;
 import micdoodle8.mods.galacticraft.api.recipe.SchematicRegistry;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.inventory.ContainerSchematicTier1Rocket;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 public class GuiSchematicTier1Rocket extends GuiContainerGC implements ISchematicResultPage {
 
     private static final ResourceLocation rocketBenchTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/rocketbench.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/rocketbench.png");
 
     private int pageIndex;
 
@@ -30,21 +28,21 @@ public class GuiSchematicTier1Rocket extends GuiContainerGC implements ISchemati
         super.initGui();
         GuiButton backButton;
         this.buttonList.add(
-                backButton = new GuiButton(
-                        0,
-                        this.width / 2 - 130,
-                        this.height / 2 - 30 + 27 - 12,
-                        40,
-                        20,
-                        GCCoreUtil.translate("gui.button.back.name")));
+            backButton = new GuiButton(
+                0,
+                this.width / 2 - 130,
+                this.height / 2 - 30 + 27 - 12,
+                40,
+                20,
+                GCCoreUtil.translate("gui.button.back.name")));
         this.buttonList.add(
-                new GuiButton(
-                        1,
-                        this.width / 2 - 130,
-                        this.height / 2 - 30 + 27 + 12,
-                        40,
-                        20,
-                        GCCoreUtil.translate("gui.button.next.name")));
+            new GuiButton(
+                1,
+                this.width / 2 - 130,
+                this.height / 2 - 30 + 27 + 12,
+                40,
+                20,
+                GCCoreUtil.translate("gui.button.next.name")));
         backButton.enabled = false;
     }
 

@@ -1,5 +1,12 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityArclamp;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.core.util.RedstoneUtil;
+import micdoodle8.mods.galacticraft.core.util.VersionUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -12,14 +19,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityArclamp;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.RedstoneUtil;
-import micdoodle8.mods.galacticraft.core.util.VersionUtil;
 
 public class BlockBrightLamp extends BlockAdvanced implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -51,13 +50,8 @@ public class BlockBrightLamp extends BlockAdvanced implements ItemBlockDesc.IBlo
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int x, int y, int z) {
         final double boundsMin = 0.2D;
         final double boundsMax = 0.8D;
-        return AxisAlignedBB.getBoundingBox(
-                x + boundsMin,
-                y + boundsMin,
-                z + boundsMin,
-                x + boundsMax,
-                y + boundsMax,
-                z + boundsMax);
+        return AxisAlignedBB
+            .getBoundingBox(x + boundsMin, y + boundsMin, z + boundsMin, x + boundsMax, y + boundsMax, z + boundsMax);
     }
 
     @Override
@@ -88,7 +82,7 @@ public class BlockBrightLamp extends BlockAdvanced implements ItemBlockDesc.IBlo
 
     @Override
     public int onBlockPlaced(World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ,
-            int metaOld) {
+        int metaOld) {
         final BlockVec3 thisvec = new BlockVec3(x, y, z);
 
         if (thisvec.blockOnSideHasSolidFace(world, side ^ 1)) {
@@ -151,7 +145,7 @@ public class BlockBrightLamp extends BlockAdvanced implements ItemBlockDesc.IBlo
 
     @Override
     public boolean onUseWrench(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         if (!world.isRemote) {
             final TileEntity tile = world.getTileEntity(x, y, z);
             if (tile instanceof TileEntityArclamp) {

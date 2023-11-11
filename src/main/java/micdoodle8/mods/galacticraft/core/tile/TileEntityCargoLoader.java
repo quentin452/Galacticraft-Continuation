@@ -1,12 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.relauncher.Side;
 import micdoodle8.mods.galacticraft.api.entity.ICargoEntity;
 import micdoodle8.mods.galacticraft.api.entity.ICargoEntity.EnumCargoLoadingState;
@@ -17,9 +10,15 @@ import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
 import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlockWithInventory;
 import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class TileEntityCargoLoader extends TileBaseElectricBlockWithInventory
-        implements ISidedInventory, ILandingPadAttachable {
+    implements ISidedInventory, ILandingPadAttachable {
 
     private ItemStack[] containingItems = new ItemStack[15];
     public boolean outOfItems;
@@ -62,8 +61,8 @@ public class TileEntityCargoLoader extends TileBaseElectricBlockWithInventory
                     this.noTarget = state == EnumCargoLoadingState.NOTARGET;
 
                     if (this.ticks % 15 == 0 && state == EnumCargoLoadingState.SUCCESS
-                            && !this.disabled
-                            && this.hasEnoughEnergyToRun) {
+                        && !this.disabled
+                        && this.hasEnoughEnergyToRun) {
                         this.attachedFuelable.addCargo(this.removeCargo(true).resultStack, true);
                     }
                 } else {
@@ -135,7 +134,7 @@ public class TileEntityCargoLoader extends TileBaseElectricBlockWithInventory
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
         return side != this.getBlockMetadata() + 2 ? new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
-                : new int[] {};
+            : new int[] {};
     }
 
     @Override
@@ -175,8 +174,8 @@ public class TileEntityCargoLoader extends TileBaseElectricBlockWithInventory
             final ItemStack stackAt = this.containingItems[count];
 
             if (stackAt != null && stackAt.getItem() == stack.getItem()
-                    && stackAt.getItemDamage() == stack.getItemDamage()
-                    && stackAt.stackSize < stackAt.getMaxStackSize()) {
+                && stackAt.getItemDamage() == stack.getItemDamage()
+                && stackAt.stackSize < stackAt.getMaxStackSize()) {
                 if (stackAt.stackSize + stack.stackSize <= stackAt.getMaxStackSize()) {
                     if (doAdd) {
                         this.containingItems[count].stackSize += stack.stackSize;

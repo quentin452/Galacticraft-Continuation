@@ -1,9 +1,5 @@
 package micdoodle8.mods.galacticraft.core.energy.tile;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
@@ -16,6 +12,9 @@ import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.energy.grid.EnergyNetwork;
 import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityAdvanced;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * This tile entity pre-fabricated for all conductors.
@@ -39,7 +38,8 @@ public abstract class TileBaseConductor extends TileEntityAdvanced implements IC
     @Override
     public void invalidate() {
         if (!this.worldObj.isRemote) {
-            this.getNetwork().split(this);
+            this.getNetwork()
+                .split(this);
         }
 
         super.invalidate();
@@ -60,7 +60,8 @@ public abstract class TileBaseConductor extends TileEntityAdvanced implements IC
     public IElectricityNetwork getNetwork() {
         if (this.network == null) {
             final EnergyNetwork network = new EnergyNetwork();
-            network.getTransmitters().add(this);
+            network.getTransmitters()
+                .add(this);
             this.setNetwork(network);
         }
 
@@ -77,16 +78,19 @@ public abstract class TileBaseConductor extends TileEntityAdvanced implements IC
         if (!this.worldObj.isRemote) {
             this.adjacentConnections = null;
 
-            this.getNetwork().refresh();
+            this.getNetwork()
+                .refresh();
 
             final BlockVec3 thisVec = new BlockVec3(this);
             for (final ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
                 final TileEntity tileEntity = thisVec.getTileEntityOnSide(this.worldObj, side);
 
                 if (tileEntity != null && tileEntity.getClass() == this.getClass()
-                        && tileEntity instanceof INetworkProvider
-                        && !this.getNetwork().equals(((INetworkProvider) tileEntity).getNetwork())) {
-                    ((INetworkProvider) tileEntity).getNetwork().merge(this.getNetwork());
+                    && tileEntity instanceof INetworkProvider
+                    && !this.getNetwork()
+                        .equals(((INetworkProvider) tileEntity).getNetwork())) {
+                    ((INetworkProvider) tileEntity).getNetwork()
+                        .merge(this.getNetwork());
                 }
             }
         }
@@ -104,8 +108,8 @@ public abstract class TileBaseConductor extends TileEntityAdvanced implements IC
             for (int i = 0; i < 6; i++) {
                 final TileEntity tileEntity = thisVec.getTileEntityOnSide(this.worldObj, i);
 
-                if (tileEntity instanceof IConnector && ((IConnector) tileEntity)
-                        .canConnect(ForgeDirection.getOrientation(i ^ 1), NetworkType.POWER)) {
+                if (tileEntity instanceof IConnector
+                    && ((IConnector) tileEntity).canConnect(ForgeDirection.getOrientation(i ^ 1), NetworkType.POWER)) {
                     this.adjacentConnections[i] = tileEntity;
                 }
             }
@@ -122,13 +126,8 @@ public abstract class TileBaseConductor extends TileEntityAdvanced implements IC
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
-        return AxisAlignedBB.getBoundingBox(
-                this.xCoord,
-                this.yCoord,
-                this.zCoord,
-                this.xCoord + 1,
-                this.yCoord + 1,
-                this.zCoord + 1);
+        return AxisAlignedBB
+            .getBoundingBox(this.xCoord, this.yCoord, this.zCoord, this.xCoord + 1, this.yCoord + 1, this.zCoord + 1);
     }
 
     @Override

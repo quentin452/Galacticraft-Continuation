@@ -1,5 +1,6 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
+import micdoodle8.mods.galacticraft.core.util.RecipeUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -8,8 +9,6 @@ import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-
-import micdoodle8.mods.galacticraft.core.util.RecipeUtil;
 
 public class ContainerBuggyBench extends Container {
 
@@ -22,7 +21,7 @@ public class ContainerBuggyBench extends Container {
 
         // OUTPUT
         this.addSlotToContainer(
-                new SlotRocketBenchResult(inventory.player, this.craftMatrix, this.craftResult, 0, 143, 64));
+            new SlotRocketBenchResult(inventory.player, this.craftMatrix, this.craftResult, 0, 143, 64));
 
         // BUGGY
         // gear
@@ -44,7 +43,7 @@ public class ContainerBuggyBench extends Container {
         this.addSlotToContainer(new SlotBuggyBench(this.craftMatrix, 13, 80, 19, x, y, z, inventory.player));
         for (int i = 0; i < 3; i++) {
             this.addSlotToContainer(
-                    new SlotBuggyBench(this.craftMatrix, 14 + i, 44 + i * 18, 109, x, y, z, inventory.player));
+                new SlotBuggyBench(this.craftMatrix, 14 + i, 44 + i * 18, 109, x, y, z, inventory.player));
         }
         // screws
         this.addSlotToContainer(new SlotBuggyBench(this.craftMatrix, 17, 8, 37, x, y, z, inventory.player));
@@ -58,7 +57,7 @@ public class ContainerBuggyBench extends Container {
         // body
         for (int i = 0; i < 3; i++) {
             this.addSlotToContainer(
-                    new SlotBuggyBench(this.craftMatrix, 25 + i, 44 + i * 18, 37, x, y, z, inventory.player));
+                new SlotBuggyBench(this.craftMatrix, 25 + i, 44 + i * 18, 37, x, y, z, inventory.player));
         }
         this.addSlotToContainer(new SlotBuggyBench(this.craftMatrix, 28, 44, 55, x, y, z, inventory.player));
         this.addSlotToContainer(new SlotBuggyBench(this.craftMatrix, 29, 80, 55, x, y, z, inventory.player));
@@ -66,7 +65,7 @@ public class ContainerBuggyBench extends Container {
         this.addSlotToContainer(new SlotBuggyBench(this.craftMatrix, 31, 80, 73, x, y, z, inventory.player));
         for (int i = 0; i < 3; i++) {
             this.addSlotToContainer(
-                    new SlotBuggyBench(this.craftMatrix, 32 + i, 44 + i * 18, 91, x, y, z, inventory.player));
+                new SlotBuggyBench(this.craftMatrix, 32 + i, 44 + i * 18, 91, x, y, z, inventory.player));
         }
 
         // CHEST

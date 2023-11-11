@@ -1,15 +1,13 @@
 package micdoodle8.mods.galacticraft.core.client.model;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.smart.render.ModelRotationRenderer;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 
 /**
  * If Smart Moving is installed, this is used by ModelPlayerBaseGC as the ModelRenderer - see
@@ -30,7 +28,7 @@ public class ModelRotationRendererGC extends ModelRotationRenderer {
         super(modelBase, i, j, (ModelRotationRenderer) baseRenderer);
         this.type = type;
         ModelPlayerBaseGC.frequencyModule = AdvancedModelLoader
-                .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/frequencyModule.obj"));
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/frequencyModule.obj"));
     }
 
     @Override
@@ -88,25 +86,28 @@ public class ModelRotationRendererGC extends ModelRotationRenderer {
 
             switch (this.type) {
                 case 0:
-                    FMLClientHandler.instance().getClient().renderEngine.bindTexture(ModelPlayerGC.oxygenMaskTexture);
+                    FMLClientHandler.instance()
+                        .getClient().renderEngine.bindTexture(ModelPlayerGC.oxygenMaskTexture);
                     break;
                 case 1:
-                    FMLClientHandler.instance().getClient().renderEngine
-                            .bindTexture(ModelPlayerBaseGC.currentGearData.getParachute());
+                    FMLClientHandler.instance()
+                        .getClient().renderEngine.bindTexture(ModelPlayerBaseGC.currentGearData.getParachute());
                     break;
                 case 15:
-                    FMLClientHandler.instance().getClient().renderEngine
-                            .bindTexture(ModelPlayerGC.frequencyModuleTexture);
+                    FMLClientHandler.instance()
+                        .getClient().renderEngine.bindTexture(ModelPlayerGC.frequencyModuleTexture);
                     break;
                 default:
-                    FMLClientHandler.instance().getClient().renderEngine.bindTexture(ModelPlayerGC.playerTexture);
+                    FMLClientHandler.instance()
+                        .getClient().renderEngine.bindTexture(ModelPlayerGC.playerTexture);
                     break;
             }
 
             if (this.type != 15) {
                 super.doRender(f, useParentTransformations);
             } else {
-                FMLClientHandler.instance().getClient().renderEngine.bindTexture(ModelPlayerGC.frequencyModuleTexture);
+                FMLClientHandler.instance()
+                    .getClient().renderEngine.bindTexture(ModelPlayerGC.frequencyModuleTexture);
                 GL11.glPushMatrix();
                 GL11.glRotatef(180, 1, 0, 0);
                 GL11.glScalef(0.3F, 0.3F, 0.3F);
@@ -114,15 +115,15 @@ public class ModelRotationRendererGC extends ModelRotationRenderer {
                 ModelPlayerBaseGC.frequencyModule.renderPart("Main");
                 GL11.glTranslatef(0, 1.2F, 0);
                 GL11.glRotatef(
-                        (float) (Math.sin(ModelPlayerBaseGC.playerRendering.ticksExisted * 0.05) * 50.0F),
-                        1,
-                        0,
-                        0);
+                    (float) (Math.sin(ModelPlayerBaseGC.playerRendering.ticksExisted * 0.05) * 50.0F),
+                    1,
+                    0,
+                    0);
                 GL11.glRotatef(
-                        (float) (Math.cos(ModelPlayerBaseGC.playerRendering.ticksExisted * 0.1) * 50.0F),
-                        0,
-                        1,
-                        0);
+                    (float) (Math.cos(ModelPlayerBaseGC.playerRendering.ticksExisted * 0.1) * 50.0F),
+                    0,
+                    1,
+                    0);
                 GL11.glTranslatef(0, -1.2F, 0);
                 ModelPlayerBaseGC.frequencyModule.renderPart("Radar");
                 GL11.glPopMatrix();

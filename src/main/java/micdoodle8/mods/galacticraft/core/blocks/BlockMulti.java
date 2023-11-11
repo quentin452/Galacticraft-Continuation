@@ -1,8 +1,11 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityMulti;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockDirectional;
@@ -23,12 +26,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityMulti;
+import java.util.List;
+import java.util.Random;
 
 public class BlockMulti extends BlockContainer implements IPartialSealableBlock, ITileEntityProvider {
 
@@ -65,7 +64,8 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
         if (GalacticraftCore.isPlanetsLoaded) {
             try {
                 final Class<?> c = Class.forName("micdoodle8.mods.galacticraft.planets.mars.MarsModule");
-                final String texturePrefix = (String) c.getField("TEXTURE_PREFIX").get(null);
+                final String texturePrefix = (String) c.getField("TEXTURE_PREFIX")
+                    .get(null);
                 this.fakeIcons[3] = par1IconRegister.registerIcon(texturePrefix + "cryoDummy");
             } catch (final Exception e) {
                 this.fakeIcons[3] = this.fakeIcons[2];
@@ -118,7 +118,7 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
 
     @Override
     public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB axisalignedbb,
-            List<AxisAlignedBB> list, Entity entity) {
+        List<AxisAlignedBB> list, Entity entity) {
         final int meta = world.getBlockMetadata(x, y, z);
 
         if (meta == 2 || meta == 6) {
@@ -157,7 +157,8 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
             final BlockVec3 mainBlockPosition = ((TileEntityMulti) tileEntity).mainBlockPosition;
 
             if (mainBlockPosition != null && !mainBlockPosition.equals(new BlockVec3(par2, par3, par4))) {
-                return mainBlockPosition.getBlock(par1World).getBlockHardness(par1World, par2, par3, par4);
+                return mainBlockPosition.getBlock(par1World)
+                    .getBlockHardness(par1World, par2, par3, par4);
             }
         }
 
@@ -205,7 +206,7 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
      */
     @Override
     public boolean onBlockActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int par6,
-            float par7, float par8, float par9) {
+        float par7, float par8, float par9) {
         final TileEntityMulti tileEntity = (TileEntityMulti) par1World.getTileEntity(x, y, z);
         return tileEntity.onBlockActivated(par1World, x, y, z, par5EntityPlayer);
     }
@@ -245,7 +246,7 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
 
                 if (Blocks.air != mainBlockID) {
                     return mainBlockID
-                            .getPickBlock(target, world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z);
+                        .getPickBlock(target, world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z);
                 }
             }
         }
@@ -261,7 +262,7 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
 
             if (mainBlockPosition != null && !mainBlockPosition.equals(new BlockVec3(x, y, z))) {
                 return mainBlockPosition.getBlock(world)
-                        .getBedDirection(world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z);
+                    .getBedDirection(world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z);
             }
         }
 
@@ -276,7 +277,7 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
 
             if (mainBlockPosition != null && !mainBlockPosition.equals(new BlockVec3(x, y, z))) {
                 return mainBlockPosition.getBlock(world)
-                        .isBed(world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z, player);
+                    .isBed(world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z, player);
             }
         }
 
@@ -289,13 +290,8 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
         final BlockVec3 mainBlockPosition = ((TileEntityMulti) tileEntity).mainBlockPosition;
 
         if (mainBlockPosition != null && !mainBlockPosition.equals(new BlockVec3(x, y, z))) {
-            mainBlockPosition.getBlock(world).setBedOccupied(
-                    world,
-                    mainBlockPosition.x,
-                    mainBlockPosition.y,
-                    mainBlockPosition.z,
-                    player,
-                    occupied);
+            mainBlockPosition.getBlock(world)
+                .setBedOccupied(world, mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z, player, occupied);
         } else {
             super.setBedOccupied(world, x, y, z, player, occupied);
         }
@@ -310,9 +306,9 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
             final BlockVec3 mainBlockPosition = ((TileEntityMulti) tileEntity).mainBlockPosition;
 
             if (mainBlockPosition != null
-                    && !mainBlockPosition.equals(new BlockVec3(target.blockX, target.blockY, target.blockZ))) {
+                && !mainBlockPosition.equals(new BlockVec3(target.blockX, target.blockY, target.blockZ))) {
                 effectRenderer
-                        .addBlockHitEffects(mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z, target);
+                    .addBlockHitEffects(mainBlockPosition.x, mainBlockPosition.y, mainBlockPosition.z, target);
             }
         }
 

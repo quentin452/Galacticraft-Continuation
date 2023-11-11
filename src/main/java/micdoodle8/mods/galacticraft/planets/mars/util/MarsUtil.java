@@ -1,10 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.util;
 
-import java.util.HashMap;
-
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-
 import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.inventory.ContainerParaChest;
@@ -18,6 +13,10 @@ import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
 import micdoodle8.mods.galacticraft.planets.mars.inventory.ContainerSlimeling;
 import micdoodle8.mods.galacticraft.planets.mars.network.PacketSimpleMars;
 import micdoodle8.mods.galacticraft.planets.mars.network.PacketSimpleMars.EnumSimplePacketMars;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+
+import java.util.HashMap;
 
 public class MarsUtil {
 
@@ -34,10 +33,10 @@ public class MarsUtil {
         player.closeContainer();
         final int windowId = player.currentWindowId;
         GalacticraftCore.packetPipeline.sendTo(
-                new PacketSimple(
-                        EnumSimplePacket.C_OPEN_PARACHEST_GUI,
-                        new Object[] { windowId, 1, landerInv.getEntityId() }),
-                player);
+            new PacketSimple(
+                EnumSimplePacket.C_OPEN_PARACHEST_GUI,
+                new Object[] { windowId, 1, landerInv.getEntityId() }),
+            player);
         player.openContainer = new ContainerParaChest(player.inventory, landerInv);
         player.openContainer.windowId = windowId;
         player.openContainer.addCraftingToCrafters(player);
@@ -48,10 +47,10 @@ public class MarsUtil {
         player.closeContainer();
         final int windowId = player.currentWindowId;
         GalacticraftCore.packetPipeline.sendTo(
-                new PacketSimpleMars(
-                        EnumSimplePacketMars.C_OPEN_CUSTOM_GUI,
-                        new Object[] { windowId, 0, slimeling.getEntityId() }),
-                player);
+            new PacketSimpleMars(
+                EnumSimplePacketMars.C_OPEN_CUSTOM_GUI,
+                new Object[] { windowId, 0, slimeling.getEntityId() }),
+            player);
         player.openContainer = new ContainerSlimeling(player.inventory, slimeling);
         player.openContainer.windowId = windowId;
         player.openContainer.addCraftingToCrafters(player);
@@ -62,10 +61,10 @@ public class MarsUtil {
         player.closeContainer();
         final int windowId = player.currentWindowId;
         GalacticraftCore.packetPipeline.sendTo(
-                new PacketSimpleMars(
-                        EnumSimplePacketMars.C_OPEN_CUSTOM_GUI,
-                        new Object[] { windowId, 1, rocket.getEntityId() }),
-                player);
+            new PacketSimpleMars(
+                EnumSimplePacketMars.C_OPEN_CUSTOM_GUI,
+                new Object[] { windowId, 1, rocket.getEntityId() }),
+            player);
         player.openContainer = new ContainerRocketInventory(player.inventory, rocket, rocket.rocketType);
         player.openContainer.windowId = windowId;
         player.openContainer.addCraftingToCrafters(player);

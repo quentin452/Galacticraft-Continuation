@@ -1,25 +1,23 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.entity;
 
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.AdvancedModelLoader;
-import net.minecraftforge.client.model.IModelCustom;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
 import micdoodle8.mods.galacticraft.planets.mars.client.model.ModelBalloonParachute;
 import micdoodle8.mods.galacticraft.planets.mars.entities.EntityLandingBalloons;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.AdvancedModelLoader;
+import net.minecraftforge.client.model.IModelCustom;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class RenderLandingBalloons extends Render {
 
     private static final ResourceLocation landerTexture = new ResourceLocation(
-            MarsModule.ASSET_PREFIX,
-            "textures/model/landingBalloon.png");
+        MarsModule.ASSET_PREFIX,
+        "textures/model/landingBalloon.png");
 
     protected IModelCustom landerModel;
     protected ModelBalloonParachute parachuteModel = new ModelBalloonParachute();
@@ -27,7 +25,7 @@ public class RenderLandingBalloons extends Render {
     public RenderLandingBalloons() {
         this.shadowSize = 1.2F;
         this.landerModel = AdvancedModelLoader
-                .loadModel(new ResourceLocation(MarsModule.ASSET_PREFIX, "models/landingBalloon.obj"));
+            .loadModel(new ResourceLocation(MarsModule.ASSET_PREFIX, "models/landingBalloon.obj"));
     }
 
     protected ResourceLocation func_110779_a(EntityLandingBalloons par1EntityArrow) {
@@ -40,7 +38,7 @@ public class RenderLandingBalloons extends Render {
     }
 
     public void renderLander(EntityLandingBalloons entity, double par2, double par4, double par6, float par8,
-            float par9) {
+        float par9) {
         GL11.glPushMatrix();
         final float var24 = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * par9;
         GL11.glTranslatef((float) par2, (float) par4 + 0.8F, (float) par6);

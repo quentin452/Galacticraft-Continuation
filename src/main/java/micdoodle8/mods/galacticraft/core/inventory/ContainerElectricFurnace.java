@@ -1,5 +1,7 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
+import micdoodle8.mods.galacticraft.api.item.IItemElectric;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricFurnace;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -7,9 +9,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-
-import micdoodle8.mods.galacticraft.api.item.IItemElectric;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricFurnace;
 
 public class ContainerElectricFurnace extends Container {
 
@@ -31,7 +30,7 @@ public class ContainerElectricFurnace extends Container {
         for (var3 = 0; var3 < 3; ++var3) {
             for (int var4 = 0; var4 < 9; ++var4) {
                 this.addSlotToContainer(
-                        new Slot(par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 84 + var3 * 18));
+                    new Slot(par1InventoryPlayer, var4 + var3 * 9 + 9, 8 + var4 * 18, 84 + var3 * 18));
             }
         }
 
@@ -76,17 +75,18 @@ public class ContainerElectricFurnace extends Container {
                     if (!this.mergeItemStack(var4, 0, 1, false)) {
                         return null;
                     }
-                } else if (FurnaceRecipes.smelting().getSmeltingResult(var4) != null) {
-                    if (!this.mergeItemStack(var4, 1, 2, false)) {
+                } else if (FurnaceRecipes.smelting()
+                    .getSmeltingResult(var4) != null) {
+                        if (!this.mergeItemStack(var4, 1, 2, false)) {
+                            return null;
+                        }
+                    } else if (par1 >= 3 && par1 < 30) {
+                        if (!this.mergeItemStack(var4, 30, 39, false)) {
+                            return null;
+                        }
+                    } else if (par1 >= 30 && par1 < 39 && !this.mergeItemStack(var4, 3, 30, false)) {
                         return null;
                     }
-                } else if (par1 >= 3 && par1 < 30) {
-                    if (!this.mergeItemStack(var4, 30, 39, false)) {
-                        return null;
-                    }
-                } else if (par1 >= 30 && par1 < 39 && !this.mergeItemStack(var4, 3, 30, false)) {
-                    return null;
-                }
             } else if (!this.mergeItemStack(var4, 3, 39, false)) {
                 return null;
             }

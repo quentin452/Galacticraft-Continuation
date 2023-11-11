@@ -1,11 +1,11 @@
 package micdoodle8.mods.galacticraft.core.asm;
 
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
+
 import static micdoodle8.mods.galacticraft.core.asm.GCLoadingPlugin.dev;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.NEW;
-
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
 
 /**
  * This cannot be a mixin, as it'd otherwise break on thermos server
@@ -36,11 +36,11 @@ public class ServerConfigurationManagerVisitor extends ClassVisitor {
         @Override
         public void visitTypeInsn(int opcode, String type) {
             if (opcode == NEW
-                    && (dev ? "net/minecraft/entity/player/EntityPlayerMP".equals(type) : "mw".equals(type))) {
+                && (dev ? "net/minecraft/entity/player/EntityPlayerMP".equals(type) : "mw".equals(type))) {
                 GCLoadingPlugin.LOGGER.debug(
-                        "Replacing NEW {} with NEW micdoodle8/mods/galacticraft/core/entities/player/GCEntityPlayerMP in {}",
-                        type,
-                        this.methodName);
+                    "Replacing NEW {} with NEW micdoodle8/mods/galacticraft/core/entities/player/GCEntityPlayerMP in {}",
+                    type,
+                    this.methodName);
                 super.visitTypeInsn(NEW, REPLACEMENT_CLASS_INTERNAL_NAME);
             } else {
                 super.visitTypeInsn(opcode, type);
@@ -50,15 +50,15 @@ public class ServerConfigurationManagerVisitor extends ClassVisitor {
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
             if (opcode == INVOKESPECIAL && "<init>".equals(name)
-                    && (dev ? "net/minecraft/entity/player/EntityPlayerMP".equals(owner) : "mw".equals(owner))) {
+                && (dev ? "net/minecraft/entity/player/EntityPlayerMP".equals(owner) : "mw".equals(owner))) {
                 GCLoadingPlugin.LOGGER.debug(
-                        "Replacing INVOKESPECIAL {}{}{} with NEW micdoodle8/mods/galacticraft/core/entities/player/GCEntityPlayerMP{}{} in {}",
-                        owner,
-                        name,
-                        desc,
-                        name,
-                        desc,
-                        this.methodName);
+                    "Replacing INVOKESPECIAL {}{}{} with NEW micdoodle8/mods/galacticraft/core/entities/player/GCEntityPlayerMP{}{} in {}",
+                    owner,
+                    name,
+                    desc,
+                    name,
+                    desc,
+                    this.methodName);
                 super.visitMethodInsn(opcode, REPLACEMENT_CLASS_INTERNAL_NAME, name, desc, itf);
             } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);

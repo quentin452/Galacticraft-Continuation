@@ -11,7 +11,7 @@ public class SlotRocketBenchResult extends Slot {
     private final EntityPlayer thePlayer;
 
     public SlotRocketBenchResult(EntityPlayer par1EntityPlayer, IInventory par2IInventory, IInventory par3IInventory,
-            int par4, int par5, int par6) {
+        int par4, int par5, int par6) {
         super(par3IInventory, par4, par5, par6);
         this.thePlayer = par1EntityPlayer;
         this.craftMatrix = par2IInventory;
@@ -30,11 +30,15 @@ public class SlotRocketBenchResult extends Slot {
             if (var3 != null) {
                 this.craftMatrix.decrStackSize(var2, 1);
 
-                if (var3.getItem().hasContainerItem(var3)) {
-                    final ItemStack var4 = new ItemStack(var3.getItem().getContainerItem());
+                if (var3.getItem()
+                    .hasContainerItem(var3)) {
+                    final ItemStack var4 = new ItemStack(
+                        var3.getItem()
+                            .getContainerItem());
 
-                    if (!var3.getItem().doesContainerItemLeaveCraftingGrid(var3)
-                            || !this.thePlayer.inventory.addItemStackToInventory(var4)) {
+                    if (!var3.getItem()
+                        .doesContainerItemLeaveCraftingGrid(var3)
+                        || !this.thePlayer.inventory.addItemStackToInventory(var4)) {
                         if (this.craftMatrix.getStackInSlot(var2) == null) {
                             this.craftMatrix.setInventorySlotContents(var2, var4);
                         } else {

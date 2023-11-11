@@ -1,11 +1,5 @@
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import micdoodle8.mods.galacticraft.api.client.IGameScreen;
@@ -14,6 +8,10 @@ import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.client.render.RenderPlanet;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple;
 import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 public class GameScreenBasic implements IGameScreen {
 
@@ -30,8 +28,11 @@ public class GameScreenBasic implements IGameScreen {
     public GameScreenBasic() {
         // This can be called from either server or client, so don't include
         // client-side only code on the server.
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
-            this.renderEngine = FMLClientHandler.instance().getClient().renderEngine;
+        if (FMLCommonHandler.instance()
+            .getEffectiveSide()
+            .isClient()) {
+            this.renderEngine = FMLClientHandler.instance()
+                .getClient().renderEngine;
         }
     }
 
@@ -77,21 +78,17 @@ public class GameScreenBasic implements IGameScreen {
                     final float centreY = scaleY / 2;
                     GL11.glTranslatef(centreX, centreY, 0F);
                     RenderPlanet.renderPlanet(
-                            ClientProxyCore.overworldTextureWide.getGlTextureId(),
-                            Math.min(scaleX, scaleY) - 0.2F,
-                            ticks,
-                            45F);
+                        ClientProxyCore.overworldTextureWide.getGlTextureId(),
+                        Math.min(scaleX, scaleY) - 0.2F,
+                        ticks,
+                        45F);
                     GL11.glPopMatrix();
                 } else {
                     this.renderEngine.bindTexture(
-                            new ResourceLocation(
-                                    GalacticraftCore.ASSET_PREFIX,
-                                    "textures/gui/celestialbodies/earth.png"));
+                        new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/gui/celestialbodies/earth.png"));
                     if (!ClientProxyCore.overworldTextureRequestSent) {
                         GalacticraftCore.packetPipeline.sendToServer(
-                                new PacketSimple(
-                                        PacketSimple.EnumSimplePacket.S_REQUEST_OVERWORLD_IMAGE,
-                                        new Object[] {}));
+                            new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_OVERWORLD_IMAGE, new Object[] {}));
                         ClientProxyCore.overworldTextureRequestSent = true;
                     }
                     this.draw2DTexture();

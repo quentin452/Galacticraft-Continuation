@@ -1,12 +1,12 @@
 package micdoodle8.mods.galacticraft.api.recipe;
 
+import net.minecraft.item.ItemStack;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import net.minecraft.item.ItemStack;
 
 public class CircuitFabricatorRecipes {
 
@@ -85,10 +85,10 @@ public class CircuitFabricatorRecipes {
                         break;
                     }
                 } else if (recipeStack.getItem() != inputStack.getItem()
-                        || recipeStack.getItemDamage() != inputStack.getItemDamage()) {
-                            found = false;
-                            break;
-                        }
+                    || recipeStack.getItemDamage() != inputStack.getItemDamage()) {
+                        found = false;
+                        break;
+                    }
             }
 
             if (!found) {
@@ -103,7 +103,7 @@ public class CircuitFabricatorRecipes {
 
     public static void removeRecipe(ItemStack match) {
         for (final Iterator<Map.Entry<ItemStack[], ItemStack>> it = CircuitFabricatorRecipes.recipes.entrySet()
-                .iterator(); it.hasNext();) {
+            .iterator(); it.hasNext();) {
             final Map.Entry<ItemStack[], ItemStack> recipe = it.next();
             if (ItemStack.areItemStacksEqual(match, recipe.getValue())) {
                 it.remove();

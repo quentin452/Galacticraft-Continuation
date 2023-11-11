@@ -1,8 +1,11 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.relauncher.Side;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -10,12 +13,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.relauncher.Side;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class PacketDynamic implements IPacket {
 
@@ -36,8 +35,8 @@ public class PacketDynamic implements IPacket {
     }
 
     public PacketDynamic(TileEntity tile) {
-        assert tile instanceof IPacketReceiver
-                : "TileEntity does not implement " + IPacketReceiver.class.getSimpleName();
+        assert tile instanceof IPacketReceiver : "TileEntity does not implement "
+            + IPacketReceiver.class.getSimpleName();
         this.type = 1;
         this.dimID = tile.getWorldObj().provider.dimensionId;
         this.data = new Object[] { tile.xCoord, tile.yCoord, tile.zCoord };
@@ -75,8 +74,10 @@ public class PacketDynamic implements IPacket {
 
         World world = GalacticraftCore.proxy.getWorldForID(this.dimID);
 
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-            world = MinecraftServer.getServer().worldServerForDimension(this.dimID);
+        if (FMLCommonHandler.instance()
+            .getEffectiveSide() == Side.SERVER) {
+            world = MinecraftServer.getServer()
+                .worldServerForDimension(this.dimID);
         }
 
         if (world == null) {
@@ -105,7 +106,7 @@ public class PacketDynamic implements IPacket {
 
                 if (world != null) {
                     final TileEntity tile = world
-                            .getTileEntity((Integer) this.data[0], (Integer) this.data[1], (Integer) this.data[2]);
+                        .getTileEntity((Integer) this.data[0], (Integer) this.data[1], (Integer) this.data[2]);
 
                     if (tile instanceof IPacketReceiver) {
                         ((IPacketReceiver) tile).decodePacketdata(buffer);
@@ -145,7 +146,7 @@ public class PacketDynamic implements IPacket {
                 break;
             case 1:
                 final TileEntity tile = player.worldObj
-                        .getTileEntity((Integer) this.data[0], (Integer) this.data[1], (Integer) this.data[2]);
+                    .getTileEntity((Integer) this.data[0], (Integer) this.data[1], (Integer) this.data[2]);
 
                 if (tile instanceof IPacketReceiver) {
                     ((IPacketReceiver) tile).handlePacketData(side, player);

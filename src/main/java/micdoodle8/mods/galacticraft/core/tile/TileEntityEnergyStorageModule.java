@@ -1,9 +1,12 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-
+import micdoodle8.mods.galacticraft.api.item.IItemElectricBase;
+import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectricalSource;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -12,16 +15,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import micdoodle8.mods.galacticraft.api.item.IItemElectricBase;
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectricalSource;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TileEntityEnergyStorageModule extends TileBaseUniversalElectricalSource
-        implements ISidedInventory, IConnector {
+    implements ISidedInventory, IConnector {
 
     private static final float BASE_CAPACITY = 500000;
     private static final float TIER2_CAPACITY = 2500000;
@@ -76,7 +75,7 @@ public class TileEntityEnergyStorageModule extends TileBaseUniversalElectricalSo
 
         final float energy = this.storage.getEnergyStoredGC();
         if (this.getTierGC() == 1 && !this.worldObj.isRemote
-                && this.lastEnergy - energy > this.storage.getMaxExtract() - 1) {
+            && this.lastEnergy - energy > this.storage.getMaxExtract() - 1) {
             // Deplete faster if being drained at maximum output
             this.storage.extractEnergyGC(25, false);
         }
@@ -220,7 +219,7 @@ public class TileEntityEnergyStorageModule extends TileBaseUniversalElectricalSo
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -259,7 +258,7 @@ public class TileEntityEnergyStorageModule extends TileBaseUniversalElectricalSo
             }
             if (slotID == 1) {
                 return ((IItemElectricBase) itemstack.getItem()).getElectricityStored(itemstack) <= 0
-                        || this.getEnergyStoredGC() >= this.getMaxEnergyStoredGC();
+                    || this.getEnergyStoredGC() >= this.getMaxEnergyStoredGC();
             }
         }
 
@@ -269,8 +268,9 @@ public class TileEntityEnergyStorageModule extends TileBaseUniversalElectricalSo
     @Override
     public EnumSet<ForgeDirection> getElectricalInputDirections() {
         return EnumSet.of(
-                ForgeDirection.getOrientation((this.getBlockMetadata() & 3) + 2).getOpposite(),
-                ForgeDirection.UNKNOWN);
+            ForgeDirection.getOrientation((this.getBlockMetadata() & 3) + 2)
+                .getOpposite(),
+            ForgeDirection.UNKNOWN);
     }
 
     @Override
@@ -292,6 +292,6 @@ public class TileEntityEnergyStorageModule extends TileBaseUniversalElectricalSo
         final int metadata = this.getBlockMetadata() & 3;
 
         return direction == ForgeDirection.getOrientation(metadata + 2)
-                || direction == ForgeDirection.getOrientation(metadata + 2 ^ 1);
+            || direction == ForgeDirection.getOrientation(metadata + 2 ^ 1);
     }
 }

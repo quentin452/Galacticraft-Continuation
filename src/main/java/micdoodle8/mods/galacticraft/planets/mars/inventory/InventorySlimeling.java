@@ -1,13 +1,12 @@
 package micdoodle8.mods.galacticraft.planets.mars.inventory;
 
+import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
 
 public class InventorySlimeling implements IInventory {
 
@@ -92,9 +91,9 @@ public class InventorySlimeling implements IInventory {
     @Override
     public void setInventorySlotContents(int par1, ItemStack par2ItemStack) {
         if (par1 == 1 && (par2ItemStack == null && this.stackList[par1] != null
-                || !ItemStack.areItemStacksEqual(par2ItemStack, this.stackList[par1]))) {
+            || !ItemStack.areItemStacksEqual(par2ItemStack, this.stackList[par1]))) {
             ContainerSlimeling
-                    .addAdditionalSlots((ContainerSlimeling) this.currentContainer, this.slimeling, par2ItemStack);
+                .addAdditionalSlots((ContainerSlimeling) this.currentContainer, this.slimeling, par2ItemStack);
         }
 
         this.stackList[par1] = par2ItemStack;

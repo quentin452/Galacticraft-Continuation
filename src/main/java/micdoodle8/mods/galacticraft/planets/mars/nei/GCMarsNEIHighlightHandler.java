@@ -1,7 +1,10 @@
 package micdoodle8.mods.galacticraft.planets.mars.nei;
 
-import java.util.List;
-
+import codechicken.nei.api.IHighlightHandler;
+import codechicken.nei.api.ItemInfo;
+import codechicken.nei.guihook.GuiContainerManager;
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -9,17 +12,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import codechicken.nei.api.IHighlightHandler;
-import codechicken.nei.api.ItemInfo;
-import codechicken.nei.guihook.GuiContainerManager;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
+import java.util.List;
 
 public class GCMarsNEIHighlightHandler implements IHighlightHandler {
 
     @Override
     public List<String> handleTextData(ItemStack stack, World world, EntityPlayer player, MovingObjectPosition mop,
-            List<String> currenttip, ItemInfo.Layout layout) {
+        List<String> currenttip, ItemInfo.Layout layout) {
         String name = null;
         try {
             final String s = GuiContainerManager.itemDisplayNameShort(stack);

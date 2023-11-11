@@ -1,8 +1,5 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
@@ -13,6 +10,8 @@ import micdoodle8.mods.galacticraft.core.network.PacketSimple;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
 import micdoodle8.mods.galacticraft.core.wrappers.FlagData;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 
 @SideOnly(Side.CLIENT)
 public class ClientUtil {
@@ -29,7 +28,7 @@ public class ClientUtil {
         }
         if (!ClientProxyCore.flagRequestsSent.contains(playerName) && sendPacket) {
             GalacticraftCore.packetPipeline
-                    .sendToServer(new PacketSimple(EnumSimplePacket.S_REQUEST_FLAG_DATA, new Object[] { playerName }));
+                .sendToServer(new PacketSimple(EnumSimplePacket.S_REQUEST_FLAG_DATA, new Object[] { playerName }));
             ClientProxyCore.flagRequestsSent.add(playerName);
         }
 
@@ -44,7 +43,7 @@ public class ClientUtil {
         }
         if (!ClientProxyCore.flagRequestsSent.contains(playerName) && sendPacket) {
             GalacticraftCore.packetPipeline
-                    .sendToServer(new PacketSimple(EnumSimplePacket.S_REQUEST_FLAG_DATA, new Object[] { playerName }));
+                .sendToServer(new PacketSimple(EnumSimplePacket.S_REQUEST_FLAG_DATA, new Object[] { playerName }));
             ClientProxyCore.flagRequestsSent.add(playerName);
         }
 

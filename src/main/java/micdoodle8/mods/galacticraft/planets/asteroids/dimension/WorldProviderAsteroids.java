@@ -1,15 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.dimension;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.TreeMap;
-
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.biome.WorldChunkManager;
-import net.minecraft.world.chunk.IChunkProvider;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.galaxies.CelestialBody;
@@ -24,6 +14,15 @@ import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
 import micdoodle8.mods.galacticraft.planets.asteroids.world.gen.ChunkProviderAsteroids;
 import micdoodle8.mods.galacticraft.planets.asteroids.world.gen.WorldChunkManagerAsteroids;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.biome.WorldChunkManager;
+import net.minecraft.world.chunk.IChunkProvider;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeMap;
 
 public class WorldProviderAsteroids extends WorldProviderSpace implements ISolarLevel {
 
@@ -213,7 +212,7 @@ public class WorldProviderAsteroids extends WorldProviderSpace implements ISolar
 
     private void loadAsteroidSavedData() {
         this.datafile = (AsteroidSaveData) this.worldObj
-                .loadItemData(AsteroidSaveData.class, AsteroidSaveData.saveDataID);
+            .loadItemData(AsteroidSaveData.class, AsteroidSaveData.saveDataID);
 
         if (this.datafile == null) {
             this.datafile = new AsteroidSaveData("");

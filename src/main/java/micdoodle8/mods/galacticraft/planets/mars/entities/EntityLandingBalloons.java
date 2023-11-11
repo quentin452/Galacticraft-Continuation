@@ -1,16 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.entities;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
-
-import net.minecraft.client.particle.EntityFX;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
@@ -20,6 +9,16 @@ import micdoodle8.mods.galacticraft.api.vector.Vector3;
 import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.planets.mars.util.MarsUtil;
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
 
 public class EntityLandingBalloons extends EntityLanderBase implements IIgnoreShift, ICameraZoomEntity {
 
@@ -194,7 +193,7 @@ public class EntityLandingBalloons extends EntityLanderBase implements IIgnoreSh
     public ArrayList<Object> getNetworkedData() {
         final ArrayList<Object> objList = new ArrayList<>(super.getNetworkedData());
         if (this.worldObj.isRemote && this.hasReceivedPacket && this.groundHitCount <= 14
-                || !this.worldObj.isRemote && this.groundHitCount == 14) {
+            || !this.worldObj.isRemote && this.groundHitCount == 14) {
             objList.add(this.groundHitCount);
         }
         return objList;

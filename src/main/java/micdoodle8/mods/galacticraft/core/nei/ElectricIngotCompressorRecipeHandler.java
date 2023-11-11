@@ -1,28 +1,26 @@
 package micdoodle8.mods.galacticraft.core.nei;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class ElectricIngotCompressorRecipeHandler extends TemplateRecipeHandler {
 
     private static final ResourceLocation ingotCompressorTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/electric_IngotCompressor.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/electric_IngotCompressor.png");
     public static int ticksPassed;
     private int alternate = 0;
 
@@ -39,11 +37,13 @@ public class ElectricIngotCompressorRecipeHandler extends TemplateRecipeHandler 
         final HashMap<ArrayList<PositionedStack>, PositionedStack> recipes = new HashMap<>();
 
         for (final Entry<HashMap<Integer, PositionedStack>, PositionedStack> stack : NEIGalacticraftConfig
-                .getIngotCompressorRecipes()) {
+            .getIngotCompressorRecipes()) {
             final ArrayList<PositionedStack> inputStacks = new ArrayList<>();
 
-            for (final Map.Entry<Integer, PositionedStack> input : stack.getKey().entrySet()) {
-                final PositionedStack inputStack = input.getValue().copy();
+            for (final Map.Entry<Integer, PositionedStack> input : stack.getKey()
+                .entrySet()) {
+                final PositionedStack inputStack = input.getValue()
+                    .copy();
                 for (final ItemStack inputItemStack : inputStack.items) {
                     inputItemStack.stackSize = 2;
                 }
@@ -67,12 +67,12 @@ public class ElectricIngotCompressorRecipeHandler extends TemplateRecipeHandler 
         }
 
         GuiDraw.drawTexturedModalRect(
-                79,
-                46,
-                176,
-                13,
-                Math.min(ElectricIngotCompressorRecipeHandler.ticksPassed % 70, 53),
-                17);
+            79,
+            46,
+            176,
+            13,
+            Math.min(ElectricIngotCompressorRecipeHandler.ticksPassed % 70, 53),
+            17);
     }
 
     @Override
@@ -119,13 +119,15 @@ public class ElectricIngotCompressorRecipeHandler extends TemplateRecipeHandler 
 
     @Override
     public ArrayList<PositionedStack> getIngredientStacks(int recipe) {
-        return (ArrayList<PositionedStack>) this.arecipes.get(recipe).getIngredients();
+        return (ArrayList<PositionedStack>) this.arecipes.get(recipe)
+            .getIngredients();
     }
 
     @Override
     public PositionedStack getResultStack(int recipe) {
         if (ElectricIngotCompressorRecipeHandler.ticksPassed % 70 >= 53) {
-            return this.arecipes.get(recipe).getResult();
+            return this.arecipes.get(recipe)
+                .getResult();
         }
 
         return null;
@@ -139,7 +141,7 @@ public class ElectricIngotCompressorRecipeHandler extends TemplateRecipeHandler 
         @Override
         public ArrayList<PositionedStack> getIngredients() {
             return (ArrayList<PositionedStack>) this
-                    .getCycledIngredients(ElectricIngotCompressorRecipeHandler.this.cycleticks / 20, this.input);
+                .getCycledIngredients(ElectricIngotCompressorRecipeHandler.this.cycleticks / 20, this.input);
         }
 
         @Override
@@ -161,7 +163,10 @@ public class ElectricIngotCompressorRecipeHandler extends TemplateRecipeHandler 
         }
 
         public ElectricCompressorRecipe(Map.Entry<ArrayList<PositionedStack>, PositionedStack> recipe) {
-            this(new ArrayList<>(recipe.getKey()), recipe.getValue().copy());
+            this(
+                new ArrayList<>(recipe.getKey()),
+                recipe.getValue()
+                    .copy());
         }
 
         @Override

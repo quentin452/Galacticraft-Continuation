@@ -1,7 +1,12 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityFallenMeteor;
+import micdoodle8.mods.galacticraft.core.util.ColorUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -17,13 +22,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityFallenMeteor;
-import micdoodle8.mods.galacticraft.core.util.ColorUtil;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.Random;
 
 public class BlockFallenMeteor extends Block implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
 
@@ -141,7 +140,7 @@ public class BlockFallenMeteor extends Block implements ITileEntityProvider, Ite
     private void tryToFall(World par1World, int par2, int par3, int par4) {
         if (BlockFallenMeteor.canFallBelow(par1World, par2, par3 - 1, par4) && par3 >= 0) {
             final int prevHeatLevel = ((TileEntityFallenMeteor) par1World.getTileEntity(par2, par3, par4))
-                    .getHeatLevel();
+                .getHeatLevel();
             par1World.setBlock(par2, par3, par4, Blocks.air, 0, 3);
 
             while (BlockFallenMeteor.canFallBelow(par1World, par2, par3 - 1, par4) && par3 > 0) {
@@ -216,7 +215,9 @@ public class BlockFallenMeteor extends Block implements ITileEntityProvider, Ite
             return player.canHarvestBlock(block) ? 1 : 0;
         }
 
-        final int toolLevel = stack.getItem().getHarvestLevel(stack, tool) - block.getHarvestLevel(metadata) + 1;
+        final int toolLevel = stack.getItem()
+            .getHarvestLevel(stack, tool) - block.getHarvestLevel(metadata)
+            + 1;
         if (toolLevel < 1) {
             return player.canHarvestBlock(block) ? 1 : 0;
         }

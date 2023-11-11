@@ -19,7 +19,7 @@ public class PlayerGearData {
     }
 
     public PlayerGearData(EntityPlayer player, int mask, int gear, int leftTank, int rightTank, int frequencyModule,
-            int[] thermalPadding) {
+        int[] thermalPadding) {
         this.player = player;
         this.mask = mask;
         this.gear = gear;
@@ -97,14 +97,19 @@ public class PlayerGearData {
 
     @Override
     public int hashCode() {
-        return this.player.getGameProfile().getName().hashCode();
+        return this.player.getGameProfile()
+            .getName()
+            .hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PlayerGearData) {
-            return ((PlayerGearData) obj).player.getGameProfile().getName()
-                    .equals(this.player.getGameProfile().getName());
+            return ((PlayerGearData) obj).player.getGameProfile()
+                .getName()
+                .equals(
+                    this.player.getGameProfile()
+                        .getName());
         }
 
         return false;

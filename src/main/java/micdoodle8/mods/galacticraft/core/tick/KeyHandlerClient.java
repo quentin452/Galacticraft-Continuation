@@ -1,12 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tick;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
-
-import org.lwjgl.input.Keyboard;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Type;
@@ -25,21 +18,26 @@ import micdoodle8.mods.galacticraft.core.network.PacketSimple;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
+import org.lwjgl.input.Keyboard;
 
 public class KeyHandlerClient extends KeyHandler {
 
     public static KeyBinding galaxyMap = new KeyBinding(
-            GCCoreUtil.translate("keybind.map.name"),
-            Keyboard.KEY_NONE,
-            Constants.MOD_NAME_SIMPLE);
+        GCCoreUtil.translate("keybind.map.name"),
+        Keyboard.KEY_NONE,
+        Constants.MOD_NAME_SIMPLE);
     public static KeyBinding openFuelGui = new KeyBinding(
-            GCCoreUtil.translate("keybind.spaceshipinv.name"),
-            Keyboard.KEY_NONE,
-            Constants.MOD_NAME_SIMPLE);
+        GCCoreUtil.translate("keybind.spaceshipinv.name"),
+        Keyboard.KEY_NONE,
+        Constants.MOD_NAME_SIMPLE);
     public static KeyBinding toggleAdvGoggles = new KeyBinding(
-            GCCoreUtil.translate("keybind.sensortoggle.name"),
-            Keyboard.KEY_NONE,
-            Constants.MOD_NAME_SIMPLE);
+        GCCoreUtil.translate("keybind.sensortoggle.name"),
+        Keyboard.KEY_NONE,
+        Constants.MOD_NAME_SIMPLE);
     public static KeyBinding accelerateKey;
     public static KeyBinding decelerateKey;
     public static KeyBinding leftKey;
@@ -52,10 +50,10 @@ public class KeyHandlerClient extends KeyHandler {
 
     public KeyHandlerClient() {
         super(
-                new KeyBinding[] { galaxyMap, openFuelGui, toggleAdvGoggles },
-                new boolean[] { false, false, false },
-                getVanillaKeyBindings(),
-                new boolean[] { false, true, true, true, true, true, true });
+            new KeyBinding[] { galaxyMap, openFuelGui, toggleAdvGoggles },
+            new boolean[] { false, false, false },
+            getVanillaKeyBindings(),
+            new boolean[] { false, true, true, true, true, true, true });
     }
 
     private static KeyBinding[] getVanillaKeyBindings() {
@@ -80,12 +78,12 @@ public class KeyHandlerClient extends KeyHandler {
         if (galaxyMap.isPressed()) {
             if (mc.currentScreen == null) {
                 mc.thePlayer.openGui(
-                        GalacticraftCore.instance,
-                        GuiIdsCore.GALAXY_MAP,
-                        mc.theWorld,
-                        (int) mc.thePlayer.posX,
-                        (int) mc.thePlayer.posY,
-                        (int) mc.thePlayer.posZ);
+                    GalacticraftCore.instance,
+                    GuiIdsCore.GALAXY_MAP,
+                    mc.theWorld,
+                    (int) mc.thePlayer.posX,
+                    (int) mc.thePlayer.posY,
+                    (int) mc.thePlayer.posZ);
             }
         } else if (openFuelGui.isPressed()) {
             final EntityClientPlayerMP playerBase = PlayerUtil.getPlayerBaseClientFromPlayer(mc.thePlayer, false);
@@ -93,11 +91,12 @@ public class KeyHandlerClient extends KeyHandler {
                 return;
             }
             if (playerBase.ridingEntity instanceof EntitySpaceshipBase
-                    || playerBase.ridingEntity instanceof EntityBuggy) {
+                || playerBase.ridingEntity instanceof EntityBuggy) {
                 GalacticraftCore.packetPipeline.sendToServer(
-                        new PacketSimple(
-                                EnumSimplePacket.S_OPEN_FUEL_GUI,
-                                new Object[] { playerBase.getGameProfile().getName() }));
+                    new PacketSimple(
+                        EnumSimplePacket.S_OPEN_FUEL_GUI,
+                        new Object[] { playerBase.getGameProfile()
+                            .getName() }));
             }
         } else if (toggleAdvGoggles.isPressed()) {
             final EntityClientPlayerMP playerBase = PlayerUtil.getPlayerBaseClientFromPlayer(mc.thePlayer, false);
@@ -139,22 +138,22 @@ public class KeyHandlerClient extends KeyHandler {
                     }
                     entity.pressKey(keyNum);
                 }
-        } else if (entityTest instanceof EntityAutoRocket) {
+            } else if (entityTest instanceof EntityAutoRocket) {
                 EntityAutoRocket autoRocket = (EntityAutoRocket) entityTest;
                 if (autoRocket.landing && (kb == leftShiftKey)) {
-                        autoRocket.motionY -= 0.02D;
-                        GalacticraftCore.packetPipeline.sendToServer(
-                            new PacketSimple(
-                                EnumSimplePacket.S_UPDATE_SHIP_MOTION_Y,
-                                new Object[]{autoRocket.getEntityId(), false}));
+                    autoRocket.motionY -= 0.02D;
+                    GalacticraftCore.packetPipeline.sendToServer(
+                        new PacketSimple(
+                            EnumSimplePacket.S_UPDATE_SHIP_MOTION_Y,
+                            new Object[] { autoRocket.getEntityId(), false }));
 
                 }
                 if (kb == spaceKey) {
                     autoRocket.motionY += 0.02D;
                     GalacticraftCore.packetPipeline.sendToServer(
-                            new PacketSimple(
-                                    EnumSimplePacket.S_UPDATE_SHIP_MOTION_Y,
-                                    new Object[] { autoRocket.getEntityId(), true }));
+                        new PacketSimple(
+                            EnumSimplePacket.S_UPDATE_SHIP_MOTION_Y,
+                            new Object[] { autoRocket.getEntityId(), true }));
                 }
             }
 

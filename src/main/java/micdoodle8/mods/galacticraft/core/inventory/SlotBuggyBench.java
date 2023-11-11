@@ -1,12 +1,5 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-
 import cpw.mods.fml.common.registry.GameRegistry;
 import micdoodle8.mods.galacticraft.core.Constants;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
@@ -14,6 +7,12 @@ import micdoodle8.mods.galacticraft.core.items.GCItems;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import micdoodle8.mods.galacticraft.core.util.RecipeUtil;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 public class SlotBuggyBench extends Slot {
 
@@ -22,7 +21,7 @@ public class SlotBuggyBench extends Slot {
     private final EntityPlayer player;
 
     public SlotBuggyBench(IInventory par2IInventory, int par3, int par4, int par5, int x, int y, int z,
-            EntityPlayer player) {
+        EntityPlayer player) {
         super(par2IInventory, par3, par4, par5);
         this.index = par3;
         this.x = x;
@@ -44,10 +43,10 @@ public class SlotBuggyBench extends Slot {
 
                     if (var14 * var14 + var16 * var16 + var18 * var18 < 20 * 20) {
                         GalacticraftCore.packetPipeline.sendTo(
-                                new PacketSimple(
-                                        EnumSimplePacket.C_SPAWN_SPARK_PARTICLES,
-                                        new Object[] { this.x, this.y, this.z }),
-                                var13);
+                            new PacketSimple(
+                                EnumSimplePacket.C_SPAWN_SPARK_PARTICLES,
+                                new Object[] { this.x, this.y, this.z }),
+                            var13);
                     }
                 }
             }
@@ -64,8 +63,8 @@ public class SlotBuggyBench extends Slot {
         }
         if (this.index == 3 && GalacticraftCore.isGalaxySpaceLoaded) {
             return itemStack.getItem()
-                    == GameRegistry.findItem(Constants.MOD_ID_GALAXYSPACE, "item.RocketControlComputer")
-                    && itemStack.getItemDamage() == 100;
+                == GameRegistry.findItem(Constants.MOD_ID_GALAXYSPACE, "item.RocketControlComputer")
+                && itemStack.getItemDamage() == 100;
         } else if (this.index >= 4 && this.index <= 7) {
             return itemStack.getItem() == GCItems.partBuggy && itemStack.getItemDamage() == 0;
         } else if (this.index >= 12 && this.index <= 16) {
@@ -74,8 +73,7 @@ public class SlotBuggyBench extends Slot {
             return itemStack.getItem() == GCItems.heavyPlatingTier1;
         } else if (this.index == 35) {
             return itemStack.getItem() == Item.getItemFromBlock(RecipeUtil.getChestBlock())
-                    && (itemStack.getItemDamage() == 0 || itemStack.getItemDamage() == 1
-                            || itemStack.getItemDamage() == 3);
+                && (itemStack.getItemDamage() == 0 || itemStack.getItemDamage() == 1 || itemStack.getItemDamage() == 3);
         } else {
             return false;
         }

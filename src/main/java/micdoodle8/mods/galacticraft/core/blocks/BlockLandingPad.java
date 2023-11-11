@@ -1,7 +1,13 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityBuggyFuelerSingle;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityLandingPadSingle;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -13,14 +19,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityBuggyFuelerSingle;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityLandingPadSingle;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class BlockLandingPad extends BlockAdvancedTile implements IPartialSealableBlock, ItemBlockDesc.IBlockShiftDesc {
 
@@ -72,22 +71,22 @@ public class BlockLandingPad extends BlockAdvancedTile implements IPartialSealab
         final Block id = GCBlocks.landingPad;
 
         if (par1World.getBlock(par2 + 1, par3, par4) == id && par1World.getBlock(par2 + 2, par3, par4) == id
-                && par1World.getBlock(par2 + 3, par3, par4) == id) {
+            && par1World.getBlock(par2 + 3, par3, par4) == id) {
             return false;
         }
 
         if (par1World.getBlock(par2 - 1, par3, par4) == id && par1World.getBlock(par2 - 2, par3, par4) == id
-                && par1World.getBlock(par2 - 3, par3, par4) == id) {
+            && par1World.getBlock(par2 - 3, par3, par4) == id) {
             return false;
         }
 
         if (par1World.getBlock(par2, par3, par4 + 1) == id && par1World.getBlock(par2, par3, par4 + 2) == id
-                && par1World.getBlock(par2, par3, par4 + 3) == id) {
+            && par1World.getBlock(par2, par3, par4 + 3) == id) {
             return false;
         }
 
         if (par1World.getBlock(par2, par3, par4 - 1) == id && par1World.getBlock(par2, par3, par4 - 2) == id
-                && par1World.getBlock(par2, par3, par4 - 3) == id) {
+            && par1World.getBlock(par2, par3, par4 - 3) == id) {
             return false;
         }
 

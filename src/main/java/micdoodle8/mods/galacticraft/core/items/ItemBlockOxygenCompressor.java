@@ -1,9 +1,8 @@
 package micdoodle8.mods.galacticraft.core.items;
 
+import micdoodle8.mods.galacticraft.core.blocks.BlockOxygenCompressor;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
-
-import micdoodle8.mods.galacticraft.core.blocks.BlockOxygenCompressor;
 
 public class ItemBlockOxygenCompressor extends ItemBlockDesc {
 

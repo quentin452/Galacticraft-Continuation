@@ -1,16 +1,14 @@
 package micdoodle8.mods.galacticraft.planets.mars;
 
+import cpw.mods.fml.common.FMLLog;
+import micdoodle8.mods.galacticraft.core.Constants;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+import org.apache.logging.log4j.Level;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-
-import org.apache.logging.log4j.Level;
-
-import cpw.mods.fml.common.FMLLog;
-import micdoodle8.mods.galacticraft.core.Constants;
 
 public class ConfigManagerMars {
 
@@ -53,7 +51,8 @@ public class ConfigManagerMars {
 
             prop = config.get(Constants.CONFIG_CATEGORY_DIMENSIONS, "dimensionIDMars", -29);
             prop.comment = "Dimension ID for Mars";
-            prop.setLanguageKey("gc.configgui.dimensionIDMars").setRequiresMcRestart(true);
+            prop.setLanguageKey("gc.configgui.dimensionIDMars")
+                .setRequiresMcRestart(true);
             dimensionIDMars = prop.getInt();
 
             //
@@ -81,57 +80,61 @@ public class ConfigManagerMars {
             launchControllerAllDims = prop.getBoolean(false);
 
             prop = config.get(
-                    update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
-                    "Disable Iron Ore Gen on Mars",
-                    false);
+                update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
+                "Disable Iron Ore Gen on Mars",
+                false);
             prop.comment = "Disable Iron Ore Gen on Mars.";
             prop.setLanguageKey("gc.configgui.disableIronGenMars");
             if (update) {
                 prop = config.get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
                 prop.setLanguageKey(prop.getLanguageKey());
-                config.getCategory(Constants.CONFIG_CATEGORY_GENERAL).remove(prop.getName());
+                config.getCategory(Constants.CONFIG_CATEGORY_GENERAL)
+                    .remove(prop.getName());
             }
             disableIronGen = prop.getBoolean(false);
             propOrder.add(prop.getName());
 
             prop = config.get(
-                    update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
-                    "Disable Copper Ore Gen on Mars",
-                    false);
+                update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
+                "Disable Copper Ore Gen on Mars",
+                false);
             prop.comment = "Disable Copper Ore Gen on Mars.";
             prop.setLanguageKey("gc.configgui.disableCopperGenMars");
             if (update) {
                 prop = config.get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
                 prop.setLanguageKey(prop.getLanguageKey());
-                config.getCategory(Constants.CONFIG_CATEGORY_GENERAL).remove(prop.getName());
+                config.getCategory(Constants.CONFIG_CATEGORY_GENERAL)
+                    .remove(prop.getName());
             }
             disableCopperGen = prop.getBoolean(false);
             propOrder.add(prop.getName());
 
             prop = config.get(
-                    update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
-                    "Disable Tin Ore Gen on Mars",
-                    false);
+                update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
+                "Disable Tin Ore Gen on Mars",
+                false);
             prop.comment = "Disable Tin Ore Gen on Mars.";
             prop.setLanguageKey("gc.configgui.disableTinGenMars");
             if (update) {
                 prop = config.get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
                 prop.setLanguageKey(prop.getLanguageKey());
-                config.getCategory(Constants.CONFIG_CATEGORY_GENERAL).remove(prop.getName());
+                config.getCategory(Constants.CONFIG_CATEGORY_GENERAL)
+                    .remove(prop.getName());
             }
             disableTinGen = prop.getBoolean(false);
             propOrder.add(prop.getName());
 
             prop = config.get(
-                    update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
-                    "Disable Desh Ore Gen on Mars",
-                    false);
+                update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
+                "Disable Desh Ore Gen on Mars",
+                false);
             prop.comment = "Disable Desh Ore Gen on Mars.";
             prop.setLanguageKey("gc.configgui.disableDeshGenMars");
             if (update) {
                 prop = config.get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
                 prop.setLanguageKey(prop.getLanguageKey());
-                config.getCategory(Constants.CONFIG_CATEGORY_GENERAL).remove(prop.getName());
+                config.getCategory(Constants.CONFIG_CATEGORY_GENERAL)
+                    .remove(prop.getName());
             }
             disableDeshGen = prop.getBoolean(false);
             propOrder.add(prop.getName());

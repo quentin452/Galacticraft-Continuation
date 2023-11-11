@@ -1,8 +1,11 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.ArrayList;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IOxygenReliantBlock;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
@@ -13,12 +16,8 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.block.IOxygenReliantBlock;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class BlockUnlitTorch extends Block implements IOxygenReliantBlock {
 
@@ -56,7 +55,8 @@ public class BlockUnlitTorch extends Block implements IOxygenReliantBlock {
     }
 
     private static boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection direction) {
-        return world.getBlock(x, y, z).isSideSolid(world, x, y, z, direction);
+        return world.getBlock(x, y, z)
+            .isSideSolid(world, x, y, z, direction);
     }
 
     @Override
@@ -90,15 +90,15 @@ public class BlockUnlitTorch extends Block implements IOxygenReliantBlock {
     @Override
     public boolean canPlaceBlockAt(World par1World, int par2, int par3, int par4) {
         return BlockUnlitTorch.isBlockSolidOnSide(par1World, par2 - 1, par3, par4, ForgeDirection.EAST)
-                || BlockUnlitTorch.isBlockSolidOnSide(par1World, par2 + 1, par3, par4, ForgeDirection.WEST)
-                || BlockUnlitTorch.isBlockSolidOnSide(par1World, par2, par3, par4 - 1, ForgeDirection.SOUTH)
-                || BlockUnlitTorch.isBlockSolidOnSide(par1World, par2, par3, par4 + 1, ForgeDirection.NORTH)
-                || this.canPlaceTorchOn(par1World, par2, par3 - 1, par4);
+            || BlockUnlitTorch.isBlockSolidOnSide(par1World, par2 + 1, par3, par4, ForgeDirection.WEST)
+            || BlockUnlitTorch.isBlockSolidOnSide(par1World, par2, par3, par4 - 1, ForgeDirection.SOUTH)
+            || BlockUnlitTorch.isBlockSolidOnSide(par1World, par2, par3, par4 + 1, ForgeDirection.NORTH)
+            || this.canPlaceTorchOn(par1World, par2, par3 - 1, par4);
     }
 
     @Override
     public int onBlockPlaced(World par1World, int par2, int par3, int par4, int par5, float par6, float par7,
-            float par8, int par9) {
+        float par8, int par9) {
         int var10 = par9;
 
         if (par5 == 1 && this.canPlaceTorchOn(par1World, par2, par3 - 1, par4)) {
@@ -165,22 +165,22 @@ public class BlockUnlitTorch extends Block implements IOxygenReliantBlock {
             boolean var7 = false;
 
             if (!BlockUnlitTorch.isBlockSolidOnSide(par1World, par2 - 1, par3, par4, ForgeDirection.EAST)
-                    && var6 == 1) {
+                && var6 == 1) {
                 var7 = true;
             }
 
             if (!BlockUnlitTorch.isBlockSolidOnSide(par1World, par2 + 1, par3, par4, ForgeDirection.WEST)
-                    && var6 == 2) {
+                && var6 == 2) {
                 var7 = true;
             }
 
             if (!BlockUnlitTorch.isBlockSolidOnSide(par1World, par2, par3, par4 - 1, ForgeDirection.SOUTH)
-                    && var6 == 3) {
+                && var6 == 3) {
                 var7 = true;
             }
 
             if (!BlockUnlitTorch.isBlockSolidOnSide(par1World, par2, par3, par4 + 1, ForgeDirection.NORTH)
-                    && var6 == 4) {
+                && var6 == 4) {
                 var7 = true;
             }
 
@@ -231,7 +231,7 @@ public class BlockUnlitTorch extends Block implements IOxygenReliantBlock {
      */
     @Override
     public MovingObjectPosition collisionRayTrace(World par1World, int par2, int par3, int par4, Vec3 par5Vec3,
-            Vec3 par6Vec3) {
+        Vec3 par6Vec3) {
         final int var7 = par1World.getBlockMetadata(par2, par3, par4) & 7;
         float var8 = 0.15F;
 

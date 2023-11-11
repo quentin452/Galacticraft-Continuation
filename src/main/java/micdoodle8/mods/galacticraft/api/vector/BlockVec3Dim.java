@@ -1,5 +1,9 @@
 package micdoodle8.mods.galacticraft.api.vector;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
@@ -12,11 +16,6 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /*
  * BlockVec3 is similar to galacticraft.api.vector.Vector3? But for speed it uses integer arithmetic not doubles, for
@@ -78,10 +77,10 @@ public class BlockVec3Dim implements Cloneable {
      */
     public Block getBlockID() {
         if (this.y < 0 || this.y >= 256
-                || this.x < -30000000
-                || this.z < -30000000
-                || this.x >= 30000000
-                || this.z >= 30000000) {
+            || this.x < -30000000
+            || this.z < -30000000
+            || this.x >= 30000000
+            || this.z >= 30000000) {
             return null;
         }
 
@@ -96,8 +95,8 @@ public class BlockVec3Dim implements Cloneable {
             // In a typical inner loop, 80% of the time consecutive calls to
             // this will be within the same chunk
             if (BlockVec3Dim.chunkCacheX == chunkx && BlockVec3Dim.chunkCacheZ == chunkz
-                    && BlockVec3Dim.chunkCacheDim == world.provider.dimensionId
-                    && BlockVec3Dim.chunkCached.isChunkLoaded) {
+                && BlockVec3Dim.chunkCacheDim == world.provider.dimensionId
+                && BlockVec3Dim.chunkCached.isChunkLoaded) {
                 return BlockVec3Dim.chunkCached.getBlock(this.x & 15, this.y, this.z & 15);
             }
             Chunk chunk = world.getChunkFromChunkCoords(chunkx, chunkz);
@@ -108,10 +107,10 @@ public class BlockVec3Dim implements Cloneable {
             return chunk.getBlock(this.x & 15, this.y, this.z & 15);
         } catch (final Throwable throwable) {
             final CrashReport crashreport = CrashReport
-                    .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
+                .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
             final CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
             crashreportcategory
-                    .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
+                .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
             throw new ReportedException(crashreport);
         }
     }
@@ -124,10 +123,10 @@ public class BlockVec3Dim implements Cloneable {
      */
     public Block getBlockID_noChunkLoad() {
         if (this.y < 0 || this.y >= 256
-                || this.x < -30000000
-                || this.z < -30000000
-                || this.x >= 30000000
-                || this.z >= 30000000) {
+            || this.x < -30000000
+            || this.z < -30000000
+            || this.x >= 30000000
+            || this.z >= 30000000) {
             return null;
         }
 
@@ -139,12 +138,13 @@ public class BlockVec3Dim implements Cloneable {
         final int chunkx = this.x >> 4;
         final int chunkz = this.z >> 4;
         try {
-            if (world.getChunkProvider().chunkExists(chunkx, chunkz)) {
+            if (world.getChunkProvider()
+                .chunkExists(chunkx, chunkz)) {
                 // In a typical inner loop, 80% of the time consecutive calls to
                 // this will be within the same chunk
                 if (BlockVec3Dim.chunkCacheX == chunkx && BlockVec3Dim.chunkCacheZ == chunkz
-                        && BlockVec3Dim.chunkCacheDim == world.provider.dimensionId
-                        && BlockVec3Dim.chunkCached.isChunkLoaded) {
+                    && BlockVec3Dim.chunkCacheDim == world.provider.dimensionId
+                    && BlockVec3Dim.chunkCached.isChunkLoaded) {
                     return BlockVec3Dim.chunkCached.getBlock(this.x & 15, this.y, this.z & 15);
                 }
                 Chunk chunk = world.getChunkFromChunkCoords(chunkx, chunkz);
@@ -158,10 +158,10 @@ public class BlockVec3Dim implements Cloneable {
             return Blocks.bedrock;
         } catch (final Throwable throwable) {
             final CrashReport crashreport = CrashReport
-                    .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
+                .makeCrashReport(throwable, "Oxygen Sealer thread: Exception getting block type in world");
             final CrashReportCategory crashreportcategory = crashreport.makeCategory("Requested block coordinates");
             crashreportcategory
-                    .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
+                .addCrashSection("Location", CrashReportCategory.getLocationInfo(this.x, this.y, this.z));
             throw new ReportedException(crashreport);
         }
     }
@@ -339,10 +339,12 @@ public class BlockVec3Dim implements Cloneable {
     }
 
     private World getWorldForId(int dimensionID) {
-        if (FMLCommonHandler.instance().getEffectiveSide() != Side.SERVER) {
+        if (FMLCommonHandler.instance()
+            .getEffectiveSide() != Side.SERVER) {
             return this.getWorldForIdClient(dimensionID);
         }
-        final MinecraftServer theServer = FMLCommonHandler.instance().getMinecraftServerInstance();
+        final MinecraftServer theServer = FMLCommonHandler.instance()
+            .getMinecraftServerInstance();
         if (theServer == null) {
             return null;
         }
@@ -351,7 +353,8 @@ public class BlockVec3Dim implements Cloneable {
 
     @SideOnly(Side.CLIENT)
     private World getWorldForIdClient(int dimensionID) {
-        final World world = FMLClientHandler.instance().getClient().theWorld;
+        final World world = FMLClientHandler.instance()
+            .getClient().theWorld;
 
         if (world != null && world.provider.dimensionId == dimensionID) {
             return world;

@@ -1,19 +1,18 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.tile;
 
-import java.util.LinkedList;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-
 import cpw.mods.fml.relauncher.Side;
 import micdoodle8.mods.galacticraft.api.power.ILaserNode;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityAdvanced;
 import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+
+import java.util.LinkedList;
 
 public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements ILaserNode {
 
@@ -31,7 +30,7 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
     public void updateEntity() {
         if (this.preLoadTarget != null) {
             final TileEntity tileAtTarget = this.worldObj
-                    .getTileEntity(this.preLoadTarget.x, this.preLoadTarget.y, this.preLoadTarget.z);
+                .getTileEntity(this.preLoadTarget.x, this.preLoadTarget.y, this.preLoadTarget.z);
 
             if (tileAtTarget instanceof ILaserNode) {
                 this.setTarget((ILaserNode) tileAtTarget);
@@ -88,13 +87,14 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
 
         for (int cX = chunkXMin; cX <= chunkXMax; cX++) {
             for (int cZ = chunkZMin; cZ <= chunkZMax; cZ++) {
-                if (this.worldObj.getChunkProvider().chunkExists(cX, cZ)) {
+                if (this.worldObj.getChunkProvider()
+                    .chunkExists(cX, cZ)) {
                     final Chunk chunk = this.worldObj.getChunkFromChunkCoords(cX, cZ);
 
                     for (final Object obj : chunk.chunkTileEntityMap.values()) {
                         if (obj != this && obj instanceof ILaserNode) {
                             final BlockVec3 deltaPos = new BlockVec3(this)
-                                    .subtract(new BlockVec3(((ILaserNode) obj).getTile()));
+                                .subtract(new BlockVec3(((ILaserNode) obj).getTile()));
 
                             if (deltaPos.x < 16 && deltaPos.y < 16 && deltaPos.z < 16) {
                                 final ILaserNode laserNode = (ILaserNode) obj;
@@ -118,7 +118,9 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
         int index = -1;
 
         for (int i = 0; i < this.nodeList.size(); i++) {
-            if (new BlockVec3(this.nodeList.get(i).getTile()).equals(new BlockVec3(node.getTile()))) {
+            if (new BlockVec3(
+                this.nodeList.get(i)
+                    .getTile()).equals(new BlockVec3(node.getTile()))) {
                 index = i;
                 break;
             }
@@ -132,14 +134,16 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
         if (this.nodeList.isEmpty()) {
             this.nodeList.add(node);
         } else {
-            int nodeCompare = this.nodeList.get(0).compareTo(node, new BlockVec3(this));
+            int nodeCompare = this.nodeList.get(0)
+                .compareTo(node, new BlockVec3(this));
 
             if (nodeCompare <= 0) {
                 this.nodeList.addFirst(node);
                 return;
             }
 
-            nodeCompare = this.nodeList.get(this.nodeList.size() - 1).compareTo(node, new BlockVec3(this));
+            nodeCompare = this.nodeList.get(this.nodeList.size() - 1)
+                .compareTo(node, new BlockVec3(this));
 
             if (nodeCompare >= 0) {
                 this.nodeList.addLast(node);
@@ -161,7 +165,9 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
         int index = -1;
 
         for (int i = 0; i < this.nodeList.size(); i++) {
-            if (new BlockVec3(this.nodeList.get(i).getTile()).equals(new BlockVec3(node.getTile()))) {
+            if (new BlockVec3(
+                this.nodeList.get(i)
+                    .getTile()).equals(new BlockVec3(node.getTile()))) {
                 index = i;
                 break;
             }
@@ -186,11 +192,14 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
 
     public void updateOrientation() {
         if (this.getTarget() != null) {
-            final Vector3 direction = Vector3.subtract(this.getOutputPoint(false), this.getTarget().getInputPoint())
-                    .normalize();
+            final Vector3 direction = Vector3.subtract(
+                this.getOutputPoint(false),
+                this.getTarget()
+                    .getInputPoint())
+                .normalize();
             this.pitch = (float) -Vector3
-                    .getAngle(new Vector3(-direction.x, -direction.y, -direction.z), new Vector3(0, 1, 0))
-                    * (float) (180.0F / Math.PI) + 90;
+                .getAngle(new Vector3(-direction.x, -direction.y, -direction.z), new Vector3(0, 1, 0))
+                * (float) (180.0F / Math.PI) + 90;
             this.yaw = (float) -(Math.atan2(direction.z, direction.x) * (float) (180.0F / Math.PI)) + 90;
         }
     }
@@ -202,8 +211,10 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
 
     @Override
     public int compareTo(ILaserNode otherNode, BlockVec3 origin) {
-        final int thisDistance = new BlockVec3(this).subtract(origin).getMagnitudeSquared();
-        final int otherDistance = new BlockVec3(otherNode.getTile()).subtract(origin).getMagnitudeSquared();
+        final int thisDistance = new BlockVec3(this).subtract(origin)
+            .getMagnitudeSquared();
+        final int otherDistance = new BlockVec3(otherNode.getTile()).subtract(origin)
+            .getMagnitudeSquared();
 
         if (thisDistance < otherDistance) {
             return 1;
@@ -216,14 +227,18 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
     }
 
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         if (this.nodeList.size() > 1) {
             int index = -1;
 
             if (this.getTarget() != null) {
                 for (int i = 0; i < this.nodeList.size(); i++) {
-                    if (new BlockVec3(this.nodeList.get(i).getTile())
-                            .equals(new BlockVec3(this.getTarget().getTile()))) {
+                    if (new BlockVec3(
+                        this.nodeList.get(i)
+                            .getTile()).equals(
+                                new BlockVec3(
+                                    this.getTarget()
+                                        .getTile()))) {
                         index = i;
                         break;
                     }
@@ -247,7 +262,7 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
     public ILaserNode getTarget() {
         if (!this.targetVec.equals(BlockVec3.INVALID_VECTOR)) {
             final TileEntity tileAtTarget = this.worldObj
-                    .getTileEntity(this.targetVec.x, this.targetVec.y, this.targetVec.z);
+                .getTileEntity(this.targetVec.x, this.targetVec.y, this.targetVec.z);
 
             if (tileAtTarget instanceof ILaserNode) {
                 return (ILaserNode) tileAtTarget;
@@ -271,9 +286,9 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
 
         if (nbt.getBoolean("HasTarget")) {
             this.preLoadTarget = new BlockVec3(
-                    nbt.getInteger("TargetX"),
-                    nbt.getInteger("TargetY"),
-                    nbt.getInteger("TargetZ"));
+                nbt.getInteger("TargetX"),
+                nbt.getInteger("TargetY"),
+                nbt.getInteger("TargetZ"));
         }
     }
 
@@ -284,9 +299,18 @@ public abstract class TileEntityBeamOutput extends TileEntityAdvanced implements
         nbt.setBoolean("HasTarget", this.getTarget() != null);
 
         if (this.getTarget() != null) {
-            nbt.setInteger("TargetX", this.getTarget().getTile().xCoord);
-            nbt.setInteger("TargetY", this.getTarget().getTile().yCoord);
-            nbt.setInteger("TargetZ", this.getTarget().getTile().zCoord);
+            nbt.setInteger(
+                "TargetX",
+                this.getTarget()
+                    .getTile().xCoord);
+            nbt.setInteger(
+                "TargetY",
+                this.getTarget()
+                    .getTile().yCoord);
+            nbt.setInteger(
+                "TargetZ",
+                this.getTarget()
+                    .getTile().zCoord);
         }
     }
 }

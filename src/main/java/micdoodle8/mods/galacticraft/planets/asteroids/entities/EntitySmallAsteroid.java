@@ -22,8 +22,8 @@ public class EntitySmallAsteroid extends Entity {
         if (!this.firstUpdate) {
             // Kill non-moving entities
             if (Math.abs(this.posX - this.prevPosX) + Math.abs(this.posZ - this.prevPosZ) <= 0 || this.posY > 288D
-                    || this.posY < -32D
-                    || this.ticksExisted > 3000) {
+                || this.posY < -32D
+                || this.ticksExisted > 3000) {
                 this.setDead();
             }
         }
@@ -42,7 +42,7 @@ public class EntitySmallAsteroid extends Entity {
         }
 
         final double sqrdMotion = this.motionX * this.motionX + this.motionY * this.motionY
-                + this.motionZ * this.motionZ;
+            + this.motionZ * this.motionZ;
 
         if (sqrdMotion < 0.05) {
             // If the motion is too low (for some odd reason), speed it back up slowly.

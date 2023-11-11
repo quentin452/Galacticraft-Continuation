@@ -1,14 +1,14 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.StructureComponent;
+
+import java.util.List;
+import java.util.Random;
 
 public class StructureComponentVillageField extends StructureComponentVillage {
 
@@ -17,7 +17,7 @@ public class StructureComponentVillageField extends StructureComponentVillage {
     public StructureComponentVillageField() {}
 
     public StructureComponentVillageField(StructureComponentVillageStartPiece par1ComponentVillageStartPiece, int par2,
-            Random par3Random, StructureBoundingBox par4StructureBoundingBox, int par5) {
+        Random par3Random, StructureBoundingBox par4StructureBoundingBox, int par5) {
         super(par1ComponentVillageStartPiece, par2);
         this.coordBaseMode = par5;
         this.boundingBox = par4StructureBoundingBox;
@@ -38,18 +38,18 @@ public class StructureComponentVillageField extends StructureComponentVillage {
     }
 
     public static StructureComponentVillageField func_74900_a(
-            StructureComponentVillageStartPiece par0ComponentVillageStartPiece, List<StructureComponent> par1List,
-            Random par2Random, int par3, int par4, int par5, int par6, int par7) {
+        StructureComponentVillageStartPiece par0ComponentVillageStartPiece, List<StructureComponent> par1List,
+        Random par2Random, int par3, int par4, int par5, int par6, int par7) {
         final StructureBoundingBox var8 = StructureBoundingBox
-                .getComponentToAddBoundingBox(par3, par4, par5, 0, 0, 0, 13, 4, 9, par6);
+            .getComponentToAddBoundingBox(par3, par4, par5, 0, 0, 0, 13, 4, 9, par6);
         return StructureComponent.findIntersecting(par1List, var8) == null
-                ? new StructureComponentVillageField(par0ComponentVillageStartPiece, par7, par2Random, var8, par6)
-                : null;
+            ? new StructureComponentVillageField(par0ComponentVillageStartPiece, par7, par2Random, var8, par6)
+            : null;
     }
 
     @Override
     public boolean addComponentParts(World par1World, Random par2Random,
-            StructureBoundingBox par3StructureBoundingBox) {
+        StructureBoundingBox par3StructureBoundingBox) {
         if (this.averageGroundLevel < 0) {
             this.averageGroundLevel = this.getAverageGroundLevel(par1World, par3StructureBoundingBox);
 
@@ -71,42 +71,42 @@ public class StructureComponentVillageField extends StructureComponentVillage {
         this.fillWithBlocks(par1World, par3StructureBoundingBox, 1, 0, 0, 11, 0, 0, Blocks.log, Blocks.log, false);
         this.fillWithBlocks(par1World, par3StructureBoundingBox, 1, 0, 8, 11, 0, 8, Blocks.log, Blocks.log, false);
         this.fillWithBlocks(
-                par1World,
-                par3StructureBoundingBox,
-                3,
-                0,
-                1,
-                3,
-                0,
-                7,
-                Blocks.flowing_water,
-                Blocks.flowing_water,
-                false);
+            par1World,
+            par3StructureBoundingBox,
+            3,
+            0,
+            1,
+            3,
+            0,
+            7,
+            Blocks.flowing_water,
+            Blocks.flowing_water,
+            false);
         this.fillWithBlocks(
-                par1World,
-                par3StructureBoundingBox,
-                9,
-                0,
-                1,
-                9,
-                0,
-                7,
-                Blocks.flowing_water,
-                Blocks.flowing_water,
-                false);
+            par1World,
+            par3StructureBoundingBox,
+            9,
+            0,
+            1,
+            9,
+            0,
+            7,
+            Blocks.flowing_water,
+            Blocks.flowing_water,
+            false);
         int var4;
 
         for (var4 = 1; var4 <= 7; ++var4) {
             for (int i = 1; i < 12; i++) {
                 if (i % 3 != 0 && par2Random.nextInt(3) == 0) {
                     this.placeBlockAtCurrentPosition(
-                            par1World,
-                            Blocks.sapling,
-                            MathHelper.getRandomIntegerInRange(par2Random, 0, 2),
-                            i,
-                            1,
-                            var4,
-                            par3StructureBoundingBox);
+                        par1World,
+                        Blocks.sapling,
+                        MathHelper.getRandomIntegerInRange(par2Random, 0, 2),
+                        i,
+                        1,
+                        var4,
+                        par3StructureBoundingBox);
                 }
             }
         }

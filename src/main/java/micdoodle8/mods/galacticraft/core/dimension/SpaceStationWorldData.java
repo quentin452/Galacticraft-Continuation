@@ -1,7 +1,11 @@
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import java.util.ArrayList;
-
+import micdoodle8.mods.galacticraft.api.galaxies.GalaxyRegistry;
+import micdoodle8.mods.galacticraft.api.galaxies.Satellite;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.GCLog;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,12 +14,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.DimensionManager;
 
-import micdoodle8.mods.galacticraft.api.galaxies.GalaxyRegistry;
-import micdoodle8.mods.galacticraft.api.galaxies.Satellite;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.GCLog;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import java.util.ArrayList;
 
 public class SpaceStationWorldData extends WorldSavedData {
 
@@ -103,7 +102,8 @@ public class SpaceStationWorldData extends WorldSavedData {
 
     @Override
     public void readFromNBT(NBTTagCompound nbttagcompound) {
-        this.owner = nbttagcompound.getString("owner").replace(".", "");
+        this.owner = nbttagcompound.getString("owner")
+            .replace(".", "");
         this.spaceStationName = nbttagcompound.getString("spaceStationName");
 
         if (nbttagcompound.hasKey("dataCompound")) {
@@ -116,8 +116,8 @@ public class SpaceStationWorldData extends WorldSavedData {
             this.homePlanet = nbttagcompound.getInteger("homePlanet");
         } else {
             GCLog.info(
-                    "Home planet data not found in space station save file for \"" + this.spaceStationName
-                            + "\". Using default overworld.");
+                "Home planet data not found in space station save file for \"" + this.spaceStationName
+                    + "\". Using default overworld.");
             this.homePlanet = 0; // Overworld dimension ID
         }
 
@@ -125,8 +125,8 @@ public class SpaceStationWorldData extends WorldSavedData {
             this.dimensionIdStatic = nbttagcompound.getInteger("dimensionIdStatic");
         } else {
             GCLog.info(
-                    "Static dimension ID not found in space station save file for \"" + this.spaceStationName
-                            + "\". Using default overworld.");
+                "Static dimension ID not found in space station save file for \"" + this.spaceStationName
+                    + "\". Using default overworld.");
             this.dimensionIdStatic = ConfigManagerCore.idDimensionOverworldOrbitStatic;
         }
 
@@ -134,8 +134,8 @@ public class SpaceStationWorldData extends WorldSavedData {
             this.dimensionIdDynamic = nbttagcompound.getInteger("dimensionIdDynamic");
         } else {
             GCLog.info(
-                    "Dynamic dimension ID not found in space station save file for \"" + this.spaceStationName
-                            + "\". Using default overworld.");
+                "Dynamic dimension ID not found in space station save file for \"" + this.spaceStationName
+                    + "\". Using default overworld.");
             this.dimensionIdDynamic = ConfigManagerCore.idDimensionOverworldOrbit;
         }
 
@@ -188,7 +188,7 @@ public class SpaceStationWorldData extends WorldSavedData {
      * Retrieve a space station data entry, creating if necessary (with provided data)
      */
     public static SpaceStationWorldData getStationData(World world, int stationID, int homeID, int providerIdDynamic,
-            int providerIdStatic, EntityPlayer owner) {
+        int providerIdStatic, EntityPlayer owner) {
         final int providerType = DimensionManager.getProviderType(stationID);
 
         boolean foundMatch = false;
@@ -196,7 +196,8 @@ public class SpaceStationWorldData extends WorldSavedData {
         // Loop through all registered satellites, checking for a provider ID match. If
         // none is found, this method is
         // being called on an incorrect
-        for (final Satellite satellite : GalaxyRegistry.getRegisteredSatellites().values()) {
+        for (final Satellite satellite : GalaxyRegistry.getRegisteredSatellites()
+            .values()) {
             if (satellite.getDimensionIdStatic() == providerType || satellite.getDimensionID() == providerType) {
                 foundMatch = true;
                 break;
@@ -208,7 +209,7 @@ public class SpaceStationWorldData extends WorldSavedData {
         }
         final String stationIdentifier = SpaceStationWorldData.getSpaceStationID(stationID);
         SpaceStationWorldData stationData = (SpaceStationWorldData) world
-                .loadItemData(SpaceStationWorldData.class, stationIdentifier);
+            .loadItemData(SpaceStationWorldData.class, stationIdentifier);
 
         if (stationData == null) {
             stationData = new SpaceStationWorldData(stationIdentifier);
@@ -216,13 +217,17 @@ public class SpaceStationWorldData extends WorldSavedData {
             stationData.dataCompound = new NBTTagCompound();
 
             if (owner != null) {
-                stationData.owner = owner.getGameProfile().getName().replace(".", "");
+                stationData.owner = owner.getGameProfile()
+                    .getName()
+                    .replace(".", "");
             }
 
             stationData.spaceStationName = "Station: " + stationData.owner;
 
             if (owner != null) {
-                stationData.allowedPlayers.add(owner.getGameProfile().getName());
+                stationData.allowedPlayers.add(
+                    owner.getGameProfile()
+                        .getName());
             }
 
             if (homeID == -1) {
@@ -239,7 +244,9 @@ public class SpaceStationWorldData extends WorldSavedData {
             stationData.markDirty();
         }
 
-        if (stationData.getSpaceStationName().replace(" ", "").isEmpty()) {
+        if (stationData.getSpaceStationName()
+            .replace(" ", "")
+            .isEmpty()) {
             stationData.setSpaceStationName("Station: " + stationData.owner);
             stationData.markDirty();
         }
@@ -260,19 +267,25 @@ public class SpaceStationWorldData extends WorldSavedData {
             var3.dataCompound = new NBTTagCompound();
 
             if (player != null) {
-                var3.owner = player.getGameProfile().getName().replace(".", "");
+                var3.owner = player.getGameProfile()
+                    .getName()
+                    .replace(".", "");
             }
 
             var3.spaceStationName = "Station: " + var3.owner;
 
             if (player != null) {
-                var3.allowedPlayers.add(player.getGameProfile().getName());
+                var3.allowedPlayers.add(
+                    player.getGameProfile()
+                        .getName());
             }
 
             var3.markDirty();
         }
 
-        if (var3.getSpaceStationName().replace(" ", "").isEmpty()) {
+        if (var3.getSpaceStationName()
+            .replace(" ", "")
+            .isEmpty()) {
             var3.setSpaceStationName("Station: " + var3.owner);
             var3.markDirty();
         }
@@ -285,7 +298,7 @@ public class SpaceStationWorldData extends WorldSavedData {
     }
 
     public static void updateSSOwnership(EntityPlayerMP player, String playerName, GCPlayerStats stats, int stationID,
-            SpaceStationWorldData stationData) {
+        SpaceStationWorldData stationData) {
         if (stationData == null) {
             stationData = SpaceStationWorldData.getMPSpaceStationData(null, stationID, null);
         }
@@ -294,9 +307,9 @@ public class SpaceStationWorldData extends WorldSavedData {
             // This player is the owner of the station - ensure stats data matches
             if (!stats.spaceStationDimensionData.containsValue(stationID)) {
                 GCLog.debug(
-                        "Player owns station: " + stationData.getSpaceStationName()
-                                + " with home planet "
-                                + stationData.getHomePlanet());
+                    "Player owns station: " + stationData.getSpaceStationName()
+                        + " with home planet "
+                        + stationData.getHomePlanet());
                 stats.spaceStationDimensionData.put(stationData.getHomePlanet(), stationID);
             }
         } else {
@@ -304,16 +317,18 @@ public class SpaceStationWorldData extends WorldSavedData {
             final Integer savedOwned = stats.spaceStationDimensionData.get(stationData.getHomePlanet());
             if (savedOwned != null && savedOwned == stationID) {
                 GCLog.debug(
-                        "Player does not own station: " + stationData.getSpaceStationName()
-                                + " with home planet "
-                                + stationData.getHomePlanet());
+                    "Player does not own station: " + stationData.getSpaceStationName()
+                        + " with home planet "
+                        + stationData.getHomePlanet());
                 stats.spaceStationDimensionData.remove(savedOwned);
             }
         }
     }
 
     public static void checkAllStations(EntityPlayerMP thePlayer, GCPlayerStats stats) {
-        final String name = thePlayer.getGameProfile().getName().replace(".", "");
+        final String name = thePlayer.getGameProfile()
+            .getName()
+            .replace(".", "");
         for (final int id : WorldUtil.registeredSpaceStations.keySet()) {
             SpaceStationWorldData.updateSSOwnership(thePlayer, name, stats, id, null);
         }

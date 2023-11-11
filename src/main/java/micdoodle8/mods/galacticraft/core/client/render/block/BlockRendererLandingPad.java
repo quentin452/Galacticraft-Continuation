@@ -1,5 +1,7 @@
 package micdoodle8.mods.galacticraft.core.client.render.block;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import micdoodle8.mods.galacticraft.api.tile.IFuelDock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHopper;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -8,11 +10,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import micdoodle8.mods.galacticraft.api.tile.IFuelDock;
 
 public class BlockRendererLandingPad implements ISimpleBlockRenderingHandler {
 
@@ -24,7 +22,7 @@ public class BlockRendererLandingPad implements ISimpleBlockRenderingHandler {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess var1, int var2, int var3, int var4, Block var5, int var6,
-            RenderBlocks var7) {
+        RenderBlocks var7) {
         this.renderBlockLandingPad(var7, var5, var1, var2, var3, var4);
         return true;
     }
@@ -76,7 +74,7 @@ public class BlockRendererLandingPad implements ISimpleBlockRenderingHandler {
     }
 
     public void renderBlockLandingPad(RenderBlocks renderBlocks, Block par1Block, IBlockAccess var1, int par2, int par3,
-            int par4) {
+        int par4) {
         renderBlocks.setRenderBounds(-1F, 0F, -1F, 2F, 0.2F, 2F);
         renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
 

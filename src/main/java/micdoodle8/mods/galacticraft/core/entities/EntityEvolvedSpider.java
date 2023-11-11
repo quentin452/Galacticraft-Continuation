@@ -1,5 +1,9 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
+import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntitySpider;
@@ -12,11 +16,6 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
-import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
-
 public class EntityEvolvedSpider extends EntitySpider implements IEntityBreathable {
 
     public EntityEvolvedSpider(World par1World) {
@@ -27,11 +26,12 @@ public class EntityEvolvedSpider extends EntitySpider implements IEntityBreathab
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(22.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
+            .setBaseValue(22.0D);
         this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
-                .setBaseValue(ConfigManagerCore.hardMode ? 1.2F : 1.0F);
+            .setBaseValue(ConfigManagerCore.hardMode ? 1.2F : 1.0F);
         this.getEntityAttribute(SharedMonsterAttributes.attackDamage)
-                .setBaseValue(ConfigManagerCore.hardMode ? 4.0D : 2.0D);
+            .setBaseValue(ConfigManagerCore.hardMode ? 4.0D : 2.0D);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class EntityEvolvedSpider extends EntitySpider implements IEntityBreathab
             livingData = new EntityEvolvedSpider.GroupData();
 
             if (this.worldObj.difficultySetting == EnumDifficulty.HARD && this.worldObj.rand.nextFloat()
-                    < 0.1F * this.worldObj.func_147462_b(this.posX, this.posY, this.posZ)) {
+                < 0.1F * this.worldObj.func_147462_b(this.posX, this.posY, this.posZ)) {
                 ((EntityEvolvedSpider.GroupData) livingData).func_111104_a(this.worldObj.rand);
             }
         }
@@ -82,7 +82,8 @@ public class EntityEvolvedSpider extends EntitySpider implements IEntityBreathab
         }
 
         if (this.isPotionActive(Potion.jump)) {
-            this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
+            this.motionY += (this.getActivePotionEffect(Potion.jump)
+                .getAmplifier() + 1) * 0.1F;
         }
 
         if (this.isSprinting()) {

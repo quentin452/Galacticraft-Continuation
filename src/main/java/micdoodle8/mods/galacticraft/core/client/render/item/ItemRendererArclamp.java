@@ -1,15 +1,13 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityArclampRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.model.obj.WavefrontObject;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityArclampRenderer;
 
 public class ItemRendererArclamp implements IItemRenderer {
 
@@ -36,11 +34,17 @@ public class ItemRendererArclamp implements IItemRenderer {
 
         GL11.glScalef(0.07F, 0.07F, 0.07F);
         GL11.glRotatef(90, 0, 0, -1);
-        FMLClientHandler.instance().getClient().getTextureManager().bindTexture(TileEntityArclampRenderer.lampTexture);
+        FMLClientHandler.instance()
+            .getClient()
+            .getTextureManager()
+            .bindTexture(TileEntityArclampRenderer.lampTexture);
         TileEntityArclampRenderer.lampMetal.renderAll();
 
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
-        FMLClientHandler.instance().getClient().getTextureManager().bindTexture(TileEntityArclampRenderer.lightTexture);
+        FMLClientHandler.instance()
+            .getClient()
+            .getTextureManager()
+            .bindTexture(TileEntityArclampRenderer.lightTexture);
         final Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawing(GL11.GL_QUADS);
         tessellator.setColorRGBA(255, 255, 255, 255);

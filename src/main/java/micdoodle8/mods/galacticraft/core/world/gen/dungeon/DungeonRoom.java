@@ -1,10 +1,10 @@
 package micdoodle8.mods.galacticraft.core.world.gen.dungeon;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.Random;
 
 public abstract class DungeonRoom {
 
@@ -38,21 +38,24 @@ public abstract class DungeonRoom {
     protected abstract void handleTileEntities(Random rand);
 
     public static DungeonRoom makeRoom(MapGenDungeon dungeon, Random rand, int x, int y, int z, ForgeDirection dir) {
-        return dungeon.otherRooms.get(rand.nextInt(dungeon.otherRooms.size())).makeRoom(dungeon, x, y, z, dir);
+        return dungeon.otherRooms.get(rand.nextInt(dungeon.otherRooms.size()))
+            .makeRoom(dungeon, x, y, z, dir);
     }
 
     public static DungeonRoom makeBossRoom(MapGenDungeon dungeon, Random rand, int x, int y, int z,
-            ForgeDirection dir) {
-        return dungeon.bossRooms.get(rand.nextInt(dungeon.bossRooms.size())).makeRoom(dungeon, x, y, z, dir);
+        ForgeDirection dir) {
+        return dungeon.bossRooms.get(rand.nextInt(dungeon.bossRooms.size()))
+            .makeRoom(dungeon, x, y, z, dir);
     }
 
     public static DungeonRoom makeTreasureRoom(MapGenDungeon dungeon, Random rand, int x, int y, int z,
-            ForgeDirection dir) {
-        return dungeon.treasureRooms.get(rand.nextInt(dungeon.treasureRooms.size())).makeRoom(dungeon, x, y, z, dir);
+        ForgeDirection dir) {
+        return dungeon.treasureRooms.get(rand.nextInt(dungeon.treasureRooms.size()))
+            .makeRoom(dungeon, x, y, z, dir);
     }
 
     protected boolean placeBlock(Block[] blocks, byte[] metas, int x, int y, int z, int cx, int cz, Block id,
-            int meta) {
+        int meta) {
         if (MapGenDungeon.useArrays) {
             cx *= 16;
             cz *= 16;

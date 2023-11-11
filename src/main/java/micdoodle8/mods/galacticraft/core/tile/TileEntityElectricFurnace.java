@@ -1,15 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.nbt.NBTTagCompound;
-
 import cpw.mods.fml.relauncher.Side;
 import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
 import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
@@ -18,6 +8,15 @@ import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlockWithIn
 import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.nbt.NBTTagCompound;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class TileEntityElectricFurnace extends TileBaseElectricBlockWithInventory implements ISidedInventory {
     // The electric furnace is 50% faster than a vanilla Furnace
@@ -97,9 +96,9 @@ public class TileEntityElectricFurnace extends TileBaseElectricBlockWithInventor
                 } else // Apply a "cooling down" process if the electric furnace runs out of energy
                        // while smelting
                     if (this.processTicks > 0 && this.processTicks < this.processTimeRequired
-                            && this.worldObj.rand.nextInt(4) == 0) {
-                                this.processTicks++;
-                            }
+                        && this.worldObj.rand.nextInt(4) == 0) {
+                            this.processTicks++;
+                        }
             } else {
                 this.processTicks = 0;
             }
@@ -110,14 +109,15 @@ public class TileEntityElectricFurnace extends TileBaseElectricBlockWithInventor
      * @return Is this machine able to process its specific task?
      */
     public boolean canProcess() {
-        if (this.containingItems[1] == null
-                || FurnaceRecipes.smelting().getSmeltingResult(this.containingItems[1]) == null) {
+        if (this.containingItems[1] == null || FurnaceRecipes.smelting()
+            .getSmeltingResult(this.containingItems[1]) == null) {
             return false;
         }
 
         if (this.containingItems[2] != null) {
-            if (!this.containingItems[2]
-                    .isItemEqual(FurnaceRecipes.smelting().getSmeltingResult(this.containingItems[1]))) {
+            if (!this.containingItems[2].isItemEqual(
+                FurnaceRecipes.smelting()
+                    .getSmeltingResult(this.containingItems[1]))) {
                 return false;
             }
 
@@ -132,29 +132,36 @@ public class TileEntityElectricFurnace extends TileBaseElectricBlockWithInventor
      */
     public void smeltItem() {
         if (this.canProcess()) {
-            final ItemStack resultItemStack = FurnaceRecipes.smelting().getSmeltingResult(this.containingItems[1]);
+            final ItemStack resultItemStack = FurnaceRecipes.smelting()
+                .getSmeltingResult(this.containingItems[1]);
 
             if (this.containingItems[2] == null) {
                 this.containingItems[2] = resultItemStack.copy();
                 if (this.tierGC > 1) {
-                    final String nameSmelted = this.containingItems[1].getUnlocalizedName().toLowerCase();
-                    if (resultItemStack.getUnlocalizedName().toLowerCase().contains("ingot")
-                            && (nameSmelted.contains("ore") || nameSmelted.contains("raw")
-                                    || nameSmelted.contains("moon")
-                                    || nameSmelted.contains("mars")
-                                    || nameSmelted.contains("shard"))) {
+                    final String nameSmelted = this.containingItems[1].getUnlocalizedName()
+                        .toLowerCase();
+                    if (resultItemStack.getUnlocalizedName()
+                        .toLowerCase()
+                        .contains("ingot")
+                        && (nameSmelted.contains("ore") || nameSmelted.contains("raw")
+                            || nameSmelted.contains("moon")
+                            || nameSmelted.contains("mars")
+                            || nameSmelted.contains("shard"))) {
                         this.containingItems[2].stackSize += resultItemStack.stackSize;
                     }
                 }
             } else if (this.containingItems[2].isItemEqual(resultItemStack)) {
                 this.containingItems[2].stackSize += resultItemStack.stackSize;
                 if (this.tierGC > 1) {
-                    final String nameSmelted = this.containingItems[1].getUnlocalizedName().toLowerCase();
-                    if (resultItemStack.getUnlocalizedName().toLowerCase().contains("ingot")
-                            && (nameSmelted.contains("ore") || nameSmelted.contains("raw")
-                                    || nameSmelted.contains("moon")
-                                    || nameSmelted.contains("mars")
-                                    || nameSmelted.contains("shard"))) {
+                    final String nameSmelted = this.containingItems[1].getUnlocalizedName()
+                        .toLowerCase();
+                    if (resultItemStack.getUnlocalizedName()
+                        .toLowerCase()
+                        .contains("ingot")
+                        && (nameSmelted.contains("ore") || nameSmelted.contains("raw")
+                            || nameSmelted.contains("moon")
+                            || nameSmelted.contains("mars")
+                            || nameSmelted.contains("shard"))) {
                         this.containingItems[2].stackSize += resultItemStack.stackSize;
                     }
                 }
@@ -214,8 +221,8 @@ public class TileEntityElectricFurnace extends TileBaseElectricBlockWithInventor
         if (itemStack == null) {
             return false;
         }
-        return slotID == 1 ? FurnaceRecipes.smelting().getSmeltingResult(itemStack) != null
-                : slotID == 0 && ItemElectricBase.isElectricItem(itemStack.getItem());
+        return slotID == 1 ? FurnaceRecipes.smelting()
+            .getSmeltingResult(itemStack) != null : slotID == 0 && ItemElectricBase.isElectricItem(itemStack.getItem());
     }
 
     @Override

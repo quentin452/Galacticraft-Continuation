@@ -1,17 +1,12 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-import java.util.UUID;
-
+import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.VersionUtil;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackOnCollide;
-import net.minecraft.entity.ai.EntityAIAvoidEntity;
-import net.minecraft.entity.ai.EntityAICreeperSwell;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
+import net.minecraft.entity.ai.*;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityCreeper;
@@ -27,11 +22,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
-import micdoodle8.mods.galacticraft.api.entity.IEntityBreathable;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.VersionUtil;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
+import java.util.UUID;
 
 public class EntityEvolvedCreeper extends EntityCreeper implements IEntityBreathable {
 
@@ -39,10 +30,10 @@ public class EntityEvolvedCreeper extends EntityCreeper implements IEntityBreath
     private float sizeYBase;
     private static final UUID babySpeedBoostUUID = UUID.fromString("ef67a435-32a4-4efd-b218-e7431438b109");
     private static final AttributeModifier babySpeedBoostModifier = new AttributeModifier(
-            babySpeedBoostUUID,
-            "Baby speed boost evolved creeper",
-            0.5D,
-            1);
+        babySpeedBoostUUID,
+        "Baby speed boost evolved creeper",
+        0.5D,
+        1);
 
     public EntityEvolvedCreeper(World par1World) {
         super(par1World);
@@ -62,14 +53,17 @@ public class EntityEvolvedCreeper extends EntityCreeper implements IEntityBreath
     @Override
     protected void entityInit() {
         super.entityInit();
-        this.getDataWatcher().addObject(12, Byte.valueOf((byte) 0));
+        this.getDataWatcher()
+            .addObject(12, Byte.valueOf((byte) 0));
     }
 
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(25.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(1.0F);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
+            .setBaseValue(25.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
+            .setBaseValue(1.0F);
     }
 
     @Override
@@ -117,7 +111,8 @@ public class EntityEvolvedCreeper extends EntityCreeper implements IEntityBreath
 
     @Override
     public boolean isChild() {
-        return this.getDataWatcher().getWatchableObjectByte(12) == 1;
+        return this.getDataWatcher()
+            .getWatchableObjectByte(12) == 1;
     }
 
     @Override
@@ -130,11 +125,12 @@ public class EntityEvolvedCreeper extends EntityCreeper implements IEntityBreath
     }
 
     public void setChild(boolean isChild) {
-        this.getDataWatcher().updateObject(12, Byte.valueOf((byte) (isChild ? 1 : 0)));
+        this.getDataWatcher()
+            .updateObject(12, Byte.valueOf((byte) (isChild ? 1 : 0)));
 
         if (this.worldObj != null && !this.worldObj.isRemote) {
             final IAttributeInstance iattributeinstance = this
-                    .getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+                .getEntityAttribute(SharedMonsterAttributes.movementSpeed);
             iattributeinstance.removeModifier(babySpeedBoostModifier);
 
             if (isChild) {
@@ -153,7 +149,8 @@ public class EntityEvolvedCreeper extends EntityCreeper implements IEntityBreath
         }
 
         if (this.isPotionActive(Potion.jump)) {
-            this.motionY += (this.getActivePotionEffect(Potion.jump).getAmplifier() + 1) * 0.1F;
+            this.motionY += (this.getActivePotionEffect(Potion.jump)
+                .getAmplifier() + 1) * 0.1F;
         }
 
         if (this.isSprinting()) {

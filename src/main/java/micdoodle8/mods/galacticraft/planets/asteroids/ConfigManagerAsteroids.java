@@ -1,15 +1,13 @@
 package micdoodle8.mods.galacticraft.planets.asteroids;
 
-import java.io.File;
-
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-
-import org.apache.logging.log4j.Level;
-
 import cpw.mods.fml.common.FMLLog;
 import micdoodle8.mods.galacticraft.core.Constants;
 import micdoodle8.mods.galacticraft.planets.mars.ConfigManagerMars;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+import org.apache.logging.log4j.Level;
+
+import java.io.File;
 
 public class ConfigManagerAsteroids {
 
@@ -58,10 +56,11 @@ public class ConfigManagerAsteroids {
 
             prop = config.get(Constants.CONFIG_CATEGORY_DIMENSIONS, "dimensionIDAsteroids", -30);
             prop.comment = "Dimension ID for Asteroids";
-            prop.setLanguageKey("gc.configgui.dimensionIDAsteroids").setRequiresMcRestart(true);
+            prop.setLanguageKey("gc.configgui.dimensionIDAsteroids")
+                .setRequiresMcRestart(true);
             if (update) {
                 propCopy = ConfigManagerMars.config
-                        .get(Constants.CONFIG_CATEGORY_DIMENSIONS, prop.getName(), prop.getInt(), prop.comment);
+                    .get(Constants.CONFIG_CATEGORY_DIMENSIONS, prop.getName(), prop.getInt(), prop.comment);
                 propCopy.setLanguageKey(prop.getLanguageKey());
                 propCopy.setRequiresMcRestart(prop.requiresMcRestart());
             }
@@ -74,7 +73,7 @@ public class ConfigManagerAsteroids {
             prop.setLanguageKey("gc.configgui.idSchematicRocketT3");
             if (update) {
                 propCopy = ConfigManagerMars.config
-                        .get(Constants.CONFIG_CATEGORY_SCHEMATIC, prop.getName(), prop.getInt(), prop.comment);
+                    .get(Constants.CONFIG_CATEGORY_SCHEMATIC, prop.getName(), prop.getInt(), prop.comment);
                 propCopy.setLanguageKey(prop.getLanguageKey());
             }
             idSchematicRocketT3 = prop.getInt(4);
@@ -84,7 +83,7 @@ public class ConfigManagerAsteroids {
             prop.setLanguageKey("gc.configgui.disableGalacticraftHelium");
             if (update) {
                 propCopy = ConfigManagerMars.config
-                        .get(Constants.CONFIG_CATEGORY_GENERAL, prop.getName(), prop.getBoolean(), prop.comment);
+                    .get(Constants.CONFIG_CATEGORY_GENERAL, prop.getName(), prop.getBoolean(), prop.comment);
                 propCopy.setLanguageKey(prop.getLanguageKey());
             }
             disableGalacticraftHelium = prop.getBoolean(false);
@@ -95,49 +94,49 @@ public class ConfigManagerAsteroids {
             prop.setLanguageKey("gc.configgui.astroMinersMax");
             if (update) {
                 propCopy = ConfigManagerMars.config
-                        .get(Constants.CONFIG_CATEGORY_GENERAL, prop.getName(), prop.getInt(), prop.comment);
+                    .get(Constants.CONFIG_CATEGORY_GENERAL, prop.getName(), prop.getInt(), prop.comment);
                 propCopy.setLanguageKey(prop.getLanguageKey());
             }
             astroMinerMax = prop.getInt(6);
             ConfigManagerMars.propOrder.add(prop.getName());
 
             prop = config.get(
-                    update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
-                    "Disable Iron Ore Gen on Asteroids",
-                    false);
+                update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
+                "Disable Iron Ore Gen on Asteroids",
+                false);
             prop.comment = "Disable Iron Ore Gen on Asteroids.";
             prop.setLanguageKey("gc.configgui.disableIronGenAsteroids");
             if (update) {
                 propCopy = ConfigManagerMars.config
-                        .get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
+                    .get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
                 propCopy.setLanguageKey(prop.getLanguageKey());
             }
             disableIronGen = prop.getBoolean(false);
             ConfigManagerMars.propOrder.add(prop.getName());
 
             prop = config.get(
-                    update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
-                    "Disable Aluminum Ore Gen on Asteroids",
-                    false);
+                update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
+                "Disable Aluminum Ore Gen on Asteroids",
+                false);
             prop.comment = "Disable Aluminum Ore Gen on Asteroids.";
             prop.setLanguageKey("gc.configgui.disableAluminumGenAsteroids");
             if (update) {
                 propCopy = ConfigManagerMars.config
-                        .get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
+                    .get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
                 propCopy.setLanguageKey(prop.getLanguageKey());
             }
             disableAluminumGen = prop.getBoolean(false);
             ConfigManagerMars.propOrder.add(prop.getName());
 
             prop = config.get(
-                    update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
-                    "Disable Ilmenite Ore Gen on Asteroids",
-                    false);
+                update ? Constants.CONFIG_CATEGORY_GENERAL : Constants.CONFIG_CATEGORY_WORLDGEN,
+                "Disable Ilmenite Ore Gen on Asteroids",
+                false);
             prop.comment = "Disable Ilmenite Ore Gen on Asteroids.";
             prop.setLanguageKey("gc.configgui.disableIlmeniteGenAsteroids");
             if (update) {
                 propCopy = ConfigManagerMars.config
-                        .get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
+                    .get(Constants.CONFIG_CATEGORY_WORLDGEN, prop.getName(), prop.getBoolean(), prop.comment);
                 propCopy.setLanguageKey(prop.getLanguageKey());
             }
             disableIlmeniteGen = prop.getBoolean(false);
@@ -145,7 +144,7 @@ public class ConfigManagerAsteroids {
 
             if (load) {
                 ConfigManagerMars.config
-                        .setCategoryPropertyOrder(Constants.CONFIG_CATEGORY_WORLDGEN, ConfigManagerMars.propOrder);
+                    .setCategoryPropertyOrder(Constants.CONFIG_CATEGORY_WORLDGEN, ConfigManagerMars.propOrder);
             }
 
             // Always save - this is last to be called both at load time and at mid-game

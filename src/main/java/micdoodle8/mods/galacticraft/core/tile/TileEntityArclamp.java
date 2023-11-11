@@ -1,9 +1,11 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+import micdoodle8.mods.galacticraft.core.util.RedstoneUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.entity.Entity;
@@ -19,12 +21,9 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
-import micdoodle8.mods.galacticraft.core.util.RedstoneUtil;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class TileEntityArclamp extends TileEntity {
 
@@ -49,10 +48,10 @@ public class TileEntityArclamp extends TileEntity {
         boolean initialLight = false;
         if (this.updateClientFlag) {
             GalacticraftCore.packetPipeline.sendToDimension(
-                    new PacketSimple(
-                            EnumSimplePacket.C_UPDATE_ARCLAMP_FACING,
-                            new Object[] { this.xCoord, this.yCoord, this.zCoord, this.facing }),
-                    this.worldObj.provider.dimensionId);
+                new PacketSimple(
+                    EnumSimplePacket.C_UPDATE_ARCLAMP_FACING,
+                    new Object[] { this.xCoord, this.yCoord, this.zCoord, this.facing }),
+                this.worldObj.provider.dimensionId);
             this.updateClientFlag = false;
         }
 
@@ -77,23 +76,23 @@ public class TileEntityArclamp extends TileEntity {
                         this.sideRear = side; // Down
                         this.facingSide = this.facing + 2;
                         this.thisAABB = AxisAlignedBB.getBoundingBox(
-                                this.xCoord - 20,
-                                this.yCoord - 8,
-                                this.zCoord - 20,
-                                this.xCoord + 20,
-                                this.yCoord + 20,
-                                this.zCoord + 20);
+                            this.xCoord - 20,
+                            this.yCoord - 8,
+                            this.zCoord - 20,
+                            this.xCoord + 20,
+                            this.yCoord + 20,
+                            this.zCoord + 20);
                         break;
                     case 1:
                         this.sideRear = side; // Up
                         this.facingSide = this.facing + 2;
                         this.thisAABB = AxisAlignedBB.getBoundingBox(
-                                this.xCoord - 20,
-                                this.yCoord - 20,
-                                this.zCoord - 20,
-                                this.xCoord + 20,
-                                this.yCoord + 8,
-                                this.zCoord + 20);
+                            this.xCoord - 20,
+                            this.yCoord - 20,
+                            this.zCoord - 20,
+                            this.xCoord + 20,
+                            this.yCoord + 8,
+                            this.zCoord + 20);
                         break;
                     case 2:
                         this.sideRear = side; // North
@@ -102,12 +101,12 @@ public class TileEntityArclamp extends TileEntity {
                             this.facingSide = 7 - this.facing;
                         }
                         this.thisAABB = AxisAlignedBB.getBoundingBox(
-                                this.xCoord - 20,
-                                this.yCoord - 20,
-                                this.zCoord - 8,
-                                this.xCoord + 20,
-                                this.yCoord + 20,
-                                this.zCoord + 20);
+                            this.xCoord - 20,
+                            this.yCoord - 20,
+                            this.zCoord - 8,
+                            this.xCoord + 20,
+                            this.yCoord + 20,
+                            this.zCoord + 20);
                         break;
                     case 3:
                         this.sideRear = side; // South
@@ -116,23 +115,23 @@ public class TileEntityArclamp extends TileEntity {
                             this.facingSide += 2;
                         }
                         this.thisAABB = AxisAlignedBB.getBoundingBox(
-                                this.xCoord - 20,
-                                this.yCoord - 20,
-                                this.zCoord - 20,
-                                this.xCoord + 20,
-                                this.yCoord + 20,
-                                this.zCoord + 8);
+                            this.xCoord - 20,
+                            this.yCoord - 20,
+                            this.zCoord - 20,
+                            this.xCoord + 20,
+                            this.yCoord + 20,
+                            this.zCoord + 8);
                         break;
                     case 4:
                         this.sideRear = side; // West
                         this.facingSide = this.facing;
                         this.thisAABB = AxisAlignedBB.getBoundingBox(
-                                this.xCoord - 8,
-                                this.yCoord - 20,
-                                this.zCoord - 20,
-                                this.xCoord + 20,
-                                this.yCoord + 20,
-                                this.zCoord + 20);
+                            this.xCoord - 8,
+                            this.yCoord - 20,
+                            this.zCoord - 20,
+                            this.xCoord + 20,
+                            this.yCoord + 20,
+                            this.zCoord + 20);
                         break;
                     case 5:
                         this.sideRear = side; // East
@@ -141,12 +140,12 @@ public class TileEntityArclamp extends TileEntity {
                             this.facingSide = 5 - this.facing;
                         }
                         this.thisAABB = AxisAlignedBB.getBoundingBox(
-                                this.xCoord - 20,
-                                this.yCoord - 20,
-                                this.zCoord - 20,
-                                this.xCoord + 8,
-                                this.yCoord + 20,
-                                this.zCoord + 20);
+                            this.xCoord - 20,
+                            this.yCoord - 20,
+                            this.zCoord - 20,
+                            this.xCoord + 8,
+                            this.yCoord + 20,
+                            this.zCoord + 20);
                         break;
                     default:
                         return;
@@ -159,7 +158,7 @@ public class TileEntityArclamp extends TileEntity {
 
             if (this.worldObj.rand.nextInt(20) == 0) {
                 final List<Entity> moblist = this.worldObj
-                        .getEntitiesWithinAABBExcludingEntity(null, this.thisAABB, IMob.mobSelector);
+                    .getEntitiesWithinAABBExcludingEntity(null, this.thisAABB, IMob.mobSelector);
 
                 if (!moblist.isEmpty()) {
                     for (final Entity entry : moblist) {
@@ -168,7 +167,7 @@ public class TileEntityArclamp extends TileEntity {
                         }
                         EntityCreature e = (EntityCreature) entry;
                         final Vec3 vecNewTarget = RandomPositionGenerator
-                                .findRandomTargetBlockAwayFrom(e, 16, 7, this.thisPos);
+                            .findRandomTargetBlockAwayFrom(e, 16, 7, this.thisPos);
                         if (vecNewTarget == null) {
                             continue;
                         }
@@ -177,16 +176,18 @@ public class TileEntityArclamp extends TileEntity {
                             continue;
                         }
                         Vec3 vecOldTarget = null;
-                        if (nav.getPath() != null && !nav.getPath().isFinished()) {
-                            vecOldTarget = nav.getPath().getPosition(e);
+                        if (nav.getPath() != null && !nav.getPath()
+                            .isFinished()) {
+                            vecOldTarget = nav.getPath()
+                                .getPosition(e);
                         }
                         final double distanceNew = vecNewTarget.squareDistanceTo(this.xCoord, this.yCoord, this.zCoord);
 
                         if (distanceNew > e.getDistanceSq(this.xCoord, this.yCoord, this.zCoord)
-                                && (vecOldTarget == null || distanceNew
-                                        > vecOldTarget.squareDistanceTo(this.xCoord, this.yCoord, this.zCoord))) {
+                            && (vecOldTarget == null || distanceNew
+                                > vecOldTarget.squareDistanceTo(this.xCoord, this.yCoord, this.zCoord))) {
                             e.getNavigator()
-                                    .tryMoveToXYZ(vecNewTarget.xCoord, vecNewTarget.yCoord, vecNewTarget.zCoord, 0.3D);
+                                .tryMoveToXYZ(vecNewTarget.xCoord, vecNewTarget.yCoord, vecNewTarget.zCoord, 0.3D);
                             // System.out.println("Debug: Arclamp repelling entity:
                             // "+e.getClass().getSimpleName());
                         }
@@ -206,9 +207,9 @@ public class TileEntityArclamp extends TileEntity {
         this.thisAABB = null;
         if (this.worldObj.isRemote) {
             GalacticraftCore.packetPipeline.sendToServer(
-                    new PacketSimple(
-                            EnumSimplePacket.S_REQUEST_ARCLAMP_FACING,
-                            new Object[] { this.xCoord, this.yCoord, this.zCoord }));
+                new PacketSimple(
+                    EnumSimplePacket.S_REQUEST_ARCLAMP_FACING,
+                    new Object[] { this.xCoord, this.yCoord, this.zCoord }));
         } else {
             this.isActive = true;
         }
@@ -246,7 +247,8 @@ public class TileEntityArclamp extends TileEntity {
         }
         BlockVec3 inFront = new BlockVec3(this);
         for (int i = 0; i < 5; i++) {
-            inFront = inFront.newVecSide(this.facingSide).newVecSide(sideskip1 ^ 1);
+            inFront = inFront.newVecSide(this.facingSide)
+                .newVecSide(sideskip1 ^ 1);
             final Block b = inFront.getBlockIDsafe_noChunkLoad(world);
             if (b != null && b.getLightOpacity() < 15) {
                 currentLayer.add(inFront);
@@ -277,8 +279,8 @@ public class TileEntityArclamp extends TileEntity {
                             } else {
                                 allAir = false;
                                 if (b != null && b.getLightOpacity(world, sideVec.x, sideVec.y, sideVec.z) == 0
-                                        && side != sideskip1
-                                        && side != sideskip2) {
+                                    && side != sideskip1
+                                    && side != sideskip2) {
                                     nextLayer.add(sideVec);
                                 }
                             }
@@ -351,10 +353,10 @@ public class TileEntityArclamp extends TileEntity {
         }
 
         GalacticraftCore.packetPipeline.sendToDimension(
-                new PacketSimple(
-                        EnumSimplePacket.C_UPDATE_ARCLAMP_FACING,
-                        new Object[] { this.xCoord, this.yCoord, this.zCoord, this.facing }),
-                this.worldObj.provider.dimensionId);
+            new PacketSimple(
+                EnumSimplePacket.C_UPDATE_ARCLAMP_FACING,
+                new Object[] { this.xCoord, this.yCoord, this.zCoord, this.facing }),
+            this.worldObj.provider.dimensionId);
         this.thisAABB = null;
         this.revertAir();
         this.markDirty();

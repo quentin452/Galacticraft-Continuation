@@ -1,22 +1,5 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import appeng.api.AEApi;
 import appeng.api.parts.IPartHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -30,9 +13,25 @@ import micdoodle8.mods.galacticraft.core.tile.TileEntityAluminumWire;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenPipe;
 import micdoodle8.mods.galacticraft.core.util.CompatibilityManager;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.List;
 
 public class BlockEnclosed extends BlockContainer
-        implements IPartialSealableBlock, ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
+    implements IPartialSealableBlock, ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
 
     private IIcon[] enclosedIcons;
     public static Item[] pipeItemsBC = new Item[6];
@@ -144,8 +143,10 @@ public class BlockEnclosed extends BlockContainer
             try {
                 final Class<?> clazzBC = Class.forName("buildcraft.BuildCraftTransport");
                 String pipeName = EnumEnclosedBlock.values()[i + 7].getPipeType();
-                pipeName = pipeName.substring(0, 1).toLowerCase() + pipeName.substring(1);
-                pipeItemsBC[i] = (Item) clazzBC.getField(pipeName).get(null);
+                pipeName = pipeName.substring(0, 1)
+                    .toLowerCase() + pipeName.substring(1);
+                pipeItemsBC[i] = (Item) clazzBC.getField(pipeName)
+                    .get(null);
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -186,11 +187,11 @@ public class BlockEnclosed extends BlockContainer
 
         for (int i = 0; i < EnumEnclosedBlock.values().length; i++) {
             this.enclosedIcons[EnumEnclosedBlock.values()[i].getMetadata()] = par1IconRegister
-                    .registerIcon(GalacticraftCore.TEXTURE_PREFIX + EnumEnclosedBlock.values()[i].getTexture());
+                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + EnumEnclosedBlock.values()[i].getTexture());
         }
 
         this.blockIcon = par1IconRegister
-                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "" + EnumEnclosedBlock.OXYGEN_PIPE.getTexture());
+            .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "" + EnumEnclosedBlock.OXYGEN_PIPE.getTexture());
     }
 
     @Override
@@ -232,12 +233,12 @@ public class BlockEnclosed extends BlockContainer
                 world.markBlockForUpdate(x, y, z);
             }
         } else if (metadata <= EnumEnclosedBlock.ALUMINUM_WIRE.getMetadata()
-                || metadata <= EnumEnclosedBlock.ALUMINUM_WIRE_HEAVY.getMetadata()) {
-                    super.onNeighborBlockChange(world, x, y, z, block);
-                    if (tileEntity instanceof IConductor) {
-                        ((IConductor) tileEntity).refresh();
-                    }
+            || metadata <= EnumEnclosedBlock.ALUMINUM_WIRE_HEAVY.getMetadata()) {
+                super.onNeighborBlockChange(world, x, y, z, block);
+                if (tileEntity instanceof IConductor) {
+                    ((IConductor) tileEntity).refresh();
                 }
+            }
     }
 
     @Override
@@ -263,8 +264,9 @@ public class BlockEnclosed extends BlockContainer
 
                     constructor.setAccessible(true);
 
-                    return (TileEntity) constructor
-                            .newInstance((short) BlockEnclosed.getTypeFromMeta(metadata).getSubMetaValue());
+                    return (TileEntity) constructor.newInstance(
+                        (short) BlockEnclosed.getTypeFromMeta(metadata)
+                            .getSubMetaValue());
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
@@ -281,14 +283,16 @@ public class BlockEnclosed extends BlockContainer
             if (CompatibilityManager.isAppEngLoaded()) {
                 // Api.INSTANCE.partHelper().getCombinedInstance( TileCableBus.class.getName() )
                 try {
-                    final IPartHelper apiPart = AEApi.instance().partHelper();
+                    final IPartHelper apiPart = AEApi.instance()
+                        .partHelper();
                     final Class<?> clazzApiPart = Class.forName("appeng.core.api.ApiPart");
                     @SuppressWarnings("unchecked")
                     final Class<? extends TileEntity> clazz = (Class<? extends TileEntity>) clazzApiPart
-                            .getDeclaredMethod("getCombinedInstance", String.class)
-                            .invoke(apiPart, "appeng.tile.networking.TileCableBus");
+                        .getDeclaredMethod("getCombinedInstance", String.class)
+                        .invoke(apiPart, "appeng.tile.networking.TileCableBus");
                     // Needs to be: appeng.parts.layers.LayerITileStorageMonitorable_TileCableBus
-                    return clazz.getConstructor().newInstance();
+                    return clazz.getConstructor()
+                        .newInstance();
                 } catch (final Exception e) {
                     e.printStackTrace();
                 }
@@ -320,7 +324,7 @@ public class BlockEnclosed extends BlockContainer
     @Override
     public void onPostBlockPlaced(World world, int x, int y, int z, int metadata) {
         if (metadata >= EnumEnclosedBlock.BC_ITEM_STONEPIPE.getMetadata()
-                && metadata <= EnumEnclosedBlock.BC_POWER_GOLDPIPE.getMetadata()) {
+            && metadata <= EnumEnclosedBlock.BC_POWER_GOLDPIPE.getMetadata()) {
             final EnumEnclosedBlock type = BlockEnclosed.getTypeFromMeta(metadata);
             if (CompatibilityManager.isBCraftTransportLoaded() && type != null && type.getPipeType() != null) {
                 BlockEnclosed.initialiseBCPipe(world, x, y, z, metadata);

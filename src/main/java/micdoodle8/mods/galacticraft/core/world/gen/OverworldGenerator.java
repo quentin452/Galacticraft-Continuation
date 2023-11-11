@@ -1,15 +1,14 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.Random;
-
+import cpw.mods.fml.common.IWorldGenerator;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 
-import cpw.mods.fml.common.IWorldGenerator;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import java.util.Random;
 
 public class OverworldGenerator implements IWorldGenerator {
 
@@ -21,7 +20,7 @@ public class OverworldGenerator implements IWorldGenerator {
     private final int metadata;
 
     public OverworldGenerator(Block oreBlock, int metadata, int amountPerChunk, int minGenLevel, int maxGenLevel,
-            int amountPerVein) {
+        int amountPerVein) {
         this.oreBlock = oreBlock;
         this.metadata = metadata;
         this.amountPerChunk = amountPerChunk;
@@ -32,13 +31,13 @@ public class OverworldGenerator implements IWorldGenerator {
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator,
-            IChunkProvider chunkProvider) {
+        IChunkProvider chunkProvider) {
         if (!(world.provider instanceof IGalacticraftWorldProvider)) {
             for (int i = 0; i < this.amountPerChunk; i++) {
                 final int x = chunkX * 16 + random.nextInt(16);
                 final int z = chunkZ * 16 + random.nextInt(16);
                 final int y = random.nextInt(Math.max(this.maxGenerateLevel - this.minGenerateLevel, 0))
-                        + this.minGenerateLevel;
+                    + this.minGenerateLevel;
                 this.generateOre(world, random, x, y, z);
             }
         }
@@ -80,7 +79,7 @@ public class OverworldGenerator implements IWorldGenerator {
 
                                 final Block block = par1World.getBlock(var38, var41, var44);
                                 if (var39 * var39 + var42 * var42 + var45 * var45 < 1.0D
-                                        && block.isReplaceableOreGen(par1World, var38, var41, var44, Blocks.stone)) {
+                                    && block.isReplaceableOreGen(par1World, var38, var41, var44, Blocks.stone)) {
                                     par1World.setBlock(var38, var41, var44, this.oreBlock, this.metadata, 2);
                                 }
                             }

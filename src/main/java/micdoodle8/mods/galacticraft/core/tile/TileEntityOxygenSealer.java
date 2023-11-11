@@ -1,20 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.relauncher.Side;
 import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
@@ -26,6 +11,20 @@ import micdoodle8.mods.galacticraft.core.oxygen.ThreadFindSeal;
 import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
 import micdoodle8.mods.galacticraft.core.util.FluidUtil;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
 
 public class TileEntityOxygenSealer extends TileEntityOxygen implements IInventory, ISidedInventory {
 
@@ -104,11 +103,8 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
             return 0;
         }
         final Block blockAbove = this.worldObj.getBlock(this.xCoord, this.yCoord + 1, this.zCoord);
-        if (!(blockAbove instanceof BlockAir) && !OxygenPressureProtocol.canBlockPassAir(
-                this.worldObj,
-                blockAbove,
-                new BlockVec3(this.xCoord, this.yCoord + 1, this.zCoord),
-                1)) {
+        if (!(blockAbove instanceof BlockAir) && !OxygenPressureProtocol
+            .canBlockPassAir(this.worldObj, blockAbove, new BlockVec3(this.xCoord, this.yCoord + 1, this.zCoord), 1)) {
             // The vent is blocked
             return 0;
         }
@@ -119,9 +115,9 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
     public boolean thermalControlEnabled() {
         final ItemStack oxygenItemStack = this.getStackInSlot(2);
         return oxygenItemStack != null && oxygenItemStack.getItem() == GCItems.basicItem
-                && oxygenItemStack.getItemDamage() == 20
-                && this.hasEnoughEnergyToRun
-                && !this.disabled;
+            && oxygenItemStack.getItemDamage() == 20
+            && this.hasEnoughEnergyToRun
+            && !this.disabled;
     }
 
     @Override
@@ -288,7 +284,7 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -311,7 +307,8 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
                 case 0:
                     return ItemElectricBase.isElectricItemCharged(itemstack);
                 case 1:
-                    return itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
+                    return itemstack.getItemDamage() < itemstack.getItem()
+                        .getMaxDamage();
                 case 2:
                     return itemstack.getItem() == GCItems.basicItem && itemstack.getItemDamage() == 20;
                 default:
@@ -378,7 +375,9 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
 
     @Override
     public EnumSet<ForgeDirection> getOxygenInputDirections() {
-        return EnumSet.of(this.getElectricInputDirection().getOpposite());
+        return EnumSet.of(
+            this.getElectricInputDirection()
+                .getOpposite());
     }
 
     @Override
@@ -387,7 +386,7 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
     }
 
     public static HashMap<BlockVec3, TileEntityOxygenSealer> getSealersAround(World world, int x, int y, int z,
-            int rSquared) {
+        int rSquared) {
         final HashMap<BlockVec3, TileEntityOxygenSealer> ret = new HashMap<>();
 
         for (final TileEntityOxygenSealer tile : new ArrayList<>(TileEntityOxygenSealer.loadedTiles)) {

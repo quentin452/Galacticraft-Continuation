@@ -1,23 +1,21 @@
 package micdoodle8.mods.galacticraft.planets.mars.nei;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import net.minecraft.item.ItemStack;
-
 import codechicken.nei.PositionedStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
 import micdoodle8.mods.galacticraft.core.Constants;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.items.GCItems;
 import micdoodle8.mods.galacticraft.core.util.RecipeUtil;
 import micdoodle8.mods.galacticraft.planets.asteroids.items.AsteroidsItems;
 import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
+import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class NEIGalacticraftMarsConfig implements IConfigureNEI {
 
@@ -172,10 +170,10 @@ public class NEIGalacticraftMarsConfig implements IConfigureNEI {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 2; j++) {
                 input.add(
-                        new PositionedStack(
-                                new ItemStack(MarsItems.marsItemBasic, 1, 3),
-                                44 + j * 18 - x,
-                                37 + i * 18 - y));
+                    new PositionedStack(
+                        new ItemStack(MarsItems.marsItemBasic, 1, 3),
+                        44 + j * 18 - x,
+                        37 + i * 18 - y));
             }
         }
         input.add(new PositionedStack(new ItemStack(GCItems.rocketEngine), 53 - x, 109 - y));
@@ -186,39 +184,39 @@ public class NEIGalacticraftMarsConfig implements IConfigureNEI {
         input2 = new ArrayList<>(input);
         input2.add(new PositionedStack(RecipeUtil.getChestItemStack(1, 3), 134 - x, 46 - y));
         this.registerCargoBenchRecipe(
-                input2,
-                new PositionedStack(new ItemStack(MarsItems.spaceship, 1, 11), 134 - x, 73 - y));
+            input2,
+            new PositionedStack(new ItemStack(MarsItems.spaceship, 1, 11), 134 - x, 73 - y));
         input2 = new ArrayList<>(input);
         input2.add(new PositionedStack(RecipeUtil.getChestItemStack(1, 0), 134 - x, 46 - y));
         this.registerCargoBenchRecipe(
-                input2,
-                new PositionedStack(new ItemStack(MarsItems.spaceship, 1, 12), 134 - x, 73 - y));
+            input2,
+            new PositionedStack(new ItemStack(MarsItems.spaceship, 1, 12), 134 - x, 73 - y));
         input2 = new ArrayList<>(input);
         input2.add(new PositionedStack(RecipeUtil.getChestItemStack(1, 1), 134 - x, 46 - y));
         this.registerCargoBenchRecipe(
-                input2,
-                new PositionedStack(new ItemStack(MarsItems.spaceship, 1, 13), 134 - x, 73 - y));
+            input2,
+            new PositionedStack(new ItemStack(MarsItems.spaceship, 1, 13), 134 - x, 73 - y));
 
         this.registerLiquefierRecipe(
-                new PositionedStack(new ItemStack(AsteroidsItems.methaneCanister, 1, 1), 2, 3),
-                new PositionedStack(new ItemStack(GCItems.fuelCanister, 1, 1), 127, 3));
+            new PositionedStack(new ItemStack(AsteroidsItems.methaneCanister, 1, 1), 2, 3),
+            new PositionedStack(new ItemStack(GCItems.fuelCanister, 1, 1), 127, 3));
         this.registerLiquefierRecipe(
-                new PositionedStack(new ItemStack(AsteroidsItems.atmosphericValve, 1, 0), 2, 3),
-                new PositionedStack(new ItemStack(AsteroidsItems.canisterLN2, 1, 1), 127, 3));
+            new PositionedStack(new ItemStack(AsteroidsItems.atmosphericValve, 1, 0), 2, 3),
+            new PositionedStack(new ItemStack(AsteroidsItems.canisterLN2, 1, 1), 127, 3));
         this.registerLiquefierRecipe(
-                new PositionedStack(new ItemStack(AsteroidsItems.atmosphericValve, 1, 0), 2, 3),
-                new PositionedStack(new ItemStack(AsteroidsItems.canisterLOX, 1, 1), 148, 3));
+            new PositionedStack(new ItemStack(AsteroidsItems.atmosphericValve, 1, 0), 2, 3),
+            new PositionedStack(new ItemStack(AsteroidsItems.canisterLOX, 1, 1), 148, 3));
         this.registerLiquefierRecipe(
-                new PositionedStack(new ItemStack(AsteroidsItems.canisterLN2, 1, 501), 2, 3),
-                new PositionedStack(new ItemStack(AsteroidsItems.canisterLN2, 1, 1), 127, 3));
+            new PositionedStack(new ItemStack(AsteroidsItems.canisterLN2, 1, 501), 2, 3),
+            new PositionedStack(new ItemStack(AsteroidsItems.canisterLN2, 1, 1), 127, 3));
         this.registerLiquefierRecipe(
-                new PositionedStack(new ItemStack(AsteroidsItems.canisterLOX, 1, 501), 2, 3),
-                new PositionedStack(new ItemStack(AsteroidsItems.canisterLOX, 1, 1), 148, 3));
+            new PositionedStack(new ItemStack(AsteroidsItems.canisterLOX, 1, 501), 2, 3),
+            new PositionedStack(new ItemStack(AsteroidsItems.canisterLOX, 1, 1), 148, 3));
         this.registerSynthesizerRecipe(
-                new PositionedStack(new ItemStack(AsteroidsItems.atmosphericValve, 1, 0), 23, 3),
-                new PositionedStack(new ItemStack(AsteroidsItems.methaneCanister, 1, 1), 148, 3));
+            new PositionedStack(new ItemStack(AsteroidsItems.atmosphericValve, 1, 0), 23, 3),
+            new PositionedStack(new ItemStack(AsteroidsItems.methaneCanister, 1, 1), 148, 3));
         this.registerSynthesizerRecipe(
-                new PositionedStack(new ItemStack(MarsItems.carbonFragments, 25, 0), 23, 49),
-                new PositionedStack(new ItemStack(AsteroidsItems.methaneCanister, 1, 1), 148, 3));
+            new PositionedStack(new ItemStack(MarsItems.carbonFragments, 25, 0), 23, 49),
+            new PositionedStack(new ItemStack(AsteroidsItems.methaneCanister, 1, 1), 148, 3));
     }
 }

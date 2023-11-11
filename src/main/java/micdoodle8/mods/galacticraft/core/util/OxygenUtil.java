@@ -1,33 +1,5 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEnchantmentTable;
-import net.minecraft.block.BlockFarmland;
-import net.minecraft.block.BlockGlass;
-import net.minecraft.block.BlockGravel;
-import net.minecraft.block.BlockLeavesBase;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockSponge;
-import net.minecraft.block.BlockStainedGlass;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -47,6 +19,23 @@ import micdoodle8.mods.galacticraft.core.items.ItemOxygenMask;
 import micdoodle8.mods.galacticraft.core.items.ItemOxygenTank;
 import micdoodle8.mods.galacticraft.core.oxygen.OxygenPressureProtocol;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenDistributor;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class OxygenUtil {
 
@@ -54,7 +43,8 @@ public class OxygenUtil {
 
     @SideOnly(Side.CLIENT)
     public static boolean shouldDisplayTankGui(GuiScreen gui) {
-        if (FMLClientHandler.instance().getClient().gameSettings.hideGUI) {
+        if (FMLClientHandler.instance()
+            .getClient().gameSettings.hideGUI) {
             return false;
         }
 
@@ -88,9 +78,9 @@ public class OxygenUtil {
         final double smin = Math.min(sx, Math.min(sy, sz)) / 2;
 
         return OxygenUtil.isAABBInBreathableAirBlock(
-                entity.worldObj,
-                AxisAlignedBB.getBoundingBox(x - smin, y - smin, z - smin, x + smin, y + smin, z + smin),
-                testThermal);
+            entity.worldObj,
+            AxisAlignedBB.getBoundingBox(x - smin, y - smin, z - smin, x + smin, y + smin, z + smin),
+            testThermal);
     }
 
     public static boolean isAABBInBreathableAirBlock(World world, AxisAlignedBB bb) {
@@ -103,14 +93,20 @@ public class OxygenUtil {
         final double avgZ = (bb.minZ + bb.maxZ) / 2.0D;
 
         if (testThermal) {
-            return OxygenUtil.isInOxygenAndThermalBlock(world, bb.copy().contract(0.001D, 0.001D, 0.001D));
+            return OxygenUtil.isInOxygenAndThermalBlock(
+                world,
+                bb.copy()
+                    .contract(0.001D, 0.001D, 0.001D));
         }
 
         if (OxygenUtil.inOxygenBubble(world, avgX, avgY, avgZ)) {
             return true;
         }
 
-        return OxygenUtil.isInOxygenBlock(world, bb.copy().contract(0.001D, 0.001D, 0.001D));
+        return OxygenUtil.isInOxygenBlock(
+            world,
+            bb.copy()
+                .contract(0.001D, 0.001D, 0.001D));
     }
 
     public static boolean isInOxygenBlock(World world, AxisAlignedBB bb) {
@@ -207,7 +203,7 @@ public class OxygenUtil {
         if (!(block instanceof BlockLeavesBase)) {
             if (block.isOpaqueCube()) {
                 if (!(block instanceof BlockGravel) && block.getMaterial() != Material.cloth
-                        && !(block instanceof BlockSponge)) {
+                    && !(block instanceof BlockSponge)) {
                     return -1;
                 }
                 permeableFlag = true;
@@ -232,12 +228,12 @@ public class OxygenUtil {
                     if (!checked.contains(sidevec)) {
                         final Block newblock = sidevec.getBlockID_noChunkLoad(world);
                         final int adjResult = OxygenUtil.testContactWithBreathableAir(
-                                world,
-                                newblock,
-                                sidevec.x,
-                                sidevec.y,
-                                sidevec.z,
-                                limitCount + 1);
+                            world,
+                            newblock,
+                            sidevec.x,
+                            sidevec.y,
+                            sidevec.z,
+                            limitCount + 1);
                         if (adjResult >= 0) {
                             return adjResult;
                         }
@@ -256,13 +252,13 @@ public class OxygenUtil {
     private static boolean canBlockPassAirOnSide(World world, Block block, BlockVec3 vec, int side) {
         if (block instanceof IPartialSealableBlock) {
             return !((IPartialSealableBlock) block)
-                    .isSealed(world, vec.x, vec.y, vec.z, ForgeDirection.getOrientation(side));
+                .isSealed(world, vec.x, vec.y, vec.z, ForgeDirection.getOrientation(side));
         }
 
         // Half slab seals on the top side or the bottom side according to its metadata
         if (block instanceof BlockSlab) {
             return (side != 0 || (vec.getBlockMetadata(world) & 8) != 8)
-                    && (side != 1 || (vec.getBlockMetadata(world) & 8) != 0);
+                && (side != 1 || (vec.getBlockMetadata(world) & 8) != 0);
         }
 
         // Farmland etc only seals on the solid underside
@@ -284,9 +280,9 @@ public class OxygenUtil {
 
     public static int getDrainSpacing(ItemStack tank, ItemStack tank2) {
         final boolean tank1Valid = tank != null && tank.getItem() instanceof ItemOxygenTank
-                && tank.getMaxDamage() - tank.getItemDamage() > 0;
+            && tank.getMaxDamage() - tank.getItemDamage() > 0;
         final boolean tank2Valid = tank2 != null && tank2.getItem() instanceof ItemOxygenTank
-                && tank2.getMaxDamage() - tank2.getItemDamage() > 0;
+            && tank2.getMaxDamage() - tank2.getItemDamage() > 0;
 
         if (!tank1Valid && !tank2Valid) {
             return 0;
@@ -301,7 +297,7 @@ public class OxygenUtil {
         final GCPlayerStats stats = GCPlayerStats.get(player);
 
         if (stats.extendedInventory.getStackInSlot(0) == null
-                || !OxygenUtil.isItemValidForPlayerTankInv(0, stats.extendedInventory.getStackInSlot(0))) {
+            || !OxygenUtil.isItemValidForPlayerTankInv(0, stats.extendedInventory.getStackInSlot(0))) {
             boolean handled = false;
 
             for (final ItemStack armorStack : player.inventory.armorInventory) {
@@ -309,7 +305,7 @@ public class OxygenUtil {
                     final IBreathableArmor breathableArmor = (IBreathableArmor) armorStack.getItem();
 
                     if (breathableArmor.handleGearType(EnumGearType.HELMET)
-                            && breathableArmor.canBreathe(armorStack, player, EnumGearType.HELMET)) {
+                        && breathableArmor.canBreathe(armorStack, player, EnumGearType.HELMET)) {
                         handled = true;
                     }
                 }
@@ -321,7 +317,7 @@ public class OxygenUtil {
         }
 
         if (stats.extendedInventory.getStackInSlot(1) == null
-                || !OxygenUtil.isItemValidForPlayerTankInv(1, stats.extendedInventory.getStackInSlot(1))) {
+            || !OxygenUtil.isItemValidForPlayerTankInv(1, stats.extendedInventory.getStackInSlot(1))) {
             boolean handled = false;
 
             for (final ItemStack armorStack : player.inventory.armorInventory) {
@@ -329,7 +325,7 @@ public class OxygenUtil {
                     final IBreathableArmor breathableArmor = (IBreathableArmor) armorStack.getItem();
 
                     if (breathableArmor.handleGearType(EnumGearType.GEAR)
-                            && breathableArmor.canBreathe(armorStack, player, EnumGearType.GEAR)) {
+                        && breathableArmor.canBreathe(armorStack, player, EnumGearType.GEAR)) {
                         handled = true;
                     }
                 }
@@ -341,9 +337,9 @@ public class OxygenUtil {
         }
 
         if ((stats.extendedInventory.getStackInSlot(2) == null
-                || !OxygenUtil.isItemValidForPlayerTankInv(2, stats.extendedInventory.getStackInSlot(2)))
-                && (stats.extendedInventory.getStackInSlot(3) == null
-                        || !OxygenUtil.isItemValidForPlayerTankInv(3, stats.extendedInventory.getStackInSlot(3)))) {
+            || !OxygenUtil.isItemValidForPlayerTankInv(2, stats.extendedInventory.getStackInSlot(2)))
+            && (stats.extendedInventory.getStackInSlot(3) == null
+                || !OxygenUtil.isItemValidForPlayerTankInv(3, stats.extendedInventory.getStackInSlot(3)))) {
             boolean handled = false;
 
             for (final ItemStack armorStack : player.inventory.armorInventory) {
@@ -351,12 +347,12 @@ public class OxygenUtil {
                     final IBreathableArmor breathableArmor = (IBreathableArmor) armorStack.getItem();
 
                     if (breathableArmor.handleGearType(EnumGearType.TANK1)
-                            && breathableArmor.canBreathe(armorStack, player, EnumGearType.TANK1)) {
+                        && breathableArmor.canBreathe(armorStack, player, EnumGearType.TANK1)) {
                         handled = true;
                     }
 
                     if (breathableArmor.handleGearType(EnumGearType.TANK2)
-                            && breathableArmor.canBreathe(armorStack, player, EnumGearType.TANK2)) {
+                        && breathableArmor.canBreathe(armorStack, player, EnumGearType.TANK2)) {
                         handled = true;
                     }
                 }
@@ -393,7 +389,7 @@ public class OxygenUtil {
             final TileEntity tileEntity = thisVec.getTileEntityOnSide(world, direction);
 
             if (tileEntity instanceof IConnector
-                    && ((IConnector) tileEntity).canConnect(direction.getOpposite(), NetworkType.OXYGEN)) {
+                && ((IConnector) tileEntity).canConnect(direction.getOpposite(), NetworkType.OXYGEN)) {
                 adjacentConnections[direction.ordinal()] = tileEntity;
             }
         }
@@ -404,7 +400,7 @@ public class OxygenUtil {
     public static boolean noAtmosphericCombustion(WorldProvider provider) {
         if (provider instanceof IGalacticraftWorldProvider) {
             return !((IGalacticraftWorldProvider) provider).isGasPresent(IAtmosphericGas.OXYGEN)
-                    && !((IGalacticraftWorldProvider) provider).hasBreathableAtmosphere();
+                && !((IGalacticraftWorldProvider) provider).hasBreathableAtmosphere();
         }
 
         return false;
@@ -415,7 +411,7 @@ public class OxygenUtil {
             if (blockVec != null && blockVec.dim == worldObj.provider.dimensionId) {
                 final TileEntity tile = worldObj.getTileEntity(blockVec.x, blockVec.y, blockVec.z);
                 if (tile instanceof TileEntityOxygenDistributor
-                        && ((TileEntityOxygenDistributor) tile).inBubble(avgX, avgY, avgZ)) {
+                    && ((TileEntityOxygenDistributor) tile).inBubble(avgX, avgY, avgZ)) {
                     return true;
                 }
             }

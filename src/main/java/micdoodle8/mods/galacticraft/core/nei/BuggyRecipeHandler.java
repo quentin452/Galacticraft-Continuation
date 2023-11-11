@@ -1,17 +1,5 @@
 package micdoodle8.mods.galacticraft.core.nei;
 
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
@@ -19,12 +7,22 @@ import codechicken.nei.recipe.TemplateRecipeHandler;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class BuggyRecipeHandler extends TemplateRecipeHandler {
 
     private static final ResourceLocation buggyGuiTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/schematic_rocket_GS1_Buggy.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/schematic_rocket_GS1_Buggy.png");
     public static final int x = -1;
     public static final int y = -12;
     public static final int tX = 3;
@@ -45,10 +43,11 @@ public class BuggyRecipeHandler extends TemplateRecipeHandler {
         final HashMap<ArrayList<PositionedStack>, PositionedStack> recipes = new HashMap<>();
 
         for (final Entry<HashMap<Integer, PositionedStack>, PositionedStack> stack : NEIGalacticraftConfig
-                .getBuggyBenchRecipes()) {
+            .getBuggyBenchRecipes()) {
             final ArrayList<PositionedStack> inputStacks = new ArrayList<>();
 
-            for (final Map.Entry<Integer, PositionedStack> input : stack.getKey().entrySet()) {
+            for (final Map.Entry<Integer, PositionedStack> input : stack.getKey()
+                .entrySet()) {
                 inputStacks.add(input.getValue());
             }
 

@@ -1,11 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.relauncher.Side;
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
 import micdoodle8.mods.galacticraft.api.transmission.grid.IOxygenNetwork;
@@ -15,6 +9,11 @@ import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlock;
 import micdoodle8.mods.galacticraft.core.oxygen.NetworkHelper;
 import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.EnumSet;
 
 public abstract class TileEntityOxygen extends TileBaseElectricBlock implements IOxygenReceiver, IOxygenStorage {
 
@@ -40,7 +39,7 @@ public abstract class TileEntityOxygen extends TileBaseElectricBlock implements 
 
     public int getCappedScaledOxygenLevel(int scale) {
         return (int) Math
-                .max(Math.min(Math.floor((double) this.storedOxygen / (double) this.maxOxygen * scale), scale), 0);
+            .max(Math.min(Math.floor((double) this.storedOxygen / (double) this.maxOxygen * scale), scale), 0);
     }
 
     @Override
@@ -107,8 +106,10 @@ public abstract class TileEntityOxygen extends TileBaseElectricBlock implements 
         }
 
         if (type == NetworkType.OXYGEN) {
-            return this.getOxygenInputDirections().contains(direction)
-                    || this.getOxygenOutputDirections().contains(direction);
+            return this.getOxygenInputDirections()
+                .contains(direction)
+                || this.getOxygenOutputDirections()
+                    .contains(direction);
         }
         if (type == NetworkType.POWER)
         // return this.nodeAvailable(new EnergySourceAdjacent(direction));
@@ -121,7 +122,8 @@ public abstract class TileEntityOxygen extends TileBaseElectricBlock implements 
 
     @Override
     public float receiveOxygen(ForgeDirection from, float receive, boolean doReceive) {
-        if (this.getOxygenInputDirections().contains(from)) {
+        if (this.getOxygenInputDirections()
+            .contains(from)) {
             if (!doReceive) {
                 return this.getOxygenRequest(from);
             }
@@ -150,7 +152,8 @@ public abstract class TileEntityOxygen extends TileBaseElectricBlock implements 
 
     @Override
     public float provideOxygen(ForgeDirection from, float request, boolean doProvide) {
-        if (this.getOxygenOutputDirections().contains(from)) {
+        if (this.getOxygenOutputDirections()
+            .contains(from)) {
             return this.provideOxygen(request, doProvide);
         }
 
@@ -187,7 +190,7 @@ public abstract class TileEntityOxygen extends TileBaseElectricBlock implements 
         if (provide > 0F) {
             final TileEntity outputTile = new BlockVec3(this).getTileEntityOnSide(this.worldObj, outputDirection);
             final IOxygenNetwork outputNetwork = NetworkHelper
-                    .getOxygenNetworkFromTileEntity(outputTile, outputDirection);
+                .getOxygenNetworkFromTileEntity(outputTile, outputDirection);
 
             if (outputNetwork != null) {
                 final float powerRequest = outputNetwork.getRequest(this);
@@ -200,11 +203,11 @@ public abstract class TileEntityOxygen extends TileBaseElectricBlock implements 
                 }
             } else if (outputTile instanceof IOxygenReceiver) {
                 final float requestedOxygen = ((IOxygenReceiver) outputTile)
-                        .getOxygenRequest(outputDirection.getOpposite());
+                    .getOxygenRequest(outputDirection.getOpposite());
 
                 if (requestedOxygen > 0) {
                     final float acceptedOxygen = ((IOxygenReceiver) outputTile)
-                            .receiveOxygen(outputDirection.getOpposite(), provide, true);
+                        .receiveOxygen(outputDirection.getOpposite(), provide, true);
                     this.provideOxygen(acceptedOxygen, true);
                     return true;
                 }

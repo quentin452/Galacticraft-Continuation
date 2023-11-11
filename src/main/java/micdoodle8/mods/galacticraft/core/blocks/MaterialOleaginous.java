@@ -1,12 +1,11 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
+import micdoodle8.mods.galacticraft.core.util.JavaUtil;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.BlockStaticLiquid;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.MaterialLiquid;
-
-import micdoodle8.mods.galacticraft.core.util.JavaUtil;
 
 // This avoids water and oil mixing, by being a different material
 public class MaterialOleaginous extends MaterialLiquid {
@@ -24,6 +23,6 @@ public class MaterialOleaginous extends MaterialLiquid {
     @Override
     public boolean blocksMovement() {
         return JavaUtil.instance
-                .isCalledBy(this.blockLiquidStaticName, this.blockLiquidName, this.blockLiquidDynamicName);
+            .isCalledBy(this.blockLiquidStaticName, this.blockLiquidName, this.blockLiquidDynamicName);
     }
 }

@@ -1,8 +1,12 @@
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import java.util.List;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySludgeling;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -13,13 +17,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
-import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySludgeling;
+import java.util.List;
+import java.util.Random;
 
 public class BlockSludge extends BlockFluidClassic {
 
@@ -33,14 +32,14 @@ public class BlockSludge extends BlockFluidClassic {
     public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity) {
         if (!world.isRemote) {
             if (entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.isFlying
-                    || entity instanceof EntitySludgeling) {
+                || entity instanceof EntitySludgeling) {
                 return;
             }
 
             final int range = 5;
             final List<?> l = world.getEntitiesWithinAABB(
-                    EntitySludgeling.class,
-                    AxisAlignedBB.getBoundingBox(x - range, y - range, z - range, x + range, y + range, z + range));
+                EntitySludgeling.class,
+                AxisAlignedBB.getBoundingBox(x - range, y - range, z - range, x + range, y + range, z + range));
 
             if (l.size() < 3) {
                 final EntitySludgeling sludgeling = new EntitySludgeling(world);
@@ -83,7 +82,9 @@ public class BlockSludge extends BlockFluidClassic {
 
     @Override
     public boolean canDisplace(IBlockAccess world, int x, int y, int z) {
-        if (world.getBlock(x, y, z).getMaterial().isLiquid()) {
+        if (world.getBlock(x, y, z)
+            .getMaterial()
+            .isLiquid()) {
             return false;
         }
         return super.canDisplace(world, x, y, z);
@@ -91,7 +92,9 @@ public class BlockSludge extends BlockFluidClassic {
 
     @Override
     public boolean displaceIfPossible(World world, int x, int y, int z) {
-        if (world.getBlock(x, y, z).getMaterial().isLiquid()) {
+        if (world.getBlock(x, y, z)
+            .getMaterial()
+            .isLiquid()) {
             return false;
         }
         return super.displaceIfPossible(world, x, y, z);
@@ -104,20 +107,22 @@ public class BlockSludge extends BlockFluidClassic {
 
         if (rand.nextInt(1200) == 0) {
             world.playSound(
-                    x + 0.5F,
-                    y + 0.5F,
-                    z + 0.5F,
-                    "liquid.lava",
-                    rand.nextFloat() * 0.25F + 0.75F,
-                    0.00001F + rand.nextFloat() * 0.5F,
-                    false);
+                x + 0.5F,
+                y + 0.5F,
+                z + 0.5F,
+                "liquid.lava",
+                rand.nextFloat() * 0.25F + 0.75F,
+                0.00001F + rand.nextFloat() * 0.5F,
+                false);
         }
         if (rand.nextInt(10) == 0 && World.doesBlockHaveSolidTopSurface(world, x, y - 1, z)
-                && !world.getBlock(x, y - 2, z).getMaterial().blocksMovement()) {
+            && !world.getBlock(x, y - 2, z)
+                .getMaterial()
+                .blocksMovement()) {
             GalacticraftPlanets.spawnParticle(
-                    "bacterialDrip",
-                    new Vector3(x + rand.nextFloat(), y - 1.05D, z + rand.nextFloat()),
-                    new Vector3(0, 0, 0));
+                "bacterialDrip",
+                new Vector3(x + rand.nextFloat(), y - 1.05D, z + rand.nextFloat()),
+                new Vector3(0, 0, 0));
         }
     }
 }

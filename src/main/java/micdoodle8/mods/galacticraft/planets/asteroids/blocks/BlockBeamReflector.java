@@ -1,7 +1,12 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityBeamReflector;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -14,13 +19,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityBeamReflector;
+import java.util.List;
 
 public class BlockBeamReflector extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -64,7 +63,7 @@ public class BlockBeamReflector extends BlockTileGC implements ItemBlockDesc.IBl
 
     @Override
     public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB axisalignedbb,
-            List<AxisAlignedBB> list, Entity entity) {
+        List<AxisAlignedBB> list, Entity entity) {
         this.setBlockBoundsBasedOnState(world, x, y, z);
         super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
     }
@@ -82,12 +81,12 @@ public class BlockBeamReflector extends BlockTileGC implements ItemBlockDesc.IBl
 
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         final TileEntity tile = world.getTileEntity(x, y, z);
 
         if (tile instanceof TileEntityBeamReflector) {
             return ((TileEntityBeamReflector) tile)
-                    .onMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
+                .onMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
         }
 
         return false;

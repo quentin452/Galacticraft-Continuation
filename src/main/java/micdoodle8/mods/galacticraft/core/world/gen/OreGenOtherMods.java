@@ -1,13 +1,5 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.gen.feature.WorldGenerator;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import micdoodle8.mods.galacticraft.api.event.wgen.GCCoreEventPopulate;
 import micdoodle8.mods.galacticraft.api.vector.BlockTuple;
@@ -20,6 +12,13 @@ import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
 import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import micdoodle8.mods.galacticraft.planets.mars.dimension.WorldProviderMars;
+import net.minecraft.block.Block;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.gen.feature.WorldGenerator;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class OreGenOtherMods {
 
@@ -44,8 +43,10 @@ public class OreGenOtherMods {
                 int dim = 0;
 
                 if (slash >= 0) {
-                    s = str.substring(0, slash).trim();
-                    final String params = str.substring(slash).toUpperCase();
+                    s = str.substring(0, slash)
+                        .trim();
+                    final String params = str.substring(slash)
+                        .toUpperCase();
                     if (params.contains("UNCOMMON")) {
                         rarity = 1;
                     } else if (params.contains("RARE")) {
@@ -91,14 +92,14 @@ public class OreGenOtherMods {
                 OreGenOtherMods.addOre(bt.block, meta, rarity, depth, size, extraRandom, dim);
             } catch (final Exception e) {
                 GCLog.severe(
-                        "[config] External Sealable IDs: error parsing '" + str
-                                + "'. Must be in the form Blockname or BlockName:metadata followed by / parameters ");
+                    "[config] External Sealable IDs: error parsing '" + str
+                        + "'. Must be in the form Blockname or BlockName:metadata followed by / parameters ");
             }
         }
     }
 
     public static void addOre(Block block, int meta, int rarity, int depth, int clumpSize, boolean extraRandom,
-            int dim) {
+        int dim) {
         int clusters = 12;
         int size = 4;
         int min = 0;
@@ -207,12 +208,12 @@ public class OreGenOtherMods {
         for (final OreGenData ore : OreGenOtherMods.data) {
             if (ore.dimRestrict == 0 || ore.dimRestrict == dimDetected) {
                 this.oreGen = new WorldGenMinableMeta(
-                        ore.oreBlock,
-                        ore.sizeCluster,
-                        ore.oreMeta,
-                        true,
-                        stoneBlock,
-                        stoneMeta);
+                    ore.oreBlock,
+                    ore.sizeCluster,
+                    ore.oreMeta,
+                    true,
+                    stoneBlock,
+                    stoneMeta);
                 this.genStandardOre1(ore.numClusters, this.oreGen, ore.minHeight, ore.maxHeight);
             }
         }

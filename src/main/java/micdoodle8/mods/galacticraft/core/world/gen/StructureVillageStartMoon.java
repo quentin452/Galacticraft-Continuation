@@ -1,11 +1,11 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class StructureVillageStartMoon extends StructureStart {
 
@@ -15,15 +15,15 @@ public class StructureVillageStartMoon extends StructureStart {
         super(par3, par4);
 
         final ArrayList<StructureVillagePieceWeightMoon> var6 = StructureVillagePiecesMoon
-                .getStructureVillageWeightedPieceList(par2Random, par5);
+            .getStructureVillageWeightedPieceList(par2Random, par5);
         final StructureComponentVillageStartPiece var7 = new StructureComponentVillageStartPiece(
-                par1World.getWorldChunkManager(),
-                0,
-                par2Random,
-                (par3 << 4) + 2,
-                (par4 << 4) + 2,
-                var6,
-                par5);
+            par1World.getWorldChunkManager(),
+            0,
+            par2Random,
+            (par3 << 4) + 2,
+            (par4 << 4) + 2,
+            var6,
+            par5);
         this.components.add(var7);
         var7.buildComponent(var7, this.components, par2Random);
         final ArrayList<Object> var8 = var7.field_74930_j;

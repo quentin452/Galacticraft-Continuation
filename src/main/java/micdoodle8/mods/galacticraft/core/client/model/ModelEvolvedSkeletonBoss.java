@@ -1,11 +1,10 @@
 package micdoodle8.mods.galacticraft.core.client.model;
 
+import micdoodle8.mods.galacticraft.core.entities.EntitySkeletonBoss;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
-
-import micdoodle8.mods.galacticraft.core.entities.EntitySkeletonBoss;
 
 public class ModelEvolvedSkeletonBoss extends ModelBase {
 
@@ -334,7 +333,7 @@ public class ModelEvolvedSkeletonBoss extends ModelBase {
             var7 = 1.0F - var7;
             var8 = MathHelper.sin(var7 * (float) Math.PI);
             final float var9 = MathHelper.sin(this.onGround * (float) Math.PI) * -(this.upperHead.rotateAngleX - 0.7F)
-                    * 0.75F;
+                * 0.75F;
             this.rightArm.rotateAngleX = (float) (this.rightArm.rotateAngleX - (var8 * 1.2D + var9));
             this.rightArm.rotateAngleY += this.spine.rotateAngleY * 2.0F;
             this.rightArm.rotateAngleZ = MathHelper.sin(this.onGround * (float) Math.PI) * -0.4F;
@@ -380,7 +379,7 @@ public class ModelEvolvedSkeletonBoss extends ModelBase {
 
         if (boss.throwTimer + boss.postThrowDelay > 0) {
             this.rightArm.rotateAngleX -= MathHelper.cos((boss.throwTimer + boss.postThrowDelay) * 0.05F) * 1.2F
-                    + 0.05F;
+                + 0.05F;
             this.leftArm.rotateAngleX -= MathHelper.cos((boss.throwTimer + boss.postThrowDelay) * 0.05F) * 1.2F + 0.05F;
         }
     }

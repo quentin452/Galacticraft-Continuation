@@ -1,32 +1,30 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityMinerBaseRenderer extends TileEntitySpecialRenderer {
 
     public static final ResourceLocation telepadTexture = new ResourceLocation(
-            AsteroidsModule.ASSET_PREFIX,
-            "textures/model/minerbase.png");
+        AsteroidsModule.ASSET_PREFIX,
+        "textures/model/minerbase.png");
     public static IModelCustom telepadModel;
 
     public TileEntityMinerBaseRenderer() {
         TileEntityMinerBaseRenderer.telepadModel = AdvancedModelLoader
-                .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/minerbase.obj"));
+            .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/minerbase.obj"));
     }
 
     public void renderModelAt(TileEntityMinerBase tileEntity, double d, double d1, double d2, float f) {
@@ -35,10 +33,11 @@ public class TileEntityMinerBaseRenderer extends TileEntitySpecialRenderer {
             return;
         }
         // Texture file
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(TileEntityMinerBaseRenderer.telepadTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(TileEntityMinerBaseRenderer.telepadTexture);
 
         final int i = tileEntity.getWorldObj()
-                .getLightBrightnessForSkyBlocks(tileEntity.xCoord, tileEntity.yCoord + 1, tileEntity.zCoord, 0);
+            .getLightBrightnessForSkyBlocks(tileEntity.xCoord, tileEntity.yCoord + 1, tileEntity.zCoord, 0);
         final int j = i % 65536;
         final int k = i / 65536;
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, j / 1.0F, k / 1.0F);

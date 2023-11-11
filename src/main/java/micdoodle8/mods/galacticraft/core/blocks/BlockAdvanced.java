@@ -1,13 +1,13 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.lang.reflect.Method;
-
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
+import java.lang.reflect.Method;
 
 /**
  * An advanced block class that is to be extended for wrenching capabilities.
@@ -33,7 +33,7 @@ public abstract class BlockAdvanced extends BlockContainer {
      */
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         /**
          * Check if the player is holding a wrench or an electric item. If so, call the wrench event.
          */
@@ -41,14 +41,14 @@ public abstract class BlockAdvanced extends BlockContainer {
             this.damageWrench(entityPlayer, entityPlayer.inventory.getCurrentItem(), x, y, z);
 
             if ((entityPlayer.isSneaking()
-                    && this.onSneakUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ))
-                    || this.onUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) {
+                && this.onSneakUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ))
+                || this.onUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) {
                 return true;
             }
         }
 
         if (entityPlayer.isSneaking()
-                && this.onSneakMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) {
+            && this.onSneakMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) {
             return true;
         }
 
@@ -63,14 +63,15 @@ public abstract class BlockAdvanced extends BlockContainer {
      */
     public boolean isUsableWrench(EntityPlayer entityPlayer, ItemStack itemStack, int x, int y, int z) {
         if (entityPlayer != null && itemStack != null) {
-            final Class<? extends Item> wrenchClass = itemStack.getItem().getClass();
+            final Class<? extends Item> wrenchClass = itemStack.getItem()
+                .getClass();
 
             /**
              * UE and Buildcraft
              */
             try {
                 final Method methodCanWrench = wrenchClass
-                        .getMethod("canWrench", EntityPlayer.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
+                    .getMethod("canWrench", EntityPlayer.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
                 return (Boolean) methodCanWrench.invoke(itemStack.getItem(), entityPlayer, x, y, z);
             } catch (final NoClassDefFoundError | Exception e) {}
 
@@ -79,7 +80,7 @@ public abstract class BlockAdvanced extends BlockContainer {
              */
             try {
                 if (wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrench")
-                        || wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrenchElectric")) {
+                    || wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrenchElectric")) {
                     return itemStack.getItemDamage() < itemStack.getMaxDamage();
                 }
             } catch (final Exception e) {}
@@ -95,14 +96,15 @@ public abstract class BlockAdvanced extends BlockContainer {
      */
     public boolean damageWrench(EntityPlayer entityPlayer, ItemStack itemStack, int x, int y, int z) {
         if (this.isUsableWrench(entityPlayer, itemStack, x, y, z)) {
-            final Class<? extends Item> wrenchClass = itemStack.getItem().getClass();
+            final Class<? extends Item> wrenchClass = itemStack.getItem()
+                .getClass();
 
             /**
              * UE and Buildcraft
              */
             try {
                 final Method methodWrenchUsed = wrenchClass
-                        .getMethod("wrenchUsed", EntityPlayer.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
+                    .getMethod("wrenchUsed", EntityPlayer.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
                 methodWrenchUsed.invoke(itemStack.getItem(), entityPlayer, x, y, z);
                 return true;
             } catch (final Exception e) {}
@@ -112,9 +114,9 @@ public abstract class BlockAdvanced extends BlockContainer {
              */
             try {
                 if (wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrench")
-                        || wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrenchElectric")) {
+                    || wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrenchElectric")) {
                     final Method methodWrenchDamage = wrenchClass
-                            .getMethod("damage", ItemStack.class, Integer.TYPE, EntityPlayer.class);
+                        .getMethod("damage", ItemStack.class, Integer.TYPE, EntityPlayer.class);
                     methodWrenchDamage.invoke(itemStack.getItem(), itemStack, 1, entityPlayer);
                     return true;
                 }
@@ -130,7 +132,7 @@ public abstract class BlockAdvanced extends BlockContainer {
      * @return True if something happens
      */
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         return false;
     }
 
@@ -140,7 +142,7 @@ public abstract class BlockAdvanced extends BlockContainer {
      * @return True if something happens
      */
     public boolean onSneakMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         return false;
     }
 
@@ -150,7 +152,7 @@ public abstract class BlockAdvanced extends BlockContainer {
      * @return True if some happens
      */
     public boolean onUseWrench(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         return false;
     }
 
@@ -160,7 +162,7 @@ public abstract class BlockAdvanced extends BlockContainer {
      * @return True if some happens
      */
     public boolean onSneakUseWrench(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         return this.onUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
     }
 }

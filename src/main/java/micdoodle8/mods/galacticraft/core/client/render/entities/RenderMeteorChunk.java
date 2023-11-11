@@ -1,27 +1,25 @@
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.EntityMeteorChunk;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.opengl.GL11;
-
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.EntityMeteorChunk;
 
 public class RenderMeteorChunk extends Render {
 
     private static final ResourceLocation meteorChunkTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/meteorChunk.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/meteorChunk.png");
     private static final ResourceLocation meteorChunkHotTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/meteorChunkHot.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/meteorChunkHot.png");
 
     private final IModelCustom meteorChunkModel = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/meteorChunk.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/meteorChunk.obj"));
 
     public RenderMeteorChunk() {
         this.shadowSize = 0.1F;
@@ -37,7 +35,7 @@ public class RenderMeteorChunk extends Render {
     }
 
     public void renderMeteorChunk(EntityMeteorChunk entity, double par2, double par4, double par6, float par8,
-            float par9) {
+        float par9) {
         GL11.glPushMatrix();
         final float var24 = entity.rotationPitch;
         final float var24b = entity.rotationYaw;

@@ -1,7 +1,9 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import java.io.IOException;
-
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.inventory.IInventorySettable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -9,10 +11,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.inventory.IInventorySettable;
+import java.io.IOException;
 
 public class PacketDynamicInventory implements IPacket {
 
@@ -115,7 +114,7 @@ public class PacketDynamicInventory implements IPacket {
                 break;
             case 1:
                 final TileEntity tile = player.worldObj
-                        .getTileEntity((Integer) this.data[0], (Integer) this.data[1], (Integer) this.data[2]);
+                    .getTileEntity((Integer) this.data[0], (Integer) this.data[1], (Integer) this.data[2]);
 
                 if (tile instanceof IInventorySettable) {
                     this.setInventoryStacks((IInventorySettable) tile);
@@ -138,7 +137,7 @@ public class PacketDynamicInventory implements IPacket {
                 break;
             case 1:
                 final TileEntity tile = player.worldObj
-                        .getTileEntity((Integer) this.data[0], (Integer) this.data[1], (Integer) this.data[2]);
+                    .getTileEntity((Integer) this.data[0], (Integer) this.data[1], (Integer) this.data[2]);
 
                 if (tile instanceof IInventorySettable) {
                     GalacticraftCore.packetPipeline.sendTo(new PacketDynamicInventory(tile), (EntityPlayerMP) player);

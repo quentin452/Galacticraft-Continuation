@@ -1,12 +1,8 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import static net.minecraftforge.common.util.ForgeDirection.EAST;
-import static net.minecraftforge.common.util.ForgeDirection.NORTH;
-import static net.minecraftforge.common.util.ForgeDirection.SOUTH;
-import static net.minecraftforge.common.util.ForgeDirection.WEST;
-
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -16,9 +12,9 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.Random;
+
+import static net.minecraftforge.common.util.ForgeDirection.*;
 
 public class BlockGlowstoneTorch extends Block implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -32,7 +28,8 @@ public class BlockGlowstoneTorch extends Block implements ItemBlockDesc.IBlockSh
     }
 
     private static boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection direction) {
-        return world.getBlock(x, y, z).isSideSolid(world, x, y, z, direction);
+        return world.getBlock(x, y, z)
+            .isSideSolid(world, x, y, z, direction);
     }
 
     @Override
@@ -71,15 +68,15 @@ public class BlockGlowstoneTorch extends Block implements ItemBlockDesc.IBlockSh
     @Override
     public boolean canPlaceBlockAt(World par1World, int par2, int par3, int par4) {
         return BlockGlowstoneTorch.isBlockSolidOnSide(par1World, par2 - 1, par3, par4, EAST)
-                || BlockGlowstoneTorch.isBlockSolidOnSide(par1World, par2 + 1, par3, par4, WEST)
-                || BlockGlowstoneTorch.isBlockSolidOnSide(par1World, par2, par3, par4 - 1, SOUTH)
-                || BlockGlowstoneTorch.isBlockSolidOnSide(par1World, par2, par3, par4 + 1, NORTH)
-                || this.canPlaceTorchOn(par1World, par2, par3 - 1, par4);
+            || BlockGlowstoneTorch.isBlockSolidOnSide(par1World, par2 + 1, par3, par4, WEST)
+            || BlockGlowstoneTorch.isBlockSolidOnSide(par1World, par2, par3, par4 - 1, SOUTH)
+            || BlockGlowstoneTorch.isBlockSolidOnSide(par1World, par2, par3, par4 + 1, NORTH)
+            || this.canPlaceTorchOn(par1World, par2, par3 - 1, par4);
     }
 
     @Override
     public int onBlockPlaced(World par1World, int par2, int par3, int par4, int par5, float par6, float par7,
-            float par8, int par9) {
+        float par8, int par9) {
         int j1 = par9;
 
         if (par5 == 1 && this.canPlaceTorchOn(par1World, par2, par3 - 1, par4)) {
@@ -180,7 +177,7 @@ public class BlockGlowstoneTorch extends Block implements ItemBlockDesc.IBlockSh
 
     @Override
     public MovingObjectPosition collisionRayTrace(World par1World, int par2, int par3, int par4, Vec3 par5Vec3,
-            Vec3 par6Vec3) {
+        Vec3 par6Vec3) {
         final int l = par1World.getBlockMetadata(par2, par3, par4) & 7;
         float f = 0.15F;
 

@@ -1,29 +1,5 @@
 package micdoodle8.mods.galacticraft.core.oxygen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEnchantmentTable;
-import net.minecraft.block.BlockFarmland;
-import net.minecraft.block.BlockGlass;
-import net.minecraft.block.BlockGravel;
-import net.minecraft.block.BlockLeavesBase;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockSponge;
-import net.minecraft.block.BlockStainedGlass;
-import net.minecraft.block.material.Material;
-import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.blocks.BlockUnlitTorch;
@@ -33,6 +9,15 @@ import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenSealer;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
 import micdoodle8.mods.galacticraft.core.wrappers.ScheduledBlockChange;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ThreadFindSeal {
 
@@ -61,10 +46,10 @@ public class ThreadFindSeal {
 
     public ThreadFindSeal(TileEntityOxygenSealer sealer) {
         this(
-                sealer.getWorldObj(),
-                new BlockVec3(sealer).translate(0, 1, 0),
-                sealer.getFindSealChecks(),
-                new ArrayList<>(Arrays.asList(sealer)));
+            sealer.getWorldObj(),
+            new BlockVec3(sealer).translate(0, 1, 0),
+            sealer.getFindSealChecks(),
+            new ArrayList<>(Arrays.asList(sealer)));
     }
 
     public ThreadFindSeal(World world, BlockVec3 head, int checkCount, List<TileEntityOxygenSealer> sealers) {
@@ -133,7 +118,7 @@ public class ThreadFindSeal {
         this.sealed = true;
         final TileEntity tile = this.head.getTileEntityOnSide(this.world, ForgeDirection.DOWN);
         this.foundAmbientThermal = tile instanceof TileEntityOxygenSealer
-                && ((TileEntityOxygenSealer) tile).thermalControlEnabled();
+            && ((TileEntityOxygenSealer) tile).thermalControlEnabled();
         this.checkedAdd(this.head.clone());
         this.currentLayer = new LinkedList<>();
         this.airToReplace = new LinkedList<>();
@@ -143,8 +128,8 @@ public class ThreadFindSeal {
         if (this.checkCount > 0) {
             this.currentLayer.add(this.head);
             if (this.head.x < -29990000 || this.head.z < -29990000
-                    || this.head.x >= 29990000
-                    || this.head.z >= 29990000) {
+                || this.head.x >= 29990000
+                || this.head.z >= 29990000) {
                 final Block b = this.head.getBlockID_noChunkLoad(this.world);
                 if (Blocks.air == b) {
                     this.airToReplace.add(this.head.clone());
@@ -188,8 +173,8 @@ public class ThreadFindSeal {
             this.currentLayer.add(this.head);
             this.torchesToUpdate.clear();
             if (this.head.x < -29990000 || this.head.z < -29990000
-                    || this.head.x >= 29990000
-                    || this.head.z >= 29990000) {
+                || this.head.x >= 29990000
+                || this.head.z >= 29990000) {
                 this.unsealNearMapEdge();
             } else {
                 this.unseal();
@@ -222,8 +207,8 @@ public class ThreadFindSeal {
                         this.torchesToUpdate = new LinkedList<>();
                         this.currentLayer.add(newhead.clone());
                         if (newhead.x < -29990000 || newhead.z < -29990000
-                                || newhead.x >= 29990000
-                                || newhead.z >= 29990000) {
+                            || newhead.x >= 29990000
+                            || newhead.z >= 29990000) {
                             this.doLayerNearMapEdge();
                         } else {
                             this.doLayer();
@@ -234,11 +219,11 @@ public class ThreadFindSeal {
                         if (this.sealed) {
                             if (ConfigManagerCore.enableDebug) {
                                 GCLog.info(
-                                        "Oxygen Sealer replacing head at x" + this.head.x
-                                                + " y"
-                                                + (this.head.y - 1)
-                                                + " z"
-                                                + this.head.z);
+                                    "Oxygen Sealer replacing head at x" + this.head.x
+                                        + " y"
+                                        + (this.head.y - 1)
+                                        + " z"
+                                        + this.head.z);
                             }
                             if (!sealersSave.isEmpty()) {
                                 final TileEntityOxygenSealer oldHead = sealersSave.get(0);
@@ -290,7 +275,9 @@ public class ThreadFindSeal {
         // own seal checks for a while
         // (The player can control which is the head sealer in a space by
         // enabling just that one and disabling all the others)
-        final TileEntityOxygenSealer headSealer = this.sealersAround.get(this.head.clone().translate(0, -1, 0));
+        final TileEntityOxygenSealer headSealer = this.sealersAround.get(
+            this.head.clone()
+                .translate(0, -1, 0));
 
         // TODO: if multi-threaded, this final code block giving access to the sealer
         // tiles needs to be threadsafe
@@ -322,25 +309,25 @@ public class ThreadFindSeal {
             final float replacing = (time3 - time2) / 1000000.0F;
             GCLog.info("Oxygen Sealer Check Completed at x" + this.head.x + " y" + this.head.y + " z" + this.head.z);
             GCLog.info(
-                    "   Sealed: " + this.sealed
-                            + "  ~  "
-                            + this.sealers.size()
-                            + " sealers  ~  "
-                            + (this.checkedSize - 1)
-                            + " blocks");
+                "   Sealed: " + this.sealed
+                    + "  ~  "
+                    + this.sealers.size()
+                    + " sealers  ~  "
+                    + (this.checkedSize - 1)
+                    + " blocks");
             GCLog.info(
-                    "   Total Time taken: " + String.format("%.2f", total)
-                            + "ms  ~  "
-                            + String.format("%.2f", looping)
-                            + " + "
-                            + String.format("%.2f", replacing)
-                            + "");
+                "   Total Time taken: " + String.format("%.2f", total)
+                    + "ms  ~  "
+                    + String.format("%.2f", looping)
+                    + " + "
+                    + String.format("%.2f", replacing)
+                    + "");
         }
     }
 
     private void makeSealGood(boolean ambientThermal) {
         if (!this.airToReplace.isEmpty() || !this.airToReplaceBright.isEmpty()
-                || !this.ambientThermalTracked.isEmpty()) {
+            || !this.ambientThermalTracked.isEmpty()) {
             final List<ScheduledBlockChange> changeList = new LinkedList<>();
             final Block breatheableAirID = GCBlocks.breatheableAir;
             int metadata = 0;
@@ -353,11 +340,11 @@ public class ThreadFindSeal {
             }
             for (final BlockVec3 checkedVec : this.airToReplaceBright) {
                 changeList
-                        .add(new ScheduledBlockChange(checkedVec.clone(), GCBlocks.brightBreatheableAir, metadata, 2));
+                    .add(new ScheduledBlockChange(checkedVec.clone(), GCBlocks.brightBreatheableAir, metadata, 2));
             }
             for (final BlockVec3 checkedVec : this.ambientThermalTracked) {
-                changeList.add(
-                        new ScheduledBlockChange(checkedVec.clone(), checkedVec.getBlock(this.world), metadata, 3));
+                changeList
+                    .add(new ScheduledBlockChange(checkedVec.clone(), checkedVec.getBlock(this.world), metadata, 3));
             }
 
             TickHandlerServer.scheduleNewBlockChange(this.world.provider.dimensionId, changeList);
@@ -602,10 +589,10 @@ public class ThreadFindSeal {
                             // id == null means the void or height y>255, both
                             // of which are unsealed obviously
                             if (id == null || id == airID
-                                    || id == breatheableAirID
-                                    || id == airIDBright
-                                    || id == breatheableAirIDBright
-                                    || this.canBlockPassAirCheck(id, sideVec, side)) {
+                                || id == breatheableAirID
+                                || id == airIDBright
+                                || id == breatheableAirIDBright
+                                || this.canBlockPassAirCheck(id, sideVec, side)) {
                                 this.sealed = false;
                                 if (this.sealers.size() > 0) {
                                     vec.sideDoneBits = side << 6;
@@ -706,10 +693,10 @@ public class ThreadFindSeal {
                             // id == null means the void or height y>255, both
                             // of which are unsealed obviously
                             if (id == null || id == airID
-                                    || id == breatheableAirID
-                                    || id == airIDBright
-                                    || id == breatheableAirIDBright
-                                    || this.canBlockPassAirCheck(id, sideVec, side)) {
+                                || id == breatheableAirID
+                                || id == airIDBright
+                                || id == breatheableAirIDBright
+                                || this.canBlockPassAirCheck(id, sideVec, side)) {
                                 this.sealed = false;
                                 if (this.sealers.size() > 0) {
                                     vec.sideDoneBits = side << 6;
@@ -834,7 +821,8 @@ public class ThreadFindSeal {
     private void traceLeak(BlockVec3 tracer) {
         GCLog.debug("Leak tracing test length = " + this.checkedSize);
         final ArrayList<BlockVec3> route = new ArrayList<>();
-        final BlockVec3 start = this.head.clone().translate(0, 1, 0);
+        final BlockVec3 start = this.head.clone()
+            .translate(0, 1, 0);
         int count = 0;
         int x = tracer.x;
         int y = tracer.y;
@@ -907,7 +895,6 @@ public class ThreadFindSeal {
             return true;
         }
 
-
         // Check leaves first, because their isOpaqueCube() test depends on graphics
         // settings
         // (See net.minecraft.block.BlockLeaves.isOpaqueCube()!)
@@ -920,7 +907,7 @@ public class ThreadFindSeal {
             // Gravel, wool and sponge are porous
             this.checkedAdd(vec);
             return block instanceof BlockGravel || block.getMaterial() == Material.cloth
-                    || block instanceof BlockSponge;
+                || block instanceof BlockSponge;
         }
 
         if (block instanceof BlockGlass || block instanceof BlockStainedGlass) {
@@ -995,7 +982,8 @@ public class ThreadFindSeal {
         // interface ###
         if (block.isSideSolid(this.world, vec.x, vec.y, vec.z, ForgeDirection.getOrientation(side ^ 1))) {
             // Solid on all sides
-            if (block.getMaterial().blocksMovement() && block.renderAsNormalBlock()) {
+            if (block.getMaterial()
+                .blocksMovement() && block.renderAsNormalBlock()) {
                 this.checkedAdd(vec);
                 return false;
             }

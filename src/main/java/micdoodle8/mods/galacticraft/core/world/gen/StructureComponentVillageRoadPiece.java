@@ -5,7 +5,7 @@ public abstract class StructureComponentVillageRoadPiece extends StructureCompon
     public StructureComponentVillageRoadPiece() {}
 
     protected StructureComponentVillageRoadPiece(StructureComponentVillageStartPiece par1ComponentVillageStartPiece,
-            int par2) {
+        int par2) {
         super(par1ComponentVillageStartPiece, par2);
     }
 }

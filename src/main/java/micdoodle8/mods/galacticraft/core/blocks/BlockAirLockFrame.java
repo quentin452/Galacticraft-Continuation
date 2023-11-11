@@ -1,7 +1,13 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityAirLock;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityAirLockController;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -16,14 +22,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityAirLock;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityAirLockController;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class BlockAirLockFrame extends BlockAdvancedTile implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -65,7 +64,8 @@ public class BlockAirLockFrame extends BlockAdvancedTile implements ItemBlockDes
         final TileEntity tile = world.getTileEntity(x, y, z);
 
         if (tile instanceof TileEntityAirLockController && entityLiving instanceof EntityPlayer) {
-            ((TileEntityAirLockController) tile).ownerName = ((EntityPlayer) entityLiving).getGameProfile().getName();
+            ((TileEntityAirLockController) tile).ownerName = ((EntityPlayer) entityLiving).getGameProfile()
+                .getName();
         }
     }
 
@@ -87,7 +87,7 @@ public class BlockAirLockFrame extends BlockAdvancedTile implements ItemBlockDes
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int par1, int par2) {
         if (par2 < BlockAirLockFrame.METADATA_AIR_LOCK_CONTROLLER || par1 == ForgeDirection.UP.ordinal()
-                || par1 == ForgeDirection.DOWN.ordinal()) {
+            || par1 == ForgeDirection.DOWN.ordinal()) {
             return this.airLockIcons[0];
         }
 
@@ -138,12 +138,13 @@ public class BlockAirLockFrame extends BlockAdvancedTile implements ItemBlockDes
                         } else {
                             return this.airLockIcons[3];
                         }
-                    } else if (orientation.getOpposite().ordinal() == side) {
-                        return this.airLockIcons[0];
-                    }
+                    } else if (orientation.getOpposite()
+                        .ordinal() == side) {
+                            return this.airLockIcons[0];
+                        }
 
                     blockVec = vector.clone()
-                            .translate(new Vector3(orientation.offsetX, orientation.offsetY, orientation.offsetZ));
+                        .translate(new Vector3(orientation.offsetX, orientation.offsetY, orientation.offsetZ));
                     connection = blockVec.getBlock(world);
 
                     if (connection != null && connection.equals(GCBlocks.airLockSeal)) {
@@ -233,7 +234,7 @@ public class BlockAirLockFrame extends BlockAdvancedTile implements ItemBlockDes
 
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
         final TileEntity tile = world.getTileEntity(x, y, z);
 

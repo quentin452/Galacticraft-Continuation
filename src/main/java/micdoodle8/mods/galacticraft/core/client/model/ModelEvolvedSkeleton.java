@@ -248,7 +248,7 @@ public class ModelEvolvedSkeleton extends ModelBiped {
             var7 = 1.0F - var7;
             var8 = MathHelper.sin(var7 * (float) Math.PI);
             final float var9 = MathHelper.sin(this.onGround * (float) Math.PI) * -(this.bipedHead.rotateAngleX - 0.7F)
-                    * 0.75F;
+                * 0.75F;
             this.bipedRightArm.rotateAngleX = (float) (this.bipedRightArm.rotateAngleX - (var8 * 1.2D + var9));
             this.bipedRightArm.rotateAngleY += this.bipedBody.rotateAngleY * 2.0F;
             this.bipedRightArm.rotateAngleZ = MathHelper.sin(this.onGround * (float) Math.PI) * -0.4F;

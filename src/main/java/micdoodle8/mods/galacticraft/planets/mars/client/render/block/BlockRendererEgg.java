@@ -1,13 +1,11 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.block;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.IBlockAccess;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class BlockRendererEgg implements ISimpleBlockRenderingHandler {
 
@@ -19,7 +17,7 @@ public class BlockRendererEgg implements ISimpleBlockRenderingHandler {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess var1, int var2, int var3, int var4, Block var5, int var6,
-            RenderBlocks var7) {
+        RenderBlocks var7) {
         this.renderBlockMeteor(var7, var5, var1, var2, var3, var4);
         return true;
     }
@@ -97,7 +95,7 @@ public class BlockRendererEgg implements ISimpleBlockRenderingHandler {
     }
 
     public void renderBlockMeteor(RenderBlocks renderBlocks, Block par1Block, IBlockAccess var1, int par2, int par3,
-            int par4) {
+        int par4) {
         var1.getBlockMetadata(par2, par3, par4);
 
         renderBlocks.setRenderBounds(0.2F, 0.0F, 0.2F, 0.8F, 0.5F, 0.8F);

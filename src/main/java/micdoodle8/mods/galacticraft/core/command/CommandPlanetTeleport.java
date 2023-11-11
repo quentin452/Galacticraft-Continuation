@@ -1,5 +1,10 @@
 package micdoodle8.mods.galacticraft.core.command;
 
+import micdoodle8.mods.galacticraft.core.client.gui.screen.GuiCelestialSelection;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -8,12 +13,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.WorldServer;
-
-import micdoodle8.mods.galacticraft.core.client.gui.screen.GuiCelestialSelection;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
-import micdoodle8.mods.galacticraft.core.util.WorldUtil;
 
 public class CommandPlanetTeleport extends CommandBase {
 
@@ -38,15 +37,14 @@ public class CommandPlanetTeleport extends CommandBase {
 
         if (astring.length >= 2) {
             throw new WrongUsageException(
-                    GCCoreUtil
-                            .translateWithFormat("commands.dimensiontp.tooMany", this.getCommandUsage(icommandsender)));
+                GCCoreUtil.translateWithFormat("commands.dimensiontp.tooMany", this.getCommandUsage(icommandsender)));
         }
         try {
             if (astring.length == 1) {
                 playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(astring[0], true);
             } else {
                 playerBase = PlayerUtil
-                        .getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
+                    .getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
             }
 
             if (playerBase == null) {
@@ -61,10 +59,10 @@ public class CommandPlanetTeleport extends CommandBase {
 
             try {
                 WorldUtil.toCelestialSelection(
-                        playerBase,
-                        stats,
-                        Integer.MAX_VALUE,
-                        GuiCelestialSelection.MapMode.TELEPORTATION);
+                    playerBase,
+                    stats,
+                    Integer.MAX_VALUE,
+                    GuiCelestialSelection.MapMode.TELEPORTATION);
             } catch (final Exception e) {
                 e.printStackTrace();
                 throw e;

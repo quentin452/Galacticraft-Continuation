@@ -1,11 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.event;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-
-import org.lwjgl.Sys;
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -20,6 +14,10 @@ import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.asteroids.client.SkyProviderAsteroids;
 import micdoodle8.mods.galacticraft.planets.asteroids.client.render.NetworkRenderer;
 import micdoodle8.mods.galacticraft.planets.asteroids.dimension.WorldProviderAsteroids;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import org.lwjgl.Sys;
+import org.lwjgl.opengl.GL11;
 
 public class AsteroidsEventHandlerClient {
 
@@ -44,7 +42,8 @@ public class AsteroidsEventHandlerClient {
     @SubscribeEvent
     public void onRingRender(CelestialBodyRenderEvent.CelestialRingRenderEvent.Pre renderEvent) {
         if (renderEvent.celestialBody.equals(AsteroidsModule.planetAsteroids)) {
-            if (FMLClientHandler.instance().getClient().currentScreen instanceof GuiCelestialSelection) {
+            if (FMLClientHandler.instance()
+                .getClient().currentScreen instanceof GuiCelestialSelection) {
                 GL11.glColor4f(0.7F, 0.0F, 0.0F, 0.5F);
             } else {
                 GL11.glColor4f(0.3F, 0.1F, 0.1F, 1.0F);
@@ -124,6 +123,9 @@ public class AsteroidsEventHandlerClient {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onSpecialRender(EventSpecialRender event) {
-        NetworkRenderer.renderNetworks(FMLClientHandler.instance().getClient().theWorld, event.partialTicks);
+        NetworkRenderer.renderNetworks(
+            FMLClientHandler.instance()
+                .getClient().theWorld,
+            event.partialTicks);
     }
 }

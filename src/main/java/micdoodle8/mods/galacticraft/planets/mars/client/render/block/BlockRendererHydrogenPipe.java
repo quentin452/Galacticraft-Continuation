@@ -1,17 +1,15 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.block;
 
-import java.util.Arrays;
-
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityHydrogenPipe;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
-
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityHydrogenPipe;
+import java.util.Arrays;
 
 public class BlockRendererHydrogenPipe implements ISimpleBlockRenderingHandler {
 
@@ -36,7 +34,8 @@ public class BlockRendererHydrogenPipe implements ISimpleBlockRenderingHandler {
 
             for (final TileEntity connection : connections) {
                 if (connection != null) {
-                    final int side = Arrays.asList(connections).indexOf(connection);
+                    final int side = Arrays.asList(connections)
+                        .indexOf(connection);
 
                     switch (side) {
                         case 0: // DOWN
@@ -109,7 +108,7 @@ public class BlockRendererHydrogenPipe implements ISimpleBlockRenderingHandler {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
-            RenderBlocks renderer) {
+        RenderBlocks renderer) {
         this.renderPipe(renderer, world, block, x, y, z);
         return true;
     }

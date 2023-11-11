@@ -1,18 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.nei;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
@@ -22,15 +9,26 @@ import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.asteroids.items.AsteroidsItems;
 import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class GasLiquefierRecipeHandler extends TemplateRecipeHandler {
 
     private static final ResourceLocation liquefierGuiTexture = new ResourceLocation(
-            MarsModule.ASSET_PREFIX,
-            "textures/gui/gasLiquefier.png");
+        MarsModule.ASSET_PREFIX,
+        "textures/gui/gasLiquefier.png");
     private static final ResourceLocation liquefierGasesTexture = new ResourceLocation(
-            AsteroidsModule.ASSET_PREFIX,
-            "textures/gui/gasesMethaneOxygenNitrogen.png");
+        AsteroidsModule.ASSET_PREFIX,
+        "textures/gui/gasesMethaneOxygenNitrogen.png");
     int ticksPassed;
     int extra = 0;
     int inputGas = 0; // 0 is methane 1 is oxygen 2 is atmosphere or nitrogen
@@ -83,12 +81,12 @@ public class GasLiquefierRecipeHandler extends TemplateRecipeHandler {
                 GuiDraw.drawTexturedModalRect(127, 62 - level, 176 + 16, 26 - level, 16, level);
             } else {
                 GuiDraw.drawTexturedModalRect(
-                        127 + (this.outputGas == 3 ? 21 : 0),
-                        62 - level,
-                        1 + this.outputGas * 17,
-                        26 - level,
-                        16,
-                        level);
+                    127 + (this.outputGas == 3 ? 21 : 0),
+                    62 - level,
+                    1 + this.outputGas * 17,
+                    26 - level,
+                    16,
+                    level);
                 GuiDraw.changeTexture(GasLiquefierRecipeHandler.liquefierGuiTexture);
             }
 
@@ -100,10 +98,10 @@ public class GasLiquefierRecipeHandler extends TemplateRecipeHandler {
 
         if (this.fillAtmos) {
             final String gasname = this.outputGas == 3 ? GCCoreUtil.translate("gas.oxygen.name")
-                    : GCCoreUtil.translate("gas.nitrogen.name");
+                : GCCoreUtil.translate("gas.nitrogen.name");
             final String text1 = " * " + GCCoreUtil.translate("gui.message.withAtmosphere0.name");
             final String text2 = GCCoreUtil.lowerCaseNoun(gasname) + " "
-                    + GCCoreUtil.translate("gui.message.withAtmosphere1.name");
+                + GCCoreUtil.translate("gui.message.withAtmosphere1.name");
             this.fontRendererObj.drawString(text1, 4, 83, 4210752);
             this.fontRendererObj.drawString(text2, 4, 93, 4210752);
         }
@@ -151,7 +149,9 @@ public class GasLiquefierRecipeHandler extends TemplateRecipeHandler {
 
     @Override
     public ArrayList<PositionedStack> getIngredientStacks(int recipe) {
-        final PositionedStack input = this.arecipes.get(recipe).getIngredients().get(0);
+        final PositionedStack input = this.arecipes.get(recipe)
+            .getIngredients()
+            .get(0);
         final Item inputItem = input.item.getItem();
 
         this.inputGas = 2;
@@ -167,15 +167,17 @@ public class GasLiquefierRecipeHandler extends TemplateRecipeHandler {
         if (this.ticksPassed % 144 > 40) {
             final ArrayList<PositionedStack> stacks = new ArrayList<>();
             stacks.add(
-                    new PositionedStack(new ItemStack(inputItem, 1, inputItem.getMaxDamage()), input.relx, input.rely));
+                new PositionedStack(new ItemStack(inputItem, 1, inputItem.getMaxDamage()), input.relx, input.rely));
             return stacks;
         }
-        return (ArrayList<PositionedStack>) this.arecipes.get(recipe).getIngredients();
+        return (ArrayList<PositionedStack>) this.arecipes.get(recipe)
+            .getIngredients();
     }
 
     @Override
     public PositionedStack getResultStack(int recipe) {
-        final PositionedStack output = this.arecipes.get(recipe).getResult();
+        final PositionedStack output = this.arecipes.get(recipe)
+            .getResult();
         final Item outputItem = output.item.getItem();
 
         if (outputItem == GCItems.fuelCanister) {
@@ -188,11 +190,12 @@ public class GasLiquefierRecipeHandler extends TemplateRecipeHandler {
 
         if (this.ticksPassed % 144 < 104) {
             return new PositionedStack(
-                    new ItemStack(outputItem, 1, outputItem.getMaxDamage()),
-                    output.relx,
-                    output.rely);
+                new ItemStack(outputItem, 1, outputItem.getMaxDamage()),
+                output.relx,
+                output.rely);
         }
-        return this.arecipes.get(recipe).getResult();
+        return this.arecipes.get(recipe)
+            .getResult();
     }
 
     public class CachedLiquefierRecipe extends TemplateRecipeHandler.CachedRecipe {

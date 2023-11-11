@@ -1,15 +1,14 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.fx;
 
-import java.lang.ref.WeakReference;
-
-import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.world.World;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
 import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityShortRangeTelepad;
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.world.World;
+
+import java.lang.ref.WeakReference;
 
 @SideOnly(Side.CLIENT)
 public class EntityFXTeleport extends EntityFX {
@@ -22,7 +21,7 @@ public class EntityFXTeleport extends EntityFX {
     private final boolean direction;
 
     public EntityFXTeleport(World par1World, Vector3 position, Vector3 motion, TileEntityShortRangeTelepad telepad,
-            boolean direction) {
+        boolean direction) {
         super(par1World, position.x, position.y, position.z, motion.x, motion.y, motion.z);
         this.motionX = motion.x;
         this.motionY = motion.y;
@@ -40,7 +39,7 @@ public class EntityFXTeleport extends EntityFX {
 
     @Override
     public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4, float par5, float par6,
-            float par7) {
+        float par7) {
         float f6 = (this.particleAge + par2) / this.particleMaxAge;
         f6 = 1.0F - f6;
         f6 *= f6;

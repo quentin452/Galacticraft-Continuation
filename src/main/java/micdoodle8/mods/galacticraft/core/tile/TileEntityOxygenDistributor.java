@@ -1,9 +1,16 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import micdoodle8.mods.galacticraft.api.block.IOxygenReliantBlock;
+import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3Dim;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.entities.IBubbleProvider;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -16,20 +23,12 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import io.netty.buffer.ByteBuf;
-import micdoodle8.mods.galacticraft.api.block.IOxygenReliantBlock;
-import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3Dim;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.entities.IBubbleProvider;
-import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
-import micdoodle8.mods.galacticraft.core.util.FluidUtil;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
 
 public class TileEntityOxygenDistributor extends TileEntityOxygen
-        implements IInventory, ISidedInventory, IBubbleProvider {
+    implements IInventory, ISidedInventory, IBubbleProvider {
 
     public boolean active;
     public boolean lastActive;
@@ -51,14 +50,14 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
         super.validate();
         if (!this.worldObj.isRemote) {
             TileEntityOxygenDistributor.loadedTiles
-                    .add(new BlockVec3Dim(this.xCoord, this.yCoord, this.zCoord, this.worldObj.provider.dimensionId));
+                .add(new BlockVec3Dim(this.xCoord, this.yCoord, this.zCoord, this.worldObj.provider.dimensionId));
         }
     }
 
     @Override
     public void onChunkUnload() {
         TileEntityOxygenDistributor.loadedTiles
-                .remove(new BlockVec3Dim(this.xCoord, this.yCoord, this.zCoord, this.worldObj.provider.dimensionId));
+            .remove(new BlockVec3Dim(this.xCoord, this.yCoord, this.zCoord, this.worldObj.provider.dimensionId));
         super.onChunkUnload();
     }
 
@@ -79,8 +78,8 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
                 }
             }
             // this.oxygenBubble.setDead();
-            TileEntityOxygenDistributor.loadedTiles.remove(
-                    new BlockVec3Dim(this.xCoord, this.yCoord, this.zCoord, this.worldObj.provider.dimensionId));
+            TileEntityOxygenDistributor.loadedTiles
+                .remove(new BlockVec3Dim(this.xCoord, this.yCoord, this.zCoord, this.worldObj.provider.dimensionId));
         }
 
         super.invalidate();
@@ -99,7 +98,8 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
             // {
             // networkedList.add(this.oxygenBubble.getEntityId());
             // }
-            if (MinecraftServer.getServer().isDedicatedServer()) {
+            if (MinecraftServer.getServer()
+                .isDedicatedServer()) {
                 networkedList.add(loadedTiles.size());
                 // TODO: Limit this to ones in the same dimension as this tile?
                 for (final BlockVec3Dim distributor : loadedTiles) {
@@ -127,12 +127,12 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
         return AxisAlignedBB.getBoundingBox(
-                this.xCoord - this.bubbleSize,
-                this.yCoord - this.bubbleSize,
-                this.zCoord - this.bubbleSize,
-                this.xCoord + this.bubbleSize,
-                this.yCoord + this.bubbleSize,
-                this.zCoord + this.bubbleSize);
+            this.xCoord - this.bubbleSize,
+            this.yCoord - this.bubbleSize,
+            this.zCoord - this.bubbleSize,
+            this.xCoord + this.bubbleSize,
+            this.yCoord + this.bubbleSize,
+            this.zCoord + this.bubbleSize);
     }
 
     @Override
@@ -186,7 +186,7 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
 
         if (!this.worldObj.isRemote) {
             if (this.getEnergyStoredGC() > 0.0F && this.hasEnoughEnergyToRun
-                    && this.storedOxygen > this.oxygenPerTick) {
+                && this.storedOxygen > this.oxygenPerTick) {
                 this.bubbleSize += 0.01F;
             } else {
                 this.bubbleSize -= 0.1F;
@@ -242,11 +242,13 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        if (nbt.func_150296_c().contains("bubbleVisible")) {
+        if (nbt.func_150296_c()
+            .contains("bubbleVisible")) {
             this.setBubbleVisible(nbt.getBoolean("bubbleVisible"));
         }
 
-        if (nbt.func_150296_c().contains("bubbleSize")) {
+        if (nbt.func_150296_c()
+            .contains("bubbleSize")) {
             this.bubbleSize = nbt.getFloat("bubbleSize");
         }
         // this.hasValidBubble = nbt.getBoolean("hasValidBubble");
@@ -348,7 +350,7 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     // ISidedInventory Implementation:
@@ -365,7 +367,8 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
                 case 0:
                     return ItemElectricBase.isElectricItemCharged(itemstack);
                 case 1:
-                    return itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
+                    return itemstack.getItemDamage() < itemstack.getItem()
+                        .getMaxDamage();
                 default:
                     return false;
             }
@@ -432,7 +435,9 @@ public class TileEntityOxygenDistributor extends TileEntityOxygen
 
     @Override
     public EnumSet<ForgeDirection> getOxygenInputDirections() {
-        return EnumSet.of(this.getElectricInputDirection().getOpposite());
+        return EnumSet.of(
+            this.getElectricInputDirection()
+                .getOpposite());
     }
 
     @Override

@@ -1,7 +1,9 @@
 package micdoodle8.mods.galacticraft.planets.mars.client;
 
-import java.util.Random;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GLAllocation;
@@ -12,14 +14,10 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.IRenderHandler;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import java.util.Random;
 
 /**
  * SkyProviderMars.java
@@ -31,8 +29,8 @@ import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 public class SkyProviderMars extends IRenderHandler {
 
     private static final ResourceLocation overworldTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/celestialbodies/earth.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/celestialbodies/earth.png");
     private static final ResourceLocation sunTexture = new ResourceLocation("textures/environment/sun.png");
 
     public int starList;
@@ -234,7 +232,8 @@ public class SkyProviderMars extends IRenderHandler {
         GL11.glRotatef(40.0F, 0.0F, 0.0F, 1.0F);
         GL11.glRotatef(200F, 1.0F, 0.0F, 0.0F);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1F);
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(SkyProviderMars.overworldTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(SkyProviderMars.overworldTexture);
         tessellator1.startDrawingQuads();
         tessellator1.addVertexWithUV(-f10, -100.0D, f10, 0, 1);
         tessellator1.addVertexWithUV(f10, -100.0D, f10, 1, 1);
@@ -353,7 +352,8 @@ public class SkyProviderMars extends IRenderHandler {
     }
 
     public float getSkyBrightness(float par1) {
-        final float var2 = FMLClientHandler.instance().getClient().theWorld.getCelestialAngle(par1);
+        final float var2 = FMLClientHandler.instance()
+            .getClient().theWorld.getCelestialAngle(par1);
         float var3 = 1.0F - (MathHelper.sin(var2 * (float) Math.PI * 2.0F) * 2.0F + 0.25F);
 
         if (var3 < 0.0F) {

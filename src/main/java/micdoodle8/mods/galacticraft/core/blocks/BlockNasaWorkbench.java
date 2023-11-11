@@ -1,7 +1,16 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
+import micdoodle8.mods.galacticraft.api.recipe.SchematicRegistry;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.IMultiBlock;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityNasaWorkbench;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.ITileEntityProvider;
@@ -15,29 +24,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
-import micdoodle8.mods.galacticraft.api.recipe.SchematicRegistry;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.IMultiBlock;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityNasaWorkbench;
-import micdoodle8.mods.galacticraft.core.util.EnumColor;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class BlockNasaWorkbench extends BlockContainer
-        implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc, IPartialSealableBlock {
+    implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc, IPartialSealableBlock {
 
     IIcon[] iconBuffer;
 
@@ -75,12 +70,12 @@ public class BlockNasaWorkbench extends BlockContainer
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k) {
         return AxisAlignedBB.getBoundingBox(
-                (double) i + -0.0F,
-                (double) j + 0.0F,
-                (double) k + -0.0F,
-                (double) i + 1.0F,
-                (double) j + 1.4F,
-                (double) k + 1.0F);
+            (double) i + -0.0F,
+            (double) j + 0.0F,
+            (double) k + -0.0F,
+            (double) i + 1.0F,
+            (double) j + 1.4F,
+            (double) k + 1.0F);
     }
 
     @SideOnly(Side.CLIENT)
@@ -102,7 +97,7 @@ public class BlockNasaWorkbench extends BlockContainer
 
     @Override
     public void addCollisionBoxesToList(World world, int i, int j, int k, AxisAlignedBB axisalignedbb,
-            List<AxisAlignedBB> arraylist, Entity par7Entity) {
+        List<AxisAlignedBB> arraylist, Entity par7Entity) {
         this.setBlockBounds(-0.0F, 0.0F, -0.0F, 1.0F, 1.4F, 1.0F);
         super.addCollisionBoxesToList(world, i, j, k, axisalignedbb, arraylist, par7Entity);
     }
@@ -126,12 +121,15 @@ public class BlockNasaWorkbench extends BlockContainer
                             final Block blockAt = world.getBlock(x0 + x, y0 + y, z0 + z);
 
                             if ((y == 0 || y == 3) && x == 0 && z == 0) {
-                                if (!blockAt.getMaterial().isReplaceable()) {
+                                if (!blockAt.getMaterial()
+                                    .isReplaceable()) {
                                     validSpot = false;
                                 }
-                            } else if (y != 0 && y != 3 && !blockAt.getMaterial().isReplaceable()) {
-                                validSpot = false;
-                            }
+                            } else if (y != 0 && y != 3
+                                && !blockAt.getMaterial()
+                                    .isReplaceable()) {
+                                        validSpot = false;
+                                    }
                         }
                     }
                 }
@@ -143,7 +141,8 @@ public class BlockNasaWorkbench extends BlockContainer
 
             if (!world.isRemote && entity instanceof EntityPlayerMP) {
                 EntityPlayerMP player = (EntityPlayerMP) entity;
-                player.addChatMessage(new ChatComponentText(EnumColor.RED + GCCoreUtil.translate("gui.warning.noroom")));
+                player
+                    .addChatMessage(new ChatComponentText(EnumColor.RED + GCCoreUtil.translate("gui.warning.noroom")));
 
                 if (!player.capabilities.isCreativeMode) {
                     final ItemStack nasaWorkbench = new ItemStack(this, 1, 0);
@@ -202,14 +201,15 @@ public class BlockNasaWorkbench extends BlockContainer
 
     @Override
     public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer,
-            int par6, float par7, float par8, float par9) {
+        int par6, float par7, float par8, float par9) {
         par5EntityPlayer.openGui(
-                GalacticraftCore.instance,
-                SchematicRegistry.getMatchingRecipeForID(0).getGuiID(),
-                par1World,
-                par2,
-                par3,
-                par4);
+            GalacticraftCore.instance,
+            SchematicRegistry.getMatchingRecipeForID(0)
+                .getGuiID(),
+            par1World,
+            par2,
+            par3,
+            par4);
         return true;
     }
 

@@ -1,20 +1,18 @@
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.client.model.block.ModelNasaWorkbench;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.client.model.block.ModelNasaWorkbench;
 
 public class TileEntityNasaWorkbenchRenderer extends TileEntitySpecialRenderer {
 
     private static final ResourceLocation assemblyTableTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/assembly.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/assembly.png");
     public ModelNasaWorkbench model = new ModelNasaWorkbench();
 
     @Override

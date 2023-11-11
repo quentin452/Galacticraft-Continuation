@@ -1,13 +1,5 @@
 package micdoodle8.mods.galacticraft.core.client.gui.container;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.inventory.IInventory;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.entity.IRocketType.EnumRocketType;
@@ -18,6 +10,12 @@ import micdoodle8.mods.galacticraft.core.client.gui.element.GuiElementInfoRegion
 import micdoodle8.mods.galacticraft.core.inventory.ContainerRocketInventory;
 import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiRocketInventory extends GuiContainerGC {
@@ -27,8 +25,8 @@ public class GuiRocketInventory extends GuiContainerGC {
     static {
         for (int i = 0; i < 4; i++) {
             GuiRocketInventory.rocketTextures[i] = new ResourceLocation(
-                    GalacticraftCore.ASSET_PREFIX,
-                    "textures/gui/rocket_" + i * 18 + ".png");
+                GalacticraftCore.ASSET_PREFIX,
+                "textures/gui/rocket_" + i * 18 + ".png");
         }
     }
 
@@ -50,17 +48,17 @@ public class GuiRocketInventory extends GuiContainerGC {
         fuelTankDesc.add(GCCoreUtil.translate("gui.fuelTank.desc.0"));
         fuelTankDesc.add(GCCoreUtil.translate("gui.fuelTank.desc.1"));
         this.infoRegions.add(
-                new GuiElementInfoRegion(
-                        (this.width - this.xSize) / 2
-                                + (((EntityTieredRocket) this.mc.thePlayer.ridingEntity).rocketType.getInventorySpace()
-                                        == 2 ? 70 : 71),
-                        (this.height - this.ySize) / 2 + 6,
-                        36,
-                        40,
-                        fuelTankDesc,
-                        this.width,
-                        this.height,
-                        this));
+            new GuiElementInfoRegion(
+                (this.width - this.xSize) / 2
+                    + (((EntityTieredRocket) this.mc.thePlayer.ridingEntity).rocketType.getInventorySpace() == 2 ? 70
+                        : 71),
+                (this.height - this.ySize) / 2 + 6,
+                36,
+                40,
+                fuelTankDesc,
+                this.width,
+                this.height,
+                this));
     }
 
     @Override
@@ -68,21 +66,21 @@ public class GuiRocketInventory extends GuiContainerGC {
         this.fontRendererObj.drawString(GCCoreUtil.translate("gui.message.fuel.name"), 8, 2 + 3, 4210752);
 
         this.fontRendererObj
-                .drawString(GCCoreUtil.translate(this.upperChestInventory.getInventoryName()), 8, 34 + 2 + 3, 4210752);
+            .drawString(GCCoreUtil.translate(this.upperChestInventory.getInventoryName()), 8, 34 + 2 + 3, 4210752);
 
         if (this.mc.thePlayer != null && this.mc.thePlayer.ridingEntity instanceof EntitySpaceshipBase) {
             this.fontRendererObj.drawString(GCCoreUtil.translate("gui.message.fuel.name") + ":", 125, 15, 4210752);
             final EntitySpaceshipBase spaceship = (EntitySpaceshipBase) this.mc.thePlayer.ridingEntity;
             final double percentage = spaceship.getScaledFuelLevel(100);
             final String color = percentage > 80.0D ? EnumColor.BRIGHT_GREEN.getCode()
-                    : percentage > 40.0D ? EnumColor.ORANGE.getCode() : EnumColor.RED.getCode();
+                : percentage > 40.0D ? EnumColor.ORANGE.getCode() : EnumColor.RED.getCode();
             // final String str = percentage + "% " +
             // GCCoreUtil.translate("gui.message.full.name");
             final String str1 = String.format("%.1f%% %s", percentage, GCCoreUtil.translate("gui.message.full.name"));
             final String str2 = String.format(
-                    "%.1f/%.1f B",
-                    spaceship.fuelTank.getFluidAmount() / 1000.0f,
-                    spaceship.fuelTank.getCapacity() / 1000.0f);
+                "%.1f/%.1f B",
+                spaceship.fuelTank.getFluidAmount() / 1000.0f,
+                spaceship.fuelTank.getCapacity() / 1000.0f);
             this.fontRendererObj.drawString(color + str1, 117 - str1.length() / 2, 16 + 8, 4210752);
             this.fontRendererObj.drawString(color + str2, 117 - str2.length() / 2, 16 + 16, 4210752);
         }
@@ -91,7 +89,7 @@ public class GuiRocketInventory extends GuiContainerGC {
     @Override
     protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {
         this.mc.getTextureManager()
-                .bindTexture(GuiRocketInventory.rocketTextures[(this.rocketType.getInventorySpace() - 2) / 18]);
+            .bindTexture(GuiRocketInventory.rocketTextures[(this.rocketType.getInventorySpace() - 2) / 18]);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         final int var5 = (this.width - this.xSize) / 2;
@@ -102,15 +100,14 @@ public class GuiRocketInventory extends GuiContainerGC {
             final int fuelLevel = ((EntitySpaceshipBase) this.mc.thePlayer.ridingEntity).getScaledFuelLevel(38);
 
             this.drawTexturedModalRect(
-                    (this.width - this.xSize) / 2
-                            + (((EntityTieredRocket) this.mc.thePlayer.ridingEntity).rocketType.getInventorySpace() == 2
-                                    ? 71
-                                    : 72),
-                    (this.height - this.ySize) / 2 + 45 - fuelLevel,
-                    176,
-                    38 - fuelLevel,
-                    42,
-                    fuelLevel);
+                (this.width - this.xSize) / 2
+                    + (((EntityTieredRocket) this.mc.thePlayer.ridingEntity).rocketType.getInventorySpace() == 2 ? 71
+                        : 72),
+                (this.height - this.ySize) / 2 + 45 - fuelLevel,
+                176,
+                38 - fuelLevel,
+                42,
+                fuelLevel);
         }
     }
 }

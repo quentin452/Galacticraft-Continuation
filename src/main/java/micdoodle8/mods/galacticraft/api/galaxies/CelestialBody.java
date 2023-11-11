@@ -1,15 +1,13 @@
 package micdoodle8.mods.galacticraft.api.galaxies;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
+import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldProvider;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public abstract class CelestialBody implements Comparable<CelestialBody> {
 
@@ -57,7 +55,8 @@ public abstract class CelestialBody implements Comparable<CelestialBody> {
         String s = this.getUnlocalizedName();
         s = s == null ? "" : StatCollector.translateToLocal(s);
         final int comment = s.indexOf('#');
-        return comment > 0 ? s.substring(0, comment).trim() : s;
+        return comment > 0 ? s.substring(0, comment)
+            .trim() : s;
     }
 
     /**
@@ -141,7 +140,7 @@ public abstract class CelestialBody implements Comparable<CelestialBody> {
     }
 
     public CelestialBody setDimensionInfo(int providerId, Class<? extends WorldProvider> providerClass,
-            boolean autoRegister) {
+        boolean autoRegister) {
         this.dimensionID = providerId;
         this.providerClass = providerClass;
         this.autoRegisterDimension = autoRegister;
@@ -222,14 +221,15 @@ public abstract class CelestialBody implements Comparable<CelestialBody> {
 
     @Override
     public int hashCode() {
-        return this.getUnlocalizedName().hashCode();
+        return this.getUnlocalizedName()
+            .hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
         if (other instanceof CelestialBody) {
             return new EqualsBuilder().append(this.getUnlocalizedName(), ((CelestialBody) other).getUnlocalizedName())
-                    .isEquals();
+                .isEquals();
         }
 
         return false;
@@ -240,7 +240,7 @@ public abstract class CelestialBody implements Comparable<CelestialBody> {
         final ScalableDistance thisDistance = this.getRelativeDistanceFromCenter();
         final ScalableDistance otherDistance = other.getRelativeDistanceFromCenter();
         return otherDistance.unScaledDistance < thisDistance.unScaledDistance ? 1
-                : otherDistance.unScaledDistance > thisDistance.unScaledDistance ? -1 : 0;
+            : otherDistance.unScaledDistance > thisDistance.unScaledDistance ? -1 : 0;
     }
 
     public static class ScalableDistance {

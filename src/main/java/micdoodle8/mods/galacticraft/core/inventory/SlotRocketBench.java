@@ -1,15 +1,14 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 
 public class SlotRocketBench extends Slot {
 
@@ -18,7 +17,7 @@ public class SlotRocketBench extends Slot {
     private final EntityPlayer player;
 
     public SlotRocketBench(IInventory par2IInventory, int par3, int par4, int par5, int x, int y, int z,
-            EntityPlayer player) {
+        EntityPlayer player) {
         super(par2IInventory, par3, par4, par5);
         this.index = par3;
         this.x = x;
@@ -40,10 +39,10 @@ public class SlotRocketBench extends Slot {
 
                     if (var14 * var14 + var16 * var16 + var18 * var18 < 20 * 20) {
                         GalacticraftCore.packetPipeline.sendTo(
-                                new PacketSimple(
-                                        EnumSimplePacket.C_SPAWN_SPARK_PARTICLES,
-                                        new Object[] { this.x, this.y, this.z }),
-                                var13);
+                            new PacketSimple(
+                                EnumSimplePacket.C_SPAWN_SPARK_PARTICLES,
+                                new Object[] { this.x, this.y, this.z }),
+                            var13);
                     }
                 }
             }

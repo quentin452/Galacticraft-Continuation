@@ -1,7 +1,6 @@
 package micdoodle8.mods.galacticraft.planets.mars.world.gen;
 
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -9,7 +8,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
-import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
+import java.util.Random;
 
 public class WorldGenTerraformTree extends WorldGenerator {
 
@@ -66,10 +65,10 @@ public class WorldGenTerraformTree extends WorldGenerator {
                         final boolean isAir = par1World.isAirBlock(l1, i1, j1);
 
                         if (!isAir && k1b != Blocks.grass
-                                && k1b != Blocks.water
-                                && k1b != Blocks.flowing_water
-                                && k1b != MarsBlocks.marsBlock
-                                && k2 != 5) {
+                            && k1b != Blocks.water
+                            && k1b != Blocks.flowing_water
+                            && k1b != MarsBlocks.marsBlock
+                            && k2 != 5) {
                             flag = false;
                         }
                     } else {
@@ -172,12 +171,12 @@ public class WorldGenTerraformTree extends WorldGenerator {
                         if (par2Random.nextInt(4 - j1) == 0) {
                             i2 = par2Random.nextInt(3);
                             this.setBlockAndNotifyAdequately(
-                                    par1World,
-                                    x + Direction.offsetX[Direction.rotateOpposite[k1]],
-                                    y + l - 5 + j1,
-                                    z + Direction.offsetZ[Direction.rotateOpposite[k1]],
-                                    Blocks.cocoa,
-                                    i2 << 2 | k1);
+                                par1World,
+                                x + Direction.offsetX[Direction.rotateOpposite[k1]],
+                                y + l - 5 + j1,
+                                z + Direction.offsetZ[Direction.rotateOpposite[k1]],
+                                Blocks.cocoa,
+                                i2 << 2 | k1);
                         }
                     }
                 }

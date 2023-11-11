@@ -1,30 +1,5 @@
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
-import java.nio.DoubleBuffer;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityOtherPlayerMP;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityOcelot;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -35,6 +10,25 @@ import micdoodle8.mods.galacticraft.core.client.render.entities.RenderPlayerGC;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityTelemetry;
 import micdoodle8.mods.galacticraft.core.util.ColorUtil;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.World;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import java.nio.DoubleBuffer;
 
 public class GameScreenText implements IGameScreen {
 
@@ -45,7 +39,9 @@ public class GameScreenText implements IGameScreen {
     private DoubleBuffer planes;
 
     public GameScreenText() {
-        if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+        if (FMLCommonHandler.instance()
+            .getEffectiveSide()
+            .isClient()) {
             this.planes = BufferUtils.createDoubleBuffer(4 * Double.SIZE);
         }
     }
@@ -89,7 +85,7 @@ public class GameScreenText implements IGameScreen {
         if (telemeter != null && telemeter.clientData.length >= 3) {
             if (telemeter.clientClass != null) {
                 if (telemeter.clientClass == screen.telemetryLastClass && (telemeter.clientClass != EntityPlayerMP.class
-                        || telemeter.clientName.equals(screen.telemetryLastName))) {
+                    || telemeter.clientName.equals(screen.telemetryLastName))) {
                     // Used cached data from last time if possible
                     entity = screen.telemetryLastEntity;
                     renderEntity = screen.telemetryLastRender;
@@ -105,7 +101,7 @@ public class GameScreenText implements IGameScreen {
                     } else {
                         try {
                             entity = telemeter.clientClass.getConstructor(World.class)
-                                    .newInstance(screen.driver.getWorldObj());
+                                .newInstance(screen.driver.getWorldObj());
                         } catch (final Exception ex) {}
                         if (entity != null) {
                             strName = entity.getCommandSenderName();
@@ -164,8 +160,8 @@ public class GameScreenText implements IGameScreen {
                         str[4] = GCCoreUtil.translate("gui.oxygenStorage.desc.1") + ": OK";
                     } else {
                         str[4] = GCCoreUtil.translate("gui.oxygenStorage.desc.1") + ": "
-                                + this.makeOxygenString(oxygen)
-                                + GCCoreUtil.translate("gui.seconds");
+                            + this.makeOxygenString(oxygen)
+                            + GCCoreUtil.translate("gui.seconds");
                     }
                 }
             } else
@@ -232,9 +228,9 @@ public class GameScreenText implements IGameScreen {
         // If there is an entity to render, draw it on the left of the text
         if (renderEntity != null && entity != null) {
             GL11.glTranslatef(
-                    -Xmargin / 2 / scaleText,
-                    textHeightPixels / 2 + (-Yoffset + (sizeY - borders) / 2) / scaleText,
-                    -0.0005F);
+                -Xmargin / 2 / scaleText,
+                textHeightPixels / 2 + (-Yoffset + (sizeY - borders) / 2) / scaleText,
+                -0.0005F);
             final float scalefactor = 38F / (float) Math.pow(Math.max(entity.height, entity.width), 0.65);
             GL11.glScalef(scalefactor, scalefactor, 0.0015F);
             GL11.glRotatef(180F, 0, 0, 1);
@@ -315,7 +311,7 @@ public class GameScreenText implements IGameScreen {
     }
 
     private void planeEquation(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3,
-            float z3) {
+        float z3) {
         final double[] result = new double[4];
         result[0] = y1 * (z2 - z3) + y2 * (z3 - z1) + y3 * (z1 - z2);
         result[1] = z1 * (x2 - x3) + z2 * (x3 - x1) + z3 * (x1 - x2);

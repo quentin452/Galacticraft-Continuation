@@ -1,8 +1,9 @@
 package micdoodle8.mods.galacticraft.core.command;
 
-import java.util.List;
-import java.util.Map;
-
+import micdoodle8.mods.galacticraft.core.dimension.SpaceStationWorldData;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -11,10 +12,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 
-import micdoodle8.mods.galacticraft.core.dimension.SpaceStationWorldData;
-import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+import java.util.List;
+import java.util.Map;
 
 public class CommandSpaceStationAddOwner extends CommandBase {
 
@@ -44,8 +43,7 @@ public class CommandSpaceStationAddOwner extends CommandBase {
 
         if (astring.length <= 0) {
             throw new WrongUsageException(
-                    GCCoreUtil
-                            .translateWithFormat("commands.ssinvite.wrongUsage", this.getCommandUsage(icommandsender)));
+                GCCoreUtil.translateWithFormat("commands.ssinvite.wrongUsage", this.getCommandUsage(icommandsender)));
         }
         String var3 = astring[0];
 
@@ -60,24 +58,26 @@ public class CommandSpaceStationAddOwner extends CommandBase {
                 }
                 for (final Map.Entry<Integer, Integer> ownedStations : stats.spaceStationDimensionData.entrySet()) {
                     final SpaceStationWorldData data = SpaceStationWorldData
-                            .getStationData(playerBase.worldObj, ownedStations.getValue(), playerBase);
+                        .getStationData(playerBase.worldObj, ownedStations.getValue(), playerBase);
 
                     if ("+all".equalsIgnoreCase(var3)) {
                         data.setAllowedAll(true);
                         playerBase.addChatMessage(
-                                new ChatComponentText(GCCoreUtil.translateWithFormat("gui.spacestation.allowAllTrue")));
+                            new ChatComponentText(GCCoreUtil.translateWithFormat("gui.spacestation.allowAllTrue")));
                         return;
                     }
                     if ("-all".equalsIgnoreCase(var3)) {
                         data.setAllowedAll(false);
                         playerBase.addChatMessage(
-                                new ChatComponentText(
-                                        GCCoreUtil.translateWithFormat("gui.spacestation.allowAllFalse", var3)));
+                            new ChatComponentText(
+                                GCCoreUtil.translateWithFormat("gui.spacestation.allowAllFalse", var3)));
                         return;
                     }
 
-                    if (!data.getAllowedPlayers().contains(var3)) {
-                        data.getAllowedPlayers().add(var3);
+                    if (!data.getAllowedPlayers()
+                        .contains(var3)) {
+                        data.getAllowedPlayers()
+                            .add(var3);
                         data.markDirty();
                     }
                 }
@@ -86,10 +86,11 @@ public class CommandSpaceStationAddOwner extends CommandBase {
 
                 if (playerToAdd != null) {
                     playerToAdd.addChatMessage(
-                            new ChatComponentText(
-                                    GCCoreUtil.translateWithFormat(
-                                            "gui.spacestation.added",
-                                            playerBase.getGameProfile().getName())));
+                        new ChatComponentText(
+                            GCCoreUtil.translateWithFormat(
+                                "gui.spacestation.added",
+                                playerBase.getGameProfile()
+                                    .getName())));
                 }
             }
         } catch (final Exception var6) {
@@ -98,7 +99,7 @@ public class CommandSpaceStationAddOwner extends CommandBase {
 
         if (playerBase != null) {
             playerBase.addChatMessage(
-                    new ChatComponentText(GCCoreUtil.translateWithFormat("gui.spacestation.addsuccess", var3)));
+                new ChatComponentText(GCCoreUtil.translateWithFormat("gui.spacestation.addsuccess", var3)));
         }
     }
 
@@ -108,7 +109,8 @@ public class CommandSpaceStationAddOwner extends CommandBase {
     }
 
     protected String[] getPlayers() {
-        return MinecraftServer.getServer().getAllUsernames();
+        return MinecraftServer.getServer()
+            .getAllUsernames();
     }
 
     @Override

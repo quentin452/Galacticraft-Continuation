@@ -1,14 +1,12 @@
 package micdoodle8.mods.galacticraft.core.client.fx;
 
-import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.world.World;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.world.World;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class EntityFXLaunchSmoke extends EntityFX {
@@ -26,7 +24,7 @@ public class EntityFXLaunchSmoke extends EntityFX {
         this.motionZ += motion.z;
         this.particleAlpha = 1.0F;
         this.particleRed = this.particleGreen = this.particleBlue = (float) (Math.random() * 0.30000001192092896D)
-                + 0.6F;
+            + 0.6F;
         this.particleScale *= 0.75F;
         this.particleScale *= size * 3;
         this.smokeParticleScale = this.particleScale;
@@ -45,7 +43,7 @@ public class EntityFXLaunchSmoke extends EntityFX {
 
     @Override
     public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4, float par5, float par6,
-            float par7) {
+        float par7) {
         GL11.glPushMatrix();
         GL11.glDepthMask(false);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -78,34 +76,18 @@ public class EntityFXLaunchSmoke extends EntityFX {
         final float f13 = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * par2 - EntityFX.interpPosZ);
         final float f14 = 1.0F;
         par1Tessellator.setColorRGBA_F(
-                this.particleRed * f14,
-                this.particleGreen * f14,
-                this.particleBlue * f14,
-                this.particleAlpha);
-        par1Tessellator.addVertexWithUV(
-                f11 - par3 * f10 - par6 * f10,
-                f12 - par4 * f10,
-                f13 - par5 * f10 - par7 * f10,
-                f7,
-                f9);
-        par1Tessellator.addVertexWithUV(
-                f11 - par3 * f10 + par6 * f10,
-                f12 + par4 * f10,
-                f13 - par5 * f10 + par7 * f10,
-                f7,
-                f8);
-        par1Tessellator.addVertexWithUV(
-                f11 + par3 * f10 + par6 * f10,
-                f12 + par4 * f10,
-                f13 + par5 * f10 + par7 * f10,
-                f6,
-                f8);
-        par1Tessellator.addVertexWithUV(
-                f11 + par3 * f10 - par6 * f10,
-                f12 - par4 * f10,
-                f13 + par5 * f10 - par7 * f10,
-                f6,
-                f9);
+            this.particleRed * f14,
+            this.particleGreen * f14,
+            this.particleBlue * f14,
+            this.particleAlpha);
+        par1Tessellator
+            .addVertexWithUV(f11 - par3 * f10 - par6 * f10, f12 - par4 * f10, f13 - par5 * f10 - par7 * f10, f7, f9);
+        par1Tessellator
+            .addVertexWithUV(f11 - par3 * f10 + par6 * f10, f12 + par4 * f10, f13 - par5 * f10 + par7 * f10, f7, f8);
+        par1Tessellator
+            .addVertexWithUV(f11 + par3 * f10 + par6 * f10, f12 + par4 * f10, f13 + par5 * f10 + par7 * f10, f6, f8);
+        par1Tessellator
+            .addVertexWithUV(f11 + par3 * f10 - par6 * f10, f12 - par4 * f10, f13 + par5 * f10 - par7 * f10, f6, f9);
 
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glDepthMask(true);

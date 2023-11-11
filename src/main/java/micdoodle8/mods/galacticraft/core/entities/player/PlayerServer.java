@@ -1,15 +1,5 @@
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraftforge.common.MinecraftForge;
-
 import micdoodle8.mods.galacticraft.api.entity.IIgnoreShift;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.dimension.WorldProviderMoon;
@@ -20,6 +10,15 @@ import micdoodle8.mods.galacticraft.core.util.DamageSourceGC;
 import micdoodle8.mods.galacticraft.planets.asteroids.dimension.WorldProviderAsteroids;
 import micdoodle8.mods.galacticraft.planets.asteroids.items.ItemArmorAsteroids;
 import micdoodle8.mods.galacticraft.planets.mars.items.ItemArmorMars;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.MinecraftForge;
 
 public class PlayerServer implements IPlayerServer {
 
@@ -28,9 +27,11 @@ public class PlayerServer implements IPlayerServer {
     @Override
     public void clonePlayer(EntityPlayerMP player, EntityPlayer oldPlayer, boolean keepInv) {
         if (oldPlayer instanceof EntityPlayerMP) {
-            GCPlayerStats.get(player).copyFrom(
+            GCPlayerStats.get(player)
+                .copyFrom(
                     GCPlayerStats.get((EntityPlayerMP) oldPlayer),
-                    keepInv || player.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory"));
+                    keepInv || player.worldObj.getGameRules()
+                        .getGameRuleBooleanValue("keepInventory"));
             TileEntityTelemetry.updateLinkedPlayer((EntityPlayerMP) oldPlayer, player);
         }
     }
@@ -48,14 +49,14 @@ public class PlayerServer implements IPlayerServer {
     @Override
     public boolean mountEntity(EntityPlayerMP player, Entity par1Entity) {
         return this.updatingRidden && player.ridingEntity instanceof IIgnoreShift
-                && ((IIgnoreShift) player.ridingEntity).shouldIgnoreShiftExit();
+            && ((IIgnoreShift) player.ridingEntity).shouldIgnoreShiftExit();
     }
 
     @Override
     public void moveEntity(EntityPlayerMP player, double par1, double par3, double par5) {
         // If the player is on the moon, not airbourne and not riding anything
         if (player.worldObj.provider instanceof WorldProviderMoon && !player.worldObj.isRemote
-                && player.ridingEntity == null) {
+            && player.ridingEntity == null) {
             GCPlayerHandler.updateFeet(player, par1, par5);
         }
     }
@@ -104,7 +105,7 @@ public class PlayerServer implements IPlayerServer {
 
     @Override
     public void knockBack(EntityPlayerMP player, Entity p_70653_1_, float p_70653_2_, double impulseX,
-            double impulseZ) {
+        double impulseZ) {
         int deshCount = 0;
         if (player.inventory != null && GalacticraftCore.isPlanetsLoaded) {
             for (int i = 0; i < 4; i++) {
@@ -115,8 +116,10 @@ public class PlayerServer implements IPlayerServer {
             }
         }
 
-        if (player.getRNG().nextDouble()
-                >= player.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).getAttributeValue()) {
+        if (player.getRNG()
+            .nextDouble()
+            >= player.getEntityAttribute(SharedMonsterAttributes.knockbackResistance)
+                .getAttributeValue()) {
             player.isAirBorne = deshCount < 2;
             final float f1 = MathHelper.sqrt_double(impulseX * impulseX + impulseZ * impulseZ);
             final float f2 = 0.4F - deshCount * 0.05F;

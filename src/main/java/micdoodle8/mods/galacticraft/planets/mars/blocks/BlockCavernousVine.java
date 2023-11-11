@@ -1,8 +1,12 @@
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import java.util.ArrayList;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -24,13 +28,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
-import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class BlockCavernousVine extends Block implements IShearable, ItemBlockDesc.IBlockShiftDesc {
 
@@ -67,7 +66,8 @@ public class BlockCavernousVine extends Block implements IShearable, ItemBlockDe
     @Override
     public boolean canBlockStay(World world, int x, int y, int z) {
         final Block blockAbove = world.getBlock(x, y + 1, z);
-        return blockAbove == this || blockAbove.getMaterial().isSolid();
+        return blockAbove == this || blockAbove.getMaterial()
+            .isSolid();
     }
 
     @Override
@@ -90,7 +90,7 @@ public class BlockCavernousVine extends Block implements IShearable, ItemBlockDe
             entity.rotationYaw += 0.4F;
 
             if (!((EntityLivingBase) entity).getActivePotionEffects()
-                    .contains(new PotionEffect(Potion.poison.id, 5, 20, false))) {
+                .contains(new PotionEffect(Potion.poison.id, 5, 20, false))) {
                 ((EntityLivingBase) entity).addPotionEffect(new PotionEffect(Potion.poison.id, 5, 20, false));
             }
         }
@@ -149,7 +149,7 @@ public class BlockCavernousVine extends Block implements IShearable, ItemBlockDe
     @Override
     public boolean canPlaceBlockOnSide(World world, int x, int y, int z, int side) {
         return ForgeDirection.getOrientation(side) == ForgeDirection.DOWN
-                && this.isBlockSolid(world, x, y + 1, z, side);
+            && this.isBlockSolid(world, x, y + 1, z, side);
     }
 
     public int getVineLength(IBlockAccess world, int x, int y, int z) {

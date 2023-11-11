@@ -1,8 +1,13 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityCircuitFabricator;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricIngotCompressor;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenStorageModule;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -18,14 +23,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityCircuitFabricator;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricIngotCompressor;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenStorageModule;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
+import java.util.Random;
 
 public class BlockMachine2 extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -64,13 +63,13 @@ public class BlockMachine2 extends BlockTileGC implements ItemBlockDesc.IBlockSh
 
         this.iconMachineSide = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_side");
         this.iconElectricCompressor = iconRegister
-                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "electric_compressor");
+            .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "electric_compressor");
         this.iconCircuitFabricator = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "circuit_fabricator");
         this.iconOxygenStorageModule = new IIcon[17];
 
         for (int i = 0; i < this.iconOxygenStorageModule.length; i++) {
             this.iconOxygenStorageModule[i] = iconRegister
-                    .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "oxygenStorageModule_" + i);
+                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "oxygenStorageModule_" + i);
         }
     }
 
@@ -130,7 +129,9 @@ public class BlockMachine2 extends BlockTileGC implements ItemBlockDesc.IBlockSh
             if (side == metadata + 2) {
                 return this.iconOxygenInput;
             }
-            if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
+            if (side == ForgeDirection.getOrientation(metadata + 2)
+                .getOpposite()
+                .ordinal()) {
                 return this.iconOxygenOutput;
             }
 
@@ -163,7 +164,9 @@ public class BlockMachine2 extends BlockTileGC implements ItemBlockDesc.IBlockSh
             if (side == metadata + 2) {
                 return this.iconOxygenInput;
             }
-            if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
+            if (side == ForgeDirection.getOrientation(metadata + 2)
+                .getOpposite()
+                .ordinal()) {
                 return this.iconOxygenOutput;
             }
 
@@ -173,24 +176,26 @@ public class BlockMachine2 extends BlockTileGC implements ItemBlockDesc.IBlockSh
             metadata -= BlockMachine2.CIRCUIT_FABRICATOR_METADATA;
 
             if (metadata == 0 && side == 4 || metadata == 1 && side == 5
-                    || metadata == 2 && side == 3
-                    || metadata == 3 && side == 2) {
+                || metadata == 2 && side == 3
+                || metadata == 3 && side == 2) {
                 return this.iconCircuitFabricator;
             }
 
-            if (side == ForgeDirection.getOrientation(metadata + 2).ordinal()) {
+            if (side == ForgeDirection.getOrientation(metadata + 2)
+                .ordinal()) {
                 return this.iconInput;
             }
         } else if (metadata >= BlockMachine2.ELECTRIC_COMPRESSOR_METADATA) {
             metadata -= BlockMachine2.ELECTRIC_COMPRESSOR_METADATA;
 
             if (metadata == 0 && side == 4 || metadata == 1 && side == 5
-                    || metadata == 2 && side == 3
-                    || metadata == 3 && side == 2) {
+                || metadata == 2 && side == 3
+                || metadata == 3 && side == 2) {
                 return this.iconElectricCompressor;
             }
 
-            if (side == ForgeDirection.getOrientation(metadata + 2).ordinal()) {
+            if (side == ForgeDirection.getOrientation(metadata + 2)
+                .ordinal()) {
                 return this.iconInput;
             }
         }
@@ -234,7 +239,7 @@ public class BlockMachine2 extends BlockTileGC implements ItemBlockDesc.IBlockSh
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
         int original = metadata;
 
@@ -286,7 +291,7 @@ public class BlockMachine2 extends BlockTileGC implements ItemBlockDesc.IBlockSh
      */
     @Override
     public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         if (!par1World.isRemote) {
             par5EntityPlayer.openGui(GalacticraftCore.instance, -1, par1World, x, y, z);
         }

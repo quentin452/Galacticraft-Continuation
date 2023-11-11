@@ -1,35 +1,6 @@
 package micdoodle8.mods.galacticraft.core.tick;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiIngameMenu;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.WorldProviderSurface;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import com.google.common.collect.Lists;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -50,12 +21,7 @@ import micdoodle8.mods.galacticraft.core.client.CloudRenderer;
 import micdoodle8.mods.galacticraft.core.client.SkyProviderMoon;
 import micdoodle8.mods.galacticraft.core.client.SkyProviderOverworld;
 import micdoodle8.mods.galacticraft.core.client.gui.GuiIdsCore;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlayDockingRocket;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlayLander;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlayLaunchCountdown;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlayOxygenTanks;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlayOxygenWarning;
-import micdoodle8.mods.galacticraft.core.client.gui.overlay.OverlayRocket;
+import micdoodle8.mods.galacticraft.core.client.gui.overlay.*;
 import micdoodle8.mods.galacticraft.core.client.gui.screen.GuiCelestialSelection;
 import micdoodle8.mods.galacticraft.core.client.gui.screen.GuiNewSpaceRace;
 import micdoodle8.mods.galacticraft.core.dimension.WorldProviderMoon;
@@ -70,15 +36,35 @@ import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
 import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenSealer;
 import micdoodle8.mods.galacticraft.core.tile.TileEntityScreen;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-import micdoodle8.mods.galacticraft.core.util.ColorUtil;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
-import micdoodle8.mods.galacticraft.core.util.MapUtil;
-import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+import micdoodle8.mods.galacticraft.core.util.*;
 import micdoodle8.mods.galacticraft.core.wrappers.BlockMetaList;
 import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiIngameMenu;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.WorldProviderSurface;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 public class TickHandlerClient {
 
@@ -110,8 +96,10 @@ public class TickHandlerClient {
             boolean flag = false;
             for (final BlockMetaList blockMetaList : ClientProxyCore.detectableBlocks) {
                 if (blockMetaList.getBlock() == bt.block) {
-                    if (!blockMetaList.getMetaList().contains(meta)) {
-                        blockMetaList.getMetaList().add(meta);
+                    if (!blockMetaList.getMetaList()
+                        .contains(meta)) {
+                        blockMetaList.getMetaList()
+                            .add(meta);
                     }
                     flag = true;
                     break;
@@ -128,7 +116,8 @@ public class TickHandlerClient {
 
     @SubscribeEvent
     public void onRenderTick(RenderTickEvent event) {
-        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final Minecraft minecraft = FMLClientHandler.instance()
+            .getClient();
         final EntityPlayerSP player = minecraft.thePlayer;
         final EntityClientPlayerMP playerBaseClient = PlayerUtil.getPlayerBaseClientFromPlayer(player, false);
         GCPlayerStatsClient stats = null;
@@ -141,8 +130,8 @@ public class TickHandlerClient {
             if (minecraft.currentScreen instanceof GuiIngameMenu) {
                 final int i = Mouse.getEventX() * minecraft.currentScreen.width / minecraft.displayWidth;
                 final int j = minecraft.currentScreen.height
-                        - Mouse.getEventY() * minecraft.currentScreen.height / minecraft.displayHeight
-                        - 1;
+                    - Mouse.getEventY() * minecraft.currentScreen.height / minecraft.displayHeight
+                    - 1;
 
                 int k = Mouse.getEventButton();
 
@@ -161,38 +150,38 @@ public class TickHandlerClient {
                 }
 
                 this.drawGradientRect(
-                        minecraft.currentScreen.width - 100,
-                        minecraft.currentScreen.height - 35,
-                        minecraft.currentScreen.width,
-                        minecraft.currentScreen.height,
-                        ColorUtil.to32BitColor(150, 10 + deltaColor, 10 + deltaColor, 10 + deltaColor),
-                        ColorUtil.to32BitColor(250, 10 + deltaColor, 10 + deltaColor, 10 + deltaColor));
+                    minecraft.currentScreen.width - 100,
+                    minecraft.currentScreen.height - 35,
+                    minecraft.currentScreen.width,
+                    minecraft.currentScreen.height,
+                    ColorUtil.to32BitColor(150, 10 + deltaColor, 10 + deltaColor, 10 + deltaColor),
+                    ColorUtil.to32BitColor(250, 10 + deltaColor, 10 + deltaColor, 10 + deltaColor));
                 minecraft.fontRenderer.drawString(
-                        GCCoreUtil.translate("gui.spaceRace.create.title.name.0"),
-                        minecraft.currentScreen.width - 50
-                                - minecraft.fontRenderer
-                                        .getStringWidth(GCCoreUtil.translate("gui.spaceRace.create.title.name.0")) / 2,
-                        minecraft.currentScreen.height - 26,
-                        ColorUtil.to32BitColor(255, 240, 240, 240));
+                    GCCoreUtil.translate("gui.spaceRace.create.title.name.0"),
+                    minecraft.currentScreen.width - 50
+                        - minecraft.fontRenderer
+                            .getStringWidth(GCCoreUtil.translate("gui.spaceRace.create.title.name.0")) / 2,
+                    minecraft.currentScreen.height - 26,
+                    ColorUtil.to32BitColor(255, 240, 240, 240));
                 minecraft.fontRenderer.drawString(
-                        GCCoreUtil.translate("gui.spaceRace.create.title.name.1"),
-                        minecraft.currentScreen.width - 50
-                                - minecraft.fontRenderer
-                                        .getStringWidth(GCCoreUtil.translate("gui.spaceRace.create.title.name.1")) / 2,
-                        minecraft.currentScreen.height - 16,
-                        ColorUtil.to32BitColor(255, 240, 240, 240));
+                    GCCoreUtil.translate("gui.spaceRace.create.title.name.1"),
+                    minecraft.currentScreen.width - 50
+                        - minecraft.fontRenderer
+                            .getStringWidth(GCCoreUtil.translate("gui.spaceRace.create.title.name.1")) / 2,
+                    minecraft.currentScreen.height - 16,
+                    ColorUtil.to32BitColor(255, 240, 240, 240));
                 Gui.drawRect(
-                        minecraft.currentScreen.width - 100,
-                        minecraft.currentScreen.height - 35,
-                        minecraft.currentScreen.width - 99,
-                        minecraft.currentScreen.height,
-                        ColorUtil.to32BitColor(255, 0, 0, 0));
+                    minecraft.currentScreen.width - 100,
+                    minecraft.currentScreen.height - 35,
+                    minecraft.currentScreen.width - 99,
+                    minecraft.currentScreen.height,
+                    ColorUtil.to32BitColor(255, 0, 0, 0));
                 Gui.drawRect(
-                        minecraft.currentScreen.width - 100,
-                        minecraft.currentScreen.height - 35,
-                        minecraft.currentScreen.width,
-                        minecraft.currentScreen.height - 34,
-                        ColorUtil.to32BitColor(255, 0, 0, 0));
+                    minecraft.currentScreen.width - 100,
+                    minecraft.currentScreen.height - 35,
+                    minecraft.currentScreen.width,
+                    minecraft.currentScreen.height - 34,
+                    ColorUtil.to32BitColor(255, 0, 0, 0));
             }
 
             if (player != null) {
@@ -200,9 +189,9 @@ public class TickHandlerClient {
                 ClientProxyCore.playerPosY = player.prevPosY + (player.posY - player.prevPosY) * event.renderTickTime;
                 ClientProxyCore.playerPosZ = player.prevPosZ + (player.posZ - player.prevPosZ) * event.renderTickTime;
                 ClientProxyCore.playerRotationYaw = player.prevRotationYaw
-                        + (player.rotationYaw - player.prevRotationYaw) * event.renderTickTime;
+                    + (player.rotationYaw - player.prevRotationYaw) * event.renderTickTime;
                 ClientProxyCore.playerRotationPitch = player.prevRotationPitch
-                        + (player.rotationPitch - player.prevRotationPitch) * event.renderTickTime;
+                    + (player.rotationPitch - player.prevRotationPitch) * event.renderTickTime;
             }
 
             if (player != null && player.ridingEntity instanceof EntityTier1Rocket) {
@@ -217,7 +206,7 @@ public class TickHandlerClient {
                 }
 
                 final ScaledResolution scaledresolution = ClientUtil
-                        .getScaledRes(minecraft, minecraft.displayWidth, minecraft.displayHeight);
+                    .getScaledRes(minecraft, minecraft.displayWidth, minecraft.displayHeight);
                 scaledresolution.getScaledWidth();
                 scaledresolution.getScaledHeight();
                 minecraft.entityRenderer.setupOverlayRendering();
@@ -234,39 +223,39 @@ public class TickHandlerClient {
             }
 
             if (minecraft.currentScreen == null && player != null
-                    && player.ridingEntity instanceof EntitySpaceshipBase
-                    && minecraft.gameSettings.thirdPersonView != 0
-                    && !minecraft.gameSettings.hideGUI) {
+                && player.ridingEntity instanceof EntitySpaceshipBase
+                && minecraft.gameSettings.thirdPersonView != 0
+                && !minecraft.gameSettings.hideGUI) {
                 OverlayRocket.renderSpaceshipOverlay(((EntitySpaceshipBase) player.ridingEntity).getSpaceshipGui());
             }
 
             if (minecraft.currentScreen == null && player != null
-                    && player.ridingEntity instanceof EntityLander
-                    && minecraft.gameSettings.thirdPersonView != 0
-                    && !minecraft.gameSettings.hideGUI) {
+                && player.ridingEntity instanceof EntityLander
+                && minecraft.gameSettings.thirdPersonView != 0
+                && !minecraft.gameSettings.hideGUI) {
                 OverlayLander.renderLanderOverlay();
             }
 
             if (minecraft.currentScreen == null && player != null
-                    && player.ridingEntity instanceof EntityAutoRocket
-                    && minecraft.gameSettings.thirdPersonView != 0
-                    && !minecraft.gameSettings.hideGUI) {
+                && player.ridingEntity instanceof EntityAutoRocket
+                && minecraft.gameSettings.thirdPersonView != 0
+                && !minecraft.gameSettings.hideGUI) {
                 OverlayDockingRocket.renderDockingOverlay();
             }
 
             if (minecraft.currentScreen == null && player != null
-                    && player.ridingEntity instanceof EntitySpaceshipBase
-                    && minecraft.gameSettings.thirdPersonView != 0
-                    && !minecraft.gameSettings.hideGUI
-                    && ((EntitySpaceshipBase) minecraft.thePlayer.ridingEntity).launchPhase
-                            != EnumLaunchPhase.LAUNCHED.ordinal()) {
+                && player.ridingEntity instanceof EntitySpaceshipBase
+                && minecraft.gameSettings.thirdPersonView != 0
+                && !minecraft.gameSettings.hideGUI
+                && ((EntitySpaceshipBase) minecraft.thePlayer.ridingEntity).launchPhase
+                    != EnumLaunchPhase.LAUNCHED.ordinal()) {
                 OverlayLaunchCountdown.renderCountdownOverlay();
             }
 
             if (player != null && (ConfigManagerCore.alwaysDisplayOxygenHUD
-                    || player.worldObj.provider instanceof IGalacticraftWorldProvider
-                            && OxygenUtil.shouldDisplayTankGui(minecraft.currentScreen)
-                            && OxygenUtil.noAtmosphericCombustion(player.worldObj.provider))) {
+                || player.worldObj.provider instanceof IGalacticraftWorldProvider
+                    && OxygenUtil.shouldDisplayTankGui(minecraft.currentScreen)
+                    && OxygenUtil.noAtmosphericCombustion(player.worldObj.provider))) {
                 int var6 = (TickHandlerClient.airRemaining - 90) * -1;
 
                 if (TickHandlerClient.airRemaining <= 0) {
@@ -281,19 +270,19 @@ public class TickHandlerClient {
 
                 final int thermalLevel = stats.thermalLevel + 22;
                 OverlayOxygenTanks.renderOxygenTankIndicator(
-                        thermalLevel,
-                        var6,
-                        var7,
-                        !ConfigManagerCore.oxygenIndicatorLeft,
-                        !ConfigManagerCore.oxygenIndicatorBottom,
-                        Math.abs(thermalLevel - 22) >= 10 && !stats.thermalLevelNormalising);
+                    thermalLevel,
+                    var6,
+                    var7,
+                    !ConfigManagerCore.oxygenIndicatorLeft,
+                    !ConfigManagerCore.oxygenIndicatorBottom,
+                    Math.abs(thermalLevel - 22) >= 10 && !stats.thermalLevelNormalising);
             }
 
             if (playerBaseClient != null && player.worldObj.provider instanceof IGalacticraftWorldProvider
-                    && !stats.oxygenSetupValid
-                    && OxygenUtil.noAtmosphericCombustion(player.worldObj.provider)
-                    && minecraft.currentScreen == null
-                    && !playerBaseClient.capabilities.isCreativeMode) {
+                && !stats.oxygenSetupValid
+                && OxygenUtil.noAtmosphericCombustion(player.worldObj.provider)
+                && minecraft.currentScreen == null
+                && !playerBaseClient.capabilities.isCreativeMode) {
                 OverlayOxygenWarning.renderOxygenWarningOverlay();
             }
         }
@@ -301,18 +290,19 @@ public class TickHandlerClient {
 
     @SubscribeEvent
     public void onPreGuiRender(RenderGameOverlayEvent.Pre event) {
-        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final Minecraft minecraft = FMLClientHandler.instance()
+            .getClient();
         final EntityClientPlayerMP player = minecraft.thePlayer;
 
         if ((event.type == RenderGameOverlayEvent.ElementType.ALL)
-                && (player != null && player.ridingEntity instanceof IIgnoreShift
-                        && ((IIgnoreShift) player.ridingEntity).shouldIgnoreShiftExit())) {
+            && (player != null && player.ridingEntity instanceof IIgnoreShift
+                && ((IIgnoreShift) player.ridingEntity).shouldIgnoreShiftExit())) {
             // Remove "Press shift to dismount" message when shift-exiting is disabled (not
             // ideal, but the only
             // option)
             final String str = I18n.format(
-                    "mount.onboard",
-                    GameSettings.getKeyDisplayString(minecraft.gameSettings.keyBindSneak.getKeyCode()));
+                "mount.onboard",
+                GameSettings.getKeyDisplayString(minecraft.gameSettings.keyBindSneak.getKeyCode()));
             if (minecraft.ingameGUI.recordPlaying.equals(str)) {
                 minecraft.ingameGUI.recordPlaying = "";
             }
@@ -321,7 +311,8 @@ public class TickHandlerClient {
 
     @SubscribeEvent
     public void onClientTick(ClientTickEvent event) {
-        final Minecraft minecraft = FMLClientHandler.instance().getClient();
+        final Minecraft minecraft = FMLClientHandler.instance()
+            .getClient();
         final WorldClient world = minecraft.theWorld;
         final EntityClientPlayerMP player = minecraft.thePlayer;
 
@@ -346,7 +337,8 @@ public class TickHandlerClient {
                 }
 
                 if (player != null && player.inventory.armorItemInSlot(3) != null
-                        && player.inventory.armorItemInSlot(3).getItem() instanceof ItemSensorGlasses) {
+                    && player.inventory.armorItemInSlot(3)
+                        .getItem() instanceof ItemSensorGlasses) {
                     ClientProxyCore.valueableBlocks.clear();
 
                     for (int i = -4; i < 5; i++) {
@@ -363,15 +355,15 @@ public class TickHandlerClient {
                                     boolean isDetectable = false;
 
                                     for (final BlockMetaList blockMetaList : ClientProxyCore.detectableBlocks) {
-                                        if (blockMetaList.getBlock() == block
-                                                && blockMetaList.getMetaList().contains(metadata)) {
+                                        if (blockMetaList.getBlock() == block && blockMetaList.getMetaList()
+                                            .contains(metadata)) {
                                             isDetectable = true;
                                             break;
                                         }
                                     }
 
                                     if (isDetectable || block instanceof IDetectableResource
-                                            && ((IDetectableResource) block).isValueable(metadata)) {
+                                        && ((IDetectableResource) block).isValueable(metadata)) {
                                         ClientProxyCore.valueableBlocks.add(new BlockVec3(x, y, z));
                                     }
                                 }
@@ -379,10 +371,10 @@ public class TickHandlerClient {
                         }
                     }
                     final TileEntityOxygenSealer nearestSealer = TileEntityOxygenSealer.getNearestSealer(
-                            world,
-                            MathHelper.floor_double(player.posX),
-                            MathHelper.floor_double(player.posY),
-                            MathHelper.floor_double(player.posZ));
+                        world,
+                        MathHelper.floor_double(player.posX),
+                        MathHelper.floor_double(player.posY),
+                        MathHelper.floor_double(player.posZ));
                     // TODO: revert. Correct code is temporarily commented out for testing render
                     if (nearestSealer != null) // && nearestSealer.threadSeal != null)
                     {
@@ -400,15 +392,15 @@ public class TickHandlerClient {
             }
 
             if (world != null && TickHandlerClient.spaceRaceGuiScheduled
-                    && minecraft.currentScreen == null
-                    && ConfigManagerCore.enableSpaceRaceManagerPopup) {
+                && minecraft.currentScreen == null
+                && ConfigManagerCore.enableSpaceRaceManagerPopup) {
                 player.openGui(
-                        GalacticraftCore.instance,
-                        GuiIdsCore.SPACE_RACE_START,
-                        player.worldObj,
-                        (int) player.posX,
-                        (int) player.posY,
-                        (int) player.posZ);
+                    GalacticraftCore.instance,
+                    GuiIdsCore.SPACE_RACE_START,
+                    player.worldObj,
+                    (int) player.posX,
+                    (int) player.posY,
+                    (int) player.posZ);
                 TickHandlerClient.spaceRaceGuiScheduled = false;
             }
 
@@ -422,12 +414,12 @@ public class TickHandlerClient {
             if (world != null) {
                 if (world.provider instanceof WorldProviderSurface) {
                     if (world.provider.getSkyRenderer() == null && player.ridingEntity instanceof EntitySpaceshipBase
-                            && player.ridingEntity.posY > Constants.OVERWORLD_SKYPROVIDER_STARTHEIGHT) {
+                        && player.ridingEntity.posY > Constants.OVERWORLD_SKYPROVIDER_STARTHEIGHT) {
                         world.provider.setSkyRenderer(new SkyProviderOverworld());
                     } else if (world.provider.getSkyRenderer() instanceof SkyProviderOverworld
-                            && player.posY <= Constants.OVERWORLD_SKYPROVIDER_STARTHEIGHT) {
-                                world.provider.setSkyRenderer(null);
-                            }
+                        && player.posY <= Constants.OVERWORLD_SKYPROVIDER_STARTHEIGHT) {
+                            world.provider.setSkyRenderer(null);
+                        }
                 } else if (world.provider instanceof WorldProviderSpaceStation) {
                     if (world.provider.getSkyRenderer() == null) {
                         ((WorldProviderSpaceStation) world.provider).createSkyProvider();
@@ -479,19 +471,25 @@ public class TickHandlerClient {
                     if (e instanceof IEntityNoisy) {
                         IEntityNoisy vehicle = (IEntityNoisy) e;
                         if (vehicle.getSoundUpdater() == null) {
-                            final ISound noise = vehicle.setSoundUpdater(FMLClientHandler.instance().getClient().thePlayer);
-                            FMLClientHandler.instance().getClient().getSoundHandler().playSound(noise);
+                            final ISound noise = vehicle.setSoundUpdater(
+                                FMLClientHandler.instance()
+                                    .getClient().thePlayer);
+                            FMLClientHandler.instance()
+                                .getClient()
+                                .getSoundHandler()
+                                .playSound(noise);
                         }
                     }
                 }
             }
 
-            if (FMLClientHandler.instance().getClient().currentScreen instanceof GuiCelestialSelection) {
+            if (FMLClientHandler.instance()
+                .getClient().currentScreen instanceof GuiCelestialSelection) {
                 player.motionY = 0;
             }
 
             if (world != null && world.provider instanceof IGalacticraftWorldProvider
-                    && OxygenUtil.noAtmosphericCombustion(world.provider)) {
+                && OxygenUtil.noAtmosphericCombustion(world.provider)) {
                 world.setRainStrength(0.0F);
             }
 
@@ -500,17 +498,17 @@ public class TickHandlerClient {
             }
 
             if (player != null && player.ridingEntity != null
-                    && KeyHandlerClient.spaceKey.getIsKeyPressed()
-                    && !ClientProxyCore.lastSpacebarDown) {
+                && KeyHandlerClient.spaceKey.getIsKeyPressed()
+                && !ClientProxyCore.lastSpacebarDown) {
                 GalacticraftCore.packetPipeline
-                        .sendToServer(new PacketSimple(EnumSimplePacket.S_IGNITE_ROCKET, new Object[] {}));
+                    .sendToServer(new PacketSimple(EnumSimplePacket.S_IGNITE_ROCKET, new Object[] {}));
                 ClientProxyCore.lastSpacebarDown = true;
             }
 
             if (!TickHandlerClient.screenConnectionsUpdateList.isEmpty()) {
                 @SuppressWarnings("unchecked")
                 final HashSet<TileEntityScreen> updateListCopy = (HashSet<TileEntityScreen>) screenConnectionsUpdateList
-                        .clone();
+                    .clone();
                 screenConnectionsUpdateList.clear();
                 for (final TileEntityScreen te : updateListCopy) {
                     if (te.refreshOnUpdate) {
@@ -522,8 +520,10 @@ public class TickHandlerClient {
     }
 
     public static void zoom(float value) {
-        FMLClientHandler.instance().getClient().entityRenderer.thirdPersonDistance = value;
-        FMLClientHandler.instance().getClient().entityRenderer.thirdPersonDistanceTemp = value;
+        FMLClientHandler.instance()
+            .getClient().entityRenderer.thirdPersonDistance = value;
+        FMLClientHandler.instance()
+            .getClient().entityRenderer.thirdPersonDistanceTemp = value;
     }
 
     private void drawGradientRect(int par1, int par2, int par3, int par4, int par5, int par6) {

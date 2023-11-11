@@ -1,16 +1,14 @@
 package micdoodle8.mods.galacticraft.core.client.fx;
 
-import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.world.World;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.world.World;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class EntityFXLaunchFlame extends EntityFX {
@@ -20,7 +18,7 @@ public class EntityFXLaunchFlame extends EntityFX {
     private final EntityLivingBase ridingEntity;
 
     public EntityFXLaunchFlame(World par1World, Vector3 position, Vector3 motion, boolean launched,
-            EntityLivingBase ridingEntity) {
+        EntityLivingBase ridingEntity) {
         super(par1World, position.x, position.y, position.z, 0.0D, 0.0D, 0.0D);
         this.motionX *= 0.10000000149011612D;
         this.motionY *= 0.10000000149011612D;
@@ -42,7 +40,7 @@ public class EntityFXLaunchFlame extends EntityFX {
 
     @Override
     public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4, float par5, float par6,
-            float par7) {
+        float par7) {
         GL11.glDepthMask(false);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         float var8 = (this.particleAge + par2) / this.particleMaxAge * 32.0F;
@@ -69,26 +67,26 @@ public class EntityFXLaunchFlame extends EntityFX {
 
         if (this.particleAge++ >= this.particleMaxAge) {
             GalacticraftCore.proxy.spawnParticle(
-                    this.spawnSmokeShort ? "whiteSmokeLaunched" : "whiteSmokeIdle",
-                    new Vector3(this.posX, this.posY + this.rand.nextDouble() * 2, this.posZ),
-                    new Vector3(this.motionX, this.motionY, this.motionZ),
-                    new Object[] {});
+                this.spawnSmokeShort ? "whiteSmokeLaunched" : "whiteSmokeIdle",
+                new Vector3(this.posX, this.posY + this.rand.nextDouble() * 2, this.posZ),
+                new Vector3(this.motionX, this.motionY, this.motionZ),
+                new Object[] {});
             GalacticraftCore.proxy.spawnParticle(
-                    this.spawnSmokeShort ? "whiteSmokeLargeLaunched" : "whiteSmokeLargeIdle",
-                    new Vector3(this.posX, this.posY + this.rand.nextDouble() * 2, this.posZ),
-                    new Vector3(this.motionX, this.motionY, this.motionZ),
-                    new Object[] {});
+                this.spawnSmokeShort ? "whiteSmokeLargeLaunched" : "whiteSmokeLargeIdle",
+                new Vector3(this.posX, this.posY + this.rand.nextDouble() * 2, this.posZ),
+                new Vector3(this.motionX, this.motionY, this.motionZ),
+                new Object[] {});
             if (!this.spawnSmokeShort) {
                 GalacticraftCore.proxy.spawnParticle(
-                        "whiteSmokeIdle",
-                        new Vector3(this.posX, this.posY + this.rand.nextDouble() * 2, this.posZ),
-                        new Vector3(this.motionX, this.motionY, this.motionZ),
-                        new Object[] {});
+                    "whiteSmokeIdle",
+                    new Vector3(this.posX, this.posY + this.rand.nextDouble() * 2, this.posZ),
+                    new Vector3(this.motionX, this.motionY, this.motionZ),
+                    new Object[] {});
                 GalacticraftCore.proxy.spawnParticle(
-                        "whiteSmokeLargeIdle",
-                        new Vector3(this.posX, this.posY + this.rand.nextDouble() * 2, this.posZ),
-                        new Vector3(this.motionX, this.motionY, this.motionZ),
-                        new Object[] {});
+                    "whiteSmokeLargeIdle",
+                    new Vector3(this.posX, this.posY + this.rand.nextDouble() * 2, this.posZ),
+                    new Vector3(this.motionX, this.motionY, this.motionZ),
+                    new Object[] {});
             }
             this.setDead();
         }

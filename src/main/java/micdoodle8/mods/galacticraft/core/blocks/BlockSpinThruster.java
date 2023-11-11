@@ -1,7 +1,14 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.dimension.SpinManager;
+import micdoodle8.mods.galacticraft.core.dimension.WorldProviderSpaceStation;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityThruster;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -15,15 +22,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.dimension.SpinManager;
-import micdoodle8.mods.galacticraft.core.dimension.WorldProviderSpaceStation;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityThruster;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.Random;
 
 public class BlockSpinThruster extends BlockAdvanced implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -38,7 +37,8 @@ public class BlockSpinThruster extends BlockAdvanced implements ItemBlockDesc.IB
     }
 
     private static boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection direction) {
-        return world.getBlock(x, y, z).isSideSolid(world, x, y, z, direction);
+        return world.getBlock(x, y, z)
+            .isSideSolid(world, x, y, z, direction);
     }
 
     // @Override
@@ -88,14 +88,14 @@ public class BlockSpinThruster extends BlockAdvanced implements ItemBlockDesc.IB
     @Override
     public boolean canPlaceBlockAt(World par1World, int x, int y, int z) {
         return BlockSpinThruster.isBlockSolidOnSide(par1World, x - 1, y, z, ForgeDirection.EAST)
-                || BlockSpinThruster.isBlockSolidOnSide(par1World, x + 1, y, z, ForgeDirection.WEST)
-                || BlockSpinThruster.isBlockSolidOnSide(par1World, x, y, z - 1, ForgeDirection.SOUTH)
-                || BlockSpinThruster.isBlockSolidOnSide(par1World, x, y, z + 1, ForgeDirection.NORTH);
+            || BlockSpinThruster.isBlockSolidOnSide(par1World, x + 1, y, z, ForgeDirection.WEST)
+            || BlockSpinThruster.isBlockSolidOnSide(par1World, x, y, z - 1, ForgeDirection.SOUTH)
+            || BlockSpinThruster.isBlockSolidOnSide(par1World, x, y, z + 1, ForgeDirection.NORTH);
     }
 
     @Override
     public int onBlockPlaced(World par1World, int x, int y, int z, int par5, float par6, float par7, float par8,
-            int par9) {
+        int par9) {
         if (par5 == 2 && BlockSpinThruster.isBlockSolidOnSide(par1World, x, y, z + 1, ForgeDirection.NORTH)) {}
 
         if (par5 == 3 && BlockSpinThruster.isBlockSolidOnSide(par1World, x, y, z - 1, ForgeDirection.SOUTH)) {}
@@ -156,7 +156,8 @@ public class BlockSpinThruster extends BlockAdvanced implements ItemBlockDesc.IB
         }
 
         if (!par1World.isRemote && par1World.provider instanceof WorldProviderSpaceStation) {
-            ((WorldProviderSpaceStation) par1World.provider).getSpinManager().checkSS(baseBlock, true);
+            ((WorldProviderSpaceStation) par1World.provider).getSpinManager()
+                .checkSS(baseBlock, true);
         }
     }
 
@@ -193,7 +194,8 @@ public class BlockSpinThruster extends BlockAdvanced implements ItemBlockDesc.IB
         }
 
         if (!par1World.isRemote && par1World.provider instanceof WorldProviderSpaceStation) {
-            ((WorldProviderSpaceStation) par1World.provider).getSpinManager().checkSS(new BlockVec3(x, y, z), true);
+            ((WorldProviderSpaceStation) par1World.provider).getSpinManager()
+                .checkSS(new BlockVec3(x, y, z), true);
         }
     }
 
@@ -252,8 +254,8 @@ public class BlockSpinThruster extends BlockAdvanced implements ItemBlockDesc.IB
         // and particle type
         // Also make small thrust sounds
         if (par1World.provider instanceof WorldProviderSpaceStation
-                && (((WorldProviderSpaceStation) par1World.provider).getSpinManager().thrustersFiring
-                        || par5Random.nextInt(80) == 0)) {
+            && (((WorldProviderSpaceStation) par1World.provider).getSpinManager().thrustersFiring
+                || par5Random.nextInt(80) == 0)) {
             final int var6 = par1World.getBlockMetadata(x, y, z) & 7;
             final double var7 = x + 0.5F;
             final double var9 = y + 0.7F;
@@ -282,7 +284,7 @@ public class BlockSpinThruster extends BlockAdvanced implements ItemBlockDesc.IB
 
     @Override
     public boolean onUseWrench(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
-            float hitY, float hitZ) {
+        float hitY, float hitZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
         final int change = 8 + metadata & 15;
         world.setBlockMetadataWithNotify(x, y, z, change, 2);

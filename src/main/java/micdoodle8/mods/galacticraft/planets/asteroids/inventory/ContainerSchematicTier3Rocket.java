@@ -1,5 +1,7 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.inventory;
 
+import micdoodle8.mods.galacticraft.core.inventory.SlotRocketBenchResult;
+import micdoodle8.mods.galacticraft.planets.mars.util.RecipeUtilMars;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -11,9 +13,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-import micdoodle8.mods.galacticraft.core.inventory.SlotRocketBenchResult;
-import micdoodle8.mods.galacticraft.planets.mars.util.RecipeUtilMars;
-
 public class ContainerSchematicTier3Rocket extends Container {
 
     public InventorySchematicTier3Rocket craftMatrix = new InventorySchematicTier3Rocket(this);
@@ -24,144 +23,80 @@ public class ContainerSchematicTier3Rocket extends Container {
         final int change = 27;
         this.worldObj = par1InventoryPlayer.player.worldObj;
         this.addSlotToContainer(
-                new SlotRocketBenchResult(
-                        par1InventoryPlayer.player,
-                        this.craftMatrix,
-                        this.craftResult,
-                        0,
-                        142,
-                        18 + 69 + change));
+            new SlotRocketBenchResult(
+                par1InventoryPlayer.player,
+                this.craftMatrix,
+                this.craftResult,
+                0,
+                142,
+                18 + 69 + change));
         int var6;
         int var7;
 
         // Cone
         this.addSlotToContainer(
-                new SlotSchematicTier3Rocket(
-                        this.craftMatrix,
-                        1,
-                        48,
-                        -8 + change,
-                        x,
-                        y,
-                        z,
-                        par1InventoryPlayer.player));
+            new SlotSchematicTier3Rocket(this.craftMatrix, 1, 48, -8 + change, x, y, z, par1InventoryPlayer.player));
 
         // Body
         for (var6 = 0; var6 < 5; ++var6) {
             this.addSlotToContainer(
-                    new SlotSchematicTier3Rocket(
-                            this.craftMatrix,
-                            2 + var6,
-                            39,
-                            -6 + var6 * 18 + 16 + change,
-                            x,
-                            y,
-                            z,
-                            par1InventoryPlayer.player));
+                new SlotSchematicTier3Rocket(
+                    this.craftMatrix,
+                    2 + var6,
+                    39,
+                    -6 + var6 * 18 + 16 + change,
+                    x,
+                    y,
+                    z,
+                    par1InventoryPlayer.player));
         }
 
         // Body Right
         for (var6 = 0; var6 < 5; ++var6) {
             this.addSlotToContainer(
-                    new SlotSchematicTier3Rocket(
-                            this.craftMatrix,
-                            7 + var6,
-                            57,
-                            -6 + var6 * 18 + 16 + change,
-                            x,
-                            y,
-                            z,
-                            par1InventoryPlayer.player));
+                new SlotSchematicTier3Rocket(
+                    this.craftMatrix,
+                    7 + var6,
+                    57,
+                    -6 + var6 * 18 + 16 + change,
+                    x,
+                    y,
+                    z,
+                    par1InventoryPlayer.player));
         }
 
         // Left fins
         this.addSlotToContainer(
-                new SlotSchematicTier3Rocket(
-                        this.craftMatrix,
-                        12,
-                        21,
-                        64 + change,
-                        x,
-                        y,
-                        z,
-                        par1InventoryPlayer.player));
+            new SlotSchematicTier3Rocket(this.craftMatrix, 12, 21, 64 + change, x, y, z, par1InventoryPlayer.player));
         this.addSlotToContainer(
-                new SlotSchematicTier3Rocket(
-                        this.craftMatrix,
-                        13,
-                        21,
-                        82 + change,
-                        x,
-                        y,
-                        z,
-                        par1InventoryPlayer.player));
+            new SlotSchematicTier3Rocket(this.craftMatrix, 13, 21, 82 + change, x, y, z, par1InventoryPlayer.player));
         this.addSlotToContainer(
-                new SlotSchematicTier3Rocket(
-                        this.craftMatrix,
-                        14,
-                        21,
-                        100 + change,
-                        x,
-                        y,
-                        z,
-                        par1InventoryPlayer.player));
+            new SlotSchematicTier3Rocket(this.craftMatrix, 14, 21, 100 + change, x, y, z, par1InventoryPlayer.player));
 
         // Engine
         this.addSlotToContainer(
-                new SlotSchematicTier3Rocket(
-                        this.craftMatrix,
-                        15,
-                        48,
-                        100 + change,
-                        x,
-                        y,
-                        z,
-                        par1InventoryPlayer.player));
+            new SlotSchematicTier3Rocket(this.craftMatrix, 15, 48, 100 + change, x, y, z, par1InventoryPlayer.player));
 
         // Right fins
         this.addSlotToContainer(
-                new SlotSchematicTier3Rocket(
-                        this.craftMatrix,
-                        16,
-                        75,
-                        64 + change,
-                        x,
-                        y,
-                        z,
-                        par1InventoryPlayer.player));
+            new SlotSchematicTier3Rocket(this.craftMatrix, 16, 75, 64 + change, x, y, z, par1InventoryPlayer.player));
         this.addSlotToContainer(
-                new SlotSchematicTier3Rocket(
-                        this.craftMatrix,
-                        17,
-                        75,
-                        82 + change,
-                        x,
-                        y,
-                        z,
-                        par1InventoryPlayer.player));
+            new SlotSchematicTier3Rocket(this.craftMatrix, 17, 75, 82 + change, x, y, z, par1InventoryPlayer.player));
         this.addSlotToContainer(
-                new SlotSchematicTier3Rocket(
-                        this.craftMatrix,
-                        18,
-                        75,
-                        100 + change,
-                        x,
-                        y,
-                        z,
-                        par1InventoryPlayer.player));
+            new SlotSchematicTier3Rocket(this.craftMatrix, 18, 75, 100 + change, x, y, z, par1InventoryPlayer.player));
 
         // Addons
         for (int var8 = 0; var8 < 3; var8++) {
             this.addSlotToContainer(
-                    new SlotSchematicTier3Rocket(
-                            this.craftMatrix,
-                            19 + var8,
-                            93 + var8 * 26,
-                            -15 + change,
-                            x,
-                            y,
-                            z,
-                            par1InventoryPlayer.player));
+                new SlotSchematicTier3Rocket(
+                    this.craftMatrix,
+                    19 + var8,
+                    93 + var8 * 26,
+                    -15 + change,
+                    x,
+                    y,
+                    z,
+                    par1InventoryPlayer.player));
         }
 
         // Player inv:
@@ -169,7 +104,7 @@ public class ContainerSchematicTier3Rocket extends Container {
         for (var6 = 0; var6 < 3; ++var6) {
             for (var7 = 0; var7 < 9; ++var7) {
                 this.addSlotToContainer(
-                        new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 129 + var6 * 18 + change));
+                    new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 129 + var6 * 18 + change));
             }
         }
 

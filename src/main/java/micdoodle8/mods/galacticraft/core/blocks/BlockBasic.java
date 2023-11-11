@@ -1,8 +1,10 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -14,11 +16,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.GCItems;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Metadata: 3 = Tin Decoration Block 1 4 = Tin Decoration Block 2 5 = Copper Ore 6 = Tin Ore 7 = Aluminium Ore 8 =
@@ -110,6 +109,7 @@ public class BlockBasic extends Block implements IDetectableResource {
 
         return result;
     }
+
     @Override
     public Item getItemDropped(int meta, Random random, int par3) {
         Item droppedItem;
@@ -133,7 +133,6 @@ public class BlockBasic extends Block implements IDetectableResource {
         }
     }
 
-
     @Override
     public int getDamageValue(World worldIn, int x, int y, int z) {
         return worldIn.getBlockMetadata(x, y, z);
@@ -155,7 +154,7 @@ public class BlockBasic extends Block implements IDetectableResource {
 
     @Override
     public float getExplosionResistance(Entity par1Entity, World world, int x, int y, int z, double explosionX,
-            double explosionY, double explosionZ) {
+        double explosionY, double explosionZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
 
         if (metadata < 5) {

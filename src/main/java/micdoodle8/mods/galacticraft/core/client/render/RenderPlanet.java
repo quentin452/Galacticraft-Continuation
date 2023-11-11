@@ -1,37 +1,36 @@
 package micdoodle8.mods.galacticraft.core.client.render;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 
 public class RenderPlanet {
 
-    private static final TextureManager renderEngine = FMLClientHandler.instance().getClient().renderEngine;
+    private static final TextureManager renderEngine = FMLClientHandler.instance()
+        .getClient().renderEngine;
 
     private static final ResourceLocation textureEuropa = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/planets/europa.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/planets/europa.png");
     private static final ResourceLocation textureGanymede = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/planets/ganymede.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/planets/ganymede.png");
     private static final ResourceLocation textureIo = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/planets/io.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/planets/io.png");
     private static final ResourceLocation textureSaturn = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/planets/saturn.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/planets/saturn.png");
     private static final ResourceLocation textureJupiterInner = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/planets/jupiterInner.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/planets/jupiterInner.png");
     private static final ResourceLocation textureJupiterUpper = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/misc/planets/jupiterUpper.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/misc/planets/jupiterUpper.png");
 
     public static void renderPlanet(int textureId, float scale, float ticks, float relSize) {
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
@@ -92,18 +91,18 @@ public class RenderPlanet {
             // - 80F * MathHelper.sin(angle)
             final float factor = 1F + MathHelper.cos((7.5F + 10F * ysect) / 62F);
             drawTexturedRectUVSixth(
-                    x,
-                    y,
-                    width,
-                    height,
-                    ticks / 1100F % 1F - (1F - factor) * 0.15F,
-                    ysect / 6F,
-                    0.16F * factor);
+                x,
+                y,
+                width,
+                height,
+                ticks / 1100F % 1F - (1F - factor) * 0.15F,
+                ysect / 6F,
+                0.16F * factor);
         }
     }
 
     public static void drawTexturedRectUVSixth(float x, float y, float width, float height, float prog, float y0,
-            float span) {
+        float span) {
         y0 /= 2;
         if (prog < 0F) {
             prog += 1.0F;

@@ -1,10 +1,9 @@
 package micdoodle8.mods.galacticraft.core.event;
 
+import cpw.mods.fml.common.eventhandler.Cancelable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayer.EnumStatus;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-
-import cpw.mods.fml.common.eventhandler.Cancelable;
 
 @Cancelable
 public class EventWakePlayer extends PlayerEvent {
@@ -19,7 +18,7 @@ public class EventWakePlayer extends PlayerEvent {
     public final boolean bypassed;
 
     public EventWakePlayer(EntityPlayer player, int x, int y, int z, boolean flag1, boolean flag2, boolean flag3,
-            boolean bypassed) {
+        boolean bypassed) {
         super(player);
         this.x = x;
         this.y = y;

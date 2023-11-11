@@ -1,5 +1,10 @@
 package micdoodle8.mods.galacticraft.core.client.gui.container;
 
+import cpw.mods.fml.common.Loader;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.client.gui.screen.InventoryTabGalacticraft;
+import micdoodle8.mods.galacticraft.core.inventory.ContainerExtendedInventory;
+import micdoodle8.mods.galacticraft.core.inventory.InventoryExtended;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
@@ -8,23 +13,16 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import cpw.mods.fml.common.Loader;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.client.gui.screen.InventoryTabGalacticraft;
-import micdoodle8.mods.galacticraft.core.inventory.ContainerExtendedInventory;
-import micdoodle8.mods.galacticraft.core.inventory.InventoryExtended;
 import tconstruct.client.tabs.AbstractTab;
 import tconstruct.client.tabs.TabRegistry;
 
 public class GuiExtendedInventory extends InventoryEffectRenderer {
 
     private static final ResourceLocation inventoryTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/inventory.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/inventory.png");
 
     private float xSize_lo_2;
     private float ySize_lo_2;
@@ -76,7 +74,8 @@ public class GuiExtendedInventory extends InventoryEffectRenderer {
     @Override
     protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(GuiExtendedInventory.inventoryTexture);
+        this.mc.getTextureManager()
+            .bindTexture(GuiExtendedInventory.inventoryTexture);
         final int k = this.guiLeft;
         final int l = this.guiTop;
         this.drawTexturedModalRect(k, l, 0, 0, this.xSize, this.ySize);
@@ -138,7 +137,8 @@ public class GuiExtendedInventory extends InventoryEffectRenderer {
 
     public int getPotionOffset() {
         // If at least one potion is active...
-        if (!Minecraft.getMinecraft().thePlayer.getActivePotionEffects().isEmpty()) {
+        if (!Minecraft.getMinecraft().thePlayer.getActivePotionEffects()
+            .isEmpty()) {
             this.initWithPotion = true;
             return 60 + this.getPotionOffsetNEI();
         }
@@ -153,8 +153,10 @@ public class GuiExtendedInventory extends InventoryEffectRenderer {
             try {
                 // Check whether NEI is hidden and enabled
                 final Class<?> c = Class.forName("codechicken.nei.NEIClientConfig");
-                final Object hidden = c.getMethod("isHidden").invoke(null);
-                final Object enabled = c.getMethod("isEnabled").invoke(null);
+                final Object hidden = c.getMethod("isHidden")
+                    .invoke(null);
+                final Object enabled = c.getMethod("isEnabled")
+                    .invoke(null);
                 if (hidden instanceof Boolean && enabled instanceof Boolean) {
                     if ((Boolean) hidden || !((Boolean) enabled)) {
                         // If NEI is disabled or hidden, offset the tabs by the standard 60

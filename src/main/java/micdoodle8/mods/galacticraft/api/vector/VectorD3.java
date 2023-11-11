@@ -64,10 +64,10 @@ public class VectorD3 implements Cloneable {
 
     public VectorD3(float rotationYaw, float rotationPitch) {
         this(
-                Math.cos(Math.toRadians(rotationYaw + 90)),
-                Math.sin(Math.toRadians(-rotationPitch)),
-                Math.sin(Math.toRadians(rotationYaw + 90)),
-                0);
+            Math.cos(Math.toRadians(rotationYaw + 90)),
+            Math.sin(Math.toRadians(-rotationPitch)),
+            Math.sin(Math.toRadians(rotationYaw + 90)),
+            0);
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {

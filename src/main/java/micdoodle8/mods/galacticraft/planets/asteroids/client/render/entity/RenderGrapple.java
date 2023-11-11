@@ -1,17 +1,15 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.entity;
 
+import micdoodle8.mods.galacticraft.planets.asteroids.client.render.item.ItemRendererGrappleHook;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityGrapple;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import micdoodle8.mods.galacticraft.planets.asteroids.client.render.item.ItemRendererGrappleHook;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityGrapple;
 
 public class RenderGrapple extends Render {
 
@@ -24,11 +22,11 @@ public class RenderGrapple extends Render {
 
         if (shootingEntity != null && grapple.getPullingEntity()) {
             final double d3 = shootingEntity.prevPosX + (shootingEntity.posX - shootingEntity.prevPosX) * partialTicks
-                    + vec3.xCoord;
+                + vec3.xCoord;
             final double d4 = shootingEntity.prevPosY + (shootingEntity.posY - shootingEntity.prevPosY) * partialTicks
-                    + vec3.yCoord;
+                + vec3.yCoord;
             final double d5 = shootingEntity.prevPosZ + (shootingEntity.posZ - shootingEntity.prevPosZ) * partialTicks
-                    + vec3.zCoord;
+                + vec3.zCoord;
 
             final Tessellator tessellator = Tessellator.instance;
             GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -58,20 +56,20 @@ public class RenderGrapple extends Render {
 
         GL11.glTranslatef((float) x, (float) y, (float) z);
         GL11.glRotatef(
-                grapple.prevRotationYaw + (grapple.rotationYaw - grapple.prevRotationYaw) * partialTicks - 90.0F,
-                0.0F,
-                1.0F,
-                0.0F);
+            grapple.prevRotationYaw + (grapple.rotationYaw - grapple.prevRotationYaw) * partialTicks - 90.0F,
+            0.0F,
+            1.0F,
+            0.0F);
         GL11.glRotatef(
-                grapple.prevRotationPitch + (grapple.rotationPitch - grapple.prevRotationPitch) * partialTicks - 180,
-                0.0F,
-                0.0F,
-                1.0F);
+            grapple.prevRotationPitch + (grapple.rotationPitch - grapple.prevRotationPitch) * partialTicks - 180,
+            0.0F,
+            0.0F,
+            1.0F);
         GL11.glRotatef(
-                grapple.prevRotationRoll + (grapple.rotationRoll - grapple.prevRotationRoll) * partialTicks,
-                1.0F,
-                0.0F,
-                0.0F);
+            grapple.prevRotationRoll + (grapple.rotationRoll - grapple.prevRotationRoll) * partialTicks,
+            1.0F,
+            0.0F,
+            0.0F);
         this.bindEntityTexture(grapple);
         ItemRendererGrappleHook.modelGrapple.renderAll();
 

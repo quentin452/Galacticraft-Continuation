@@ -1,16 +1,15 @@
 package micdoodle8.mods.galacticraft.core.world.gen.dungeon;
 
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityDungeonSpawner;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityDungeonSpawner;
+import java.util.Random;
 
 public class RoomBossMoon extends DungeonRoom {
 
@@ -36,48 +35,45 @@ public class RoomBossMoon extends DungeonRoom {
             for (int k = this.posZ - 1; k <= this.posZ + this.sizeZ; k++) {
                 for (int j = this.posY - 1; j <= this.posY + this.sizeY; j++) {
                     if (i == this.posX - 1 || i == this.posX + this.sizeX
-                            || j == this.posY - 1
-                            || j == this.posY + this.sizeY
-                            || k == this.posZ - 1
-                            || k == this.posZ + this.sizeZ) {
+                        || j == this.posY - 1
+                        || j == this.posY + this.sizeY
+                        || k == this.posZ - 1
+                        || k == this.posZ + this.sizeZ) {
                         this.placeBlock(
-                                chunk,
-                                meta,
-                                i,
-                                j,
-                                k,
-                                cx,
-                                cz,
-                                this.dungeonInstance.DUNGEON_WALL_ID,
-                                this.dungeonInstance.DUNGEON_WALL_META);
+                            chunk,
+                            meta,
+                            i,
+                            j,
+                            k,
+                            cx,
+                            cz,
+                            this.dungeonInstance.DUNGEON_WALL_ID,
+                            this.dungeonInstance.DUNGEON_WALL_META);
                     } else if (i == this.posX && k == this.posZ || i == this.posX + this.sizeX - 1 && k == this.posZ
-                            || i == this.posX && k == this.posZ + this.sizeZ - 1
-                            || i == this.posX + this.sizeX - 1 && k == this.posZ + this.sizeZ - 1) {
-                                this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.flowing_lava, 0);
-                            } else
-                        if (j % 3 == 0 && j >= this.posY + 2
-                                && (i == this.posX || i == this.posX + this.sizeX - 1
-                                        || k == this.posZ
-                                        || k == this.posZ + this.sizeZ - 1)
-                                || i == this.posX + 1 && k == this.posZ
-                                || i == this.posX && k == this.posZ + 1
-                                || i == this.posX + this.sizeX - 2 && k == this.posZ
-                                || i == this.posX + this.sizeX - 1 && k == this.posZ + 1
-                                || i == this.posX + 1 && k == this.posZ + this.sizeZ - 1
-                                || i == this.posX && k == this.posZ + this.sizeZ - 2
-                                || i == this.posX + this.sizeX - 2 && k == this.posZ + this.sizeZ - 1
-                                || i == this.posX + this.sizeX - 1 && k == this.posZ + this.sizeZ - 2) {
+                        || i == this.posX && k == this.posZ + this.sizeZ - 1
+                        || i == this.posX + this.sizeX - 1 && k == this.posZ + this.sizeZ - 1) {
+                            this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.flowing_lava, 0);
+                        } else if (j % 3 == 0 && j >= this.posY + 2
+                            && (i == this.posX || i == this.posX + this.sizeX - 1
+                                || k == this.posZ
+                                || k == this.posZ + this.sizeZ - 1)
+                            || i == this.posX + 1 && k == this.posZ
+                            || i == this.posX && k == this.posZ + 1
+                            || i == this.posX + this.sizeX - 2 && k == this.posZ
+                            || i == this.posX + this.sizeX - 1 && k == this.posZ + 1
+                            || i == this.posX + 1 && k == this.posZ + this.sizeZ - 1
+                            || i == this.posX && k == this.posZ + this.sizeZ - 2
+                            || i == this.posX + this.sizeX - 2 && k == this.posZ + this.sizeZ - 1
+                            || i == this.posX + this.sizeX - 1 && k == this.posZ + this.sizeZ - 2) {
+                                this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.iron_bars, 0);
+                            } else if ((i == this.posX + 1 && k == this.posZ + 1
+                                || i == this.posX + this.sizeX - 2 && k == this.posZ + 1
+                                || i == this.posX + 1 && k == this.posZ + this.sizeZ - 2
+                                || i == this.posX + this.sizeX - 2 && k == this.posZ + this.sizeZ - 2) && j % 3 == 0) {
                                     this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.iron_bars, 0);
-                                } else
-                            if ((i == this.posX + 1 && k == this.posZ + 1
-                                    || i == this.posX + this.sizeX - 2 && k == this.posZ + 1
-                                    || i == this.posX + 1 && k == this.posZ + this.sizeZ - 2
-                                    || i == this.posX + this.sizeX - 2 && k == this.posZ + this.sizeZ - 2)
-                                    && j % 3 == 0) {
-                                        this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.iron_bars, 0);
-                                    } else {
-                                        this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.air, 0);
-                                    }
+                                } else {
+                                    this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.air, 0);
+                                }
                 }
             }
         }
@@ -104,27 +100,25 @@ public class RoomBossMoon extends DungeonRoom {
         }
 
         this.worldObj.setBlock(
-                this.spawnerCoords.posX,
-                this.spawnerCoords.posY,
-                this.spawnerCoords.posZ,
-                GCBlocks.blockMoon,
-                15,
-                3);
+            this.spawnerCoords.posX,
+            this.spawnerCoords.posY,
+            this.spawnerCoords.posZ,
+            GCBlocks.blockMoon,
+            15,
+            3);
 
         final TileEntity tile = this.worldObj
-                .getTileEntity(this.spawnerCoords.posX, this.spawnerCoords.posY, this.spawnerCoords.posZ);
+            .getTileEntity(this.spawnerCoords.posX, this.spawnerCoords.posY, this.spawnerCoords.posZ);
 
         if (tile == null || !(tile instanceof TileEntityDungeonSpawner)) {
             final TileEntityDungeonSpawner spawner = new TileEntityDungeonSpawner();
-            spawner.setRoom(
-                    new Vector3(this.posX, this.posY, this.posZ),
-                    new Vector3(this.sizeX, this.sizeY, this.sizeZ));
+            spawner
+                .setRoom(new Vector3(this.posX, this.posY, this.posZ), new Vector3(this.sizeX, this.sizeY, this.sizeZ));
             this.worldObj
-                    .setTileEntity(this.spawnerCoords.posX, this.spawnerCoords.posY, this.spawnerCoords.posZ, spawner);
+                .setTileEntity(this.spawnerCoords.posX, this.spawnerCoords.posY, this.spawnerCoords.posZ, spawner);
         } else if (tile instanceof TileEntityDungeonSpawner) {
-            ((TileEntityDungeonSpawner) tile).setRoom(
-                    new Vector3(this.posX, this.posY, this.posZ),
-                    new Vector3(this.sizeX, this.sizeY, this.sizeZ));
+            ((TileEntityDungeonSpawner) tile)
+                .setRoom(new Vector3(this.posX, this.posY, this.posZ), new Vector3(this.sizeX, this.sizeY, this.sizeZ));
         }
     }
 }

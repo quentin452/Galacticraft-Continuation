@@ -1,17 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
@@ -26,6 +14,17 @@ import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
 import micdoodle8.mods.galacticraft.planets.GalacticraftPlanets;
 import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+import java.util.List;
 
 public class BlockWalkway extends BlockTransmitter implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
 
@@ -83,19 +82,20 @@ public class BlockWalkway extends BlockTransmitter implements ITileEntityProvide
 
     public int getWalkwayOrientation(World world, int x, int y, int z) {
         final int connectedNorth = this.isBlockNormalCube(world.getBlock(x, y, z - 1))
-                || world.getBlock(x, y, z - 1) instanceof BlockWalkway ? 1 : 0;
+            || world.getBlock(x, y, z - 1) instanceof BlockWalkway ? 1 : 0;
         final int connectedEast = this.isBlockNormalCube(world.getBlock(x + 1, y, z))
-                || world.getBlock(x + 1, y, z) instanceof BlockWalkway ? 2 : 0;
+            || world.getBlock(x + 1, y, z) instanceof BlockWalkway ? 2 : 0;
         final int connectedSouth = this.isBlockNormalCube(world.getBlock(x, y, z + 1))
-                || world.getBlock(x, y, z + 1) instanceof BlockWalkway ? 4 : 0;
+            || world.getBlock(x, y, z + 1) instanceof BlockWalkway ? 4 : 0;
         final int connectedWest = this.isBlockNormalCube(world.getBlock(x - 1, y, z))
-                || world.getBlock(x - 1, y, z) instanceof BlockWalkway ? 8 : 0;
+            || world.getBlock(x - 1, y, z) instanceof BlockWalkway ? 8 : 0;
 
         return connectedNorth | connectedEast | connectedSouth | connectedWest;
     }
 
     public boolean isBlockNormalCube(Block block) {
-        return block.getMaterial().blocksMovement() && block.renderAsNormalBlock();
+        return block.getMaterial()
+            .blocksMovement() && block.renderAsNormalBlock();
     }
 
     @Override
@@ -168,7 +168,7 @@ public class BlockWalkway extends BlockTransmitter implements ITileEntityProvide
 
     @Override
     public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB axisalignedbb,
-            List<AxisAlignedBB> list, Entity entity) {
+        List<AxisAlignedBB> list, Entity entity) {
         final TileEntity tileEntity = world.getTileEntity(x, y, z);
         TileEntity[] connectable = new TileEntity[6];
 
@@ -186,12 +186,12 @@ public class BlockWalkway extends BlockTransmitter implements ITileEntityProvide
         }
 
         this.setBlockBounds(
-                (float) this.minVector.x,
-                (float) this.minVector.y,
-                (float) this.minVector.z,
-                (float) this.maxVector.x,
-                (float) this.maxVector.y,
-                (float) this.maxVector.z);
+            (float) this.minVector.x,
+            (float) this.minVector.y,
+            (float) this.minVector.z,
+            (float) this.maxVector.x,
+            (float) this.maxVector.y,
+            (float) this.maxVector.z);
         this.addCollisionBox(world, x, y, z, axisalignedbb, list);
 
         this.setBlockBounds(0.0F, 0.9F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -199,67 +199,67 @@ public class BlockWalkway extends BlockTransmitter implements ITileEntityProvide
 
         if (connectable[4] != null) {
             this.setBlockBounds(
-                    0,
-                    (float) this.minVector.y,
-                    (float) this.minVector.z,
-                    (float) this.maxVector.x,
-                    (float) this.maxVector.y,
-                    (float) this.maxVector.z);
+                0,
+                (float) this.minVector.y,
+                (float) this.minVector.z,
+                (float) this.maxVector.x,
+                (float) this.maxVector.y,
+                (float) this.maxVector.z);
             this.addCollisionBox(world, x, y, z, axisalignedbb, list);
         }
 
         if (connectable[5] != null) {
             this.setBlockBounds(
-                    (float) this.minVector.x,
-                    (float) this.minVector.y,
-                    (float) this.minVector.z,
-                    1,
-                    (float) this.maxVector.y,
-                    (float) this.maxVector.z);
+                (float) this.minVector.x,
+                (float) this.minVector.y,
+                (float) this.minVector.z,
+                1,
+                (float) this.maxVector.y,
+                (float) this.maxVector.z);
             this.addCollisionBox(world, x, y, z, axisalignedbb, list);
         }
 
         if (connectable[0] != null) {
             this.setBlockBounds(
-                    (float) this.minVector.x,
-                    0,
-                    (float) this.minVector.z,
-                    (float) this.maxVector.x,
-                    (float) this.maxVector.y,
-                    (float) this.maxVector.z);
+                (float) this.minVector.x,
+                0,
+                (float) this.minVector.z,
+                (float) this.maxVector.x,
+                (float) this.maxVector.y,
+                (float) this.maxVector.z);
             this.addCollisionBox(world, x, y, z, axisalignedbb, list);
         }
 
         if (connectable[1] != null) {
             this.setBlockBounds(
-                    (float) this.minVector.x,
-                    (float) this.minVector.y,
-                    (float) this.minVector.z,
-                    (float) this.maxVector.x,
-                    1,
-                    (float) this.maxVector.z);
+                (float) this.minVector.x,
+                (float) this.minVector.y,
+                (float) this.minVector.z,
+                (float) this.maxVector.x,
+                1,
+                (float) this.maxVector.z);
             this.addCollisionBox(world, x, y, z, axisalignedbb, list);
         }
 
         if (connectable[2] != null) {
             this.setBlockBounds(
-                    (float) this.minVector.x,
-                    (float) this.minVector.y,
-                    0,
-                    (float) this.maxVector.x,
-                    (float) this.maxVector.y,
-                    (float) this.maxVector.z);
+                (float) this.minVector.x,
+                (float) this.minVector.y,
+                0,
+                (float) this.maxVector.x,
+                (float) this.maxVector.y,
+                (float) this.maxVector.z);
             this.addCollisionBox(world, x, y, z, axisalignedbb, list);
         }
 
         if (connectable[3] != null) {
             this.setBlockBounds(
-                    (float) this.minVector.x,
-                    (float) this.minVector.y,
-                    (float) this.minVector.z,
-                    (float) this.maxVector.x,
-                    (float) this.maxVector.y,
-                    1);
+                (float) this.minVector.x,
+                (float) this.minVector.y,
+                (float) this.minVector.z,
+                (float) this.maxVector.x,
+                (float) this.maxVector.y,
+                1);
             this.addCollisionBox(world, x, y, z, axisalignedbb, list);
         }
 

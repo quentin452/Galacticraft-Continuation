@@ -1,13 +1,5 @@
 package micdoodle8.mods.galacticraft.core.client.gui.container;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
@@ -17,19 +9,25 @@ import micdoodle8.mods.galacticraft.core.inventory.ContainerElectricIngotCompres
 import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricIngotCompressor;
 import micdoodle8.mods.galacticraft.core.util.EnumColor;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiElectricIngotCompressor extends GuiContainerGC {
 
     private static final ResourceLocation electricFurnaceTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/electric_IngotCompressor.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/electric_IngotCompressor.png");
     private final TileEntityElectricIngotCompressor tileEntity;
     private final GuiElementInfoRegion electricInfoRegion = new GuiElementInfoRegion(0, 0, 56, 9, null, 0, 0, this);
     private final GuiElementInfoRegion processInfoRegion = new GuiElementInfoRegion(0, 0, 52, 25, null, 0, 0, this);
 
     public GuiElectricIngotCompressor(InventoryPlayer par1InventoryPlayer,
-            TileEntityElectricIngotCompressor tileEntity) {
+        TileEntityElectricIngotCompressor tileEntity) {
         super(new ContainerElectricIngotCompressor(par1InventoryPlayer, tileEntity));
         this.tileEntity = tileEntity;
         this.ySize = 199;
@@ -48,15 +46,15 @@ public class GuiElectricIngotCompressor extends GuiContainerGC {
         batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.0"));
         batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.1"));
         this.infoRegions.add(
-                new GuiElementInfoRegion(
-                        (this.width - this.xSize) / 2 + 54,
-                        (this.height - this.ySize) / 2 + 74,
-                        18,
-                        18,
-                        batterySlotDesc,
-                        this.width,
-                        this.height,
-                        this));
+            new GuiElementInfoRegion(
+                (this.width - this.xSize) / 2 + 54,
+                (this.height - this.ySize) / 2 + 74,
+                18,
+                18,
+                batterySlotDesc,
+                this.width,
+                this.height,
+                this));
         this.processInfoRegion.tooltipStrings = new ArrayList<>();
         this.processInfoRegion.xPosition = (this.width - this.xSize) / 2 + 77;
         this.processInfoRegion.yPosition = (this.height - this.ySize) / 2 + 30;
@@ -104,9 +102,9 @@ public class GuiElectricIngotCompressor extends GuiContainerGC {
         final List<String> electricityDesc = new ArrayList<>();
         electricityDesc.add(GCCoreUtil.translate("gui.energyStorage.desc.0"));
         EnergyDisplayHelper.getEnergyDisplayTooltip(
-                this.tileEntity.getEnergyStoredGC(),
-                this.tileEntity.getMaxEnergyStoredGC(),
-                electricityDesc);
+            this.tileEntity.getEnergyStoredGC(),
+            this.tileEntity.getMaxEnergyStoredGC(),
+            electricityDesc);
         this.electricInfoRegion.tooltipStrings = electricityDesc;
 
         if (this.tileEntity.processTicks > 0) {

@@ -1,14 +1,13 @@
 package micdoodle8.mods.galacticraft.core.command;
 
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
-
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
 
 public class CommandKeepDim extends CommandBase {
 
@@ -47,21 +46,21 @@ public class CommandKeepDim extends CommandBase {
                         dimID = CommandBase.parseInt(icommandsender, astring[0]);
                     } catch (final Exception e) {
                         throw new WrongUsageException(
-                                "Needs a dimension number! Usage: " + this.getCommandUsage(icommandsender));
+                            "Needs a dimension number! Usage: " + this.getCommandUsage(icommandsender));
                     }
                 }
 
                 if (ConfigManagerCore.setLoaded(dimID)) {
                     playerBase.addChatMessage(
-                            new ChatComponentText(
-                                    "[GCKeepLoaded] Successfully set dimension " + dimID + " to load staticly"));
+                        new ChatComponentText(
+                            "[GCKeepLoaded] Successfully set dimension " + dimID + " to load staticly"));
                 } else if (ConfigManagerCore.setUnloaded(dimID)) {
                     playerBase.addChatMessage(
-                            new ChatComponentText(
-                                    "[GCKeepLoaded] Successfully set dimension " + dimID + " to not load staticly"));
+                        new ChatComponentText(
+                            "[GCKeepLoaded] Successfully set dimension " + dimID + " to not load staticly"));
                 } else {
-                    playerBase.addChatMessage(
-                            new ChatComponentText("[GCKeepLoaded] Failed to set dimension as not static"));
+                    playerBase
+                        .addChatMessage(new ChatComponentText("[GCKeepLoaded] Failed to set dimension as not static"));
                 }
             }
         } catch (final Exception var6) {

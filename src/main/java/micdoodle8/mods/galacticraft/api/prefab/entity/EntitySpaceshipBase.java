@@ -1,27 +1,5 @@
 package micdoodle8.mods.galacticraft.api.prefab.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.command.IEntitySelector;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.fluids.FluidTank;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
@@ -39,6 +17,26 @@ import micdoodle8.mods.galacticraft.core.tile.TileEntityTelemetry;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.DamageSourceGC;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.command.IEntitySelector;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.fluids.FluidTank;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Do not include this prefab class in your released mod download.
@@ -107,7 +105,7 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
             return true;
         }
         final boolean flag = par1DamageSource.getEntity() instanceof EntityPlayer
-                && ((EntityPlayer) par1DamageSource.getEntity()).capabilities.isCreativeMode;
+            && ((EntityPlayer) par1DamageSource.getEntity()).capabilities.isCreativeMode;
         final Entity e = par1DamageSource.getEntity();
         if (this.isEntityInvulnerable() || this.posY > 255 || !(e instanceof EntityPlayer)) {
             return false;
@@ -145,7 +143,10 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
             final EntityItem entityItem = this.entityDropItem(item, 0);
 
             if (item.hasTagCompound()) {
-                entityItem.getEntityItem().setTagCompound((NBTTagCompound) item.getTagCompound().copy());
+                entityItem.getEntityItem()
+                    .setTagCompound(
+                        (NBTTagCompound) item.getTagCompound()
+                            .copy());
             }
         }
     }
@@ -270,9 +271,9 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
         }
 
         this.motionX = -(50 * Math.cos(this.rotationYaw * Math.PI / 180.0D)
-                * Math.sin(this.rotationPitch * 0.01 * Math.PI / 180.0D));
+            * Math.sin(this.rotationPitch * 0.01 * Math.PI / 180.0D));
         this.motionZ = -(50 * Math.sin(this.rotationYaw * Math.PI / 180.0D)
-                * Math.sin(this.rotationPitch * 0.01 * Math.PI / 180.0D));
+            * Math.sin(this.rotationPitch * 0.01 * Math.PI / 180.0D));
 
         if (this.launchPhase != EnumLaunchPhase.LAUNCHED.ordinal()) {
             this.motionX = this.motionY = this.motionZ = 0.0F;
@@ -300,12 +301,13 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
 
         if (!this.worldObj.isRemote && this.ticks % 3 == 0) {
             GalacticraftCore.packetPipeline
-                    .sendToDimension(new PacketDynamic(this), this.worldObj.provider.dimensionId);
+                .sendToDimension(new PacketDynamic(this), this.worldObj.provider.dimensionId);
             // PacketDispatcher.sendPacketToAllInDimension(GCCorePacketManager.getPacket(GalacticraftCore.CHANNELENTITIES,
             // this, this.getNetworkedData(new ArrayList())),
             // this.worldObj.provider.dimensionId);
         }
     }
+
     private double getExitHeightCoordinateToTeleport() {
         if (this.worldObj.provider instanceof IExitHeight) {
             IExitHeight exitHeight = (IExitHeight) this.worldObj.provider;
@@ -314,6 +316,7 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
             return 1200;
         }
     }
+
     private int getTeleportYCoordinate() {
         if (this.worldObj.provider instanceof IExitHeight) {
             IExitHeight exitHeight = (IExitHeight) this.worldObj.provider;
@@ -322,6 +325,7 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
             return 1200;
         }
     }
+
     protected boolean shouldMoveClientSide() {
         return true;
     }
@@ -394,7 +398,8 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
         boolean hasOldTags = false;
 
         // Backwards compatibility:
-        if (nbt.func_150296_c().contains("launched")) {
+        if (nbt.func_150296_c()
+            .contains("launched")) {
             hasOldTags = true;
 
             final boolean launched = nbt.getBoolean("launched");
@@ -405,7 +410,8 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
         }
 
         // Backwards compatibility:
-        if (nbt.func_150296_c().contains("ignite")) {
+        if (nbt.func_150296_c()
+            .contains("ignite")) {
             hasOldTags = true;
 
             final int ignite = nbt.getInteger("ignite");
@@ -418,7 +424,7 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
         // Backwards compatibility:
         if (hasOldTags) {
             if (this.launchPhase != EnumLaunchPhase.LAUNCHED.ordinal()
-                    && this.launchPhase != EnumLaunchPhase.IGNITED.ordinal()) {
+                && this.launchPhase != EnumLaunchPhase.IGNITED.ordinal()) {
                 this.setLaunchPhase(EnumLaunchPhase.UNIGNITED);
             }
         } else {
@@ -470,7 +476,7 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
 
     @SideOnly(Side.CLIENT)
     public void spawnParticle(String var1, double var2, double var4, double var6, double var8, double var10,
-            double var12) {}
+        double var12) {}
 
     @Override
     public boolean canRiderInteract() {
@@ -509,7 +515,7 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
         for (final BlockVec3Dim vec : new ArrayList<>(this.telemetryList)) {
             final TileEntity t1 = vec.getTileEntity();
             if (t1 instanceof TileEntityTelemetry && !t1.isInvalid()
-                    && ((TileEntityTelemetry) t1).linkedEntity == this) {
+                && ((TileEntityTelemetry) t1).linkedEntity == this) {
                 returnList.add((TileEntityTelemetry) t1);
             }
         }
@@ -536,8 +542,8 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
         final int countdown = data[0];
         str[0] = "";
         str[1] = countdown == 400 ? GCCoreUtil.translate("gui.rocket.onLaunchpad")
-                : countdown > 0 ? GCCoreUtil.translate("gui.rocket.countdown") + ": " + countdown / 20
-                        : GCCoreUtil.translate("gui.rocket.launched");
+            : countdown > 0 ? GCCoreUtil.translate("gui.rocket.countdown") + ": " + countdown / 20
+                : GCCoreUtil.translate("gui.rocket.launched");
         str[2] = GCCoreUtil.translate("gui.rocket.height") + ": " + data[1];
         str[3] = GameScreenText.makeSpeedString(data[2]);
         str[4] = GCCoreUtil.translate("gui.message.fuel.name") + ": " + data[3] + "%";

@@ -1,13 +1,5 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-
 import cpw.mods.fml.relauncher.Side;
 import micdoodle8.mods.galacticraft.api.recipe.CircuitFabricatorRecipes;
 import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
@@ -17,6 +9,13 @@ import micdoodle8.mods.galacticraft.core.items.ItemBasic;
 import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInventory implements ISidedInventory {
 
@@ -48,7 +47,7 @@ public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInvent
 
                 if (this.processTicks == TileEntityCircuitFabricator.PROCESS_TIME_REQUIRED) {
                     this.worldObj
-                            .playSoundEffect(this.xCoord, this.yCoord, this.zCoord, "random.anvil_land", 0.2F, 0.5F);
+                        .playSoundEffect(this.xCoord, this.yCoord, this.zCoord, "random.anvil_land", 0.2F, 0.5F);
                     this.processTicks = 0;
                     this.compressItems();
                     updateInv = true;
@@ -71,7 +70,7 @@ public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInvent
 
     public void updateInput() {
         this.producingStack = CircuitFabricatorRecipes
-                .getOutputForInput(Arrays.copyOfRange(this.containingItems, 1, 6));
+            .getOutputForInput(Arrays.copyOfRange(this.containingItems, 1, 6));
     }
 
     private boolean canCompress() {
@@ -86,7 +85,7 @@ public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInvent
             return false;
         }
         final int result = this.containingItems[6] == null ? 0
-                : this.containingItems[6].stackSize + itemstack.stackSize;
+            : this.containingItems[6].stackSize + itemstack.stackSize;
         return result <= this.getInventoryStackLimit() && result <= itemstack.getMaxStackSize();
     }
 
@@ -111,11 +110,11 @@ public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInvent
                         final double dy = this.worldObj.rand.nextFloat() * var + (1.0F - var) * 0.5D;
                         final double dz = this.worldObj.rand.nextFloat() * var + (1.0F - var) * 0.5D;
                         final EntityItem entityitem = new EntityItem(
-                                this.worldObj,
-                                this.xCoord + dx,
-                                this.yCoord + dy,
-                                this.zCoord + dz,
-                                new ItemStack(resultItemStack.getItem(), 1, resultItemStack.getItemDamage()));
+                            this.worldObj,
+                            this.xCoord + dx,
+                            this.yCoord + dy,
+                            this.zCoord + dz,
+                            new ItemStack(resultItemStack.getItem(), 1, resultItemStack.getItemDamage()));
 
                         entityitem.delayBeforeCanPickup = 10;
 
@@ -191,7 +190,7 @@ public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInvent
 
         // Offer whichever silicon slot has less silicon
         final boolean siliconFlag = this.containingItems[2] != null && (this.containingItems[3] == null
-                || this.containingItems[3].stackSize < this.containingItems[2].stackSize);
+            || this.containingItems[3].stackSize < this.containingItems[2].stackSize);
         return siliconFlag ? new int[] { 0, 1, 3, 4, 5 } : new int[] { 0, 1, 2, 4, 5 };
     }
 

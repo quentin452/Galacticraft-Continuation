@@ -18,7 +18,7 @@ public class ColorUtil {
 
     static double[] colorwheelAngles = { -110D, -30D, 0D, 60D, 120D, 180D, 215D, 250D, 330D, 360D, 420D, 480D };
     static Vector3[] colorwheelColors = { blue, magenta, red, orange, yellow, green, cyan, blue, magenta, red, orange,
-            yellow };
+        yellow };
 
     private static Vector3 hue_to_rgb(double deg) {
         deg = deg % 360;
@@ -123,7 +123,8 @@ public class ColorUtil {
         // TODO: if hue1 and hue2 differ by close to 180degrees, add in some 'mud' color
         // TODO: add greyscale here
 
-        return ColorUtil.hue_to_rgb(hueresult).scale(1 / 255D);
+        return ColorUtil.hue_to_rgb(hueresult)
+            .scale(1 / 255D);
     }
 
     public static int to32BitColor(int a, int r, int g, int b) {

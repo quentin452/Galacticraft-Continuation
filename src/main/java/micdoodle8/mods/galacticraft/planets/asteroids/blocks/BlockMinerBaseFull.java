@@ -1,8 +1,8 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import java.util.ArrayList;
-import java.util.Random;
-
+import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,9 +12,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
-import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class BlockMinerBaseFull extends BlockTileGC {
 
@@ -81,7 +80,7 @@ public class BlockMinerBaseFull extends BlockTileGC {
 
     @Override
     public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int par6,
-            float par7, float par8, float par9) {
+        float par7, float par8, float par9) {
         final TileEntity tileEntity = par1World.getTileEntity(x, y, z);
         if (tileEntity instanceof TileEntityMinerBase) {
             return ((TileEntityMinerBase) tileEntity).onActivated(par5EntityPlayer);
@@ -108,7 +107,7 @@ public class BlockMinerBaseFull extends BlockTileGC {
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final TileEntity te = par1World.getTileEntity(x, y, z);
         if (te instanceof TileEntityMinerBase) {
             ((TileEntityMinerBase) te).updateFacing();

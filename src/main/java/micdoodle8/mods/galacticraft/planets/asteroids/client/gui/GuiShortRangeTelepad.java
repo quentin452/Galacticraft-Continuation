@@ -1,19 +1,6 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
-
 import com.google.common.collect.Maps;
-
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.client.gui.container.GuiContainerGC;
 import micdoodle8.mods.galacticraft.core.client.gui.element.GuiElementInfoRegion;
@@ -28,12 +15,22 @@ import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.asteroids.inventory.ContainerShortRangeTelepad;
 import micdoodle8.mods.galacticraft.planets.asteroids.network.PacketSimpleAsteroids;
 import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityShortRangeTelepad;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCallback {
 
     private static final ResourceLocation launchControllerGui = new ResourceLocation(
-            AsteroidsModule.ASSET_PREFIX,
-            "textures/gui/shortRangeTelepad.png");
+        AsteroidsModule.ASSET_PREFIX,
+        "textures/gui/shortRangeTelepad.png");
 
     private final TileEntityShortRangeTelepad telepad;
 
@@ -55,8 +52,8 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
         this.enableControllerButton.enabled = this.telepad.disableCooldown <= 0;
 
         this.enableControllerButton.displayString = this.telepad.getDisabled(0)
-                ? GCCoreUtil.translate("gui.button.enable.name")
-                : GCCoreUtil.translate("gui.button.disable.name");
+            ? GCCoreUtil.translate("gui.button.enable.name")
+            : GCCoreUtil.translate("gui.button.disable.name");
 
         super.drawScreen(par1, par2, par3);
     }
@@ -64,7 +61,7 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
     @Override
     protected void keyTyped(char keyChar, int keyID) {
         if (keyID != Keyboard.KEY_ESCAPE && keyID != this.mc.gameSettings.keyBindInventory.getKeyCode()
-                && (this.address.keyTyped(keyChar, keyID) || this.targetAddress.keyTyped(keyChar, keyID))) {
+            && (this.address.keyTyped(keyChar, keyID) || this.targetAddress.keyTyped(keyChar, keyID))) {
             return;
         }
 
@@ -78,12 +75,12 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
         final int var5 = (this.width - this.xSize) / 2;
         final int var6 = (this.height - this.ySize) / 2;
         this.enableControllerButton = new GuiButton(
-                0,
-                var5 + 70 + 124 - 72,
-                var6 + 16,
-                48,
-                20,
-                GCCoreUtil.translate("gui.button.enable.name"));
+            0,
+            var5 + 70 + 124 - 72,
+            var6 + 16,
+            48,
+            20,
+            GCCoreUtil.translate("gui.button.enable.name"));
         this.address = new GuiElementTextBox(1, this, var5 + 66, var6 + 16, 48, 20, "", true, 6, false);
         this.targetAddress = new GuiElementTextBox(2, this, var5 + 122, var6 + 16 + 22, 48, 20, "", true, 6, false);
         this.buttonList.add(this.enableControllerButton);
@@ -99,37 +96,37 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
         batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.0"));
         batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.1"));
         this.infoRegions.add(
-                new GuiElementInfoRegion(
-                        (this.width - this.xSize) / 2 + 151,
-                        (this.height - this.ySize) / 2 + 104,
-                        18,
-                        18,
-                        batterySlotDesc,
-                        this.width,
-                        this.height,
-                        this));
+            new GuiElementInfoRegion(
+                (this.width - this.xSize) / 2 + 151,
+                (this.height - this.ySize) / 2 + 104,
+                18,
+                18,
+                batterySlotDesc,
+                this.width,
+                this.height,
+                this));
         batterySlotDesc = new ArrayList<>(GCCoreUtil.translateWithSplit("gui.telepad.desc.0"));
         this.infoRegions.add(
-                new GuiElementInfoRegion(
-                        (this.width - this.xSize) / 2 + 5,
-                        (this.height - this.ySize) / 2 + 20,
-                        59,
-                        13,
-                        batterySlotDesc,
-                        this.width,
-                        this.height,
-                        this));
+            new GuiElementInfoRegion(
+                (this.width - this.xSize) / 2 + 5,
+                (this.height - this.ySize) / 2 + 20,
+                59,
+                13,
+                batterySlotDesc,
+                this.width,
+                this.height,
+                this));
         batterySlotDesc = new ArrayList<>(GCCoreUtil.translateWithSplit("gui.telepad.desc.1"));
         this.infoRegions.add(
-                new GuiElementInfoRegion(
-                        (this.width - this.xSize) / 2 + 5,
-                        (this.height - this.ySize) / 2 + 42,
-                        117,
-                        13,
-                        batterySlotDesc,
-                        this.width,
-                        this.height,
-                        this));
+            new GuiElementInfoRegion(
+                (this.width - this.xSize) / 2 + 5,
+                (this.height - this.ySize) / 2 + 42,
+                117,
+                13,
+                batterySlotDesc,
+                this.width,
+                this.height,
+                this));
     }
 
     @Override
@@ -143,9 +140,9 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
             switch (par1GuiButton.id) {
                 case 0:
                     GalacticraftCore.packetPipeline.sendToServer(
-                            new PacketSimple(
-                                    EnumSimplePacket.S_UPDATE_DISABLEABLE_BUTTON,
-                                    new Object[] { this.telepad.xCoord, this.telepad.yCoord, this.telepad.zCoord, 0 }));
+                        new PacketSimple(
+                            EnumSimplePacket.S_UPDATE_DISABLEABLE_BUTTON,
+                            new Object[] { this.telepad.xCoord, this.telepad.yCoord, this.telepad.zCoord, 0 }));
                     break;
                 default:
                     break;
@@ -157,16 +154,17 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
     protected void drawGuiContainerForegroundLayer(int par1, int par2) {
         final String displayString = this.telepad.getInventoryName();
         this.fontRendererObj.drawString(
-                displayString,
-                this.xSize / 2 - this.fontRendererObj.getStringWidth(displayString) / 2,
-                5,
-                4210752);
+            displayString,
+            this.xSize / 2 - this.fontRendererObj.getStringWidth(displayString) / 2,
+            5,
+            4210752);
 
         this.fontRendererObj.drawString(GCCoreUtil.translate("container.inventory"), 8, 115, 4210752);
         this.fontRendererObj.drawString(GCCoreUtil.translate("gui.message.address.name") + ":", 7, 22, 4210752);
         this.fontRendererObj.drawString(GCCoreUtil.translate("gui.message.destAddress.name") + ":", 7, 44, 4210752);
         this.fontRendererObj.drawString(this.telepad.getReceivingStatus(), 7, 66, 4210752);
-        if (!this.telepad.getReceivingStatus().equals(this.telepad.getSendingStatus())) {
+        if (!this.telepad.getReceivingStatus()
+            .equals(this.telepad.getSendingStatus())) {
             this.fontRendererObj.drawString(this.telepad.getSendingStatus(), 7, 88, 4210752);
         }
     }
@@ -183,9 +181,9 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
         final List<String> electricityDesc = new ArrayList<>();
         electricityDesc.add(GCCoreUtil.translate("gui.energyStorage.desc.0"));
         EnergyDisplayHelper.getEnergyDisplayTooltip(
-                this.telepad.getEnergyStoredGC(),
-                this.telepad.getMaxEnergyStoredGC(),
-                electricityDesc);
+            this.telepad.getEnergyStoredGC(),
+            this.telepad.getMaxEnergyStoredGC(),
+            electricityDesc);
         this.electricInfoRegion.tooltipStrings = electricityDesc;
 
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -200,7 +198,9 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
 
     @Override
     public boolean canPlayerEdit(GuiElementTextBox textBox, EntityPlayer player) {
-        return player.getGameProfile().getName().equals(this.telepad.getOwner());
+        return player.getGameProfile()
+            .getName()
+            .equals(this.telepad.getOwner());
     }
 
     @Override
@@ -208,17 +208,17 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
         if (textBox.equals(this.address)) {
             this.telepad.address = textBox.getIntegerValue();
             GalacticraftCore.packetPipeline.sendToServer(
-                    new PacketSimpleAsteroids(
-                            PacketSimpleAsteroids.EnumSimplePacketAsteroids.S_UPDATE_ADVANCED_GUI,
-                            new Object[] { 0, this.telepad.xCoord, this.telepad.yCoord, this.telepad.zCoord,
-                                    this.telepad.address }));
+                new PacketSimpleAsteroids(
+                    PacketSimpleAsteroids.EnumSimplePacketAsteroids.S_UPDATE_ADVANCED_GUI,
+                    new Object[] { 0, this.telepad.xCoord, this.telepad.yCoord, this.telepad.zCoord,
+                        this.telepad.address }));
         } else if (textBox.equals(this.targetAddress)) {
             this.telepad.targetAddress = textBox.getIntegerValue();
             GalacticraftCore.packetPipeline.sendToServer(
-                    new PacketSimpleAsteroids(
-                            PacketSimpleAsteroids.EnumSimplePacketAsteroids.S_UPDATE_ADVANCED_GUI,
-                            new Object[] { 1, this.telepad.xCoord, this.telepad.yCoord, this.telepad.zCoord,
-                                    this.telepad.targetAddress }));
+                new PacketSimpleAsteroids(
+                    PacketSimpleAsteroids.EnumSimplePacketAsteroids.S_UPDATE_ADVANCED_GUI,
+                    new Object[] { 1, this.telepad.xCoord, this.telepad.yCoord, this.telepad.zCoord,
+                        this.telepad.targetAddress }));
         }
     }
 
@@ -238,12 +238,12 @@ public class GuiShortRangeTelepad extends GuiContainerGC implements ITextBoxCall
     public int getTextColor(GuiElementTextBox textBox) {
         if (textBox.equals(this.address)) {
             return this.telepad.addressValid ? ColorUtil.to32BitColor(255, 20, 255, 20)
-                    : ColorUtil.to32BitColor(255, 255, 25, 25);
+                : ColorUtil.to32BitColor(255, 255, 25, 25);
         }
         if (textBox.equals(this.targetAddress)) {
             return this.telepad.targetAddressResult == TileEntityShortRangeTelepad.EnumTelepadSearchResult.VALID
-                    ? ColorUtil.to32BitColor(255, 20, 255, 20)
-                    : ColorUtil.to32BitColor(255, 255, 25, 25);
+                ? ColorUtil.to32BitColor(255, 20, 255, 20)
+                : ColorUtil.to32BitColor(255, 255, 25, 25);
         }
 
         return 0;

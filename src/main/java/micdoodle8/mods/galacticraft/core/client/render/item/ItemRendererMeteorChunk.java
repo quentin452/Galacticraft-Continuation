@@ -1,27 +1,25 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 
 public class ItemRendererMeteorChunk implements IItemRenderer {
 
     private static final ResourceLocation meteorChunkTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/meteorChunk.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/meteorChunk.png");
     private static final ResourceLocation meteorChunkHotTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/model/meteorChunkHot.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/model/meteorChunkHot.png");
 
     private final IModelCustom meteorChunkModel = AdvancedModelLoader
-            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/meteorChunk.obj"));
+        .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/meteorChunk.obj"));
 
     private void renderMeteorChunk(ItemRenderType type, ItemStack item) {
         GL11.glPushMatrix();
@@ -38,11 +36,15 @@ public class ItemRendererMeteorChunk implements IItemRenderer {
         }
 
         if (item.getItemDamage() == 0) {
-            FMLClientHandler.instance().getClient().getTextureManager()
-                    .bindTexture(ItemRendererMeteorChunk.meteorChunkTexture);
+            FMLClientHandler.instance()
+                .getClient()
+                .getTextureManager()
+                .bindTexture(ItemRendererMeteorChunk.meteorChunkTexture);
         } else {
-            FMLClientHandler.instance().getClient().getTextureManager()
-                    .bindTexture(ItemRendererMeteorChunk.meteorChunkHotTexture);
+            FMLClientHandler.instance()
+                .getClient()
+                .getTextureManager()
+                .bindTexture(ItemRendererMeteorChunk.meteorChunkHotTexture);
         }
         this.meteorChunkModel.renderAll();
 

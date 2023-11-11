@@ -1,28 +1,16 @@
 package micdoodle8.mods.galacticraft.core.oxygen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.common.FMLLog;
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
 import micdoodle8.mods.galacticraft.api.transmission.grid.IOxygenNetwork;
 import micdoodle8.mods.galacticraft.api.transmission.grid.Pathfinder;
 import micdoodle8.mods.galacticraft.api.transmission.grid.PathfinderChecker;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
-import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkConnection;
-import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkProvider;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IOxygenReceiver;
-import micdoodle8.mods.galacticraft.api.transmission.tile.ITransmitter;
+import micdoodle8.mods.galacticraft.api.transmission.tile.*;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.*;
 
 /**
  * An Oxygen Network comprised of ITransmitter which can transmit oxygen
@@ -64,7 +52,8 @@ public class OxygenNetwork implements IOxygenNetwork {
                                                     * (oxygenTile.getOxygenRequest(direction) / totalOxygenRequest));
 
                                             if (oxygenToSend > 0) {
-                                                remainingUsableOxygen -= oxygenTile.receiveOxygen(direction, oxygenToSend, true);
+                                                remainingUsableOxygen -= oxygenTile
+                                                    .receiveOxygen(direction, oxygenToSend, true);
                                             }
                                         }
                                     }
@@ -73,7 +62,7 @@ public class OxygenNetwork implements IOxygenNetwork {
                         }
                     }
                 }
-        }
+            }
         }
 
         return remainingUsableOxygen;
@@ -99,8 +88,8 @@ public class OxygenNetwork implements IOxygenNetwork {
             if ((tileEntity instanceof IOxygenReceiver) && !tileEntity.isInvalid()) {
                 IOxygenReceiver oxygenTile = (IOxygenReceiver) tileEntity;
 
-                if (oxygenTile.shouldPullOxygen()
-                    && (tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord) == tileEntity)) {
+                if (oxygenTile.shouldPullOxygen() && (tileEntity.getWorldObj()
+                    .getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord) == tileEntity)) {
                     for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
                         if (oxygenTile.canConnect(direction, NetworkType.OXYGEN)) {
                             final TileEntity connectedTile = new BlockVec3(tileEntity)
@@ -175,7 +164,7 @@ public class OxygenNetwork implements IOxygenNetwork {
                 final ITransmitter transmitter = it.next();
 
                 if (transmitter == null || ((TileEntity) transmitter).isInvalid()
-                        || ((TileEntity) transmitter).getWorldObj() == null) {
+                    || ((TileEntity) transmitter).getWorldObj() == null) {
                     it.remove();
                     continue;
                 }
@@ -235,10 +224,10 @@ public class OxygenNetwork implements IOxygenNetwork {
                     for (final TileEntity connectedBlockB : connectedBlocks) {
                         if (connectedBlockA != connectedBlockB && connectedBlockB instanceof INetworkConnection) {
                             final Pathfinder finder = new PathfinderChecker(
-                                    ((TileEntity) splitPoint).getWorldObj(),
-                                    (INetworkConnection) connectedBlockB,
-                                    NetworkType.OXYGEN,
-                                    splitPoint);
+                                ((TileEntity) splitPoint).getWorldObj(),
+                                (INetworkConnection) connectedBlockB,
+                                NetworkType.OXYGEN,
+                                splitPoint);
                             finder.init(new BlockVec3(connectedBlockA));
 
                             if (finder.results.size() > 0) {
@@ -248,7 +237,7 @@ public class OxygenNetwork implements IOxygenNetwork {
                                  */
                                 for (final BlockVec3 node : finder.closedSet) {
                                     final TileEntity nodeTile = node
-                                            .getTileEntity(((TileEntity) splitPoint).getWorldObj());
+                                        .getTileEntity(((TileEntity) splitPoint).getWorldObj());
 
                                     if (nodeTile instanceof INetworkProvider && nodeTile != splitPoint) {
                                         ((INetworkProvider) nodeTile).setNetwork(this);
@@ -262,10 +251,11 @@ public class OxygenNetwork implements IOxygenNetwork {
 
                                 for (final BlockVec3 node : finder.closedSet) {
                                     final TileEntity nodeTile = node
-                                            .getTileEntity(((TileEntity) splitPoint).getWorldObj());
+                                        .getTileEntity(((TileEntity) splitPoint).getWorldObj());
 
                                     if (nodeTile instanceof INetworkProvider && nodeTile != splitPoint) {
-                                        newNetwork.getTransmitters().add((ITransmitter) nodeTile);
+                                        newNetwork.getTransmitters()
+                                            .add((ITransmitter) nodeTile);
                                     }
                                 }
 
@@ -281,10 +271,10 @@ public class OxygenNetwork implements IOxygenNetwork {
     @Override
     public String toString() {
         return "OxygenNetwork[" + this.hashCode()
-                + "|Pipes:"
-                + this.pipes.size()
-                + "|Acceptors:"
-                + (this.oxygenTiles == null ? 0 : this.oxygenTiles.size())
-                + "]";
+            + "|Pipes:"
+            + this.pipes.size()
+            + "|Acceptors:"
+            + (this.oxygenTiles == null ? 0 : this.oxygenTiles.size())
+            + "]";
     }
 }

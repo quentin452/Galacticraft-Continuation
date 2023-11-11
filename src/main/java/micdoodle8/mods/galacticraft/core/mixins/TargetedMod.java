@@ -24,10 +24,10 @@ public enum TargetedMod {
     @Override
     public String toString() {
         return "TargetedMod{modName='" + this.modName
-                + "', coreModClass='"
-                + this.coreModClass
-                + "', modId='"
-                + this.modId
-                + "'}";
+            + "', coreModClass='"
+            + this.coreModClass
+            + "', modId='"
+            + this.modId
+            + "'}";
     }
 }

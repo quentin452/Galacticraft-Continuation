@@ -1,7 +1,12 @@
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import java.util.List;
-
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.event.ZeroGravityEvent;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -17,13 +22,7 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.event.ZeroGravityEvent;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.api.world.IZeroGDimension;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import java.util.List;
 
 public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
 
@@ -31,7 +30,7 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
     int lastLandingTicks;
 
     public GCEntityClientPlayerMP(Minecraft minecraft, World world, Session session, NetHandlerPlayClient netHandler,
-            StatFileWriter statFileWriter) {
+        StatFileWriter statFileWriter) {
         super(minecraft, world, session, netHandler, statFileWriter);
     }
 
@@ -73,10 +72,11 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
                     }
 
                     if (this.timeInPortal == 0.0F) {
-                        this.mc.getSoundHandler().playSound(
+                        this.mc.getSoundHandler()
+                            .playSound(
                                 PositionedSoundRecord.func_147674_a(
-                                        new ResourceLocation("portal.trigger"),
-                                        this.rand.nextFloat() * 0.4F + 0.8F));
+                                    new ResourceLocation("portal.trigger"),
+                                    this.rand.nextFloat() * 0.4F + 0.8F));
                     }
 
                     this.timeInPortal += 0.0125F;
@@ -86,22 +86,22 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
                     }
 
                     this.inPortal = false;
-                } else if (this.isPotionActive(Potion.confusion)
-                        && this.getActivePotionEffect(Potion.confusion).getDuration() > 60) {
-                            this.timeInPortal += 0.006666667F;
+                } else if (this.isPotionActive(Potion.confusion) && this.getActivePotionEffect(Potion.confusion)
+                    .getDuration() > 60) {
+                        this.timeInPortal += 0.006666667F;
 
-                            if (this.timeInPortal > 1.0F) {
-                                this.timeInPortal = 1.0F;
-                            }
-                        } else {
-                            if (this.timeInPortal > 0.0F) {
-                                this.timeInPortal -= 0.05F;
-                            }
-
-                            if (this.timeInPortal < 0.0F) {
-                                this.timeInPortal = 0.0F;
-                            }
+                        if (this.timeInPortal > 1.0F) {
+                            this.timeInPortal = 1.0F;
                         }
+                    } else {
+                        if (this.timeInPortal > 0.0F) {
+                            this.timeInPortal -= 0.05F;
+                        }
+
+                        if (this.timeInPortal < 0.0F) {
+                            this.timeInPortal = 0.0F;
+                        }
+                    }
 
                 if (this.timeUntilPortal > 0) {
                     --this.timeUntilPortal;
@@ -134,30 +134,31 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
                 // -----------END CUSTOM
 
                 this.func_145771_j(
-                        this.posX - this.width * 0.35D,
-                        this.boundingBox.minY + 0.5D,
-                        this.posZ + this.width * 0.35D);
+                    this.posX - this.width * 0.35D,
+                    this.boundingBox.minY + 0.5D,
+                    this.posZ + this.width * 0.35D);
                 this.func_145771_j(
-                        this.posX - this.width * 0.35D,
-                        this.boundingBox.minY + 0.5D,
-                        this.posZ - this.width * 0.35D);
+                    this.posX - this.width * 0.35D,
+                    this.boundingBox.minY + 0.5D,
+                    this.posZ - this.width * 0.35D);
                 this.func_145771_j(
-                        this.posX + this.width * 0.35D,
-                        this.boundingBox.minY + 0.5D,
-                        this.posZ - this.width * 0.35D);
+                    this.posX + this.width * 0.35D,
+                    this.boundingBox.minY + 0.5D,
+                    this.posZ - this.width * 0.35D);
                 this.func_145771_j(
-                        this.posX + this.width * 0.35D,
-                        this.boundingBox.minY + 0.5D,
-                        this.posZ + this.width * 0.35D);
+                    this.posX + this.width * 0.35D,
+                    this.boundingBox.minY + 0.5D,
+                    this.posZ + this.width * 0.35D);
 
-                final boolean flag2 = this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying;
+                final boolean flag2 = this.getFoodStats()
+                    .getFoodLevel() > 6.0F || this.capabilities.allowFlying;
 
                 if (this.onGround && !flag1
-                        && this.movementInput.moveForward >= ff
-                        && !this.isSprinting()
-                        && flag2
-                        && !this.isUsingItem()
-                        && !this.isPotionActive(Potion.blindness)) {
+                    && this.movementInput.moveForward >= ff
+                    && !this.isSprinting()
+                    && flag2
+                    && !this.isUsingItem()
+                    && !this.isPotionActive(Potion.blindness)) {
                     if (this.sprintToggleTimer <= 0 && !this.mc.gameSettings.keyBindSprint.getIsKeyPressed()) {
                         this.sprintToggleTimer = 7;
                     } else {
@@ -166,15 +167,15 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
                 }
 
                 if (!this.isSprinting() && this.movementInput.moveForward >= ff
-                        && flag2
-                        && !this.isUsingItem()
-                        && !this.isPotionActive(Potion.blindness)
-                        && this.mc.gameSettings.keyBindSprint.getIsKeyPressed()) {
+                    && flag2
+                    && !this.isUsingItem()
+                    && !this.isPotionActive(Potion.blindness)
+                    && this.mc.gameSettings.keyBindSprint.getIsKeyPressed()) {
                     this.setSprinting(true);
                 }
 
                 if (this.isSprinting()
-                        && (this.movementInput.moveForward < ff || this.isCollidedHorizontally || !flag2)) {
+                    && (this.movementInput.moveForward < ff || this.isCollidedHorizontally || !flag2)) {
                     this.setSprinting(false);
                 }
 
@@ -196,8 +197,9 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
 
                 // Omit fly toggle timer
                 if (this.worldObj.difficultySetting == EnumDifficulty.PEACEFUL && this.getHealth() < this.getMaxHealth()
-                        && this.worldObj.getGameRules().getGameRuleBooleanValue("naturalRegeneration")
-                        && this.ticksExisted % 20 * 12 == 0) {
+                    && this.worldObj.getGameRules()
+                        .getGameRuleBooleanValue("naturalRegeneration")
+                    && this.ticksExisted % 20 * 12 == 0) {
                     this.heal(1.0F);
                 }
 
@@ -212,7 +214,7 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
                     final double d3 = MathHelper.wrapAngleTo180_double(this.newRotationYaw - this.rotationYaw);
                     this.rotationYaw = (float) (this.rotationYaw + d3 / this.newPosRotationIncrements);
                     this.rotationPitch = (float) (this.rotationPitch
-                            + (this.newRotationPitch - this.rotationPitch) / this.newPosRotationIncrements);
+                        + (this.newRotationPitch - this.rotationPitch) / this.newPosRotationIncrements);
                     --this.newPosRotationIncrements;
                     this.setPosition(d0, d1, d2);
                     this.setRotation(this.rotationYaw, this.rotationPitch);
@@ -276,7 +278,7 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
 
                     if (this.ridingEntity != null && !this.ridingEntity.isDead) {
                         axisalignedbb = this.boundingBox.func_111270_a(this.ridingEntity.boundingBox)
-                                .expand(1.0D, 0.0D, 1.0D);
+                            .expand(1.0D, 0.0D, 1.0D);
                     } else {
                         axisalignedbb = this.boundingBox.expand(1.0D, 0.5D, 1.0D);
                     }
@@ -305,7 +307,7 @@ public class GCEntityClientPlayerMP extends EntityClientPlayerMP {
             }
         } catch (final RuntimeException e) {
             FMLLog.severe(
-                    "A mod has crashed while Minecraft was doing a normal player tick update.  See details below.  GCEntityClientPlayerMP is in this because that is the player class name when Galacticraft is installed.  This is =*NOT*= a bug in Galacticraft, please report it to the mod indicated by the first lines of the crash report.");
+                "A mod has crashed while Minecraft was doing a normal player tick update.  See details below.  GCEntityClientPlayerMP is in this because that is the player class name when Galacticraft is installed.  This is =*NOT*= a bug in Galacticraft, please report it to the mod indicated by the first lines of the crash report.");
             throw e;
         }
         ClientProxyCore.playerClientHandler.onLivingUpdatePost(this);

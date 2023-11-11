@@ -1,26 +1,24 @@
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.util.ClientUtil;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.util.ClientUtil;
-
 public abstract class GuiStarBackground extends GuiScreen {
 
     private static final ResourceLocation backgroundTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/stars.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/stars.png");
     private static final ResourceLocation blackTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/black.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/black.png");
 
     public void drawBlackBackground() {
         final ScaledResolution var5 = ClientUtil.getScaledRes(this.mc, this.mc.displayWidth, this.mc.displayHeight);
@@ -31,7 +29,8 @@ public abstract class GuiStarBackground extends GuiScreen {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
-        this.mc.getTextureManager().bindTexture(GuiStarBackground.blackTexture);
+        this.mc.getTextureManager()
+            .bindTexture(GuiStarBackground.blackTexture);
         final Tessellator var3 = Tessellator.instance;
         var3.startDrawingQuads();
         var3.addVertexWithUV(0.0D, var7, -90.0D, 0.0D, 1.0D);
@@ -114,7 +113,8 @@ public abstract class GuiStarBackground extends GuiScreen {
                     GL11.glTranslatef(1.96F, 1.96F, 0.0F);
                 }
 
-                this.mc.getTextureManager().bindTexture(GuiStarBackground.backgroundTexture);
+                this.mc.getTextureManager()
+                    .bindTexture(GuiStarBackground.backgroundTexture);
                 var4.startDrawingQuads();
                 var4.setColorRGBA_I(16777215, 255 / (var6 + 1));
                 var4.addVertexWithUV(-1.0D, -1.0D, 1.0D, 0.0F + 1, 0.0F + 1);
@@ -200,7 +200,8 @@ public abstract class GuiStarBackground extends GuiScreen {
                     GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
                 }
 
-                this.mc.getTextureManager().bindTexture(GuiStarBackground.backgroundTexture);
+                this.mc.getTextureManager()
+                    .bindTexture(GuiStarBackground.backgroundTexture);
                 var4.startDrawingQuads();
                 var4.setColorRGBA_I(16777215, 255 / (var6 + 1));
                 var4.addVertexWithUV(-1.0D, -1.0D, 1.0D, 0.0F + 1, 0.0F + 1);
@@ -226,7 +227,8 @@ public abstract class GuiStarBackground extends GuiScreen {
     }
 
     private void rotateAndBlurSkybox() {
-        this.mc.getTextureManager().bindTexture(GuiStarBackground.backgroundTexture);
+        this.mc.getTextureManager()
+            .bindTexture(GuiStarBackground.backgroundTexture);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glColorMask(true, true, true, false);

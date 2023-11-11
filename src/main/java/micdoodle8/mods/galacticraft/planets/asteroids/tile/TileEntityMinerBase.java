@@ -1,20 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.tile;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.UUID;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
@@ -31,6 +16,20 @@ import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityAstroMiner;
 import micdoodle8.mods.galacticraft.planets.asteroids.items.AsteroidsItems;
 import micdoodle8.mods.galacticraft.planets.asteroids.network.PacketSimpleAsteroids;
 import micdoodle8.mods.galacticraft.planets.asteroids.network.PacketSimpleAsteroids.EnumSimplePacketAsteroids;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.UUID;
 
 public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory implements ISidedInventory, IMultiBlock {
 
@@ -110,13 +109,13 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
                 this.unlinkMiner();
             }
             if (this.linkedMinerID == null && EntityAstroMiner.spawnMinerAtBase(
-                    this.worldObj,
-                    this.xCoord + 1,
-                    this.yCoord + 1,
-                    this.zCoord + 1,
-                    this.facing + 2 ^ 1,
-                    new BlockVec3(this),
-                    player)) {
+                this.worldObj,
+                this.xCoord + 1,
+                this.yCoord + 1,
+                this.zCoord + 1,
+                this.facing + 2 ^ 1,
+                new BlockVec3(this),
+                player)) {
                 this.findTargetPoints();
                 return true;
             }
@@ -213,7 +212,7 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -235,8 +234,8 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
                 existingStack = this.containingItems[k];
 
                 if (existingStack != null && existingStack.getItem() == itemstack.getItem()
-                        && (!itemstack.getHasSubtypes() || itemstack.getItemDamage() == existingStack.getItemDamage())
-                        && ItemStack.areItemStackTagsEqual(itemstack, existingStack)) {
+                    && (!itemstack.getHasSubtypes() || itemstack.getItemDamage() == existingStack.getItemDamage())
+                    && ItemStack.areItemStackTagsEqual(itemstack, existingStack)) {
                     final int combined = existingStack.stackSize + itemstack.stackSize;
 
                     if (combined <= itemstack.getMaxStackSize()) {
@@ -280,9 +279,9 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
         super.validate();
         if (this.worldObj.isRemote) {
             GalacticraftCore.packetPipeline.sendToServer(
-                    new PacketSimpleAsteroids(
-                            EnumSimplePacketAsteroids.S_REQUEST_MINERBASE_FACING,
-                            new Object[] { this.xCoord, this.yCoord, this.zCoord }));
+                new PacketSimpleAsteroids(
+                    EnumSimplePacketAsteroids.S_REQUEST_MINERBASE_FACING,
+                    new Object[] { this.xCoord, this.yCoord, this.zCoord }));
         }
     }
 
@@ -371,12 +370,12 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
         }
 
         entityPlayer.openGui(
-                GalacticraftPlanets.instance,
-                GuiIdsPlanets.MACHINE_ASTEROIDS,
-                this.worldObj,
-                this.xCoord,
-                this.yCoord,
-                this.zCoord);
+            GalacticraftPlanets.instance,
+            GuiIdsPlanets.MACHINE_ASTEROIDS,
+            this.worldObj,
+            this.xCoord,
+            this.yCoord,
+            this.zCoord);
         return true;
     }
 
@@ -401,13 +400,8 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
-        return AxisAlignedBB.getBoundingBox(
-                this.xCoord,
-                this.yCoord,
-                this.zCoord,
-                this.xCoord + 2,
-                this.yCoord + 2,
-                this.zCoord + 2);
+        return AxisAlignedBB
+            .getBoundingBox(this.xCoord, this.yCoord, this.zCoord, this.xCoord + 2, this.yCoord + 2, this.zCoord + 2);
     }
 
     @Override
@@ -455,10 +449,10 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
         }
         final int link = this.linkedMinerID != null ? 1 : 0;
         GalacticraftCore.packetPipeline.sendToDimension(
-                new PacketSimpleAsteroids(
-                        EnumSimplePacketAsteroids.C_UPDATE_MINERBASE_FACING,
-                        new Object[] { this.xCoord, this.yCoord, this.zCoord, this.facing, x, y, z, link }),
-                this.worldObj.provider.dimensionId);
+            new PacketSimpleAsteroids(
+                EnumSimplePacketAsteroids.C_UPDATE_MINERBASE_FACING,
+                new Object[] { this.xCoord, this.yCoord, this.zCoord, this.facing, x, y, z, link }),
+            this.worldObj.provider.dimensionId);
     }
 
     @Override
@@ -637,7 +631,7 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
 
         if (this.worldObj.provider instanceof WorldProviderAsteroids) {
             final ArrayList<BlockVec3> roids = ((WorldProviderAsteroids) this.worldObj.provider)
-                    .getClosestAsteroidsXZ(posnTarget.x, posnTarget.y, posnTarget.z, baseFacing, 100);
+                .getClosestAsteroidsXZ(posnTarget.x, posnTarget.y, posnTarget.z, baseFacing, 100);
             if (roids != null && roids.size() > 0) {
                 this.targetPoints.addAll(roids);
                 return;
@@ -645,7 +639,7 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
         }
 
         posnTarget
-                .modifyPositionFromSide(ForgeDirection.getOrientation(baseFacing), this.worldObj.rand.nextInt(16) + 32);
+            .modifyPositionFromSide(ForgeDirection.getOrientation(baseFacing), this.worldObj.rand.nextInt(16) + 32);
         int miny = Math.min(this.yCoord * 2 - 90, this.yCoord - 22);
         if (miny < 5) {
             miny = 5;
@@ -660,37 +654,57 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
             lateral = ForgeDirection.WEST;
         }
 
-        this.targetPoints.add(posnTarget.clone().modifyPositionFromSide(lateral, 13));
-        this.targetPoints.add(posnTarget.clone().modifyPositionFromSide(lateral, -13));
+        this.targetPoints.add(
+            posnTarget.clone()
+                .modifyPositionFromSide(lateral, 13));
+        this.targetPoints.add(
+            posnTarget.clone()
+                .modifyPositionFromSide(lateral, -13));
         if (posnTarget.y > 17) {
             this.targetPoints.add(
-                    posnTarget.clone().modifyPositionFromSide(lateral, 7)
-                            .modifyPositionFromSide(ForgeDirection.DOWN, 11));
+                posnTarget.clone()
+                    .modifyPositionFromSide(lateral, 7)
+                    .modifyPositionFromSide(ForgeDirection.DOWN, 11));
             this.targetPoints.add(
-                    posnTarget.clone().modifyPositionFromSide(lateral, -7)
-                            .modifyPositionFromSide(ForgeDirection.DOWN, 11));
+                posnTarget.clone()
+                    .modifyPositionFromSide(lateral, -7)
+                    .modifyPositionFromSide(ForgeDirection.DOWN, 11));
         } else {
-            this.targetPoints.add(posnTarget.clone().modifyPositionFromSide(lateral, 26));
-            this.targetPoints.add(posnTarget.clone().modifyPositionFromSide(lateral, -26));
+            this.targetPoints.add(
+                posnTarget.clone()
+                    .modifyPositionFromSide(lateral, 26));
+            this.targetPoints.add(
+                posnTarget.clone()
+                    .modifyPositionFromSide(lateral, -26));
         }
         this.targetPoints.add(
-                posnTarget.clone().modifyPositionFromSide(lateral, 7).modifyPositionFromSide(ForgeDirection.UP, 11));
+            posnTarget.clone()
+                .modifyPositionFromSide(lateral, 7)
+                .modifyPositionFromSide(ForgeDirection.UP, 11));
         this.targetPoints.add(
-                posnTarget.clone().modifyPositionFromSide(lateral, -7).modifyPositionFromSide(ForgeDirection.UP, 11));
+            posnTarget.clone()
+                .modifyPositionFromSide(lateral, -7)
+                .modifyPositionFromSide(ForgeDirection.UP, 11));
         if (posnTarget.y < this.yCoord - 38) {
             this.targetPoints.add(
-                    posnTarget.clone().modifyPositionFromSide(lateral, 13)
-                            .modifyPositionFromSide(ForgeDirection.UP, 22));
-            this.targetPoints.add(posnTarget.clone().modifyPositionFromSide(ForgeDirection.UP, 22));
+                posnTarget.clone()
+                    .modifyPositionFromSide(lateral, 13)
+                    .modifyPositionFromSide(ForgeDirection.UP, 22));
             this.targetPoints.add(
-                    posnTarget.clone().modifyPositionFromSide(lateral, -13)
-                            .modifyPositionFromSide(ForgeDirection.UP, 22));
+                posnTarget.clone()
+                    .modifyPositionFromSide(ForgeDirection.UP, 22));
+            this.targetPoints.add(
+                posnTarget.clone()
+                    .modifyPositionFromSide(lateral, -13)
+                    .modifyPositionFromSide(ForgeDirection.UP, 22));
         }
 
         final int s = this.targetPoints.size();
         for (int i = 0; i < s; i++) {
             this.targetPoints.add(
-                    this.targetPoints.get(i).clone().modifyPositionFromSide(inLine, EntityAstroMiner.MINE_LENGTH + 6));
+                this.targetPoints.get(i)
+                    .clone()
+                    .modifyPositionFromSide(inLine, EntityAstroMiner.MINE_LENGTH + 6));
         }
 
         this.markDirty();

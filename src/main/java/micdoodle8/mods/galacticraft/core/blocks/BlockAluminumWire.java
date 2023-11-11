@@ -1,7 +1,13 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityAluminumWire;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -13,14 +19,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
-import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.tile.TileEntityAluminumWire;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class BlockAluminumWire extends BlockTransmitter implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
 
@@ -49,7 +48,7 @@ public class BlockAluminumWire extends BlockTransmitter implements ITileEntityPr
 
         for (int i = 0; i < BlockAluminumWire.names.length; i++) {
             BlockAluminumWire.blockIcons[i] = par1IconRegister
-                    .registerIcon(GalacticraftCore.TEXTURE_PREFIX + BlockAluminumWire.names[i]);
+                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + BlockAluminumWire.names[i]);
         }
     }
 
@@ -75,6 +74,7 @@ public class BlockAluminumWire extends BlockTransmitter implements ITileEntityPr
                 return BlockAluminumWire.blockIcons[0];
         }
     }
+
     @Override
     public int getRenderType() {
         return -1;

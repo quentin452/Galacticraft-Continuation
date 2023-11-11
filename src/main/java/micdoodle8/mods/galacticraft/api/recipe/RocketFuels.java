@@ -1,16 +1,13 @@
 package micdoodle8.mods.galacticraft.api.recipe;
 
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
+import micdoodle8.mods.galacticraft.api.entity.IFuelable;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.SetMultimap;
-
-import micdoodle8.mods.galacticraft.api.entity.IFuelable;
+import javax.annotation.Nonnull;
+import java.util.Set;
 
 /**
  * Handles which fluids can be used to fuel an {@link IFuelable} object. This is used by the Fuel Loader but you can use
@@ -90,7 +87,8 @@ public class RocketFuels {
             return ((Fluid) fluid).getName();
         }
         if (fluid instanceof FluidStack) {
-            return ((FluidStack) fluid).getFluid().getName();
+            return ((FluidStack) fluid).getFluid()
+                .getName();
         }
         throw new IllegalArgumentException(fluid + " is not an instance of String, Fluid, or FluidStack!");
     }

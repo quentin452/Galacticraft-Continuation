@@ -1,10 +1,6 @@
 package micdoodle8.mods.galacticraft.api.recipe;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
+import micdoodle8.mods.galacticraft.api.GalacticraftConfigAccess;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -15,7 +11,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-import micdoodle8.mods.galacticraft.api.GalacticraftConfigAccess;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class CompressorRecipes {
 
@@ -71,7 +70,8 @@ public class CompressorRecipes {
             final char c0 = s.charAt(i1);
 
             if (hashmap.containsKey(Character.valueOf(c0))) {
-                aitemstack[i1] = hashmap.get(Character.valueOf(c0)).copy();
+                aitemstack[i1] = hashmap.get(Character.valueOf(c0))
+                    .copy();
             } else {
                 aitemstack[i1] = null;
             }
@@ -151,13 +151,20 @@ public class CompressorRecipes {
         }
 
         if (i == 2 && itemstack.getItem() == itemstack1.getItem()
-                && itemstack.stackSize == 1
-                && itemstack1.stackSize == 1
-                && itemstack.getItem().isRepairable()) {
-            final int k = itemstack.getItem().getMaxDamage() - itemstack.getItemDamageForDisplay();
-            final int l = itemstack.getItem().getMaxDamage() - itemstack1.getItemDamageForDisplay();
-            final int i1 = k + l + itemstack.getItem().getMaxDamage() * 5 / 100;
-            int j1 = itemstack.getItem().getMaxDamage() - i1;
+            && itemstack.stackSize == 1
+            && itemstack1.stackSize == 1
+            && itemstack.getItem()
+                .isRepairable()) {
+            final int k = itemstack.getItem()
+                .getMaxDamage() - itemstack.getItemDamageForDisplay();
+            final int l = itemstack.getItem()
+                .getMaxDamage() - itemstack1.getItemDamageForDisplay();
+            final int i1 = k + l
+                + itemstack.getItem()
+                    .getMaxDamage() * 5
+                    / 100;
+            int j1 = itemstack.getItem()
+                .getMaxDamage() - i1;
 
             if (j1 < 0) {
                 j1 = 0;
@@ -171,9 +178,10 @@ public class CompressorRecipes {
             final IRecipe irecipe = theRecipes.get(j);
 
             if (irecipe instanceof ShapedRecipes && CompressorRecipes.matches((ShapedRecipes) irecipe, inventory)
-                    || irecipe instanceof ShapelessOreRecipe
-                            && CompressorRecipes.matchesShapeless((ShapelessOreRecipe) irecipe, inventory)) {
-                return irecipe.getRecipeOutput().copy();
+                || irecipe instanceof ShapelessOreRecipe
+                    && CompressorRecipes.matchesShapeless((ShapelessOreRecipe) irecipe, inventory)) {
+                return irecipe.getRecipeOutput()
+                    .copy();
             }
         }
 
@@ -184,7 +192,7 @@ public class CompressorRecipes {
         for (int i = 0; i <= 3 - recipe.recipeWidth; ++i) {
             for (int j = 0; j <= 3 - recipe.recipeHeight; ++j) {
                 if (CompressorRecipes.checkMatch(recipe, inventory, i, j, true)
-                        || CompressorRecipes.checkMatch(recipe, inventory, i, j, false)) {
+                    || CompressorRecipes.checkMatch(recipe, inventory, i, j, false)) {
                     return true;
                 }
             }
@@ -217,8 +225,8 @@ public class CompressorRecipes {
 
                 if (itemstack1 != null || itemstack != null) {
                     if ((itemstack1 == null == (itemstack != null)) || itemstack.getItem() != itemstack1.getItem()
-                            || itemstack.getItemDamage() != 32767
-                                    && itemstack.getItemDamage() != itemstack1.getItemDamage()) {
+                        || itemstack.getItemDamage() != 32767
+                            && itemstack.getItemDamage() != itemstack1.getItemDamage()) {
                         return false;
                     }
                 }
@@ -267,11 +275,12 @@ public class CompressorRecipes {
 
     public static List<IRecipe> getRecipeList() {
         return GalacticraftConfigAccess.getChallengeRecipes() ? CompressorRecipes.recipesAdventure
-                : CompressorRecipes.recipes;
+            : CompressorRecipes.recipes;
     }
 
     public static void removeRecipe(ItemStack match) {
-        for (final Iterator<IRecipe> it = CompressorRecipes.getRecipeList().iterator(); it.hasNext();) {
+        for (final Iterator<IRecipe> it = CompressorRecipes.getRecipeList()
+            .iterator(); it.hasNext();) {
             final IRecipe irecipe = it.next();
             if (ItemStack.areItemStacksEqual(match, irecipe.getRecipeOutput())) {
                 it.remove();

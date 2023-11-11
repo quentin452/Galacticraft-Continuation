@@ -1,21 +1,5 @@
 package micdoodle8.mods.galacticraft.planets.mars.blocks;
 
-import java.util.List;
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.World;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
@@ -31,6 +15,21 @@ import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityElectrolyzer;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityGasLiquefier;
 import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityMethaneSynthesizer;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.World;
+
+import java.util.List;
+import java.util.Random;
 
 public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -60,14 +59,14 @@ public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBl
 
         this.iconMachineSide = par1IconRegister.registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machine_side_warning");
         this.iconGasInput = par1IconRegister
-                .registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machine_oxygen_input_warning");
+            .registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machine_oxygen_input_warning");
         this.iconGasOutput = par1IconRegister
-                .registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machine_oxygen_output_warning");
+            .registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machine_oxygen_output_warning");
         this.iconWaterInput = par1IconRegister
-                .registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machine_water_input_warning");
+            .registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machine_water_input_warning");
         this.iconGasLiquefier = par1IconRegister.registerIcon(AsteroidsModule.TEXTURE_PREFIX + "gasLiquefier");
         this.iconMethaneSynthesizer = par1IconRegister
-                .registerIcon(AsteroidsModule.TEXTURE_PREFIX + "methaneSynthesizer");
+            .registerIcon(AsteroidsModule.TEXTURE_PREFIX + "methaneSynthesizer");
         this.iconElectrolyzer = par1IconRegister.registerIcon(AsteroidsModule.TEXTURE_PREFIX + "electrolyzer");
     }
 
@@ -166,7 +165,7 @@ public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBl
 
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
         final int original = metadata & 3;
         int change = 0;
@@ -201,7 +200,7 @@ public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBl
      */
     @Override
     public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
-            float hitX, float hitY, float hitZ) {
+        float hitX, float hitY, float hitZ) {
         par5EntityPlayer.openGui(GalacticraftPlanets.instance, GuiIdsPlanets.MACHINE_MARS, world, x, y, z);
         return true;
     }
@@ -260,28 +259,28 @@ public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBl
                         "whiteSmokeTiny",
                         new Vector3(x + i, y, z - 0.41F),
                         new Vector3(0.0D, -0.015D, -0.0015D),
-                        new Object[]{});
+                        new Object[] {});
                 }
                 if (rand.nextInt(3) == 0) {
                     GalacticraftCore.proxy.spawnParticle(
                         "whiteSmokeTiny",
                         new Vector3(x + i, y, z + 0.537F),
                         new Vector3(0.0D, -0.015D, 0.0015D),
-                        new Object[]{});
+                        new Object[] {});
                 }
                 if (rand.nextInt(3) == 0) {
                     GalacticraftCore.proxy.spawnParticle(
                         "whiteSmokeTiny",
                         new Vector3(x - 0.41F, y, z + i),
                         new Vector3(-0.0015D, -0.015D, 0.0D),
-                        new Object[]{});
+                        new Object[] {});
                 }
                 if (rand.nextInt(3) == 0) {
                     GalacticraftCore.proxy.spawnParticle(
                         "whiteSmokeTiny",
                         new Vector3(x + 0.537F, y, z + i),
                         new Vector3(0.0015D, -0.015D, 0.0D),
-                        new Object[]{});
+                        new Object[] {});
                 }
             }
         }

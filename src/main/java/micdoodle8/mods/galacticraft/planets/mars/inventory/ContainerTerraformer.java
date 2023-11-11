@@ -1,10 +1,8 @@
 package micdoodle8.mods.galacticraft.planets.mars.inventory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
+import micdoodle8.mods.galacticraft.api.item.IItemElectric;
+import micdoodle8.mods.galacticraft.core.inventory.SlotSpecific;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTerraformer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,9 +13,10 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import micdoodle8.mods.galacticraft.api.item.IItemElectric;
-import micdoodle8.mods.galacticraft.core.inventory.SlotSpecific;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityTerraformer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ContainerTerraformer extends Container {
 
@@ -28,13 +27,7 @@ public class ContainerTerraformer extends Container {
         this.tileEntity = tileEntity;
 
         this.addSlotToContainer(
-                new SlotSpecific(
-                        tileEntity,
-                        0,
-                        25,
-                        19,
-                        new ItemStack(Items.water_bucket),
-                        new ItemStack(Items.bucket)));
+            new SlotSpecific(tileEntity, 0, 25, 19, new ItemStack(Items.water_bucket), new ItemStack(Items.bucket)));
 
         this.addSlotToContainer(new SlotSpecific(tileEntity, 1, 25, 39, IItemElectric.class));
 
@@ -63,19 +56,19 @@ public class ContainerTerraformer extends Container {
 
             for (var7 = 0; var7 < 4; ++var7) {
                 this.addSlotToContainer(
-                        new SlotSpecific(
-                                tileEntity,
-                                var7 + var6 * 4 + 2,
-                                25 + var7 * 18,
-                                63 + var6 * 24,
-                                stacks.toArray(new ItemStack[stacks.size()])));
+                    new SlotSpecific(
+                        tileEntity,
+                        var7 + var6 * 4 + 2,
+                        25 + var7 * 18,
+                        63 + var6 * 24,
+                        stacks.toArray(new ItemStack[stacks.size()])));
             }
         }
 
         for (var6 = 0; var6 < 3; ++var6) {
             for (var7 = 0; var7 < 9; ++var7) {
                 this.addSlotToContainer(
-                        new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 155 + var6 * 18));
+                    new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 155 + var6 * 18));
             }
         }
 
@@ -123,21 +116,22 @@ public class ContainerTerraformer extends Container {
                 if (!this.mergeItemStack(var4, 2, 6, false)) {
                     return null;
                 }
-            } else if (this.getSlot(6).isItemValid(var4)) {
-                if (!this.mergeItemStack(var4, 6, 10, false)) {
+            } else if (this.getSlot(6)
+                .isItemValid(var4)) {
+                    if (!this.mergeItemStack(var4, 6, 10, false)) {
+                        return null;
+                    }
+                } else if (var4.getItem() == Items.wheat_seeds) {
+                    if (!this.mergeItemStack(var4, 10, 14, false)) {
+                        return null;
+                    }
+                } else if (par1 < b - 9) {
+                    if (!this.mergeItemStack(var4, b - 9, b, false)) {
+                        return null;
+                    }
+                } else if (!this.mergeItemStack(var4, b - 36, b - 9, false)) {
                     return null;
                 }
-            } else if (var4.getItem() == Items.wheat_seeds) {
-                if (!this.mergeItemStack(var4, 10, 14, false)) {
-                    return null;
-                }
-            } else if (par1 < b - 9) {
-                if (!this.mergeItemStack(var4, b - 9, b, false)) {
-                    return null;
-                }
-            } else if (!this.mergeItemStack(var4, b - 36, b - 9, false)) {
-                return null;
-            }
 
             if (var4.stackSize == 0) {
                 slot.putStack(null);
@@ -171,7 +165,8 @@ public class ContainerTerraformer extends Container {
 
     private static void initSaplingList() {
         ContainerTerraformer.saplingList = new LinkedList<>();
-        final Iterator<?> iterator = Block.blockRegistry.getKeys().iterator();
+        final Iterator<?> iterator = Block.blockRegistry.getKeys()
+            .iterator();
 
         while (iterator.hasNext()) {
             final Block b = (Block) Block.blockRegistry.getObject((String) iterator.next());

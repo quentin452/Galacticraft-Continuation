@@ -1,7 +1,11 @@
 package micdoodle8.mods.galacticraft.core.client;
 
-import java.util.Random;
-
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.dimension.WorldProviderMoon;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GLAllocation;
@@ -10,22 +14,16 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IRenderHandler;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.dimension.WorldProviderMoon;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import java.util.Random;
 
 public class SkyProviderMoon extends IRenderHandler {
 
     private static final ResourceLocation overworldTexture = new ResourceLocation(
-            GalacticraftCore.ASSET_PREFIX,
-            "textures/gui/celestialbodies/earth.png");
+        GalacticraftCore.ASSET_PREFIX,
+        "textures/gui/celestialbodies/earth.png");
     private static final ResourceLocation sunTexture = new ResourceLocation("textures/environment/sun.png");
 
     public int starGLCallList = GLAllocation.generateDisplayLists(3);
@@ -79,7 +77,7 @@ public class SkyProviderMoon extends IRenderHandler {
     public void render(float partialTicks, WorldClient world, Minecraft mc) {
         if (!ClientProxyCore.overworldTextureRequestSent) {
             GalacticraftCore.packetPipeline.sendToServer(
-                    new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_OVERWORLD_IMAGE, new Object[] {}));
+                new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_OVERWORLD_IMAGE, new Object[] {}));
             ClientProxyCore.overworldTextureRequestSent = true;
         }
 
@@ -142,7 +140,8 @@ public class SkyProviderMoon extends IRenderHandler {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         var12 = 20.0F;
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(SkyProviderMoon.sunTexture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(SkyProviderMoon.sunTexture);
         var23.startDrawingQuads();
         var23.addVertexWithUV(-var12, 100.0D, -var12, 0.0D, 0.0D);
         var23.addVertexWithUV(var12, 100.0D, -var12, 1.0D, 0.0D);
@@ -167,7 +166,8 @@ public class SkyProviderMoon extends IRenderHandler {
         if (ClientProxyCore.overworldTexturesValid) {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, ClientProxyCore.overworldTextureClient.getGlTextureId());
         } else {
-            FMLClientHandler.instance().getClient().renderEngine.bindTexture(SkyProviderMoon.overworldTexture);
+            FMLClientHandler.instance()
+                .getClient().renderEngine.bindTexture(SkyProviderMoon.overworldTexture);
         }
         world.getMoonPhase();
         var23.startDrawingQuads();
@@ -280,7 +280,8 @@ public class SkyProviderMoon extends IRenderHandler {
     }
 
     public float getSkyBrightness(float par1) {
-        final float var2 = FMLClientHandler.instance().getClient().theWorld.getCelestialAngle(par1);
+        final float var2 = FMLClientHandler.instance()
+            .getClient().theWorld.getCelestialAngle(par1);
         float var3 = 1.0F - (MathHelper.sin(var2 * (float) Math.PI * 2.0F) * 2.0F + 0.25F);
 
         if (var3 < 0.0F) {

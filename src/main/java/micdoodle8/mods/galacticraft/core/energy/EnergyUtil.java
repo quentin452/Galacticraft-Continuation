@@ -1,23 +1,10 @@
 package micdoodle8.mods.galacticraft.core.energy;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-
 import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
-import ic2.api.energy.tile.IEnergyAcceptor;
-import ic2.api.energy.tile.IEnergyConductor;
-import ic2.api.energy.tile.IEnergyEmitter;
-import ic2.api.energy.tile.IEnergySink;
-import ic2.api.energy.tile.IEnergySource;
-import ic2.api.energy.tile.IEnergyTile;
+import ic2.api.energy.tile.*;
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
 import micdoodle8.mods.galacticraft.api.transmission.tile.IConductor;
 import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
@@ -27,6 +14,13 @@ import micdoodle8.mods.galacticraft.core.energy.tile.EnergyStorageTile;
 import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseConductor;
 import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 public class EnergyUtil {
 
@@ -105,11 +99,11 @@ public class EnergyUtil {
 
             if (isRFLoaded && tileEntity instanceof IEnergyConnection) {
                 if (isRF2Loaded && (tileEntity instanceof IEnergyProvider || tileEntity instanceof IEnergyReceiver)
-                        || isRF1Loaded && tileEntity instanceof IEnergyHandler
-                        || clazzRailcraftEngine != null && clazzRailcraftEngine.isInstance(tileEntity)) {
+                    || isRF1Loaded && tileEntity instanceof IEnergyHandler
+                    || clazzRailcraftEngine != null && clazzRailcraftEngine.isInstance(tileEntity)) {
                     // Do not connect GC wires directly to power conduits
                     if (clazzEnderIOCable != null && clazzEnderIOCable.isInstance(tileEntity)
-                            || clazzMFRRednetEnergyCable != null && clazzMFRRednetEnergyCable.isInstance(tileEntity)) {
+                        || clazzMFRRednetEnergyCable != null && clazzMFRRednetEnergyCable.isInstance(tileEntity)) {
                         continue;
                     }
 
@@ -136,7 +130,7 @@ public class EnergyUtil {
      * @throws Exception
      */
     public static void setAdjacentPowerConnections(TileEntity conductor, List<TileEntity> acceptors,
-            List<ForgeDirection> directions) throws Exception {
+        List<ForgeDirection> directions) throws Exception {
         final BlockVec3 thisVec = new BlockVec3(conductor);
         final World world = conductor.getWorldObj();
         for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
@@ -175,9 +169,9 @@ public class EnergyUtil {
             }
 
             if (isRF2Loaded && tileEntity instanceof IEnergyReceiver
-                    || isRF1Loaded && tileEntity instanceof IEnergyHandler) {
+                || isRF1Loaded && tileEntity instanceof IEnergyHandler) {
                 if (clazzEnderIOCable != null && clazzEnderIOCable.isInstance(tileEntity)
-                        || clazzMFRRednetEnergyCable != null && clazzMFRRednetEnergyCable.isInstance(tileEntity)) {
+                    || clazzMFRRednetEnergyCable != null && clazzMFRRednetEnergyCable.isInstance(tileEntity)) {
                     continue;
                 }
 
@@ -190,7 +184,7 @@ public class EnergyUtil {
     }
 
     public static float otherModsEnergyTransfer(TileEntity tileAdj, ForgeDirection inputAdj, float toSend,
-            boolean simulate) {
+        boolean simulate) {
         if (isIC2Loaded && !EnergyConfigHandler.disableIC2Output && tileAdj instanceof IEnergySink) {
             double demanded = 0;
             try {
@@ -211,10 +205,10 @@ public class EnergyUtil {
                 try {
                     if (EnergyUtil.voltageParameterIC2) {
                         result = energySendingIC2
-                                - (Double) EnergyUtil.injectEnergyIC2.invoke(tileAdj, inputAdj, energySendingIC2, 120D);
+                            - (Double) EnergyUtil.injectEnergyIC2.invoke(tileAdj, inputAdj, energySendingIC2, 120D);
                     } else {
                         result = energySendingIC2
-                                - (Double) EnergyUtil.injectEnergyIC2.invoke(tileAdj, inputAdj, energySendingIC2);
+                            - (Double) EnergyUtil.injectEnergyIC2.invoke(tileAdj, inputAdj, energySendingIC2);
                     }
                 } catch (final Exception ex) {
                     if (ConfigManagerCore.enableDebug) {
@@ -231,21 +225,21 @@ public class EnergyUtil {
             // GCLog.debug("Beam/storage offering RF1 up to " + toSend + " into pipe, it
             // accepted " + sent);
             return ((IEnergyHandler) tileAdj)
-                    .receiveEnergy(inputAdj, MathHelper.floor_float(toSend * EnergyConfigHandler.TO_RF_RATIO), simulate)
-                    / EnergyConfigHandler.TO_RF_RATIO;
+                .receiveEnergy(inputAdj, MathHelper.floor_float(toSend * EnergyConfigHandler.TO_RF_RATIO), simulate)
+                / EnergyConfigHandler.TO_RF_RATIO;
         } else if (isRF2Loaded && !EnergyConfigHandler.disableRFOutput && tileAdj instanceof IEnergyReceiver) {
 
             // GCLog.debug("Beam/storage offering RF2 up to " + toSend + " into pipe, it
             // accepted " + sent);
             return ((IEnergyReceiver) tileAdj)
-                    .receiveEnergy(inputAdj, MathHelper.floor_float(toSend * EnergyConfigHandler.TO_RF_RATIO), simulate)
-                    / EnergyConfigHandler.TO_RF_RATIO;
+                .receiveEnergy(inputAdj, MathHelper.floor_float(toSend * EnergyConfigHandler.TO_RF_RATIO), simulate)
+                / EnergyConfigHandler.TO_RF_RATIO;
         }
         return 0F;
     }
 
     public static float otherModsEnergyExtract(TileEntity tileAdj, ForgeDirection inputAdj, float toPull,
-            boolean simulate) {
+        boolean simulate) {
         if (isIC2Loaded && !EnergyConfigHandler.disableIC2Input && tileAdj instanceof IEnergySource) {
             double offered = 0;
             try {
@@ -277,12 +271,12 @@ public class EnergyUtil {
             }
         } else if (isRF2Loaded && !EnergyConfigHandler.disableRFInput && tileAdj instanceof IEnergyProvider) {
             return ((IEnergyProvider) tileAdj)
-                    .extractEnergy(inputAdj, MathHelper.floor_float(toPull * EnergyConfigHandler.TO_RF_RATIO), simulate)
-                    / EnergyConfigHandler.TO_RF_RATIO;
+                .extractEnergy(inputAdj, MathHelper.floor_float(toPull * EnergyConfigHandler.TO_RF_RATIO), simulate)
+                / EnergyConfigHandler.TO_RF_RATIO;
         } else if (isRF1Loaded && !EnergyConfigHandler.disableRFInput && tileAdj instanceof IEnergyHandler) {
             return ((IEnergyHandler) tileAdj)
-                    .extractEnergy(inputAdj, MathHelper.floor_float(toPull * EnergyConfigHandler.TO_RF_RATIO), simulate)
-                    / EnergyConfigHandler.TO_RF_RATIO;
+                .extractEnergy(inputAdj, MathHelper.floor_float(toPull * EnergyConfigHandler.TO_RF_RATIO), simulate)
+                / EnergyConfigHandler.TO_RF_RATIO;
         }
 
         return 0F;
@@ -342,7 +336,7 @@ public class EnergyUtil {
         } catch (final Exception e) {}
         try {
             clazzMFRRednetEnergyCable = Class
-                    .forName("powercrystals.minefactoryreloaded.tile.rednet.TileEntityRedNetEnergy");
+                .forName("powercrystals.minefactoryreloaded.tile.rednet.TileEntityRedNetEnergy");
         } catch (final Exception e) {}
         try {
             clazzRailcraftEngine = Class.forName("mods.railcraft.common.blocks.machine.beta.TileEngine");
@@ -376,13 +370,13 @@ public class EnergyUtil {
                 try {
                     // 1.7.2 version
                     EnergyUtil.injectEnergyIC2 = clazz
-                            .getMethod("injectEnergyUnits", ForgeDirection.class, double.class);
+                        .getMethod("injectEnergyUnits", ForgeDirection.class, double.class);
                     GCLog.debug("IC2 inject 1.7.2 succeeded");
                 } catch (final Exception e) {
                     // if that fails, try 1.7.10 version
                     try {
                         EnergyUtil.injectEnergyIC2 = clazz
-                                .getMethod("injectEnergy", ForgeDirection.class, double.class, double.class);
+                            .getMethod("injectEnergy", ForgeDirection.class, double.class, double.class);
                         EnergyUtil.voltageParameterIC2 = true;
                         GCLog.debug("IC2 inject 1.7.10 succeeded");
                     } catch (final Exception ee) {

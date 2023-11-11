@@ -1,8 +1,5 @@
 package micdoodle8.mods.galacticraft.core.world.gen.dungeon;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityChest;
@@ -10,6 +7,9 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class RoomChestsMoon extends DungeonRoom {
 
@@ -35,20 +35,20 @@ public class RoomChestsMoon extends DungeonRoom {
             for (int j = this.posY - 1; j <= this.posY + this.sizeY; j++) {
                 for (int k = this.posZ - 1; k <= this.posZ + this.sizeZ; k++) {
                     if (i == this.posX - 1 || i == this.posX + this.sizeX
-                            || j == this.posY - 1
-                            || j == this.posY + this.sizeY
-                            || k == this.posZ - 1
-                            || k == this.posZ + this.sizeZ) {
+                        || j == this.posY - 1
+                        || j == this.posY + this.sizeY
+                        || k == this.posZ - 1
+                        || k == this.posZ + this.sizeZ) {
                         this.placeBlock(
-                                chunk,
-                                meta,
-                                i,
-                                j,
-                                k,
-                                cx,
-                                cz,
-                                this.dungeonInstance.DUNGEON_WALL_ID,
-                                this.dungeonInstance.DUNGEON_WALL_META);
+                            chunk,
+                            meta,
+                            i,
+                            j,
+                            k,
+                            cx,
+                            cz,
+                            this.dungeonInstance.DUNGEON_WALL_ID,
+                            this.dungeonInstance.DUNGEON_WALL_META);
                     } else {
                         this.placeBlock(chunk, meta, i, j, k, cx, cz, Blocks.air, 0);
                     }
@@ -76,14 +76,14 @@ public class RoomChestsMoon extends DungeonRoom {
     protected void handleTileEntities(Random rand) {
         if (!this.chests.isEmpty()) {
             this.worldObj.setBlock(
-                    this.chests.get(0).posX,
-                    this.chests.get(0).posY,
-                    this.chests.get(0).posZ,
-                    Blocks.chest,
-                    0,
-                    2);
+                this.chests.get(0).posX,
+                this.chests.get(0).posY,
+                this.chests.get(0).posZ,
+                Blocks.chest,
+                0,
+                2);
             final TileEntityChest chest = (TileEntityChest) this.worldObj
-                    .getTileEntity(this.chests.get(0).posX, this.chests.get(0).posY, this.chests.get(0).posZ);
+                .getTileEntity(this.chests.get(0).posX, this.chests.get(0).posY, this.chests.get(0).posZ);
 
             if (chest != null) {
                 for (int i = 0; i < chest.getSizeInventory(); i++) {

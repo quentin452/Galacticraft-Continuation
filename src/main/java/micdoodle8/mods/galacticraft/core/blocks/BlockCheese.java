@@ -1,7 +1,10 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import java.util.Random;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -13,11 +16,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.Random;
 
 public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc {
 
@@ -73,7 +72,7 @@ public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc 
         final float var7 = (1 + var5 * 2) / 16.0F;
         final float var8 = 0.5F;
         return AxisAlignedBB
-                .getBoundingBox(par2 + var7, par3, par4 + var6, par2 + 1 - var6, par3 + var8 - var6, par4 + 1 - var6);
+            .getBoundingBox(par2 + var7, par3, par4 + var6, par2 + 1 - var6, par3 + var8 - var6, par4 + 1 - var6);
     }
 
     @Override
@@ -87,7 +86,7 @@ public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc 
         final float var7 = (1 + var5 * 2) / 16.0F;
         final float var8 = 0.5F;
         return AxisAlignedBB
-                .getBoundingBox(par2 + var7, par3, par4 + var6, par2 + 1 - var6, par3 + var8, par4 + 1 - var6);
+            .getBoundingBox(par2 + var7, par3, par4 + var6, par2 + 1 - var6, par3 + var8, par4 + 1 - var6);
     }
 
     /**
@@ -96,7 +95,7 @@ public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc 
     @Override
     public IIcon getIcon(int par1, int par2) {
         return par1 == 1 ? this.cheeseIcons[0]
-                : par1 == 0 ? this.cheeseIcons[0] : par2 > 0 && par1 == 4 ? this.cheeseIcons[2] : this.cheeseIcons[1];
+            : par1 == 0 ? this.cheeseIcons[0] : par2 > 0 && par1 == 4 ? this.cheeseIcons[2] : this.cheeseIcons[1];
     }
 
     /**
@@ -121,7 +120,7 @@ public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc 
      */
     @Override
     public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer,
-            int par6, float par7, float par8, float par9) {
+        int par6, float par7, float par8, float par9) {
         this.eatCakeSlice(par1World, par2, par3, par4, par5EntityPlayer);
         return true;
     }
@@ -139,7 +138,8 @@ public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc 
      */
     private void eatCakeSlice(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer) {
         if (par5EntityPlayer.canEat(false)) {
-            par5EntityPlayer.getFoodStats().addStats(2, 0.1F);
+            par5EntityPlayer.getFoodStats()
+                .addStats(2, 0.1F);
             final int l = par1World.getBlockMetadata(par2, par3, par4) + 1;
 
             if (l >= 6) {
@@ -174,7 +174,9 @@ public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc 
      */
     @Override
     public boolean canBlockStay(World par1World, int par2, int par3, int par4) {
-        return par1World.getBlock(par2, par3 - 1, par4).getMaterial().isSolid();
+        return par1World.getBlock(par2, par3 - 1, par4)
+            .getMaterial()
+            .isSolid();
     }
 
     /**

@@ -1,12 +1,11 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
+import micdoodle8.mods.galacticraft.api.entity.IRocketType.EnumRocketType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
-import micdoodle8.mods.galacticraft.api.entity.IRocketType.EnumRocketType;
 
 public class ContainerRocketInventory extends Container {
 
@@ -43,7 +42,7 @@ public class ContainerRocketInventory extends Container {
         for (var4 = 0; var4 < 3; ++var4) {
             for (var5 = 0; var5 < 9; ++var5) {
                 this.addSlotToContainer(
-                        new Slot(this.lowerChestInventory, var5 + (var4 + 1) * 9, 8 + var5 * 18, 84 + var4 * 18 - 34));
+                    new Slot(this.lowerChestInventory, var5 + (var4 + 1) * 9, 8 + var5 * 18, 84 + var4 * 18 - 34));
             }
         }
 
@@ -67,7 +66,7 @@ public class ContainerRocketInventory extends Container {
         for (var4 = 0; var4 < 3; ++var4) {
             for (var5 = 0; var5 < 9; ++var5) {
                 this.addSlotToContainer(
-                        new Slot(this.lowerChestInventory, var5 + var4 * 9 + 9, 8 + var5 * 18, ySize - 82 + var4 * 18));
+                    new Slot(this.lowerChestInventory, var5 + var4 * 9 + 9, 8 + var5 * 18, ySize - 82 + var4 * 18));
             }
         }
 

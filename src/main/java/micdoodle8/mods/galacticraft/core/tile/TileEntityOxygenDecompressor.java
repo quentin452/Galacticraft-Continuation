@@ -1,7 +1,9 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import java.util.EnumSet;
-
+import micdoodle8.mods.galacticraft.core.blocks.BlockOxygenCompressor;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.items.ItemOxygenTank;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -10,10 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import micdoodle8.mods.galacticraft.core.blocks.BlockOxygenCompressor;
-import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
-import micdoodle8.mods.galacticraft.core.items.ItemOxygenTank;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.EnumSet;
 
 public class TileEntityOxygenDecompressor extends TileEntityOxygen implements IInventory, ISidedInventory {
 
@@ -143,7 +142,7 @@ public class TileEntityOxygenDecompressor extends TileEntityOxygen implements II
     @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
         return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
-                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+            && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
     @Override
@@ -212,7 +211,7 @@ public class TileEntityOxygenDecompressor extends TileEntityOxygen implements II
     @Override
     public ForgeDirection getElectricInputDirection() {
         return ForgeDirection
-                .getOrientation(this.getBlockMetadata() - BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA + 2);
+            .getOrientation(this.getBlockMetadata() - BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA + 2);
     }
 
     @Override
@@ -221,7 +220,8 @@ public class TileEntityOxygenDecompressor extends TileEntityOxygen implements II
     }
 
     public ForgeDirection getOxygenOutputDirection() {
-        return this.getElectricInputDirection().getOpposite();
+        return this.getElectricInputDirection()
+            .getOpposite();
     }
 
     @Override
@@ -231,7 +231,9 @@ public class TileEntityOxygenDecompressor extends TileEntityOxygen implements II
 
     @Override
     public EnumSet<ForgeDirection> getOxygenOutputDirections() {
-        return EnumSet.of(this.getElectricInputDirection().getOpposite());
+        return EnumSet.of(
+            this.getElectricInputDirection()
+                .getOpposite());
     }
 
     @Override
@@ -246,8 +248,8 @@ public class TileEntityOxygenDecompressor extends TileEntityOxygen implements II
 
     @Override
     public float getOxygenProvide(ForgeDirection direction) {
-        return this.getOxygenOutputDirections().contains(direction)
-                ? Math.min(TileEntityOxygenDecompressor.OUTPUT_PER_TICK, this.getOxygenStored())
+        return this.getOxygenOutputDirections()
+            .contains(direction) ? Math.min(TileEntityOxygenDecompressor.OUTPUT_PER_TICK, this.getOxygenStored())
                 : 0.0F;
     }
 }

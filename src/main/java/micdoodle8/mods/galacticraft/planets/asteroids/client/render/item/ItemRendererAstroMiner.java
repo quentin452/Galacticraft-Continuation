@@ -1,5 +1,10 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.api.prefab.entity.EntityAutoRocket;
+import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import micdoodle8.mods.galacticraft.planets.asteroids.client.render.entity.RenderAstroMiner;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,15 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.model.IModelCustom;
-
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import micdoodle8.mods.galacticraft.api.prefab.entity.EntityAutoRocket;
-import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
-import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
-import micdoodle8.mods.galacticraft.planets.asteroids.client.render.entity.RenderAstroMiner;
 
 public class ItemRendererAstroMiner implements IItemRenderer {
 
@@ -24,8 +22,8 @@ public class ItemRendererAstroMiner implements IItemRenderer {
     protected IModelCustom modellasergr;
     protected static RenderItem drawItems = new RenderItem();
     protected ResourceLocation texture = new ResourceLocation(
-            AsteroidsModule.ASSET_PREFIX,
-            "textures/model/astroMiner_off.png");
+        AsteroidsModule.ASSET_PREFIX,
+        "textures/model/astroMiner_off.png");
 
     public ItemRendererAstroMiner() {
         this.modelMiner = RenderAstroMiner.modelObj;
@@ -34,7 +32,7 @@ public class ItemRendererAstroMiner implements IItemRenderer {
     }
 
     protected void renderMiner(ItemRenderType type, RenderBlocks render, ItemStack item, float translateX,
-            float translateY, float translateZ) {
+        float translateY, float translateZ) {
         final boolean saveCullState = GL11.glIsEnabled(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glPushMatrix();
@@ -42,7 +40,8 @@ public class ItemRendererAstroMiner implements IItemRenderer {
         this.transform(item, type);
         GL11.glScalef(0.06F, 0.06F, 0.06F);
 
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(this.texture);
+        FMLClientHandler.instance()
+            .getClient().renderEngine.bindTexture(this.texture);
         this.modelMiner.renderAll();
         GL11.glTranslatef(1.875F, 0F, 0F);
         this.modellasergl.renderAll();
@@ -55,7 +54,8 @@ public class ItemRendererAstroMiner implements IItemRenderer {
     }
 
     public void transform(ItemStack itemstack, ItemRenderType type) {
-        final EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
+        final EntityPlayer player = FMLClientHandler.instance()
+            .getClient().thePlayer;
 
         if (type == ItemRenderType.EQUIPPED) {
             // The additional offsets cause this to be held one-handed overhead (avoids
@@ -67,8 +67,8 @@ public class ItemRendererAstroMiner implements IItemRenderer {
             GL11.glScalef(4.6F, 4.6F, 4.6F);
 
             if (player != null && player.ridingEntity != null
-                    && (player.ridingEntity instanceof EntityAutoRocket
-                            || player.ridingEntity instanceof EntityLanderBase)) {
+                && (player.ridingEntity instanceof EntityAutoRocket
+                    || player.ridingEntity instanceof EntityLanderBase)) {
                 GL11.glScalef(0.0F, 0.0F, 0.0F);
             }
         }
@@ -79,8 +79,8 @@ public class ItemRendererAstroMiner implements IItemRenderer {
             GL11.glScalef(5.2F, 5.2F, 5.2F);
 
             if (player != null && player.ridingEntity != null
-                    && (player.ridingEntity instanceof EntityAutoRocket
-                            || player.ridingEntity instanceof EntityLanderBase)) {
+                && (player.ridingEntity instanceof EntityAutoRocket
+                    || player.ridingEntity instanceof EntityLanderBase)) {
                 GL11.glScalef(0.0F, 0.0F, 0.0F);
             }
         }

@@ -1,7 +1,11 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.EntityMeteorChunk;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,12 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.entities.EntityMeteorChunk;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import java.util.List;
 
 public class ItemMeteorChunk extends Item {
 
@@ -41,18 +40,21 @@ public class ItemMeteorChunk extends Item {
     public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
         if (itemstack.getItemDamage() == 1 && !world.isRemote) {
             if (itemstack.hasTagCompound()) {
-                float meteorBurnTime = itemstack.getTagCompound().getFloat("MeteorBurnTimeF");
+                float meteorBurnTime = itemstack.getTagCompound()
+                    .getFloat("MeteorBurnTimeF");
 
                 if (meteorBurnTime >= 0.5F) {
                     meteorBurnTime -= 0.5F;
-                    itemstack.getTagCompound().setFloat("MeteorBurnTimeF", meteorBurnTime);
+                    itemstack.getTagCompound()
+                        .setFloat("MeteorBurnTimeF", meteorBurnTime);
                 } else {
                     itemstack.setItemDamage(0);
                     itemstack.stackTagCompound = null;
                 }
             } else {
                 itemstack.setTagCompound(new NBTTagCompound());
-                itemstack.getTagCompound().setFloat("MeteorBurnTimeF", ItemMeteorChunk.METEOR_BURN_TIME);
+                itemstack.getTagCompound()
+                    .setFloat("MeteorBurnTimeF", ItemMeteorChunk.METEOR_BURN_TIME);
             }
         }
     }
@@ -66,7 +68,8 @@ public class ItemMeteorChunk extends Item {
                 itemstack.setTagCompound(new NBTTagCompound());
             }
 
-            itemstack.getTagCompound().setFloat("MeteorBurnTimeF", ItemMeteorChunk.METEOR_BURN_TIME);
+            itemstack.getTagCompound()
+                .setFloat("MeteorBurnTimeF", ItemMeteorChunk.METEOR_BURN_TIME);
         }
     }
 
@@ -80,21 +83,22 @@ public class ItemMeteorChunk extends Item {
     @SideOnly(Side.CLIENT)
     @Override
     public void addInformation(ItemStack itemstack, EntityPlayer par2EntityPlayer, List<String> par3List,
-            boolean par4) {
+        boolean par4) {
         if (itemstack.getItemDamage() > 0) {
             float burnTime = 0.0F;
 
             if (itemstack.hasTagCompound()) {
-                final float meteorBurnTime = itemstack.getTagCompound().getFloat("MeteorBurnTimeF");
+                final float meteorBurnTime = itemstack.getTagCompound()
+                    .getFloat("MeteorBurnTimeF");
                 burnTime = Math.round(meteorBurnTime / 10.0F) / 2.0F;
             } else {
                 burnTime = 45.0F;
             }
 
             par3List.add(
-                    GCCoreUtil.translate("item.hotDescription.name") + " "
-                            + burnTime
-                            + GCCoreUtil.translate("gui.seconds"));
+                GCCoreUtil.translate("item.hotDescription.name") + " "
+                    + burnTime
+                    + GCCoreUtil.translate("gui.seconds"));
         }
     }
 

@@ -1,19 +1,17 @@
 package micdoodle8.mods.galacticraft.core.client.gui.element;
 
-import java.util.List;
-
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import micdoodle8.mods.galacticraft.core.client.gui.container.GuiContainerGC;
 import micdoodle8.mods.galacticraft.core.util.ColorUtil;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiElementInfoRegion extends Gui {
@@ -32,7 +30,7 @@ public class GuiElementInfoRegion extends Gui {
     public GuiContainerGC parentGui;
 
     public GuiElementInfoRegion(int xPos, int yPos, int width, int height, List<String> tooltipStrings, int parentWidth,
-            int parentHeight, GuiContainerGC parentGui) {
+        int parentHeight, GuiContainerGC parentGui) {
         this.width = 200;
         this.height = 20;
         this.enabled = true;
@@ -65,24 +63,25 @@ public class GuiElementInfoRegion extends Gui {
         GL11.glDisable(GL11.GL_DEPTH_TEST);
 
         this.withinRegion = par2 >= this.xPosition && par3 >= this.yPosition
-                && par2 < this.xPosition + this.width
-                && par3 < this.yPosition + this.height;
+            && par2 < this.xPosition + this.width
+            && par3 < this.yPosition + this.height;
 
         if (this.drawRegion) {
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             final int k = this.getHoverState(this.withinRegion);
             Gui.drawRect(
-                    this.xPosition,
-                    this.yPosition,
-                    this.xPosition + this.width,
-                    this.yPosition + this.height,
-                    ColorUtil.to32BitColor(100 * k, 255, 0, 0));
+                this.xPosition,
+                this.yPosition,
+                this.xPosition + this.width,
+                this.yPosition + this.height,
+                ColorUtil.to32BitColor(100 * k, 255, 0, 0));
         }
 
         if (this.tooltipStrings != null && !this.tooltipStrings.isEmpty() && this.withinRegion) {
             int k = 0;
             for (String s : this.tooltipStrings) {
-                final int l = FMLClientHandler.instance().getClient().fontRenderer.getStringWidth(s);
+                final int l = FMLClientHandler.instance()
+                    .getClient().fontRenderer.getStringWidth(s);
 
                 if (l > k) {
                     k = l;
@@ -121,7 +120,8 @@ public class GuiElementInfoRegion extends Gui {
             this.drawGradientRect(i1 - 3, j1 + k1 + 2, i1 + k + 3, j1 + k1 + 3, j2, j2);
 
             for (final String s1 : this.tooltipStrings) {
-                FMLClientHandler.instance().getClient().fontRenderer.drawStringWithShadow(s1, i1, j1, -1);
+                FMLClientHandler.instance()
+                    .getClient().fontRenderer.drawStringWithShadow(s1, i1, j1, -1);
 
                 j1 += 10;
             }
