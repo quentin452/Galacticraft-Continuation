@@ -1,8 +1,17 @@
 package micdoodle8.mods.galacticraft.api.block;
 
-public interface IPlantableBlock
-{
+/**
+ * Extend this block to allow planting of saplings on it. Requires
+ */
+public interface IPlantableBlock {
+
+    /**
+     * @return amount of water blocks required for sapling to be growable. 4 is default.
+     */
     int requiredLiquidBlocksNearby();
-    
-    boolean isPlantable(final int p0);
+
+    /**
+     * @return is sapling can be placed on the provided metadata value, return true
+     */
+    boolean isPlantable(int metadata);
 }

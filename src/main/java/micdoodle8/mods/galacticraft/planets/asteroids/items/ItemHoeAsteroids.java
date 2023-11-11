@@ -1,25 +1,32 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemHoe;
+import net.minecraft.item.ItemStack;
 
-public class ItemHoeAsteroids extends ItemHoe
-{
-    public ItemHoeAsteroids(final String assetName) {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+
+public class ItemHoeAsteroids extends ItemHoe {
+
+    public ItemHoeAsteroids(String assetName) {
         super(AsteroidsItems.TOOL_TITANIUM);
         this.setUnlocalizedName(assetName);
-        this.setTextureName("galacticraftasteroids:" + assetName);
+        this.setTextureName(AsteroidsModule.TEXTURE_PREFIX + assetName);
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
 }

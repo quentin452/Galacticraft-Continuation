@@ -1,16 +1,18 @@
 package micdoodle8.mods.galacticraft.api.tile;
 
-import java.util.*;
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.api.entity.*;
+import java.util.HashSet;
 
-public interface IFuelDock
-{
+import net.minecraft.world.IBlockAccess;
+
+import micdoodle8.mods.galacticraft.api.entity.IDockable;
+
+public interface IFuelDock {
+
     HashSet<ILandingPadAttachable> getConnectedTiles();
-    
-    boolean isBlockAttachable(final IBlockAccess p0, final int p1, final int p2, final int p3);
-    
+
+    boolean isBlockAttachable(IBlockAccess world, int x, int y, int z);
+
     IDockable getDockedEntity();
-    
-    void dockEntity(final IDockable p0);
+
+    void dockEntity(IDockable entity);
 }

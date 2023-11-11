@@ -1,24 +1,30 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.client.renderer.texture.*;
-import micdoodle8.mods.galacticraft.core.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
-public class ItemFuel extends Item
-{
-    public ItemFuel(final String assetName) {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+
+public class ItemFuel extends Item {
+
+    public ItemFuel(String assetName) {
         this.setUnlocalizedName(assetName);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(final IIconRegister par1IconRegister) {
+    public void registerIcons(IIconRegister par1IconRegister) {
         this.itemIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "fuel_flow");
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
 }

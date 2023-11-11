@@ -1,15 +1,22 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import java.util.*;
-import io.netty.buffer.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
+import java.util.ArrayList;
 
-public interface IPacketReceiver
-{
-    void getNetworkedData(final ArrayList<Object> p0);
-    
-    void decodePacketdata(final ByteBuf p0);
-    
-    void handlePacketData(final Side p0, final EntityPlayer p1);
+import net.minecraft.entity.player.EntityPlayer;
+
+import cpw.mods.fml.relauncher.Side;
+import io.netty.buffer.ByteBuf;
+
+public interface IPacketReceiver {
+
+    /**
+     * Note this can be called during the init constructor of the entity's superclass, if this is a subclass of the
+     * IPacketReceiver entity. So make sure any fields referenced in getNetworkedData() are either in the superclass, or
+     * add some null checks!!
+     */
+    void getNetworkedData(ArrayList<Object> sendData);
+
+    void decodePacketdata(ByteBuf buffer);
+
+    void handlePacketData(Side side, EntityPlayer player);
 }

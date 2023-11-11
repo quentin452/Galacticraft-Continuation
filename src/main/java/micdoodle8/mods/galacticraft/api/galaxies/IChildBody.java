@@ -1,6 +1,6 @@
 package micdoodle8.mods.galacticraft.api.galaxies;
 
-public interface IChildBody
-{
+public interface IChildBody {
+
     Planet getParentPlanet();
 }

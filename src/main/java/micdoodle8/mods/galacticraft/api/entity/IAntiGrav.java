@@ -1,5 +1,7 @@
 package micdoodle8.mods.galacticraft.api.entity;
 
-public interface IAntiGrav
-{
+/**
+ * Implement into entities that are unaffected by gravity
+ */
+public interface IAntiGrav {
 }

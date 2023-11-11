@@ -1,114 +1,174 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
+import java.util.ArrayList;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotFurnace;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
+import micdoodle8.mods.galacticraft.api.item.IItemElectric;
+import micdoodle8.mods.galacticraft.api.recipe.CircuitFabricatorRecipes;
 import micdoodle8.mods.galacticraft.core.items.GCItems;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import micdoodle8.mods.galacticraft.api.item.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.api.recipe.*;
-import net.minecraft.inventory.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.init.*;
-import net.minecraft.item.*;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityCircuitFabricator;
 
-public class ContainerCircuitFabricator extends Container
-{
-    private TileEntityCircuitFabricator tileEntity;
+public class ContainerCircuitFabricator extends Container {
 
-    public ContainerCircuitFabricator(final InventoryPlayer playerInv, final TileEntityCircuitFabricator tileEntity) {
+    private final TileEntityCircuitFabricator tileEntity;
+
+    public ContainerCircuitFabricator(InventoryPlayer playerInv, TileEntityCircuitFabricator tileEntity) {
         this.tileEntity = tileEntity;
-        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)tileEntity, 0, 6, 69, new Class[] { IItemElectric.class }));
+
+        // Energy slot
+        this.addSlotToContainer(new SlotSpecific(tileEntity, 0, 6, 69, IItemElectric.class));
+
+        // Diamond
         ArrayList<ItemStack> slotContentsList = CircuitFabricatorRecipes.slotValidItems.get(0);
-        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)tileEntity, 1, 15, 17, (ItemStack[])slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
+        this.addSlotToContainer(
+                new SlotSpecific(
+                        tileEntity,
+                        1,
+                        15,
+                        17,
+                        slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
+
+        // Silicon
         slotContentsList = CircuitFabricatorRecipes.slotValidItems.get(1);
-        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)tileEntity, 2, 74, 46, (ItemStack[])slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
+        this.addSlotToContainer(
+                new SlotSpecific(
+                        tileEntity,
+                        2,
+                        74,
+                        46,
+                        slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
         slotContentsList = CircuitFabricatorRecipes.slotValidItems.get(2);
-        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)tileEntity, 3, 74, 64, (ItemStack[])slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
+        this.addSlotToContainer(
+                new SlotSpecific(
+                        tileEntity,
+                        3,
+                        74,
+                        64,
+                        slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
+
+        // Redstone
         slotContentsList = CircuitFabricatorRecipes.slotValidItems.get(3);
-        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)tileEntity, 4, 122, 46, (ItemStack[])slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
+        this.addSlotToContainer(
+                new SlotSpecific(
+                        tileEntity,
+                        4,
+                        122,
+                        46,
+                        slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
+
+        // Optional
         slotContentsList = CircuitFabricatorRecipes.slotValidItems.get(4);
-        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)tileEntity, 5, 145, 20, (ItemStack[])slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
-        this.addSlotToContainer((Slot)new SlotFurnace(playerInv.player, (IInventory)tileEntity, 6, 152, 86));
-        for (int slot = 0; slot < 3; ++slot) {
+        this.addSlotToContainer(
+                new SlotSpecific(
+                        tileEntity,
+                        5,
+                        145,
+                        20,
+                        slotContentsList.toArray(new ItemStack[slotContentsList.size()])));
+
+        // Smelting result
+        this.addSlotToContainer(new SlotFurnace(playerInv.player, tileEntity, 6, 152, 86));
+
+        int slot;
+
+        for (slot = 0; slot < 3; ++slot) {
             for (int var4 = 0; var4 < 9; ++var4) {
-                this.addSlotToContainer(new Slot((IInventory)playerInv, var4 + slot * 9 + 9, 8 + var4 * 18, 110 + slot * 18));
+                this.addSlotToContainer(new Slot(playerInv, var4 + slot * 9 + 9, 8 + var4 * 18, 110 + slot * 18));
             }
         }
-        for (int slot = 0; slot < 9; ++slot) {
-            this.addSlotToContainer(new Slot((IInventory)playerInv, slot, 8 + slot * 18, 168));
+
+        for (slot = 0; slot < 9; ++slot) {
+            this.addSlotToContainer(new Slot(playerInv, slot, 8 + slot * 18, 168));
         }
     }
 
-    public boolean canInteractWith(final EntityPlayer par1EntityPlayer) {
+    @Override
+    public boolean canInteractWith(EntityPlayer par1EntityPlayer) {
         return this.tileEntity.isUseableByPlayer(par1EntityPlayer);
     }
 
-    public void onCraftMatrixChanged(final IInventory par1IInventory) {
+    @Override
+    public void onCraftMatrixChanged(IInventory par1IInventory) {
         super.onCraftMatrixChanged(par1IInventory);
     }
 
-    public ItemStack transferStackInSlot(final EntityPlayer par1EntityPlayer, final int par1) {
+    /**
+     * Called to transfer a stack from one inventory to the other eg. when shift clicking.
+     */
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par1) {
         ItemStack var2 = null;
-        final Slot slot = (Slot) this.inventorySlots.get(par1);
+        final Slot slot = this.inventorySlots.get(par1);
         final int b = this.inventorySlots.size();
+
         if (slot != null && slot.getHasStack()) {
-            final ItemStack var3 = slot.getStack();
-            var2 = var3.copy();
+            final ItemStack var4 = slot.getStack();
+            var2 = var4.copy();
+
             if (par1 < b - 36) {
-                if (!this.mergeItemStack(var3, b - 36, b, true)) {
+                if (!this.mergeItemStack(var4, b - 36, b, true)) {
                     return null;
                 }
+
                 if (par1 == 6) {
-                    slot.onSlotChange(var3, var2);
+                    slot.onSlotChange(var4, var2);
                 }
-            }
-            else {
-                final Item i = var3.getItem();
+            } else {
+                final Item i = var4.getItem();
                 if (i instanceof IItemElectric) {
-                    if (!this.mergeItemStack(var3, 0, 1, false)) {
+                    if (!this.mergeItemStack(var4, 0, 1, false)) {
                         return null;
                     }
-                }
-                else if (i == Items.diamond) {
-                    if (!this.mergeItemStack(var3, 1, 2, false)) {
+                } else if (i == Items.diamond) {
+                    if (!this.mergeItemStack(var4, 1, 2, false)) {
                         return null;
                     }
-                }
-                else if (i == GCItems.basicItem && i.getDamage(var3) == 2) {
-                    if (!this.mergeItemStack(var3, 2, 4, false)) {
+                } else if (i == GCItems.basicItem && i.getDamage(var4) == 2) {
+                    if (!this.mergeItemStack(var4, 2, 4, false)) {
                         return null;
                     }
-                }
-                else if (i == Items.redstone) {
-                    if (!this.mergeItemStack(var3, 4, 5, false)) {
+                } else if (i == Items.redstone) {
+                    if (!this.mergeItemStack(var4, 4, 5, false)) {
                         return null;
                     }
-                }
-                else if (i == Items.repeater || i == new ItemStack(Blocks.redstone_torch).getItem() || (i == Items.dye && i.getDamage(var3) == 4)) {
-                    if (!this.mergeItemStack(var3, 5, 6, false)) {
+                } else if (i == Items.repeater || i == new ItemStack(Blocks.redstone_torch).getItem()
+                        || i == Items.dye && i.getDamage(var4) == 4) {
+                            if (!this.mergeItemStack(var4, 5, 6, false)) {
+                                return null;
+                            }
+                        } else
+                    if (par1 < b - 9) {
+                        if (!this.mergeItemStack(var4, b - 9, b, false)) {
+                            return null;
+                        }
+                    } else if (!this.mergeItemStack(var4, b - 36, b - 9, false)) {
                         return null;
                     }
-                }
-                else if (par1 < b - 9) {
-                    if (!this.mergeItemStack(var3, b - 9, b, false)) {
-                        return null;
-                    }
-                }
-                else if (!this.mergeItemStack(var3, b - 36, b - 9, false)) {
-                    return null;
-                }
             }
-            if (var3.stackSize == 0) {
-                slot.putStack((ItemStack)null);
-            }
-            else {
+
+            if (var4.stackSize == 0) {
+                slot.putStack(null);
+            } else {
                 slot.onSlotChanged();
             }
-            if (var3.stackSize == var2.stackSize) {
+
+            if (var4.stackSize == var2.stackSize) {
                 return null;
             }
-            slot.onPickupFromSlot(par1EntityPlayer, var3);
+
+            slot.onPickupFromSlot(par1EntityPlayer, var4);
         }
+
         return var2;
     }
 }

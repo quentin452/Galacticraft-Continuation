@@ -1,63 +1,74 @@
 package micdoodle8.mods.galacticraft.planets;
 
-import cpw.mods.fml.common.network.*;
-import cpw.mods.fml.common.event.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.world.*;
-import java.util.*;
-import cpw.mods.fml.relauncher.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PlanetsProxy implements IGuiHandler
-{
-    public void preInit(final FMLPreInitializationEvent event) {
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.IGuiHandler;
+import cpw.mods.fml.relauncher.Side;
+
+public class PlanetsProxy implements IGuiHandler {
+
+    public void preInit(FMLPreInitializationEvent event) {
         for (final IPlanetsModule module : GalacticraftPlanets.commonModules.values()) {
             module.preInit(event);
         }
     }
-    
-    public void init(final FMLInitializationEvent event) {
+
+    public void init(FMLInitializationEvent event) {
         for (final IPlanetsModule module : GalacticraftPlanets.commonModules.values()) {
             module.init(event);
         }
     }
-    
-    public void postInit(final FMLPostInitializationEvent event) {
+
+    public void postInit(FMLPostInitializationEvent event) {
         for (final IPlanetsModule module : GalacticraftPlanets.commonModules.values()) {
             module.postInit(event);
         }
     }
-    
-    public void serverStarting(final FMLServerStartingEvent event) {
+
+    public void serverStarting(FMLServerStartingEvent event) {
         for (final IPlanetsModule module : GalacticraftPlanets.commonModules.values()) {
             module.serverStarting(event);
         }
     }
-    
-    public void serverInit(final FMLServerStartedEvent event) {
+
+    public void serverInit(FMLServerStartedEvent event) {
         for (final IPlanetsModule module : GalacticraftPlanets.commonModules.values()) {
             module.serverInit(event);
         }
     }
-    
-    public Object getServerGuiElement(final int ID, final EntityPlayer player, final World world, final int x, final int y, final int z) {
+
+    @Override
+    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         for (final IPlanetsModule module : GalacticraftPlanets.commonModules.values()) {
-            final List<Integer> guiIDs = new ArrayList<Integer>();
-            module.getGuiIDs((List)guiIDs);
+            final List<Integer> guiIDs = new ArrayList<>();
+            module.getGuiIDs(guiIDs);
             if (guiIDs.contains(ID)) {
                 return module.getGuiElement(Side.SERVER, ID, player, world, x, y, z);
             }
         }
+
         return null;
     }
-    
-    public Object getClientGuiElement(final int ID, final EntityPlayer player, final World world, final int x, final int y, final int z) {
+
+    @Override
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         for (final IPlanetsModuleClient module : GalacticraftPlanets.clientModules.values()) {
-            final List<Integer> guiIDs = new ArrayList<Integer>();
-            module.getGuiIDs((List)guiIDs);
+            final List<Integer> guiIDs = new ArrayList<>();
+            module.getGuiIDs(guiIDs);
             if (guiIDs.contains(ID)) {
                 return module.getGuiElement(Side.CLIENT, ID, player, world, x, y, z);
             }
         }
+
         return null;
     }
 }

@@ -423,7 +423,7 @@ gui.telemetryFailWearingIt.message=Ja ću morati da skinem frekvencijski modul, 
 
 gui.rocketType.0=Storage Space: 18
 gui.rocketType.1=Storage Space: 36
-gui.rocketType.2=Storage Space: 56
+gui.rocketType.2=Storage Space: 54
 gui.rocketType.3=Sa Gorivom
 
 gui.spacestation.typeCommand=Upiši
@@ -443,6 +443,7 @@ gui.receiver.cannotAttach=Nemožeš staviti stroj ovdje!
 gui.warning.invalidThermal=Nepoznata Termalna Zaštita!
 
 gui.tank.oxygenRemaining=Zraka Ostalo
+gui.tank.infinite=BESKONAČAN
 gui.buggy.storageSpace=Mjesto
 gui.frequencyModule.desc.0=Čitanje jako tihih zvukova
 gui.frequencyModule.desc.1=valova i dalekih signala

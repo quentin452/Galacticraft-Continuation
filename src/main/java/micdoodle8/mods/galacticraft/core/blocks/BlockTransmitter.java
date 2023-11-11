@@ -1,150 +1,216 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.api.vector.*;
-import net.minecraft.block.material.*;
-import net.minecraft.block.*;
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.core.*;
-import cpw.mods.fml.common.network.*;
-import micdoodle8.mods.galacticraft.core.network.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.api.transmission.tile.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import micdoodle8.mods.galacticraft.planets.mars.tile.*;
-import micdoodle8.mods.galacticraft.core.energy.*;
-import micdoodle8.mods.galacticraft.api.transmission.*;
-import java.util.*;
-import net.minecraft.entity.*;
+import java.util.List;
 
-public abstract class BlockTransmitter extends BlockContainer
-{
-    public Vector3 minVector;
-    public Vector3 maxVector;
-    
-    public BlockTransmitter(final Material material) {
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
+import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkConnection;
+import micdoodle8.mods.galacticraft.api.transmission.tile.ITransmitter;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+import micdoodle8.mods.galacticraft.core.util.OxygenUtil;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityHydrogenPipe;
+
+public abstract class BlockTransmitter extends BlockContainer {
+
+    public Vector3 minVector = new Vector3(0.3, 0.3, 0.3);
+    public Vector3 maxVector = new Vector3(0.7, 0.7, 0.7);
+
+    public BlockTransmitter(Material material) {
         super(material);
-        this.minVector = new Vector3(0.3, 0.3, 0.3);
-        this.maxVector = new Vector3(0.7, 0.7, 0.7);
     }
-    
-    public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final Block block) {
+
+    @Override
+    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
         super.onNeighborBlockChange(world, x, y, z, block);
+
         final TileEntity tile = world.getTileEntity(x, y, z);
-        this.setBlockBoundsBasedOnState((IBlockAccess)world, x, y, z);
-        GalacticraftCore.packetPipeline.sendToAllAround(new PacketSimple(PacketSimple.EnumSimplePacket.C_UPDATE_WIRE_BOUNDS, new Object[] { x, y, z }), new NetworkRegistry.TargetPoint(world.provider.dimensionId, (double)x, (double)y, (double)z, 10.0));
+
+        this.setBlockBoundsBasedOnState(world, x, y, z);
+        GalacticraftCore.packetPipeline.sendToAllAround(
+                new PacketSimple(EnumSimplePacket.C_UPDATE_WIRE_BOUNDS, new Object[] { x, y, z }),
+                new TargetPoint(world.provider.dimensionId, x, y, z, 10.0D));
+
         if (tile instanceof INetworkConnection) {
-            ((INetworkConnection)tile).refresh();
+            ((INetworkConnection) tile).refresh();
         }
     }
-    
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
-        this.setBlockBoundsBasedOnState((IBlockAccess)world, x, y, z);
+
+    /**
+     * Returns a bounding box from the pool of bounding boxes (this means this box can change after the pool has been
+     * cleared to be reused)
+     */
+    @Override
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
+        this.setBlockBoundsBasedOnState(world, x, y, z);
         return super.getCollisionBoundingBoxFromPool(world, x, y, z);
     }
-    
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
-        this.setBlockBoundsBasedOnState((IBlockAccess)world, x, y, z);
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
+        this.setBlockBoundsBasedOnState(world, x, y, z);
         return super.getSelectedBoundingBoxFromPool(world, x, y, z);
     }
-    
-    public void setBlockBoundsBasedOnState(final IBlockAccess world, final int x, final int y, final int z) {
+
+    /**
+     * Returns the bounding box of the wired rectangular prism to render.
+     */
+    @Override
+    public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
         final TileEntity tileEntity = world.getTileEntity(x, y, z);
+
         if (tileEntity instanceof ITransmitter) {
             TileEntity[] connectable = new TileEntity[6];
             switch (this.getNetworkType()) {
-                case OXYGEN: {
+                case OXYGEN:
                     connectable = OxygenUtil.getAdjacentOxygenConnections(tileEntity);
                     break;
-                }
-                case HYDROGEN: {
+                case HYDROGEN:
                     connectable = TileEntityHydrogenPipe.getAdjacentHydrogenConnections(tileEntity);
                     break;
-                }
-                case POWER: {
+                case POWER:
                     connectable = EnergyUtil.getAdjacentPowerConnections(tileEntity);
                     break;
-                }
+                default:
+                    break;
             }
-            float minX = (float)this.minVector.x;
-            float minY = (float)this.minVector.y;
-            float minZ = (float)this.minVector.z;
-            float maxX = (float)this.maxVector.x;
-            float maxY = (float)this.maxVector.y;
-            float maxZ = (float)this.maxVector.z;
+
+            float minX = (float) this.minVector.x;
+            float minY = (float) this.minVector.y;
+            float minZ = (float) this.minVector.z;
+            float maxX = (float) this.maxVector.x;
+            float maxY = (float) this.maxVector.y;
+            float maxZ = (float) this.maxVector.z;
+
             if (connectable[0] != null) {
-                minY = 0.0f;
+                minY = 0.0F;
             }
+
             if (connectable[1] != null) {
-                maxY = 1.0f;
+                maxY = 1.0F;
             }
+
             if (connectable[2] != null) {
-                minZ = 0.0f;
+                minZ = 0.0F;
             }
+
             if (connectable[3] != null) {
-                maxZ = 1.0f;
+                maxZ = 1.0F;
             }
+
             if (connectable[4] != null) {
-                minX = 0.0f;
+                minX = 0.0F;
             }
+
             if (connectable[5] != null) {
-                maxX = 1.0f;
+                maxX = 1.0F;
             }
+
             this.setBlockBounds(minX, minY, minZ, maxX, maxY, maxZ);
         }
     }
-    
+
     public abstract NetworkType getNetworkType();
-    
-    public void addCollisionBoxesToList(final World world, final int x, final int y, final int z, final AxisAlignedBB axisalignedbb, final List list, final Entity entity) {
-        this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, (float)this.minVector.z, (float)this.maxVector.x, (float)this.maxVector.y, (float)this.maxVector.z);
+
+    @Override
+    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB axisalignedbb,
+            List<AxisAlignedBB> list, Entity entity) {
+        this.setBlockBounds(
+                (float) this.minVector.x,
+                (float) this.minVector.y,
+                (float) this.minVector.z,
+                (float) this.maxVector.x,
+                (float) this.maxVector.y,
+                (float) this.maxVector.z);
         super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
+
         final TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity instanceof ITransmitter) {
-            TileEntity[] connectable = null;
-            switch (this.getNetworkType()) {
-                case OXYGEN: {
-                    connectable = OxygenUtil.getAdjacentOxygenConnections(tileEntity);
-                    break;
-                }
-                case HYDROGEN: {
-                    connectable = TileEntityHydrogenPipe.getAdjacentHydrogenConnections(tileEntity);
-                    break;
-                }
-                case POWER: {
-                    connectable = EnergyUtil.getAdjacentPowerConnections(tileEntity);
-                    break;
-                }
-                default: {
-                    connectable = new TileEntity[6];
-                    break;
-                }
-            }
+            TileEntity[] connectable = switch (this.getNetworkType()) {
+                case OXYGEN -> OxygenUtil.getAdjacentOxygenConnections(tileEntity);
+                case HYDROGEN -> TileEntityHydrogenPipe.getAdjacentHydrogenConnections(tileEntity);
+                case POWER -> EnergyUtil.getAdjacentPowerConnections(tileEntity);
+                default -> new TileEntity[6];
+            };
             if (connectable[4] != null) {
-                this.setBlockBounds(0.0f, (float)this.minVector.y, (float)this.minVector.z, (float)this.maxVector.x, (float)this.maxVector.y, (float)this.maxVector.z);
+                this.setBlockBounds(
+                        0,
+                        (float) this.minVector.y,
+                        (float) this.minVector.z,
+                        (float) this.maxVector.x,
+                        (float) this.maxVector.y,
+                        (float) this.maxVector.z);
                 super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
             }
+
             if (connectable[5] != null) {
-                this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, (float)this.minVector.z, 1.0f, (float)this.maxVector.y, (float)this.maxVector.z);
+                this.setBlockBounds(
+                        (float) this.minVector.x,
+                        (float) this.minVector.y,
+                        (float) this.minVector.z,
+                        1,
+                        (float) this.maxVector.y,
+                        (float) this.maxVector.z);
                 super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
             }
+
             if (connectable[0] != null) {
-                this.setBlockBounds((float)this.minVector.x, 0.0f, (float)this.minVector.z, (float)this.maxVector.x, (float)this.maxVector.y, (float)this.maxVector.z);
+                this.setBlockBounds(
+                        (float) this.minVector.x,
+                        0,
+                        (float) this.minVector.z,
+                        (float) this.maxVector.x,
+                        (float) this.maxVector.y,
+                        (float) this.maxVector.z);
                 super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
             }
+
             if (connectable[1] != null) {
-                this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, (float)this.minVector.z, (float)this.maxVector.x, 1.0f, (float)this.maxVector.z);
+                this.setBlockBounds(
+                        (float) this.minVector.x,
+                        (float) this.minVector.y,
+                        (float) this.minVector.z,
+                        (float) this.maxVector.x,
+                        1,
+                        (float) this.maxVector.z);
                 super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
             }
+
             if (connectable[2] != null) {
-                this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, 0.0f, (float)this.maxVector.x, (float)this.maxVector.y, (float)this.maxVector.z);
+                this.setBlockBounds(
+                        (float) this.minVector.x,
+                        (float) this.minVector.y,
+                        0,
+                        (float) this.maxVector.x,
+                        (float) this.maxVector.y,
+                        (float) this.maxVector.z);
                 super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
             }
+
             if (connectable[3] != null) {
-                this.setBlockBounds((float)this.minVector.x, (float)this.minVector.y, (float)this.minVector.z, (float)this.maxVector.x, (float)this.maxVector.y, 1.0f);
+                this.setBlockBounds(
+                        (float) this.minVector.x,
+                        (float) this.minVector.y,
+                        (float) this.minVector.z,
+                        (float) this.maxVector.x,
+                        (float) this.maxVector.y,
+                        1);
                 super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
             }
         }
-        this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
+
+        this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
     }
 }

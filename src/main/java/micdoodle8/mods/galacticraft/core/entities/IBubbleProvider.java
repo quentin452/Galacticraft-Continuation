@@ -1,10 +1,11 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-public interface IBubbleProvider
-{
+public interface IBubbleProvider {
+
+    // public IBubble getBubble();
     float getBubbleSize();
-    
-    void setBubbleVisible(final boolean p0);
-    
+
+    void setBubbleVisible(boolean shouldRender);
+
     boolean getBubbleVisible();
 }

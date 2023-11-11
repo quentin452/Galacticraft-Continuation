@@ -1,160 +1,172 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
-import net.minecraftforge.client.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.entities.*;
-import cpw.mods.fml.client.*;
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraftforge.client.model.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.item.*;
-import org.lwjgl.opengl.*;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.model.AdvancedModelLoader;
+import net.minecraftforge.client.model.IModelCustom;
 
-public class ItemRendererBuggy implements IItemRenderer
-{
-    private static final ResourceLocation buggyTextureBody;
-    private static final ResourceLocation buggyTextureWheel;
-    private static final ResourceLocation buggyTextureStorage;
-    EntityBuggy spaceship;
-    private final IModelCustom modelBuggy;
-    private final IModelCustom modelBuggyWheelRight;
-    private final IModelCustom modelBuggyWheelLeft;
-    
-    public ItemRendererBuggy() {
-        this.spaceship = new EntityBuggy((World)FMLClientHandler.instance().getClient().theWorld);
-        this.modelBuggy = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggy.obj"));
-        this.modelBuggyWheelRight = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggyWheelRight.obj"));
-        this.modelBuggyWheelLeft = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggyWheelLeft.obj"));
-    }
-    
-    private void renderPipeItem(final IItemRenderer.ItemRenderType type, final RenderBlocks render, final ItemStack item, final float translateX, final float translateY, final float translateZ) {
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.EntityBuggy;
+
+public class ItemRendererBuggy implements IItemRenderer {
+
+    private static final ResourceLocation buggyTextureBody = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/buggyMain.png");
+    private static final ResourceLocation buggyTextureWheel = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/buggyWheels.png");
+    private static final ResourceLocation buggyTextureStorage = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/buggyStorage.png");
+
+    EntityBuggy spaceship = new EntityBuggy(FMLClientHandler.instance().getClient().theWorld);
+
+    private final IModelCustom modelBuggy = AdvancedModelLoader
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggy.obj"));
+    private final IModelCustom modelBuggyWheelRight = AdvancedModelLoader
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggyWheelRight.obj"));
+    private final IModelCustom modelBuggyWheelLeft = AdvancedModelLoader
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/buggyWheelLeft.obj"));
+
+    private void renderPipeItem(ItemRenderType type, ItemStack item) {
         GL11.glPushMatrix();
         long var10 = this.spaceship.getEntityId() * 493286711L;
         var10 = var10 * var10 * 4392167121L + var10 * 98761L;
-        final float var11 = (((var10 >> 16 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        final float var12 = (((var10 >> 20 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        final float var13 = (((var10 >> 24 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        GL11.glScalef(0.75f, 0.75f, 0.75f);
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED) {
-            GL11.glRotatef(150.0f, 0.0f, 0.0f, 1.0f);
-            GL11.glScalef(2.2f, 2.2f, 2.2f);
-            GL11.glTranslatef(0.0f, -0.65f, 0.9f);
+        final float var12 = (((var10 >> 16 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        final float var13 = (((var10 >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        final float var14 = (((var10 >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+
+        GL11.glScalef(0.75F, 0.75F, 0.75F);
+
+        if (type == ItemRenderType.EQUIPPED) {
+            GL11.glRotatef(150.0F, 0F, 0F, 1F);
+            GL11.glScalef(2.2F, 2.2F, 2.2F);
+            GL11.glTranslatef(0.0F, -0.65F, 0.9F);
+        } else if (type == ItemRenderType.EQUIPPED_FIRST_PERSON) {
+            GL11.glTranslatef(0.0F, 1.0F, 0.0F);
         }
-        else if (type == IItemRenderer.ItemRenderType.EQUIPPED_FIRST_PERSON) {
-            GL11.glTranslatef(0.0f, 1.0f, 0.0f);
-        }
-        GL11.glTranslatef(var11, var12 - 0.1f, var13);
-        GL11.glScalef(-0.4f, -0.4f, 0.4f);
-        if (type == IItemRenderer.ItemRenderType.INVENTORY || type == IItemRenderer.ItemRenderType.ENTITY) {
-            if (type == IItemRenderer.ItemRenderType.INVENTORY) {
-                GL11.glScalef(0.5f, 0.35f, 0.5f);
+
+        GL11.glTranslatef(var12, var13 - 0.1F, var14);
+        GL11.glScalef(-0.4F, -0.4F, 0.4F);
+        if (type == ItemRenderType.INVENTORY || type == ItemRenderType.ENTITY) {
+            if (type == ItemRenderType.INVENTORY) {
+                GL11.glScalef(0.5F, 0.35F, 0.5F);
+            } else {
+                GL11.glTranslatef(0, -0.9F, 0);
+                GL11.glScalef(0.5F, 0.5F, 0.5F);
             }
-            else {
-                GL11.glTranslatef(0.0f, -0.9f, 0.0f);
-                GL11.glScalef(0.5f, 0.5f, 0.5f);
-            }
-            GL11.glScalef(1.5f, 1.5f, 1.5f);
-            GL11.glTranslatef(0.0f, 1.6f, 0.0f);
-            GL11.glRotatef(-45.0f, 0.0f, 1.0f, 0.0f);
+
+            GL11.glScalef(1.5F, 1.5F, 1.5F);
+            GL11.glTranslatef(0, 1.6F, 0);
+            GL11.glRotatef(-45.0F, 0F, 1F, 0F);
         }
-        GL11.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+
+        GL11.glRotatef(180, 0, 0, 1);
+
         FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ItemRendererBuggy.buggyTextureWheel);
+
+        // Front wheel covers
         GL11.glPushMatrix();
-        GL11.glTranslatef(0.0f, 1.0f, -2.6f);
-        GL11.glTranslatef(1.4f, 0.0f, 0.0f);
+        GL11.glTranslatef(0.0F, 1.0F, -2.6F);
+        GL11.glTranslatef(1.4F, 0.0F, 0.0F);
         this.modelBuggyWheelRight.renderPart("WheelRightCover_Cover");
-        GL11.glTranslatef(-2.8f, 0.0f, 0.0f);
+        GL11.glTranslatef(-2.8F, 0.0F, 0.0F);
         this.modelBuggyWheelLeft.renderPart("WheelLeftCover_Cover");
         GL11.glPopMatrix();
+
+        // Back wheel covers
         GL11.glPushMatrix();
-        GL11.glTranslatef(0.0f, 1.0f, 3.7f);
-        GL11.glTranslatef(2.0f, 0.0f, 0.0f);
+        GL11.glTranslatef(0.0F, 1.0F, 3.7F);
+        GL11.glTranslatef(2.0F, 0.0F, 0.0F);
         this.modelBuggyWheelRight.renderPart("WheelRightCover_Cover");
-        GL11.glTranslatef(-4.0f, 0.0f, 0.0f);
+        GL11.glTranslatef(-4.0F, 0.0F, 0.0F);
         this.modelBuggyWheelLeft.renderPart("WheelLeftCover_Cover");
         GL11.glPopMatrix();
+
+        // Front wheels
         GL11.glPushMatrix();
-        GL11.glTranslatef(0.0f, 1.0f, -2.7f);
-        GL11.glTranslatef(1.4f, 0.0f, 0.0f);
+        GL11.glTranslatef(0.0F, 1.0F, -2.7F);
+        GL11.glTranslatef(1.4F, 0.0F, 0.0F);
         this.modelBuggyWheelRight.renderPart("WheelRight_Wheel");
-        GL11.glTranslatef(-2.8f, 0.0f, 0.0f);
+        GL11.glTranslatef(-2.8F, 0.0F, 0.0F);
         this.modelBuggyWheelLeft.renderPart("WheelLeft_Wheel");
         GL11.glPopMatrix();
+
+        // Back wheels
         GL11.glPushMatrix();
-        GL11.glTranslatef(0.0f, 1.0f, 3.6f);
-        GL11.glTranslatef(2.0f, 0.0f, 0.0f);
+        GL11.glTranslatef(0.0F, 1.0F, 3.6F);
+        GL11.glTranslatef(2.0F, 0.0F, 0.0F);
         this.modelBuggyWheelRight.renderPart("WheelRight_Wheel");
-        GL11.glTranslatef(-4.0f, 0.0f, 0.0f);
+        GL11.glTranslatef(-4.0F, 0.0F, 0.0F);
         this.modelBuggyWheelLeft.renderPart("WheelLeft_Wheel");
         GL11.glPopMatrix();
+
         FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ItemRendererBuggy.buggyTextureBody);
         this.modelBuggy.renderPart("MainBody");
+
+        // Radar Dish
         GL11.glPushMatrix();
-        GL11.glTranslatef(-1.178f, 4.1f, -2.397f);
+        GL11.glTranslatef(-1.178F, 4.1F, -2.397F);
         this.modelBuggy.renderPart("RadarDish_Dish");
         GL11.glPopMatrix();
+
         FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ItemRendererBuggy.buggyTextureStorage);
+
         if (item.getItemDamage() > 0) {
             this.modelBuggy.renderPart("CargoLeft");
+
             if (item.getItemDamage() > 1) {
                 this.modelBuggy.renderPart("CargoMid");
+
                 if (item.getItemDamage() > 2) {
                     this.modelBuggy.renderPart("CargoRight");
                 }
             }
         }
+
         GL11.glPopMatrix();
     }
-    
-    public boolean handleRenderType(final ItemStack item, final IItemRenderer.ItemRenderType type) {
-        switch (type) {
-            case ENTITY: {
-                return true;
-            }
-            case EQUIPPED: {
-                return true;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                return true;
-            }
-            case INVENTORY: {
-                return true;
-            }
-            default: {
-                return false;
-            }
-        }
+
+    /**
+     * IItemRenderer implementation *
+     */
+    @Override
+    public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+        return switch (type) {
+            case ENTITY -> true;
+            case EQUIPPED -> true;
+            case EQUIPPED_FIRST_PERSON -> true;
+            case INVENTORY -> true;
+            default -> false;
+        };
     }
-    
-    public boolean shouldUseRenderHelper(final IItemRenderer.ItemRenderType type, final ItemStack item, final IItemRenderer.ItemRendererHelper helper) {
+
+    @Override
+    public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
         return true;
     }
-    
-    public void renderItem(final IItemRenderer.ItemRenderType type, final ItemStack item, final Object... data) {
+
+    @Override
+    public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         switch (type) {
-            case EQUIPPED: {
-                this.renderPipeItem(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED:
+                this.renderPipeItem(type, item);
                 break;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                this.renderPipeItem(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED_FIRST_PERSON:
+                this.renderPipeItem(type, item);
                 break;
-            }
-            case INVENTORY: {
-                this.renderPipeItem(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case INVENTORY:
+                this.renderPipeItem(type, item);
                 break;
-            }
-            case ENTITY: {
-                this.renderPipeItem(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case ENTITY:
+                this.renderPipeItem(type, item);
                 break;
-            }
+            default:
         }
-    }
-    
-    static {
-        buggyTextureBody = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/buggyMain.png");
-        buggyTextureWheel = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/buggyWheels.png");
-        buggyTextureStorage = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/buggyStorage.png");
     }
 }

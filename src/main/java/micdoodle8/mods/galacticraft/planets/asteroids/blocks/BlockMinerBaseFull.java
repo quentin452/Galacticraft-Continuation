@@ -1,87 +1,117 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import net.minecraft.block.material.*;
-import net.minecraft.world.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.*;
-import java.util.*;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
+import java.util.ArrayList;
+import java.util.Random;
 
-public class BlockMinerBaseFull extends BlockTileGC
-{
-    private IIcon iconInput;
-    
-    public BlockMinerBaseFull(final String assetName) {
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.World;
+
+import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBase;
+
+public class BlockMinerBaseFull extends BlockTileGC {
+
+    public BlockMinerBaseFull(String assetName) {
         super(Material.rock);
-        this.blockHardness = 3.0f;
+        this.blockHardness = 3.0F;
         this.setBlockName(assetName);
-        this.setBlockTextureName("galacticraftasteroids:machineframe");
-        this.setStepSound(BlockMinerBaseFull.soundTypeMetal);
+        this.setBlockTextureName(AsteroidsModule.TEXTURE_PREFIX + "machineframe");
+        this.setStepSound(soundTypeMetal);
     }
-    
+
+    @Override
     public int getRenderType() {
         return -1;
     }
-    
-    public int damageDropped(final int meta) {
+
+    @Override
+    public int damageDropped(int meta) {
         return 0;
     }
-    
-    public int quantityDropped(final int meta, final int fortune, final Random random) {
+
+    @Override
+    public int quantityDropped(int meta, int fortune, Random random) {
         return 1;
     }
-    
+
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
-    
-    public TileEntity createTileEntity(final World world, final int metadata) {
-        return (TileEntity)new TileEntityMinerBase();
+
+    @Override
+    public TileEntity createTileEntity(World world, int metadata) {
+        return new TileEntityMinerBase();
     }
-    
-    public int onBlockPlaced(final World world, final int x, final int y, final int z, final int side, final float hitX, final float hitY, final float hitZ, final int meta) {
+
+    @Override
+    public int onBlockPlaced(World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int meta) {
         return 0;
+        // TODO
+        // return this.getMetadataFromAngle(world, x, y, z, side);
     }
-    
-    public boolean canPlaceBlockOnSide(final World world, final int x, final int y, final int z, final int side) {
+
+    @Override
+    public boolean canPlaceBlockOnSide(World world, int x, int y, int z, int side) {
+        // TODO
+        /*
+         * if (this.getMetadataFromAngle(world, x, y, z, side) != -1) { return true; }
+         */
+
         return true;
     }
-    
-    public void breakBlock(final World world, final int x, final int y, final int z, final Block par5, final int par6) {
+
+    @Override
+    public void breakBlock(World world, int x, int y, int z, Block par5, int par6) {
         final TileEntity tileEntity = world.getTileEntity(x, y, z);
+
         if (tileEntity instanceof TileEntityMinerBase) {
-            ((TileEntityMinerBase)tileEntity).onBlockRemoval();
+            ((TileEntityMinerBase) tileEntity).onBlockRemoval();
         }
+
         super.breakBlock(world, x, y, z, par5, par6);
     }
-    
-    public boolean onMachineActivated(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int par6, final float par7, final float par8, final float par9) {
+
+    @Override
+    public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int par6,
+            float par7, float par8, float par9) {
         final TileEntity tileEntity = par1World.getTileEntity(x, y, z);
-        return tileEntity instanceof TileEntityMinerBase && ((TileEntityMinerBase)tileEntity).onActivated(par5EntityPlayer);
+        if (tileEntity instanceof TileEntityMinerBase) {
+            return ((TileEntityMinerBase) tileEntity).onActivated(par5EntityPlayer);
+        }
+        return false;
     }
-    
-    public Item getItemDropped(final int par1, final Random par2Random, final int par3) {
+
+    @Override
+    public Item getItemDropped(int par1, Random par2Random, int par3) {
         return Item.getItemFromBlock(AsteroidBlocks.blockMinerBase);
     }
-    
-    public ArrayList<ItemStack> getDrops(final World world, final int x, final int y, final int z, final int metadata, final int fortune) {
-        final ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
+
+    @Override
+    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
+        final ArrayList<ItemStack> ret = new ArrayList<>();
         ret.add(new ItemStack(Item.getItemFromBlock(AsteroidBlocks.blockMinerBase), 8, 0));
         return ret;
     }
-    
-    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         return new ItemStack(Item.getItemFromBlock(AsteroidBlocks.blockMinerBase), 1, 0);
     }
-    
-    public boolean onUseWrench(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    @Override
+    public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
+            float hitX, float hitY, float hitZ) {
         final TileEntity te = par1World.getTileEntity(x, y, z);
         if (te instanceof TileEntityMinerBase) {
-            ((TileEntityMinerBase)te).updateFacing();
+            ((TileEntityMinerBase) te).updateFacing();
         }
         return true;
     }

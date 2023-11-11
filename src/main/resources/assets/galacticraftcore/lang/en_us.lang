@@ -7,6 +7,10 @@ item.oxygenTankMedFull.name=Medium Oxygen Tank
 item.oxygenTankMedEmpty.name=Empty Medium Oxygen Tank
 item.oxygenTankHeavyFull.name=Heavy Oxygen Tank
 item.oxygenTankHeavyEmpty.name=Empty Heavy Oxygen Tank
+item.oxygenTankSuperHeavyFull.name=Super Heavy Oxygen Tank
+item.oxygenTankSuperHeavyEmpty.name=Empty Super Heavy Oxygen Tank
+item.oxygenTankUltraHeavyFull.name=Ultra Heavy Oxygen Tank
+item.oxygenTankUltraHeavyEmpty.name=Empty Ultra Heavy Oxygen Tank
 item.oxygenMask.name=Oxygen Mask
 item.spaceship.name=Tier 1 Rocket
 item.sensorGlasses.name=Sensor Glasses
@@ -15,7 +19,7 @@ item.canister.copper.name=Copper Canister
 item.airVent.name=Oxygen Vent
 item.airFan.name=Oxygen Fan
 item.oxygenConcentrator.name=Oxygen Concentrator
-item.heavyPlating.name=Heavy-Duty Plate
+item.heavyPlating.name=Heavy Duty Plate
 item.engine.tier1engine.name=Tier 1 Rocket Engine
 item.engine.tier1booster.name=Tier 1 Booster
 item.rocketFins.name=Rocket Fins
@@ -241,11 +245,13 @@ galaxy.milkyWay=Milky Way
 # OTHER
 newversion.failed.name=Galacticraft update check failed! Trying again in 15 seconds
 newversion.success.name=Galacticraft remote version found:
+tooltip.rocket_fuel_tier=Can be used as rocket fuel up to tier %s
+tooltip.rocket_fuel_tier_max=Can be used as rocket fuel for all tiers
 
 # KEYBINDINGS
-keybind.map.name=[GC] Galaxy Map
-keybind.spaceshipinv.name=[GC] Open Spaceship Inventory
-keybind.sensortoggle.name=[GC] Toggle Sensor Goggles Mode
+keybind.map.name=Open Galaxy Map
+keybind.spaceshipinv.name=Open Spaceship Inventory
+keybind.sensortoggle.name=Toggle Sensor Goggles Mode
 keybind.vehicleforward.name=[GC] Vehicle Forward Key
 keybind.vehiclebackward.name=[GC] Vehicle Backward Key
 keybind.vehicleleft.name=[GC] Vehicle Left Key
@@ -321,6 +327,7 @@ gui.status.sealed.name=Sealed
 gui.status.unknown.name=Unknown
 gui.status.disabled.name=Disabled
 gui.status.nofuel.name=No Fuel to Load!
+gui.status.wrongfuel.name=Wrong Fuel!
 gui.status.noitems.name=No Items to Load!
 gui.status.notargetload.name=No Target to Load Into!
 gui.status.notargetunload.name=No Target to Unload!
@@ -429,7 +436,7 @@ gui.telemetryFailWearingIt.message=I'll need to take off my Frequency Module if 
 
 gui.rocketType.0=Storage Space: 18
 gui.rocketType.1=Storage Space: 36
-gui.rocketType.2=Storage Space: 56
+gui.rocketType.2=Storage Space: 54
 gui.rocketType.3=Pre-fueled
 
 gui.spacestation.typeCommand=Type
@@ -449,6 +456,7 @@ gui.receiver.cannotAttach=Cannot attach receiver here!
 gui.warning.invalidThermal=Invalid Thermal Protection!
 
 gui.tank.oxygenRemaining=Oxygen Remaining
+gui.tank.infinite=INFINITE
 gui.buggy.storageSpace=Storage Space
 gui.frequencyModule.desc.0=Can receive weak sound
 gui.frequencyModule.desc.1=waves and distant signals
@@ -720,6 +728,8 @@ gc.configgui.keyOverrideFuelLevel=Set key: Rocket Fuel GUI
 gc.configgui.keyOverrideToggleAdvGoggles=Set key: Advanced Goggles
 gc.configgui.meteorSpawnMod=Meteor Spawn Modifier
 gc.configgui.meteorBlockDamage=Meteor Block Damage Enabled
+gc.configgui.handfill=Enable Oxygen Tank Hand fill
 gc.configgui.disableUpdateCheck=Disable Update Check
+gc.configgui.alwaysDisplayOxygenHUD=Always show Oxygen HUD
 
 gc.configgui.title=Galacticraft Core Config

@@ -1,24 +1,29 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.material.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.BlockStaticLiquid;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.MaterialLiquid;
 
-public class MaterialOleaginous extends MaterialLiquid
-{
-    private Class blockLiquidName;
-    private Class blockLiquidStaticName;
-    private Class blockLiquidDynamicName;
-    
-    public MaterialOleaginous(final MapColor color) {
+import micdoodle8.mods.galacticraft.core.util.JavaUtil;
+
+// This avoids water and oil mixing, by being a different material
+public class MaterialOleaginous extends MaterialLiquid {
+
+    private final Class<BlockLiquid> blockLiquidName = BlockLiquid.class;
+    private final Class<BlockStaticLiquid> blockLiquidStaticName = BlockStaticLiquid.class;
+    private final Class<BlockDynamicLiquid> blockLiquidDynamicName = BlockDynamicLiquid.class;
+
+    public MaterialOleaginous(MapColor color) {
         super(color);
-        this.blockLiquidName = BlockLiquid.class;
-        this.blockLiquidStaticName = BlockStaticLiquid.class;
-        this.blockLiquidDynamicName = BlockDynamicLiquid.class;
         this.setNoPushMobility();
     }
-    
+
+    // Water and other liquids cannot displace oil, but solid blocks can
+    @Override
     public boolean blocksMovement() {
-        return JavaUtil.instance.isCalledBy(this.blockLiquidStaticName, this.blockLiquidName, this.blockLiquidDynamicName);
+        return JavaUtil.instance
+                .isCalledBy(this.blockLiquidStaticName, this.blockLiquidName, this.blockLiquidDynamicName);
     }
 }

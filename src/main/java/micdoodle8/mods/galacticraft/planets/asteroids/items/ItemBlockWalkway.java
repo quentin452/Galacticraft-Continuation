@@ -1,29 +1,34 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import cpw.mods.fml.relauncher.*;
+import java.util.List;
 
-public class ItemBlockWalkway extends ItemBlockDesc
-{
-    public ItemBlockWalkway(final Block block) {
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
+
+public class ItemBlockWalkway extends ItemBlockDesc {
+
+    public ItemBlockWalkway(Block block) {
         super(block);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(final ItemStack itemStack, final EntityPlayer entityPlayer, final List list, final boolean advanced) {
+    public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List<String> list, boolean advanced) {
         if (itemStack.getItem() == Item.getItemFromBlock(AsteroidBlocks.blockWalkwayWire)) {
             list.add(EnumColor.AQUA + GCBlocks.aluminumWire.getLocalizedName());
-        }
-        else if (itemStack.getItem() == Item.getItemFromBlock(AsteroidBlocks.blockWalkwayOxygenPipe)) {
+        } else if (itemStack.getItem() == Item.getItemFromBlock(AsteroidBlocks.blockWalkwayOxygenPipe)) {
             list.add(EnumColor.AQUA + GCBlocks.oxygenPipe.getLocalizedName());
         }
+
         super.addInformation(itemStack, entityPlayer, list, advanced);
     }
 }

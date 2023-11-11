@@ -1,16 +1,17 @@
 package micdoodle8.mods.galacticraft.api.recipe;
 
-import net.minecraft.inventory.*;
-import net.minecraft.item.*;
-import java.util.*;
+import java.util.HashMap;
 
-public interface INasaWorkbenchRecipe
-{
-    boolean matches(final IInventory p0);
-    
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+
+public interface INasaWorkbenchRecipe {
+
+    boolean matches(IInventory inventory);
+
     int getRecipeSize();
-    
+
     ItemStack getRecipeOutput();
-    
+
     HashMap<Integer, ItemStack> getRecipeInput();
 }

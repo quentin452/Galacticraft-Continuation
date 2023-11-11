@@ -1,16 +1,25 @@
 package micdoodle8.mods.galacticraft.core.energy;
 
-import java.util.*;
-import net.minecraft.util.*;
+import java.util.List;
 
-public class EnergyDisplayHelper
-{
-    public static void getEnergyDisplayTooltip(final float energyVal, final float maxEnergy, final List strList) {
-        strList.add(EnumChatFormatting.GREEN + StatCollector.translateToLocal("gui.message.energy") + ": " + getEnergyDisplayS(energyVal));
-        strList.add(EnumChatFormatting.RED + StatCollector.translateToLocal("gui.message.maxEnergy") + ": " + getEnergyDisplayS(maxEnergy));
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.StatCollector;
+
+public class EnergyDisplayHelper {
+
+    public static void getEnergyDisplayTooltip(float energyVal, float maxEnergy, List<String> strList) {
+        strList.add(
+                EnumChatFormatting.GREEN + StatCollector.translateToLocal("gui.message.energy")
+                        + ": "
+                        + getEnergyDisplayS(energyVal));
+        strList.add(
+                EnumChatFormatting.RED + StatCollector.translateToLocal("gui.message.maxEnergy")
+                        + ": "
+                        + getEnergyDisplayS(maxEnergy));
     }
-    
-    public static String getEnergyDisplayS(final float energyVal) {
+
+    public static String getEnergyDisplayS(float energyVal) {
         if (EnergyConfigHandler.displayEnergyUnitsIC2) {
             return getEnergyDisplayIC2(energyVal * EnergyConfigHandler.TO_IC2_RATIOdisp);
         }
@@ -19,61 +28,69 @@ public class EnergyDisplayHelper
         }
         if (EnergyConfigHandler.displayEnergyUnitsMek) {
             return getEnergyDisplayMek(energyVal * EnergyConfigHandler.TO_MEKANISM_RATIOdisp);
-        }
-        if (EnergyConfigHandler.displayEnergyUnitsRF) {
+        } else if (EnergyConfigHandler.displayEnergyUnitsRF) {
             return getEnergyDisplayRF(energyVal * EnergyConfigHandler.TO_RF_RATIOdisp);
         }
         final String val = String.valueOf(getEnergyDisplayI(energyVal));
-        String newVal = "";
-        for (int i = val.length() - 1; i >= 0; --i) {
-            newVal += val.charAt(val.length() - 1 - i);
+        StringBuilder newVal = new StringBuilder();
+
+        for (int i = val.length() - 1; i >= 0; i--) {
+            newVal.append(val.charAt(val.length() - 1 - i));
             if (i % 3 == 0 && i != 0) {
-                newVal += ',';
+                newVal.append(',');
             }
         }
-        return newVal + " gJ";
+
+        return newVal.append(" gJ").toString();
     }
-    
-    public static String getEnergyDisplayIC2(final float energyVal) {
+
+    public static String getEnergyDisplayIC2(float energyVal) {
         final String val = String.valueOf(getEnergyDisplayI(energyVal));
-        String newVal = "";
-        for (int i = val.length() - 1; i >= 0; --i) {
-            newVal += val.charAt(val.length() - 1 - i);
+        StringBuilder newVal = new StringBuilder();
+
+        for (int i = val.length() - 1; i >= 0; i--) {
+            newVal.append(val.charAt(val.length() - 1 - i));
             if (i % 3 == 0 && i != 0) {
-                newVal += ',';
+                newVal.append(',');
             }
         }
-        return newVal + " EU";
+
+        return newVal.append(" EU").toString();
     }
-    
-    public static String getEnergyDisplayBC(final float energyVal) {
+
+    public static String getEnergyDisplayBC(float energyVal) {
         final String val = String.valueOf(getEnergyDisplayI(energyVal));
+
         return val + " MJ";
     }
-    
-    public static String getEnergyDisplayMek(final float energyVal) {
-        if (energyVal < 1000.0f) {
+
+    public static String getEnergyDisplayMek(float energyVal) {
+        if (energyVal < 1000) {
             final String val = String.valueOf(getEnergyDisplayI(energyVal));
             return val + " J";
         }
-        if (energyVal < 1000000.0f) {
-            final String val = getEnergyDisplay1DP(energyVal / 1000.0f);
+        if (energyVal < 1000000) {
+            final String val = getEnergyDisplay1DP(energyVal / 1000);
             return val + " kJ";
         }
-        final String val = getEnergyDisplay1DP(energyVal / 1000000.0f);
+        final String val = getEnergyDisplay1DP(energyVal / 1000000);
         return val + " MJ";
     }
-    
-    public static String getEnergyDisplayRF(final float energyVal) {
+
+    public static String getEnergyDisplayRF(float energyVal) {
         final String val = String.valueOf(getEnergyDisplayI(energyVal));
+
         return val + " RF";
     }
-    
-    public static int getEnergyDisplayI(final float energyVal) {
+
+    public static int getEnergyDisplayI(float energyVal) {
         return MathHelper.floor_float(energyVal);
     }
-    
-    public static String getEnergyDisplay1DP(final float energyVal) {
-        return "" + MathHelper.floor_float(energyVal) + "." + MathHelper.floor_float(energyVal * 10.0f) % 10 + MathHelper.floor_float(energyVal * 100.0f) % 10;
+
+    public static String getEnergyDisplay1DP(float energyVal) {
+        return "" + MathHelper.floor_float(energyVal)
+                + "."
+                + MathHelper.floor_float(energyVal * 10) % 10
+                + MathHelper.floor_float(energyVal * 100) % 10;
     }
 }

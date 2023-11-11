@@ -1,21 +1,24 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.event;
 
-import micdoodle8.mods.galacticraft.core.entities.player.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.items.*;
-import cpw.mods.fml.common.eventhandler.*;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerHandler.ThermalArmorEvent;
+import micdoodle8.mods.galacticraft.planets.asteroids.items.AsteroidsItems;
 
-public class AsteroidsEventHandler
-{
+public class AsteroidsEventHandler {
+
     @SubscribeEvent
-    public void onThermalArmorEvent(final GCPlayerHandler.ThermalArmorEvent event) {
+    public void onThermalArmorEvent(ThermalArmorEvent event) {
         if (event.armorStack == null) {
-            event.setArmorAddResult(GCPlayerHandler.ThermalArmorEvent.ArmorAddResult.REMOVE);
+            event.setArmorAddResult(ThermalArmorEvent.ArmorAddResult.REMOVE);
             return;
         }
-        if (event.armorStack.getItem() == AsteroidsItems.thermalPadding && event.armorStack.getItemDamage() == event.armorIndex) {
-            event.setArmorAddResult(GCPlayerHandler.ThermalArmorEvent.ArmorAddResult.ADD);
+
+        if (event.armorStack.getItem() == AsteroidsItems.thermalPadding
+                && event.armorStack.getItemDamage() == event.armorIndex) {
+            event.setArmorAddResult(ThermalArmorEvent.ArmorAddResult.ADD);
             return;
         }
-        event.setArmorAddResult(GCPlayerHandler.ThermalArmorEvent.ArmorAddResult.NOTHING);
+
+        event.setArmorAddResult(ThermalArmorEvent.ArmorAddResult.NOTHING);
     }
 }

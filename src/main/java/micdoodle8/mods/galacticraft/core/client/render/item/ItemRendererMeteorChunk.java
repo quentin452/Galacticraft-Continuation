@@ -1,91 +1,89 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
-import net.minecraftforge.client.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraftforge.client.model.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.item.*;
-import org.lwjgl.opengl.*;
-import cpw.mods.fml.client.*;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.model.AdvancedModelLoader;
+import net.minecraftforge.client.model.IModelCustom;
 
-public class ItemRendererMeteorChunk implements IItemRenderer
-{
-    private static final ResourceLocation meteorChunkTexture;
-    private static final ResourceLocation meteorChunkHotTexture;
-    private final IModelCustom meteorChunkModel;
-    
-    public ItemRendererMeteorChunk() {
-        this.meteorChunkModel = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/meteorChunk.obj"));
-    }
-    
-    private void renderMeteorChunk(final IItemRenderer.ItemRenderType type, final RenderBlocks render, final ItemStack item, final float translateX, final float translateY, final float translateZ) {
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+
+public class ItemRendererMeteorChunk implements IItemRenderer {
+
+    private static final ResourceLocation meteorChunkTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/meteorChunk.png");
+    private static final ResourceLocation meteorChunkHotTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/meteorChunkHot.png");
+
+    private final IModelCustom meteorChunkModel = AdvancedModelLoader
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/meteorChunk.obj"));
+
+    private void renderMeteorChunk(ItemRenderType type, ItemStack item) {
         GL11.glPushMatrix();
-        GL11.glScalef(0.7f, 0.7f, 0.7f);
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED_FIRST_PERSON) {
-            GL11.glTranslatef(1.4f, 1.0f, 0.0f);
-            GL11.glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+
+        GL11.glScalef(0.7F, 0.7F, 0.7F);
+
+        if (type == ItemRenderType.EQUIPPED_FIRST_PERSON) {
+            GL11.glTranslatef(1.4F, 1.0F, 0.0F);
+            GL11.glRotatef(180.0F, 1, 0, 0);
         }
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED) {
-            GL11.glTranslatef(1.4f, 1.0f, 0.5f);
+
+        if (type == ItemRenderType.EQUIPPED) {
+            GL11.glTranslatef(1.4F, 1.0F, 0.5F);
         }
+
         if (item.getItemDamage() == 0) {
-            FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ItemRendererMeteorChunk.meteorChunkTexture);
-        }
-        else {
-            FMLClientHandler.instance().getClient().getTextureManager().bindTexture(ItemRendererMeteorChunk.meteorChunkHotTexture);
+            FMLClientHandler.instance().getClient().getTextureManager()
+                    .bindTexture(ItemRendererMeteorChunk.meteorChunkTexture);
+        } else {
+            FMLClientHandler.instance().getClient().getTextureManager()
+                    .bindTexture(ItemRendererMeteorChunk.meteorChunkHotTexture);
         }
         this.meteorChunkModel.renderAll();
+
         GL11.glPopMatrix();
     }
-    
-    public boolean handleRenderType(final ItemStack item, final IItemRenderer.ItemRenderType type) {
-        switch (type) {
-            case ENTITY: {
-                return true;
-            }
-            case EQUIPPED: {
-                return true;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                return true;
-            }
-            case INVENTORY: {
-                return true;
-            }
-            default: {
-                return false;
-            }
-        }
+
+    /**
+     * IItemRenderer implementation *
+     */
+    @Override
+    public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+        return switch (type) {
+            case ENTITY -> true;
+            case EQUIPPED -> true;
+            case EQUIPPED_FIRST_PERSON -> true;
+            case INVENTORY -> true;
+            default -> false;
+        };
     }
-    
-    public boolean shouldUseRenderHelper(final IItemRenderer.ItemRenderType type, final ItemStack item, final IItemRenderer.ItemRendererHelper helper) {
+
+    @Override
+    public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
         return true;
     }
-    
-    public void renderItem(final IItemRenderer.ItemRenderType type, final ItemStack item, final Object... data) {
+
+    @Override
+    public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         switch (type) {
-            case EQUIPPED: {
-                this.renderMeteorChunk(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED:
+                this.renderMeteorChunk(type, item);
                 break;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                this.renderMeteorChunk(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED_FIRST_PERSON:
+                this.renderMeteorChunk(type, item);
                 break;
-            }
-            case INVENTORY: {
-                this.renderMeteorChunk(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case INVENTORY:
+                this.renderMeteorChunk(type, item);
                 break;
-            }
-            case ENTITY: {
-                this.renderMeteorChunk(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case ENTITY:
+                this.renderMeteorChunk(type, item);
                 break;
-            }
+            default:
         }
-    }
-    
-    static {
-        meteorChunkTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/meteorChunk.png");
-        meteorChunkHotTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/meteorChunkHot.png");
     }
 }

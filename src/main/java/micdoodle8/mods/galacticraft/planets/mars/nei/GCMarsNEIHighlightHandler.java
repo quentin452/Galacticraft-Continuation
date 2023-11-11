@@ -1,43 +1,51 @@
 package micdoodle8.mods.galacticraft.planets.mars.nei;
 
-import net.minecraft.item.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.util.*;
-import java.util.*;
-import codechicken.nei.api.*;
-import codechicken.nei.guihook.*;
-import net.minecraft.init.*;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.*;
-import net.minecraft.block.*;
+import java.util.List;
 
-public class GCMarsNEIHighlightHandler implements IHighlightHandler
-{
-    public List<String> handleTextData(final ItemStack stack, final World world, final EntityPlayer player, final MovingObjectPosition mop, final List<String> currenttip, final ItemInfo.Layout layout) {
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.World;
+
+import codechicken.nei.api.IHighlightHandler;
+import codechicken.nei.api.ItemInfo;
+import codechicken.nei.guihook.GuiContainerManager;
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
+
+public class GCMarsNEIHighlightHandler implements IHighlightHandler {
+
+    @Override
+    public List<String> handleTextData(ItemStack stack, World world, EntityPlayer player, MovingObjectPosition mop,
+            List<String> currenttip, ItemInfo.Layout layout) {
         String name = null;
         try {
             final String s = GuiContainerManager.itemDisplayNameShort(stack);
             if (s != null && !s.endsWith("Unnamed")) {
                 name = s;
             }
+
             if (name != null) {
                 currenttip.add(name);
             }
-        }
-        catch (Exception ex) {}
+        } catch (final Exception e) {}
+
         if (stack.getItem() == Items.redstone) {
             final int md = world.getBlockMetadata(mop.blockX, mop.blockY, mop.blockZ);
-            String s2 = "" + md;
-            if (s2.length() < 2) {
-                s2 = " " + s2;
+            String s = "" + md;
+            if (s.length() < 2) {
+                s = " " + s;
             }
-            currenttip.set(currenttip.size() - 1, name + " " + s2);
+            currenttip.set(currenttip.size() - 1, name + " " + s);
         }
+
         return currenttip;
     }
-    
-    public ItemStack identifyHighlight(final World world, final EntityPlayer player, final MovingObjectPosition mop) {
+
+    @Override
+    public ItemStack identifyHighlight(World world, EntityPlayer player, MovingObjectPosition mop) {
         final int x = mop.blockX;
         final int y = mop.blockY;
         final int z = mop.blockZ;
@@ -47,11 +55,11 @@ public class GCMarsNEIHighlightHandler implements IHighlightHandler
             if (meta == 2) {
                 return new ItemStack(MarsBlocks.marsBlock, 1, 2);
             }
+
             if (meta == 9) {
                 return new ItemStack(MarsBlocks.marsBlock, 1, 9);
             }
-        }
-        else if (b == AsteroidBlocks.blockBasic && meta == 4) {
+        } else if (b == AsteroidBlocks.blockBasic && meta == 4) {
             return new ItemStack(AsteroidBlocks.blockBasic, 1, 4);
         }
         return null;

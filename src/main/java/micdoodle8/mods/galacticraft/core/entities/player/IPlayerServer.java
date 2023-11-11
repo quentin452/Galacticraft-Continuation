@@ -1,24 +1,25 @@
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import net.minecraft.entity.player.*;
-import net.minecraft.entity.*;
-import net.minecraft.util.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.DamageSource;
 
-public interface IPlayerServer
-{
-    void clonePlayer(final EntityPlayerMP p0, final EntityPlayer p1, final boolean p2);
-    
-    void updateRiddenPre(final EntityPlayerMP p0);
-    
-    void updateRiddenPost(final EntityPlayerMP p0);
-    
-    boolean mountEntity(final EntityPlayerMP p0, final Entity p1);
-    
-    void moveEntity(final EntityPlayerMP p0, final double p1, final double p2, final double p3);
-    
-    boolean wakeUpPlayer(final EntityPlayerMP p0, final boolean p1, final boolean p2, final boolean p3);
-    
-    float attackEntityFrom(final EntityPlayerMP p0, final DamageSource p1, final float p2);
-    
-    void knockBack(final EntityPlayerMP p0, final Entity p1, final float p2, final double p3, final double p4);
+public interface IPlayerServer {
+
+    void clonePlayer(EntityPlayerMP player, EntityPlayer oldPlayer, boolean keepInv);
+
+    void updateRiddenPre(EntityPlayerMP player);
+
+    void updateRiddenPost(EntityPlayerMP player);
+
+    boolean mountEntity(EntityPlayerMP player, Entity par1Entity);
+
+    void moveEntity(EntityPlayerMP player, double par1, double par3, double par5);
+
+    boolean wakeUpPlayer(EntityPlayerMP player, boolean par1, boolean par2, boolean par3);
+
+    float attackEntityFrom(EntityPlayerMP player, DamageSource par1DamageSource, float par2);
+
+    void knockBack(EntityPlayerMP player, Entity p_70653_1_, float p_70653_2_, double impulseX, double impulseZ);
 }

@@ -1,36 +1,41 @@
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import net.minecraft.nbt.*;
-import net.minecraft.world.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldSavedData;
 
-public class WorldDataSpaceRaces extends WorldSavedData
-{
+public class WorldDataSpaceRaces extends WorldSavedData {
+
     public static final String saveDataID = "GCSpaceRaceData";
-    private NBTTagCompound dataCompound;
-    
-    public WorldDataSpaceRaces(final String id) {
+
+    public WorldDataSpaceRaces(String id) {
         super(id);
     }
-    
-    public void readFromNBT(final NBTTagCompound nbt) {
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
         SpaceRaceManager.loadSpaceRaces(nbt);
     }
-    
-    public void writeToNBT(final NBTTagCompound nbt) {
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbt) {
         SpaceRaceManager.saveSpaceRaces(nbt);
     }
-    
-    public static WorldDataSpaceRaces initWorldData(final World world) {
-        WorldDataSpaceRaces worldData = (WorldDataSpaceRaces)world.loadItemData((Class)WorldDataSpaceRaces.class, "GCSpaceRaceData");
+
+    public static WorldDataSpaceRaces initWorldData(World world) {
+        WorldDataSpaceRaces worldData = (WorldDataSpaceRaces) world
+                .loadItemData(WorldDataSpaceRaces.class, WorldDataSpaceRaces.saveDataID);
+
         if (worldData == null) {
-            worldData = new WorldDataSpaceRaces("GCSpaceRaceData");
-            world.setItemData("GCSpaceRaceData", (WorldSavedData)worldData);
-            worldData.dataCompound = new NBTTagCompound();
+            worldData = new WorldDataSpaceRaces(WorldDataSpaceRaces.saveDataID);
+            world.setItemData(WorldDataSpaceRaces.saveDataID, worldData);
             worldData.markDirty();
         }
+
         return worldData;
     }
-    
+
+    @Override
     public boolean isDirty() {
         return true;
     }

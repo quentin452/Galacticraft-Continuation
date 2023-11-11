@@ -1,106 +1,105 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
-import net.minecraftforge.client.*;
-import micdoodle8.mods.galacticraft.core.client.model.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.item.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.entity.item.*;
-import org.lwjgl.*;
-import net.minecraft.util.*;
-import cpw.mods.fml.client.*;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.IItemRenderer;
 
-public class ItemRendererKey implements IItemRenderer
-{
+import org.lwjgl.Sys;
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.client.model.ModelKey;
+
+public class ItemRendererKey implements IItemRenderer {
+
     private final ResourceLocation treasureChestTexture;
-    ModelKey keyModel;
-    
-    public ItemRendererKey(final ResourceLocation resourceLocation) {
-        this.keyModel = new ModelKey();
+
+    ModelKey keyModel = new ModelKey();
+
+    public ItemRendererKey(ResourceLocation resourceLocation) {
         this.treasureChestTexture = resourceLocation;
     }
-    
-    private void renderKey(final IItemRenderer.ItemRenderType type, final RenderBlocks render, final ItemStack item, final float translateX, final float translateY, final float translateZ, final Object... data) {
+
+    private void renderKey(ItemRenderType type, Object... data) {
         GL11.glPushMatrix();
+
         EntityItem entityItem = null;
+
         if (data.length == 2 && data[1] instanceof EntityItem) {
-            entityItem = (EntityItem)data[1];
+            entityItem = (EntityItem) data[1];
         }
-        if (type == IItemRenderer.ItemRenderType.INVENTORY) {
-            GL11.glTranslatef(8.0f, 8.0f, 0.0f);
-            GL11.glRotatef((MathHelper.sin(Sys.getTime() / 90.0f / 20.0f) - 55.0f) * 50.0f, 0.0f, 0.0f, 1.0f);
-            GL11.glScalef(5.0f, 5.0f, 5.0f);
-            GL11.glScalef(1.5f, 1.5f, 1.5f);
+
+        if (type == ItemRenderType.INVENTORY) {
+            GL11.glTranslatef(8.0F, 8.0F, 0F);
+            GL11.glRotatef((MathHelper.sin(Sys.getTime() / 90F / 20.0F) - 55.0F) * 50.0F, 0, 0, 1);
+            GL11.glScalef(5.0F, 5.0F, 5.0F);
+            GL11.glScalef(1.5F, 1.5F, 1.5F);
+        } else if (type == ItemRenderType.ENTITY) {
+            GL11.glTranslatef(0.0F, 2.0F, 0F);
+            GL11.glScalef(3.0F, 3.0F, 3.0F);
+        } else if (type == ItemRenderType.EQUIPPED) {
+            GL11.glRotatef(100.0F, 0, 1, 0);
+            GL11.glRotatef(60.0F, 0, 0, 1);
+            GL11.glRotatef(-10.0F, 1, 0, 0);
+            GL11.glTranslatef(0.4F, 0.1F, 0.5F);
+        } else if (type == ItemRenderType.EQUIPPED_FIRST_PERSON) {
+            GL11.glRotatef(-4.0F, 0, 1, 0);
+            GL11.glRotatef(2.0F, 1, 0, 0);
+            GL11.glTranslatef(3.0F, 2.0F, -0.6F);
+            GL11.glScalef(3.0F, 3.0F, 3.0F);
         }
-        else if (type == IItemRenderer.ItemRenderType.ENTITY) {
-            GL11.glTranslatef(0.0f, 2.0f, 0.0f);
-            GL11.glScalef(3.0f, 3.0f, 3.0f);
-        }
-        else if (type == IItemRenderer.ItemRenderType.EQUIPPED) {
-            GL11.glRotatef(100.0f, 0.0f, 1.0f, 0.0f);
-            GL11.glRotatef(60.0f, 0.0f, 0.0f, 1.0f);
-            GL11.glRotatef(-10.0f, 1.0f, 0.0f, 0.0f);
-            GL11.glTranslatef(0.4f, 0.1f, 0.5f);
-        }
-        else if (type == IItemRenderer.ItemRenderType.EQUIPPED_FIRST_PERSON) {
-            GL11.glRotatef(-4.0f, 0.0f, 1.0f, 0.0f);
-            GL11.glRotatef(2.0f, 1.0f, 0.0f, 0.0f);
-            GL11.glTranslatef(3.0f, 2.0f, -0.6f);
-            GL11.glScalef(3.0f, 3.0f, 3.0f);
-        }
-        GL11.glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
+
+        GL11.glRotatef(45, 0, 0, 1);
+
         if (entityItem != null) {
-            final float f2 = MathHelper.sin((entityItem.age + 1.0f) / 10.0f + entityItem.hoverStart) * 0.1f + 0.1f;
-            GL11.glRotatef(f2 * 90.0f - 45.0f, 0.0f, 0.0f, 1.0f);
-            GL11.glRotatef((float)(Math.sin((entityItem.age + 1) / 100.0f) * 180.0), 0.0f, 1.0f, 0.0f);
+            final float f2 = MathHelper.sin(((float) entityItem.age + 1) / 10.0F + entityItem.hoverStart) * 0.1F + 0.1F;
+            GL11.glRotatef(f2 * 90F - 45F, 0, 0, 1);
+            GL11.glRotatef((float) (Math.sin((entityItem.age + 1) / 100.0F) * 180.0F), 0, 1, 0);
         }
+
         FMLClientHandler.instance().getClient().renderEngine.bindTexture(this.treasureChestTexture);
+
         this.keyModel.renderAll();
         GL11.glPopMatrix();
     }
-    
-    public boolean handleRenderType(final ItemStack item, final IItemRenderer.ItemRenderType type) {
-        switch (type) {
-            case ENTITY: {
-                return true;
-            }
-            case EQUIPPED: {
-                return true;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                return true;
-            }
-            case INVENTORY: {
-                return true;
-            }
-            default: {
-                return false;
-            }
-        }
+
+    /**
+     * IItemRenderer implementation *
+     */
+    @Override
+    public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+        return switch (type) {
+            case ENTITY -> true;
+            case EQUIPPED -> true;
+            case EQUIPPED_FIRST_PERSON -> true;
+            case INVENTORY -> true;
+            default -> false;
+        };
     }
-    
-    public boolean shouldUseRenderHelper(final IItemRenderer.ItemRenderType type, final ItemStack item, final IItemRenderer.ItemRendererHelper helper) {
+
+    @Override
+    public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
         return false;
     }
-    
-    public void renderItem(final IItemRenderer.ItemRenderType type, final ItemStack item, final Object... data) {
+
+    @Override
+    public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         switch (type) {
-            case EQUIPPED: {
-                this.renderKey(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f, data);
+            case EQUIPPED:
+                this.renderKey(type, data);
                 break;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                this.renderKey(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f, data);
+            case EQUIPPED_FIRST_PERSON:
+                this.renderKey(type, data);
                 break;
-            }
-            case INVENTORY: {
-                this.renderKey(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f, data);
+            case INVENTORY:
+                this.renderKey(type, data);
                 break;
-            }
-            case ENTITY: {
-                this.renderKey(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f, data);
+            case ENTITY:
+                this.renderKey(type, data);
                 break;
-            }
+            default:
         }
     }
 }

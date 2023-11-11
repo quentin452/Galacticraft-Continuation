@@ -1,43 +1,53 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.client.*;
-import net.minecraft.client.gui.*;
-import micdoodle8.mods.galacticraft.core.wrappers.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import micdoodle8.mods.galacticraft.core.*;
-import micdoodle8.mods.galacticraft.core.network.*;
-import micdoodle8.mods.galacticraft.core.dimension.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.dimension.SpaceRace;
+import micdoodle8.mods.galacticraft.core.dimension.SpaceRaceManager;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.wrappers.FlagData;
 
 @SideOnly(Side.CLIENT)
-public class ClientUtil
-{
-    public static ScaledResolution getScaledRes(final Minecraft minecraft, final int width, final int height) {
+public class ClientUtil {
+
+    public static ScaledResolution getScaledRes(Minecraft minecraft, int width, int height) {
         return VersionUtil.getScaledRes(minecraft, width, height);
     }
-    
-    public static FlagData updateFlagData(final String playerName, final boolean sendPacket) {
+
+    public static FlagData updateFlagData(String playerName, boolean sendPacket) {
         final SpaceRace race = SpaceRaceManager.getSpaceRaceFromPlayer(playerName);
+
         if (race != null) {
             return race.getFlagData();
         }
         if (!ClientProxyCore.flagRequestsSent.contains(playerName) && sendPacket) {
-            GalacticraftCore.packetPipeline.sendToServer((IPacket)new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_FLAG_DATA, new Object[] { playerName }));
+            GalacticraftCore.packetPipeline
+                    .sendToServer(new PacketSimple(EnumSimplePacket.S_REQUEST_FLAG_DATA, new Object[] { playerName }));
             ClientProxyCore.flagRequestsSent.add(playerName);
         }
+
         return null;
     }
-    
-    public static Vector3 updateTeamColor(final String playerName, final boolean sendPacket) {
+
+    public static Vector3 updateTeamColor(String playerName, boolean sendPacket) {
         final SpaceRace race = SpaceRaceManager.getSpaceRaceFromPlayer(playerName);
+
         if (race != null) {
             return race.getTeamColor();
         }
         if (!ClientProxyCore.flagRequestsSent.contains(playerName) && sendPacket) {
-            GalacticraftCore.packetPipeline.sendToServer((IPacket)new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_FLAG_DATA, new Object[] { playerName }));
+            GalacticraftCore.packetPipeline
+                    .sendToServer(new PacketSimple(EnumSimplePacket.S_REQUEST_FLAG_DATA, new Object[] { playerName }));
             ClientProxyCore.flagRequestsSent.add(playerName);
         }
-        return new Vector3(1.0, 1.0, 1.0);
+
+        return new Vector3(1, 1, 1);
     }
 }

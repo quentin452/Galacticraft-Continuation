@@ -1,18 +1,19 @@
 package micdoodle8.mods.galacticraft.api.vector;
 
-import net.minecraft.block.*;
-import net.minecraft.item.*;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
-public class BlockTuple
-{
+public class BlockTuple {
+
     public Block block;
     public int meta;
-    
-    public BlockTuple(final Block b, final int m) {
+
+    public BlockTuple(Block b, int m) {
         this.block = b;
         this.meta = m;
     }
-    
+
     @Override
     public String toString() {
         final Item item = Item.getItemFromBlock(this.block);

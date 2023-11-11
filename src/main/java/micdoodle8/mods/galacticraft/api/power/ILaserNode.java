@@ -1,25 +1,27 @@
 package micdoodle8.mods.galacticraft.api.power;
 
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
+import net.minecraft.tileentity.TileEntity;
 
-public interface ILaserNode extends IEnergyHandlerGC
-{
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+
+public interface ILaserNode extends IEnergyHandlerGC {
+
     Vector3 getInputPoint();
-    
-    Vector3 getOutputPoint(final boolean p0);
-    
+
+    Vector3 getOutputPoint(boolean offset);
+
     ILaserNode getTarget();
-    
+
     TileEntity getTile();
-    
-    boolean canConnectTo(final ILaserNode p0);
-    
+
+    boolean canConnectTo(ILaserNode node);
+
     Vector3 getColor();
-    
-    void addNode(final ILaserNode p0);
-    
-    void removeNode(final ILaserNode p0);
-    
-    int compareTo(final ILaserNode p0, final BlockVec3 p1);
+
+    void addNode(ILaserNode node);
+
+    void removeNode(ILaserNode node);
+
+    int compareTo(ILaserNode otherNode, BlockVec3 origin);
 }

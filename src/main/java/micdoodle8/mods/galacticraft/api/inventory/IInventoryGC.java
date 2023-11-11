@@ -1,11 +1,26 @@
 package micdoodle8.mods.galacticraft.api.inventory;
 
-import net.minecraft.inventory.*;
-import net.minecraft.entity.player.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 
-public interface IInventoryGC extends IInventory
-{
-    void dropExtendedItems(final EntityPlayer p0);
-    
-    void copyInventory(final IInventoryGC p0);
+/**
+ * An interface for other mods to access the Galacticraft extended inventory slots.
+ * <p>
+ * (All normal IInventory methods will work)
+ */
+public interface IInventoryGC extends IInventory {
+
+    /**
+     * Drop only the Galacticraft items from the player's inventory.
+     *
+     * @param player
+     */
+    void dropExtendedItems(EntityPlayer player);
+
+    /**
+     * Make the implementing inventory a copy of the specified extended inventory.
+     *
+     * @param par1InventoryPlayer The inventory to copy
+     */
+    void copyInventory(IInventoryGC par1InventoryPlayer);
 }

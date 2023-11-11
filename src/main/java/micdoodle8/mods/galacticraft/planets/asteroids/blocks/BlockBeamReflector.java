@@ -1,80 +1,105 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.material.*;
-import net.minecraft.block.*;
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.world.*;
-import net.minecraft.util.*;
-import java.util.*;
-import net.minecraft.entity.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
-import net.minecraft.item.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.List;
 
-public class BlockBeamReflector extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc
-{
-    public BlockBeamReflector(final String assetName) {
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityBeamReflector;
+
+public class BlockBeamReflector extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
+
+    public BlockBeamReflector(String assetName) {
         super(Material.iron);
         this.setBlockName(assetName);
         this.setBlockTextureName("stone");
         this.setStepSound(Block.soundTypeMetal);
     }
-    
+
     @SideOnly(Side.CLIENT)
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
+
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
-    
+
+    @Override
     public boolean renderAsNormalBlock() {
         return false;
     }
-    
+
+    @Override
     public int getRenderType() {
         return -1;
     }
-    
-    public int damageDropped(final int metadata) {
+
+    @Override
+    public int damageDropped(int metadata) {
         return metadata;
     }
-    
-    public void setBlockBoundsBasedOnState(final IBlockAccess world, final int x, final int y, final int z) {
-        this.setBlockBounds(0.25f, 0.0f, 0.25f, 0.75f, 0.8f, 0.75f);
+
+    @Override
+    public void setBlockBoundsBasedOnState(IBlockAccess world, int x, int y, int z) {
+        this.setBlockBounds(0.25F, 0.0F, 0.25F, 0.75F, 0.8F, 0.75F);
     }
-    
-    public void addCollisionBoxesToList(final World world, final int x, final int y, final int z, final AxisAlignedBB axisalignedbb, final List list, final Entity entity) {
-        this.setBlockBoundsBasedOnState((IBlockAccess)world, x, y, z);
+
+    @Override
+    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB axisalignedbb,
+            List<AxisAlignedBB> list, Entity entity) {
+        this.setBlockBoundsBasedOnState(world, x, y, z);
         super.addCollisionBoxesToList(world, x, y, z, axisalignedbb, list, entity);
     }
-    
-    public TileEntity createTileEntity(final World world, final int metadata) {
-        return (TileEntity)new TileEntityBeamReflector();
+
+    @Override
+    public TileEntity createTileEntity(World world, int metadata) {
+        return new TileEntityBeamReflector();
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
         par3List.add(new ItemStack(par1, 1, 0));
     }
-    
-    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    @Override
+    public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
+            float hitY, float hitZ) {
         final TileEntity tile = world.getTileEntity(x, y, z);
-        return tile instanceof TileEntityBeamReflector && ((TileEntityBeamReflector)tile).onMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
+
+        if (tile instanceof TileEntityBeamReflector) {
+            return ((TileEntityBeamReflector) tile)
+                    .onMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
+        }
+
+        return false;
     }
-    
-    public String getShiftDescription(final int meta) {
+
+    @Override
+    public String getShiftDescription(int meta) {
         return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-    
-    public boolean showDescription(final int meta) {
+
+    @Override
+    public boolean showDescription(int meta) {
         return true;
     }
 }

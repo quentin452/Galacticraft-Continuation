@@ -1,6 +1,6 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-public interface IScaleableFuelLevel
-{
-    int getScaledFuelLevel(final int p0);
+public interface IScaleableFuelLevel {
+
+    int getScaledFuelLevel(int scale);
 }

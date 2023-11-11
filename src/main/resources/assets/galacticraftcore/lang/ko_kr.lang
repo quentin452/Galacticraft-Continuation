@@ -426,7 +426,7 @@ gui.telemetryFailWearingIt.message=원격측정 유닛에 주파수 모듈을 �
 
 gui.rocketType.0=저장 용량: 18
 gui.rocketType.1=저장 용량: 36
-gui.rocketType.2=저장 용량: 56
+gui.rocketType.2=저장 용량: 54
 gui.rocketType.3=이미 연료 공급됨
 
 gui.spacestation.typeCommand=입장을 희망하는
@@ -446,6 +446,7 @@ gui.receiver.cannotAttach=수신기를 이곳에 부착할 수 없습니다!
 gui.warning.invalidThermal=열보호 장비가 유효하지 않습니다!
 
 gui.tank.oxygenRemaining=남은 산소
+gui.tank.infinite=무한
 gui.buggy.storageSpace=저장 용량
 gui.frequencyModule.desc.0=약한 음파와 먼 신호를
 gui.frequencyModule.desc.1=수신할 수 있습니다

@@ -1,8 +1,5 @@
-@API(
-    apiVersion = "1.1",
-    owner = "GalacticraftCore",
-    provides = "Galacticraft API"
-)
+@API(apiVersion = Tags.VERSION, owner = "Galacticraft API|Prefabs", provides = "Galacticraft API|Entity Prefabs")
 package micdoodle8.mods.galacticraft.api.prefab.entity;
 
-import micdoodle8.mods.galacticraft.core.util.API;
+import cpw.mods.fml.common.API;
+import micdoodle8.mods.galacticraft.api.Tags;

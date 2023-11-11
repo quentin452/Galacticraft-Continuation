@@ -1,145 +1,269 @@
 package micdoodle8.mods.galacticraft.core.client.gui.overlay;
 
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.util.*;
-import net.minecraft.client.*;
-import org.lwjgl.opengl.*;
-import cpw.mods.fml.client.*;
-import net.minecraft.client.renderer.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraft.client.gui.*;
-import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.util.ClientUtil;
+import micdoodle8.mods.galacticraft.core.util.ColorUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
 
 @SideOnly(Side.CLIENT)
-public class OverlayOxygenTanks extends Overlay
-{
-    private static final ResourceLocation guiTexture;
-    private static Minecraft minecraft;
-    
-    public static void renderOxygenTankIndicator(final int heatLevel, final int oxygenInTank1, final int oxygenInTank2, final boolean right, final boolean top, final boolean invalid) {
-        final ScaledResolution scaledresolution = ClientUtil.getScaledRes(OverlayOxygenTanks.minecraft, OverlayOxygenTanks.minecraft.displayWidth, OverlayOxygenTanks.minecraft.displayHeight);
+public class OverlayOxygenTanks extends Overlay {
+
+    private static final ResourceLocation guiTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/gui/gui.png");
+
+    private static final Minecraft minecraft = FMLClientHandler.instance().getClient();
+
+    /**
+     * Render the GUI that displays oxygen level in tanks
+     */
+    public static void renderOxygenTankIndicator(int heatLevel, int oxygenInTank1, int oxygenInTank2, boolean right,
+            boolean top, boolean invalid) {
+        final ScaledResolution scaledresolution = ClientUtil.getScaledRes(
+                OverlayOxygenTanks.minecraft,
+                OverlayOxygenTanks.minecraft.displayWidth,
+                OverlayOxygenTanks.minecraft.displayHeight);
         final int i = scaledresolution.getScaledWidth();
         final int j = scaledresolution.getScaledHeight();
         OverlayOxygenTanks.minecraft.entityRenderer.setupOverlayRendering();
-        GL11.glEnable(3042);
-        GL11.glDisable(2929);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDepthMask(false);
-        GL11.glBlendFunc(770, 771);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glDisable(3008);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
         FMLClientHandler.instance().getClient().renderEngine.bindTexture(OverlayOxygenTanks.guiTexture);
         final Tessellator tessellator = Tessellator.instance;
-        GL11.glEnable(2929);
-        GL11.glEnable(3008);
-        GL11.glDisable(2896);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
         int minLeftX = 0;
         int maxLeftX = 0;
         int minRightX = 0;
         int maxRightX = 0;
-        double bottomY = 0.0;
-        double topY = 0.0;
-        final double zLevel = -190.0;
+        double topY = 0;
+        final double zLevel = -190.0D;
+
         if (right) {
             minLeftX = i - 59;
             maxLeftX = i - 40;
             minRightX = i - 39;
             maxRightX = i - 20;
-        }
-        else {
+        } else {
             minLeftX = 10;
             maxLeftX = 29;
             minRightX = 30;
             maxRightX = 49;
         }
+
         if (top) {
             topY = 10.5;
-        }
-        else {
+        } else {
             topY = j - 57;
         }
-        bottomY = topY + 46.5;
-        final float texMod = 0.00390625f;
+
+        double bottomY = topY + 46.5;
+
+        final float texMod = 0.00390625F;
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)minLeftX, bottomY, zLevel, (double)(66.0f * texMod), (double)(47.0f * texMod));
-        tessellator.addVertexWithUV((double)(minLeftX + 9), bottomY, zLevel, (double)(75.0f * texMod), (double)(47.0f * texMod));
-        tessellator.addVertexWithUV((double)(minLeftX + 9), topY, zLevel, (double)(75.0f * texMod), (double)(94.0f * texMod));
-        tessellator.addVertexWithUV((double)minLeftX, topY, zLevel, (double)(66.0f * texMod), (double)(94.0f * texMod));
+        tessellator.addVertexWithUV(minLeftX, bottomY, zLevel, 66 * texMod, 47 * texMod);
+        tessellator.addVertexWithUV(minLeftX + 9, bottomY, zLevel, (66 + 9) * texMod, 47 * texMod);
+        tessellator.addVertexWithUV(minLeftX + 9, topY, zLevel, (66 + 9) * texMod, 47 * 2 * texMod);
+        tessellator.addVertexWithUV(minLeftX, topY, zLevel, 66 * texMod, 47 * 2 * texMod);
         tessellator.draw();
+
         final int heatLevelScaled = Math.min(Math.max(heatLevel, 1), 45);
         final int heatLeveLScaledMax = Math.min(heatLevelScaled + 2, 45);
         final int heatLevelScaledMin = Math.max(heatLeveLScaledMax - 2, 0);
+
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(minLeftX + 1), bottomY - heatLevelScaledMin, zLevel, (double)(76.0f * texMod), (double)((93 - heatLevelScaled) * texMod));
-        tessellator.addVertexWithUV((double)(minLeftX + 8), bottomY - heatLevelScaledMin, zLevel, (double)(83.0f * texMod), (double)((93 - heatLevelScaled) * texMod));
-        tessellator.addVertexWithUV((double)(minLeftX + 8), bottomY - heatLeveLScaledMax, zLevel, (double)(83.0f * texMod), (double)((93 - heatLevelScaled) * texMod));
-        tessellator.addVertexWithUV((double)(minLeftX + 1), bottomY - heatLeveLScaledMax, zLevel, (double)(76.0f * texMod), (double)((93 - heatLevelScaled) * texMod));
+        tessellator.addVertexWithUV(
+                minLeftX + 1,
+                bottomY - heatLevelScaledMin,
+                zLevel,
+                76 * texMod,
+                (48 + 45 - heatLevelScaled) * texMod);
+        tessellator.addVertexWithUV(
+                minLeftX + 8,
+                bottomY - heatLevelScaledMin,
+                zLevel,
+                (76 + 7) * texMod,
+                (48 + 45 - heatLevelScaled) * texMod);
+        tessellator.addVertexWithUV(
+                minLeftX + 8,
+                bottomY - heatLeveLScaledMax,
+                zLevel,
+                (76 + 7) * texMod,
+                (48 + 45 - heatLevelScaled) * texMod);
+        tessellator.addVertexWithUV(
+                minLeftX + 1,
+                bottomY - heatLeveLScaledMax,
+                zLevel,
+                76 * texMod,
+                (48 + 45 - heatLevelScaled) * texMod);
         tessellator.draw();
+
         if (invalid) {
-            GL11.glColor3f(1.0f, 0.0f, 0.0f);
+            GL11.glColor3f(1, 0, 0);
             tessellator.startDrawingQuads();
-            tessellator.addVertexWithUV((double)(minLeftX - 5), bottomY - heatLevelScaledMin + 3.0, zLevel, (double)(84.0f * texMod), (double)(47.0f * texMod));
-            tessellator.addVertexWithUV((double)(minLeftX - 1), bottomY - heatLevelScaledMin + 3.0, zLevel, (double)(89.0f * texMod), (double)(47.0f * texMod));
-            tessellator.addVertexWithUV((double)(minLeftX - 1), bottomY - heatLeveLScaledMax - 3.0, zLevel, (double)(89.0f * texMod), (double)(56.0f * texMod));
-            tessellator.addVertexWithUV((double)(minLeftX - 5), bottomY - heatLeveLScaledMax - 3.0, zLevel, (double)(84.0f * texMod), (double)(56.0f * texMod));
+            tessellator
+                    .addVertexWithUV(minLeftX - 5, bottomY - heatLevelScaledMin + 3, zLevel, 84 * texMod, 47 * texMod);
+            tessellator.addVertexWithUV(
+                    minLeftX - 1,
+                    bottomY - heatLevelScaledMin + 3,
+                    zLevel,
+                    (84 + 5) * texMod,
+                    47 * texMod);
+            tessellator.addVertexWithUV(
+                    minLeftX - 1,
+                    bottomY - heatLeveLScaledMax - 3,
+                    zLevel,
+                    (84 + 5) * texMod,
+                    (47 + 9) * texMod);
+            tessellator.addVertexWithUV(
+                    minLeftX - 5,
+                    bottomY - heatLeveLScaledMax - 3,
+                    zLevel,
+                    84 * texMod,
+                    (47 + 9) * texMod);
             tessellator.draw();
-            GL11.glColor3f(1.0f, 1.0f, 1.0f);
+            GL11.glColor3f(1, 1, 1);
         }
+
         minLeftX += 10;
         maxLeftX += 10;
         minRightX += 10;
         maxRightX += 10;
+
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)minRightX, bottomY, zLevel, (double)(85.0f * texMod), (double)(47.0f * texMod));
-        tessellator.addVertexWithUV((double)maxRightX, bottomY, zLevel, (double)(104.0f * texMod), (double)(47.0f * texMod));
-        tessellator.addVertexWithUV((double)maxRightX, topY, zLevel, (double)(104.0f * texMod), (double)(0.0f * texMod));
-        tessellator.addVertexWithUV((double)minRightX, topY, zLevel, (double)(85.0f * texMod), (double)(0.0f * texMod));
+        tessellator.addVertexWithUV(minRightX, bottomY, zLevel, 85 * texMod, 47 * texMod);
+        tessellator.addVertexWithUV(maxRightX, bottomY, zLevel, (85 + 19) * texMod, 47 * texMod);
+        tessellator.addVertexWithUV(maxRightX, topY, zLevel, (85 + 19) * texMod, 0 * texMod);
+        tessellator.addVertexWithUV(minRightX, topY, zLevel, 85 * texMod, 0 * texMod);
         tessellator.draw();
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)minLeftX, bottomY, zLevel, (double)(85.0f * texMod), (double)(47.0f * texMod));
-        tessellator.addVertexWithUV((double)maxLeftX, bottomY, zLevel, (double)(104.0f * texMod), (double)(47.0f * texMod));
-        tessellator.addVertexWithUV((double)maxLeftX, topY, zLevel, (double)(104.0f * texMod), (double)(0.0f * texMod));
-        tessellator.addVertexWithUV((double)minLeftX, topY, zLevel, (double)(85.0f * texMod), (double)(0.0f * texMod));
+        tessellator.addVertexWithUV(minLeftX, bottomY, zLevel, 85 * texMod, 47 * texMod);
+        tessellator.addVertexWithUV(maxLeftX, bottomY, zLevel, (85 + 19) * texMod, 47 * texMod);
+        tessellator.addVertexWithUV(maxLeftX, topY, zLevel, (85 + 19) * texMod, 0 * texMod);
+        tessellator.addVertexWithUV(minLeftX, topY, zLevel, 85 * texMod, 0 * texMod);
         tessellator.draw();
         GL11.glDepthMask(true);
+
         if (oxygenInTank1 > 0) {
             final Tessellator tessellator2 = Tessellator.instance;
+
             tessellator2.startDrawingQuads();
-            tessellator.addVertexWithUV((double)(minLeftX + 1), topY + 1.0 + oxygenInTank1 / 2, zLevel, 0.41015625, (double)(oxygenInTank1 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)(maxLeftX - 1), topY + 1.0 + oxygenInTank1 / 2, zLevel, 0.4765625, (double)(oxygenInTank1 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)(maxLeftX - 1), topY + 1.0, zLevel, 0.4765625, 0.00390625);
-            tessellator.addVertexWithUV((double)(minLeftX + 1), topY + 1.0, zLevel, 0.41015625, 0.00390625);
+            tessellator.addVertexWithUV(
+                    minLeftX + 1,
+                    topY + 1 + oxygenInTank1 / 2,
+                    zLevel,
+                    105 * 0.00390625F,
+                    oxygenInTank1 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(
+                    maxLeftX - 1,
+                    topY + 1 + oxygenInTank1 / 2,
+                    zLevel,
+                    (105 + 17) * 0.00390625F,
+                    oxygenInTank1 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(maxLeftX - 1, topY + 1, zLevel, (105 + 17) * 0.00390625F, 1 * 0.00390625F);
+            tessellator.addVertexWithUV(minLeftX + 1, topY + 1, zLevel, 105 * 0.00390625F, 1 * 0.00390625F);
             tessellator2.draw();
+
             tessellator2.startDrawingQuads();
-            tessellator.addVertexWithUV((double)minLeftX, topY + 1.0 + oxygenInTank1 / 2, zLevel, 0.2578125, (double)(oxygenInTank1 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)(maxLeftX - 1), topY + 1.0 + oxygenInTank1 / 2, zLevel, 0.32421875, (double)(oxygenInTank1 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)(maxLeftX - 1), topY + 1.0 + oxygenInTank1 / 2 - 1.0, zLevel, 0.32421875, 0.00390625);
-            tessellator.addVertexWithUV((double)minLeftX, topY + 1.0 + oxygenInTank1 / 2 - 1.0, zLevel, 0.2578125, 0.00390625);
+            tessellator.addVertexWithUV(
+                    minLeftX,
+                    topY + 1 + oxygenInTank1 / 2,
+                    zLevel,
+                    66 * 0.00390625F,
+                    oxygenInTank1 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(
+                    maxLeftX - 1,
+                    topY + 1 + oxygenInTank1 / 2,
+                    zLevel,
+                    (66 + 17) * 0.00390625F,
+                    oxygenInTank1 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(
+                    maxLeftX - 1,
+                    topY + 1 + oxygenInTank1 / 2 - 1,
+                    zLevel,
+                    (66 + 17) * 0.00390625F,
+                    1 * 0.00390625F);
+            tessellator.addVertexWithUV(
+                    minLeftX,
+                    topY + 1 + oxygenInTank1 / 2 - 1,
+                    zLevel,
+                    66 * 0.00390625F,
+                    1 * 0.00390625F);
             tessellator2.draw();
         }
+
         if (oxygenInTank2 > 0) {
             final Tessellator tessellator2 = Tessellator.instance;
+
             tessellator2.startDrawingQuads();
-            tessellator.addVertexWithUV((double)(minRightX + 1), topY + 1.0 + oxygenInTank2 / 2, 0.0, 0.41015625, (double)(oxygenInTank2 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)(maxRightX - 1), topY + 1.0 + oxygenInTank2 / 2, 0.0, 0.4765625, (double)(oxygenInTank2 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)(maxRightX - 1), topY + 1.0, 0.0, 0.4765625, 0.00390625);
-            tessellator.addVertexWithUV((double)(minRightX + 1), topY + 1.0, 0.0, 0.41015625, 0.00390625);
+            tessellator.addVertexWithUV(
+                    minRightX + 1,
+                    topY + 1 + oxygenInTank2 / 2,
+                    0,
+                    105 * 0.00390625F,
+                    oxygenInTank2 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(
+                    maxRightX - 1,
+                    topY + 1 + oxygenInTank2 / 2,
+                    0,
+                    (105 + 17) * 0.00390625F,
+                    oxygenInTank2 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(maxRightX - 1, topY + 1, 0, (105 + 17) * 0.00390625F, 1 * 0.00390625F);
+            tessellator.addVertexWithUV(minRightX + 1, topY + 1, 0, 105 * 0.00390625F, 1 * 0.00390625F);
             tessellator2.draw();
+
             tessellator2.startDrawingQuads();
-            tessellator.addVertexWithUV((double)minRightX, topY + 1.0 + oxygenInTank2 / 2, 0.0, 0.2578125, (double)(oxygenInTank2 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)(maxRightX - 1), topY + 1.0 + oxygenInTank2 / 2, 0.0, 0.32421875, (double)(oxygenInTank2 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)(maxRightX - 1), topY + 1.0 + oxygenInTank2 / 2 - 1.0, 0.0, 0.32421875, (double)(oxygenInTank2 / 2 * 0.00390625f));
-            tessellator.addVertexWithUV((double)minRightX, topY + 1.0 + oxygenInTank2 / 2 - 1.0, 0.0, 0.2578125, (double)(oxygenInTank2 / 2 * 0.00390625f));
+            tessellator.addVertexWithUV(
+                    minRightX,
+                    topY + 1 + oxygenInTank2 / 2,
+                    0,
+                    66 * 0.00390625F,
+                    oxygenInTank2 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(
+                    maxRightX - 1,
+                    topY + 1 + oxygenInTank2 / 2,
+                    0,
+                    (66 + 17) * 0.00390625F,
+                    oxygenInTank2 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(
+                    maxRightX - 1,
+                    topY + 1 + oxygenInTank2 / 2 - 1,
+                    0,
+                    (66 + 17) * 0.00390625F,
+                    oxygenInTank2 / 2 * 0.00390625F);
+            tessellator.addVertexWithUV(
+                    minRightX,
+                    topY + 1 + oxygenInTank2 / 2 - 1,
+                    0,
+                    66 * 0.00390625F,
+                    oxygenInTank2 / 2 * 0.00390625F);
             tessellator2.draw();
         }
+
         if (invalid) {
             final String value = GCCoreUtil.translate("gui.warning.invalidThermal");
-            OverlayOxygenTanks.minecraft.fontRenderer.drawString(value, minLeftX - 18 - OverlayOxygenTanks.minecraft.fontRenderer.getStringWidth(value), (int)bottomY - heatLevelScaled - OverlayOxygenTanks.minecraft.fontRenderer.FONT_HEIGHT / 2 - 1, ColorUtil.to32BitColor(255, 255, 10, 10));
+            OverlayOxygenTanks.minecraft.fontRenderer.drawString(
+                    value,
+                    minLeftX - 18 - OverlayOxygenTanks.minecraft.fontRenderer.getStringWidth(value),
+                    (int) bottomY - heatLevelScaled - OverlayOxygenTanks.minecraft.fontRenderer.FONT_HEIGHT / 2 - 1,
+                    ColorUtil.to32BitColor(255, 255, 10, 10));
         }
-    }
-    
-    static {
-        guiTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/gui/gui.png");
-        OverlayOxygenTanks.minecraft = FMLClientHandler.instance().getClient();
     }
 }

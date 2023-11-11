@@ -1,64 +1,82 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import micdoodle8.mods.galacticraft.core.items.GCItems;
-import net.minecraft.inventory.*;
-import micdoodle8.mods.miccore.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import micdoodle8.mods.galacticraft.core.oxygen.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import micdoodle8.mods.galacticraft.api.item.*;
-import net.minecraft.nbt.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.energy.item.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraftforge.common.util.*;
-import net.minecraft.world.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
 
-public class TileEntityOxygenSealer extends TileEntityOxygen implements IInventory, ISidedInventory
-{
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.item.IItemOxygenSupply;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.energy.tile.EnergyStorageTile;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.oxygen.OxygenPressureProtocol;
+import micdoodle8.mods.galacticraft.core.oxygen.ThreadFindSeal;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import micdoodle8.mods.galacticraft.core.util.FluidUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class TileEntityOxygenSealer extends TileEntityOxygen implements IInventory, ISidedInventory {
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public boolean sealed;
-    public boolean lastSealed;
-    public boolean lastDisabled;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+
+    public boolean lastSealed = false;
+
+    public boolean lastDisabled = false;
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public boolean active;
-    private ItemStack[] containingItems;
+
+    private ItemStack[] containingItems = new ItemStack[3];
     public ThreadFindSeal threadSeal;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public int stopSealThreadCooldown;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public int threadCooldownTotal;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public boolean calculatingSealed;
-    public static int countEntities;
-    private static int countTemp;
-    private static boolean sealerCheckedThisTick;
-    public static ArrayList<TileEntityOxygenSealer> loadedTiles;
+
+    public static int countEntities = 0;
+    private static int countTemp = 0;
+    private static boolean sealerCheckedThisTick = false;
+    public static ArrayList<TileEntityOxygenSealer> loadedTiles = new ArrayList<>();
     private static final int UNSEALED_OXYGENPERTICK = 12;
 
     public TileEntityOxygenSealer() {
-        super(10000.0f, 12.0f);
-        this.lastSealed = false;
-        this.lastDisabled = false;
-        this.containingItems = new ItemStack[3];
+        super(10000, UNSEALED_OXYGENPERTICK);
         this.noRedstoneControl = true;
-        this.storage.setMaxExtract(5.0f);
-        this.storage.setMaxReceive(25.0f);
-        this.storage.setCapacity(32000.0f);
+        this.storage.setMaxExtract(5.0F); // Half of a standard machine's power draw
+        this.storage.setMaxReceive(25.0F);
+        this.storage.setCapacity(EnergyStorageTile.STANDARD_CAPACITY * 2); // Large capacity so it can keep working for
+        // a while even if chunk unloads affect its
+        // power supply
     }
 
+    @Override
     public void validate() {
         super.validate();
         if (!this.worldObj.isRemote && !TileEntityOxygenSealer.loadedTiles.contains(this)) {
             TileEntityOxygenSealer.loadedTiles.add(this);
         }
-        this.stopSealThreadCooldown = 126 + TileEntityOxygenSealer.countEntities;
+        this.stopSealThreadCooldown = 126 + countEntities;
     }
 
+    @Override
     public void invalidate() {
         if (!this.worldObj.isRemote) {
             TileEntityOxygenSealer.loadedTiles.remove(this);
@@ -66,6 +84,7 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
         super.invalidate();
     }
 
+    @Override
     public void onChunkUnload() {
         if (!this.worldObj.isRemote) {
             TileEntityOxygenSealer.loadedTiles.remove(this);
@@ -73,9 +92,9 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
         super.onChunkUnload();
     }
 
-    public int getScaledThreadCooldown(final int i) {
+    public int getScaledThreadCooldown(int i) {
         if (this.active) {
-            return Math.min(i, (int)Math.floor(this.stopSealThreadCooldown * i / (double)this.threadCooldownTotal));
+            return Math.min(i, (int) Math.floor(this.stopSealThreadCooldown * i / (double) this.threadCooldownTotal));
         }
         return 0;
     }
@@ -85,64 +104,82 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
             return 0;
         }
         final Block blockAbove = this.worldObj.getBlock(this.xCoord, this.yCoord + 1, this.zCoord);
-        if (!(blockAbove instanceof BlockAir) && !OxygenPressureProtocol.canBlockPassAir(this.worldObj, blockAbove, new BlockVec3(this.xCoord, this.yCoord + 1, this.zCoord), 1)) {
+        if (!(blockAbove instanceof BlockAir) && !OxygenPressureProtocol.canBlockPassAir(
+                this.worldObj,
+                blockAbove,
+                new BlockVec3(this.xCoord, this.yCoord + 1, this.zCoord),
+                1)) {
+            // The vent is blocked
             return 0;
         }
+
         return 1250;
     }
 
     public boolean thermalControlEnabled() {
         final ItemStack oxygenItemStack = this.getStackInSlot(2);
-        return oxygenItemStack != null && oxygenItemStack.getItem() == GCItems.basicItem && oxygenItemStack.getItemDamage() == 20 && this.hasEnoughEnergyToRun && !this.disabled;
+        return oxygenItemStack != null && oxygenItemStack.getItem() == GCItems.basicItem
+                && oxygenItemStack.getItemDamage() == 20
+                && this.hasEnoughEnergyToRun
+                && !this.disabled;
     }
 
+    @Override
     public void updateEntity() {
         if (!this.worldObj.isRemote) {
             final ItemStack oxygenItemStack = this.getStackInSlot(1);
             if (oxygenItemStack != null && oxygenItemStack.getItem() instanceof IItemOxygenSupply) {
-                final IItemOxygenSupply oxygenItem = (IItemOxygenSupply)oxygenItemStack.getItem();
-                final float oxygenDraw = Math.min(30.0f, this.maxOxygen - this.storedOxygen);
+                final IItemOxygenSupply oxygenItem = (IItemOxygenSupply) oxygenItemStack.getItem();
+                final float oxygenDraw = Math.min(UNSEALED_OXYGENPERTICK * 2.5F, this.maxOxygen - this.storedOxygen);
                 this.storedOxygen += oxygenItem.discharge(oxygenItemStack, oxygenDraw);
                 if (this.storedOxygen > this.maxOxygen) {
                     this.storedOxygen = this.maxOxygen;
                 }
             }
+
             if (this.thermalControlEnabled()) {
-                if (this.storage.getMaxExtract() != 20.0f) {
-                    this.storage.setMaxExtract(20.0f);
+                if (this.storage.getMaxExtract() != 20.0F) {
+                    this.storage.setMaxExtract(20.0F);
                 }
-            }
-            else if (this.storage.getMaxExtract() != 5.0f) {
-                this.storage.setMaxExtract(5.0f);
-                this.storage.setMaxReceive(25.0f);
+            } else if (this.storage.getMaxExtract() != 5.0F) {
+                this.storage.setMaxExtract(5.0F);
+                this.storage.setMaxReceive(25.0F);
             }
         }
-        this.oxygenPerTick = (this.sealed ? 2.0f : 12.0f);
+
+        this.oxygenPerTick = this.sealed ? 2 : UNSEALED_OXYGENPERTICK;
         super.updateEntity();
+
         if (!this.worldObj.isRemote) {
-            ++TileEntityOxygenSealer.countTemp;
-            this.active = (this.storedOxygen >= 1.0f && this.hasEnoughEnergyToRun && !this.disabled);
+            // Some code to count the number of Oxygen Sealers being updated,
+            // tick by tick - needed for queueing
+            TileEntityOxygenSealer.countTemp++;
+
+            this.active = this.storedOxygen >= 1 && this.hasEnoughEnergyToRun && !this.disabled;
+
+            // TODO: if multithreaded, this codeblock should not run if the current
+            // threadSeal is flagged looping
             if (this.stopSealThreadCooldown > 0) {
-                --this.stopSealThreadCooldown;
-            }
-            else if (!TileEntityOxygenSealer.sealerCheckedThisTick) {
-                final int n = 75 + TileEntityOxygenSealer.countEntities;
-                this.stopSealThreadCooldown = n;
-                this.threadCooldownTotal = n;
+                this.stopSealThreadCooldown--;
+            } else if (!TileEntityOxygenSealer.sealerCheckedThisTick) {
+                // This puts any Sealer which is updated to the back of the queue for updates
+                this.threadCooldownTotal = this.stopSealThreadCooldown = 75 + TileEntityOxygenSealer.countEntities;
                 if (this.active || this.sealed) {
                     TileEntityOxygenSealer.sealerCheckedThisTick = true;
                     OxygenPressureProtocol.updateSealerStatus(this);
                 }
             }
+
+            // TODO: if multithreaded, this.threadSeal needs to be atomic
             if (this.threadSeal != null) {
                 if (this.threadSeal.looping.get()) {
                     this.calculatingSealed = this.active;
-                }
-                else {
+                } else {
                     this.calculatingSealed = false;
-                    this.sealed = (this.active && this.threadSeal.sealedFinal.get());
+                    this.sealed = this.active && this.threadSeal.sealedFinal.get();
                 }
             }
+
             this.lastDisabled = this.disabled;
             this.lastSealed = this.sealed;
         }
@@ -154,58 +191,73 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
         TileEntityOxygenSealer.sealerCheckedThisTick = false;
     }
 
-    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+    @Override
+    public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
         super.readFromNBT(par1NBTTagCompound);
+
         final NBTTagList var2 = par1NBTTagCompound.getTagList("Items", 10);
         this.containingItems = new ItemStack[this.getSizeInventory()];
+
         for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
             final NBTTagCompound var4 = var2.getCompoundTagAt(var3);
-            final int var5 = var4.getByte("Slot") & 0xFF;
+            final int var5 = var4.getByte("Slot") & 255;
+
             if (var5 < this.containingItems.length) {
                 this.containingItems[var5] = ItemStack.loadItemStackFromNBT(var4);
             }
         }
     }
 
-    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+    @Override
+    public void writeToNBT(NBTTagCompound par1NBTTagCompound) {
         super.writeToNBT(par1NBTTagCompound);
+
         final NBTTagList list = new NBTTagList();
+
         for (int var3 = 0; var3 < this.containingItems.length; ++var3) {
             if (this.containingItems[var3] != null) {
                 final NBTTagCompound var4 = new NBTTagCompound();
-                var4.setByte("Slot", (byte)var3);
+                var4.setByte("Slot", (byte) var3);
                 this.containingItems[var3].writeToNBT(var4);
-                list.appendTag((NBTBase)var4);
+                list.appendTag(var4);
             }
         }
-        par1NBTTagCompound.setTag("Items", (NBTBase)list);
+
+        par1NBTTagCompound.setTag("Items", list);
     }
 
+    @Override
     public int getSizeInventory() {
         return this.containingItems.length;
     }
 
-    public ItemStack getStackInSlot(final int par1) {
+    @Override
+    public ItemStack getStackInSlot(int par1) {
         return this.containingItems[par1];
     }
 
-    public ItemStack decrStackSize(final int par1, final int par2) {
+    @Override
+    public ItemStack decrStackSize(int par1, int par2) {
         if (this.containingItems[par1] == null) {
             return null;
         }
+        ItemStack var3;
+
         if (this.containingItems[par1].stackSize <= par2) {
-            final ItemStack var3 = this.containingItems[par1];
+            var3 = this.containingItems[par1];
             this.containingItems[par1] = null;
-            return var3;
-        }
-        final ItemStack var3 = this.containingItems[par1].splitStack(par2);
-        if (this.containingItems[par1].stackSize == 0) {
-            this.containingItems[par1] = null;
+        } else {
+            var3 = this.containingItems[par1].splitStack(par2);
+
+            if (this.containingItems[par1].stackSize == 0) {
+                this.containingItems[par1] = null;
+            }
         }
         return var3;
     }
 
-    public ItemStack getStackInSlotOnClosing(final int par1) {
+    @Override
+    public ItemStack getStackInSlotOnClosing(int par1) {
         if (this.containingItems[par1] != null) {
             final ItemStack var2 = this.containingItems[par1];
             this.containingItems[par1] = null;
@@ -214,140 +266,146 @@ public class TileEntityOxygenSealer extends TileEntityOxygen implements IInvento
         return null;
     }
 
-    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+    @Override
+    public void setInventorySlotContents(int par1, ItemStack par2ItemStack) {
         this.containingItems[par1] = par2ItemStack;
+
         if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit()) {
             par2ItemStack.stackSize = this.getInventoryStackLimit();
         }
     }
 
+    @Override
     public String getInventoryName() {
         return GCCoreUtil.translate("container.oxygensealer.name");
     }
 
+    @Override
     public int getInventoryStackLimit() {
         return 64;
     }
 
-    public boolean isUseableByPlayer(final EntityPlayer par1EntityPlayer) {
-        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
+    @Override
+    public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
+                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
 
-    public void openInventory() {
-    }
+    @Override
+    public void openInventory() {}
 
-    public void closeInventory() {
-    }
+    @Override
+    public void closeInventory() {}
 
-    public int[] getAccessibleSlotsFromSide(final int side) {
+    // ISidedInventory Implementation:
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(int side) {
         return new int[] { 0, 1 };
     }
 
-    public boolean canInsertItem(final int slotID, final ItemStack itemstack, final int side) {
-        if (!this.isItemValidForSlot(slotID, itemstack)) {
-            return false;
+    @Override
+    public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
+        if (this.isItemValidForSlot(slotID, itemstack)) {
+            return switch (slotID) {
+                case 0 -> ItemElectricBase.isElectricItemCharged(itemstack);
+                case 1 -> itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
+                case 2 -> itemstack.getItem() == GCItems.basicItem && itemstack.getItemDamage() == 20;
+                default -> false;
+            };
         }
-        switch (slotID) {
-            case 0: {
-                return ItemElectricBase.isElectricItemCharged(itemstack);
-            }
-            case 1: {
-                return itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
-            }
-            case 2: {
-                return itemstack.getItem() == GCItems.basicItem && itemstack.getItemDamage() == 20;
-            }
-            default: {
-                return false;
-            }
-        }
+        return false;
     }
 
-    public boolean canExtractItem(final int slotID, final ItemStack itemstack, final int side) {
-        switch (slotID) {
-            case 0: {
-                return ItemElectricBase.isElectricItemEmpty(itemstack);
-            }
-            case 1: {
-                return FluidUtil.isEmptyContainer(itemstack);
-            }
-            default: {
-                return false;
-            }
-        }
+    @Override
+    public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
+        return switch (slotID) {
+            case 0 -> ItemElectricBase.isElectricItemEmpty(itemstack);
+            case 1 -> FluidUtil.isEmptyContainer(itemstack);
+            default -> false;
+        };
     }
 
+    @Override
     public boolean hasCustomInventoryName() {
         return true;
     }
 
-    public boolean isItemValidForSlot(final int slotID, final ItemStack itemstack) {
+    @Override
+    public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
         if (itemstack == null) {
             return false;
         }
-        if (slotID == 0) {
-            return ItemElectricBase.isElectricItem(itemstack.getItem());
+        switch (slotID) {
+            case 0:
+                return ItemElectricBase.isElectricItem(itemstack.getItem());
+            case 1:
+                return itemstack.getItem() instanceof IItemOxygenSupply;
+            case 2:
+                return itemstack.getItem() == GCItems.basicItem && itemstack.getItemDamage() == 20;
+            default:
+                break;
         }
-        if (slotID == 1) {
-            return itemstack.getItem() instanceof IItemOxygenSupply;
-        }
-        return slotID == 2 && itemstack.getItem() == GCItems.basicItem && itemstack.getItemDamage() == 20;
+        return false;
     }
 
+    @Override
     public boolean shouldUseEnergy() {
         return this.storedOxygen > this.oxygenPerTick && !this.getDisabled(0);
     }
 
+    @Override
     public ForgeDirection getElectricInputDirection() {
         return ForgeDirection.getOrientation(this.getBlockMetadata() + 2);
     }
 
+    @Override
     public ItemStack getBatteryInSlot() {
         return this.getStackInSlot(0);
     }
 
+    @Override
     public boolean shouldUseOxygen() {
         return this.hasEnoughEnergyToRun && this.active;
     }
 
+    @Override
     public EnumSet<ForgeDirection> getOxygenInputDirections() {
         return EnumSet.of(this.getElectricInputDirection().getOpposite());
     }
 
+    @Override
     public EnumSet<ForgeDirection> getOxygenOutputDirections() {
         return EnumSet.noneOf(ForgeDirection.class);
     }
 
-    public static HashMap<BlockVec3, TileEntityOxygenSealer> getSealersAround(final World world, final int x, final int y, final int z, final int rSquared) {
-        final HashMap<BlockVec3, TileEntityOxygenSealer> ret = new HashMap<BlockVec3, TileEntityOxygenSealer>();
-        for (final TileEntityOxygenSealer tile : new ArrayList<TileEntityOxygenSealer>(TileEntityOxygenSealer.loadedTiles)) {
-            if (tile != null && tile.getWorldObj() == world && tile.getDistanceFrom((double)x, (double)y, (double)z) < rSquared) {
+    public static HashMap<BlockVec3, TileEntityOxygenSealer> getSealersAround(World world, int x, int y, int z,
+            int rSquared) {
+        final HashMap<BlockVec3, TileEntityOxygenSealer> ret = new HashMap<>();
+
+        for (final TileEntityOxygenSealer tile : new ArrayList<>(TileEntityOxygenSealer.loadedTiles)) {
+            if (tile != null && tile.getWorldObj() == world && tile.getDistanceFrom(x, y, z) < rSquared) {
                 ret.put(new BlockVec3(tile.xCoord, tile.yCoord, tile.zCoord), tile);
             }
         }
+
         return ret;
     }
 
-    public static TileEntityOxygenSealer getNearestSealer(final World world, final double x, final double y, final double z) {
+    public static TileEntityOxygenSealer getNearestSealer(World world, double x, double y, double z) {
         TileEntityOxygenSealer ret = null;
-        double dist = 9216.0;
+        double dist = 96 * 96D;
+
         for (final Object tile : world.loadedTileEntityList) {
             if (tile instanceof TileEntityOxygenSealer) {
-                final double testDist = ((TileEntityOxygenSealer)tile).getDistanceFrom(x, y, z);
-                if (testDist >= dist) {
-                    continue;
+                final double testDist = ((TileEntityOxygenSealer) tile).getDistanceFrom(x, y, z);
+                if (testDist < dist) {
+                    dist = testDist;
+                    ret = (TileEntityOxygenSealer) tile;
                 }
-                dist = testDist;
-                ret = (TileEntityOxygenSealer)tile;
             }
         }
-        return ret;
-    }
 
-    static {
-        TileEntityOxygenSealer.countEntities = 0;
-        TileEntityOxygenSealer.countTemp = 0;
-        TileEntityOxygenSealer.sealerCheckedThisTick = false;
-        TileEntityOxygenSealer.loadedTiles = new ArrayList<TileEntityOxygenSealer>();
+        return ret;
     }
 }

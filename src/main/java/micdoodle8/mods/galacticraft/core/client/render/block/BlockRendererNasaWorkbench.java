@@ -1,47 +1,56 @@
 package micdoodle8.mods.galacticraft.core.client.render.block;
 
-import cpw.mods.fml.client.registry.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.world.*;
-import net.minecraft.block.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.client.renderer.tileentity.*;
-import net.minecraft.tileentity.*;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.world.IBlockAccess;
 
-public class BlockRendererNasaWorkbench implements ISimpleBlockRenderingHandler
-{
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityNasaWorkbench;
+
+public class BlockRendererNasaWorkbench implements ISimpleBlockRenderingHandler {
+
     final int renderID;
-    private final TileEntityNasaWorkbench table;
-    
-    public BlockRendererNasaWorkbench(final int var1) {
-        this.table = new TileEntityNasaWorkbench();
+
+    public BlockRendererNasaWorkbench(int var1) {
         this.renderID = var1;
     }
-    
-    public void renderNasaBench(final RenderBlocks renderBlocks, final IBlockAccess iblockaccess, final Block par1Block, final int par2, final int par3, final int par4) {
-        renderBlocks.setRenderBounds(0.0, 0.0, 0.0, 1.0, 0.9200000166893005, 1.0);
+
+    public void renderNasaBench(RenderBlocks renderBlocks, IBlockAccess iblockaccess, Block par1Block, int par2,
+            int par3, int par4) {
+        renderBlocks.setRenderBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.92F, 1.0F);
         renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
+
         renderBlocks.clearOverrideBlockTexture();
     }
-    
-    public void renderInventoryBlock(final Block block, final int metadata, final int modelID, final RenderBlocks renderer) {
-        GL11.glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-        GL11.glTranslatef(-0.5f, -1.1f, -0.1f);
-        GL11.glScalef(0.7f, 0.6f, 0.7f);
-        TileEntityRendererDispatcher.instance.renderTileEntityAt((TileEntity)this.table, 0.0, 0.0, 0.0, 0.0f);
-        GL11.glEnable(32826);
+
+    private final TileEntityNasaWorkbench table = new TileEntityNasaWorkbench();
+
+    @Override
+    public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {
+        GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
+        GL11.glTranslatef(-0.5F, -1.1F, -0.1F);
+        GL11.glScalef(0.7F, 0.6F, 0.7F);
+        TileEntityRendererDispatcher.instance.renderTileEntityAt(this.table, 0.0D, 0.0D, 0.0D, 0.0F);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
     }
-    
-    public boolean renderWorldBlock(final IBlockAccess world, final int x, final int y, final int z, final Block block, final int modelId, final RenderBlocks renderer) {
+
+    @Override
+    public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
+            RenderBlocks renderer) {
         this.renderNasaBench(renderer, world, block, x, y, z);
         return true;
     }
-    
-    public boolean shouldRender3DInInventory(final int modelId) {
+
+    @Override
+    public boolean shouldRender3DInInventory(int modelId) {
         return true;
     }
-    
+
+    @Override
     public int getRenderId() {
         return this.renderID;
     }

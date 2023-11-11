@@ -1,86 +1,117 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.miccore.*;
-import net.minecraft.entity.*;
-import net.minecraft.world.*;
-import net.minecraft.client.entity.*;
-import net.minecraft.init.*;
-import net.minecraftforge.common.util.*;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
-public class ItemUniversalWrench extends Item
-{
-    public ItemUniversalWrench(final String assetName) {
+import buildcraft.api.tools.IToolWrench;
+import cpw.mods.fml.common.Optional.Interface;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+
+@Interface(modid = "BuildCraftAPI|tools", iface = "buildcraft.api.tools.IToolWrench")
+public class ItemUniversalWrench extends Item implements IToolWrench {
+
+    public ItemUniversalWrench(String assetName) {
         this.setUnlocalizedName(assetName);
         this.setMaxStackSize(1);
         this.setMaxDamage(256);
         this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
-    @Annotations.RuntimeInterface(clazz = "buildcraft.api.tools.IToolWrench", modID = "BuildCraft|Core")
-    public boolean canWrench(final EntityPlayer entityPlayer, final int x, final int y, final int z) {
+
+    @Override
+    public boolean canWrench(EntityPlayer entityPlayer, int x, int y, int z) {
         return true;
     }
-    
-    @Annotations.RuntimeInterface(clazz = "buildcraft.api.tools.IToolWrench", modID = "BuildCraft|Core")
-    public void wrenchUsed(final EntityPlayer entityPlayer, final int x, final int y, final int z) {
+
+    @Override
+    public void wrenchUsed(EntityPlayer entityPlayer, int x, int y, int z) {
         final ItemStack stack = entityPlayer.inventory.getCurrentItem();
+
         if (stack != null) {
-            stack.damageItem(1, (EntityLivingBase)entityPlayer);
+            stack.damageItem(1, entityPlayer);
+
             if (stack.getItemDamage() >= stack.getMaxDamage()) {
-                final ItemStack itemStack = stack;
-                --itemStack.stackSize;
+                stack.stackSize--;
             }
+
             if (stack.stackSize <= 0) {
-                entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, (ItemStack)null);
+                entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, null);
             }
         }
     }
-    
-    public boolean onItemUse(final ItemStack par1ItemStack, final EntityPlayer player, final World world, final int x, final int y, final int z, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    @Override
+    public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer player, World world, int x, int y, int z, int side,
+            float hitX, float hitY, float hitZ) {
         return false;
     }
-    
-    public boolean doesSneakBypassUse(final World world, final int x, final int y, final int z, final EntityPlayer player) {
+
+    @Override
+    public boolean doesSneakBypassUse(World world, int x, int y, int z, EntityPlayer player) {
         return true;
     }
-    
-    public void onCreated(final ItemStack stack, final World world, final EntityPlayer player) {
+
+    @Override
+    public void onCreated(ItemStack stack, World world, EntityPlayer player) {
         if (world.isRemote && player instanceof EntityPlayerSP) {
-            ClientProxyCore.playerClientHandler.onBuild(3, (EntityPlayerSP)player);
+            ClientProxyCore.playerClientHandler.onBuild(3, (EntityPlayerSP) player);
         }
     }
-    
-    public boolean onItemUseFirst(final ItemStack stack, final EntityPlayer entityPlayer, final World world, final int x, final int y, final int z, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    @Override
+    public boolean onItemUseFirst(ItemStack stack, EntityPlayer entityPlayer, World world, int x, int y, int z,
+            int side, float hitX, float hitY, float hitZ) {
         if (world.isRemote) {
             return false;
         }
         final Block blockID = world.getBlock(x, y, z);
-        if (blockID == Blocks.furnace || blockID == Blocks.lit_furnace || blockID == Blocks.dropper || blockID == Blocks.hopper || blockID == Blocks.dispenser || blockID == Blocks.piston || blockID == Blocks.sticky_piston) {
+
+        if (blockID == Blocks.furnace || blockID == Blocks.lit_furnace
+                || blockID == Blocks.dropper
+                || blockID == Blocks.hopper
+                || blockID == Blocks.dispenser
+                || blockID == Blocks.piston
+                || blockID == Blocks.sticky_piston) {
             final int metadata = world.getBlockMetadata(x, y, z);
+
             int[] rotationMatrix = { 1, 2, 3, 4, 5, 0 };
+
             if (blockID == Blocks.furnace || blockID == Blocks.lit_furnace) {
                 rotationMatrix = ForgeDirection.ROTATION_MATRIX[0];
             }
-            world.setBlockMetadataWithNotify(x, y, z, ForgeDirection.getOrientation(rotationMatrix[metadata]).ordinal(), 3);
+
+            world.setBlockMetadataWithNotify(
+                    x,
+                    y,
+                    z,
+                    ForgeDirection.getOrientation(rotationMatrix[metadata]).ordinal(),
+                    3);
             this.wrenchUsed(entityPlayer, x, y, z);
+
             return true;
         }
+
         return false;
     }
 }

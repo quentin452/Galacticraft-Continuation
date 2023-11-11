@@ -1,59 +1,80 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.*;
-import micdoodle8.mods.galacticraft.core.network.*;
-import micdoodle8.mods.galacticraft.core.entities.*;
-import micdoodle8.mods.galacticraft.core.inventory.*;
-import net.minecraft.entity.*;
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.relauncher.*;
-import cpw.mods.fml.common.registry.*;
-import net.minecraft.item.*;
-import net.minecraft.block.*;
-import net.minecraft.util.*;
-import java.util.*;
-import net.minecraft.client.gui.*;
-import net.minecraft.client.*;
-import net.minecraft.client.resources.*;
-import net.minecraft.launchwrapper.*;
-import net.minecraft.inventory.*;
+import java.util.Arrays;
+import java.util.List;
 
-public class GCCoreUtil
-{
-    public static int nextID;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.Language;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.util.StatCollector;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
+import micdoodle8.mods.galacticraft.core.inventory.ContainerBuggy;
+import micdoodle8.mods.galacticraft.core.inventory.ContainerParaChest;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+
+public class GCCoreUtil {
+
+    public static int nextID = 0;
     private static boolean deobfuscated;
-    
-    public static boolean isDeobfuscated() {
-        return GCCoreUtil.deobfuscated;
+
+    static {
+        try {
+            deobfuscated = Launch.classLoader.getClassBytes("net.minecraft.world.World") != null;
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
     }
-    
-    public static void openBuggyInv(final EntityPlayerMP player, final IInventory buggyInv, final int type) {
+
+    public static boolean isDeobfuscated() {
+        return deobfuscated;
+    }
+
+    public static void openBuggyInv(EntityPlayerMP player, IInventory buggyInv, int type) {
         player.getNextWindowId();
         player.closeContainer();
         final int id = player.currentWindowId;
-        GalacticraftCore.packetPipeline.sendTo((IPacket)new PacketSimple(PacketSimple.EnumSimplePacket.C_OPEN_PARACHEST_GUI, new Object[] { id, 0, 0 }), player);
-        player.openContainer = (Container)new ContainerBuggy((IInventory)player.inventory, buggyInv, type);
+        GalacticraftCore.packetPipeline
+                .sendTo(new PacketSimple(EnumSimplePacket.C_OPEN_PARACHEST_GUI, new Object[] { id, 0, 0 }), player);
+        player.openContainer = new ContainerBuggy(player.inventory, buggyInv, type);
         player.openContainer.windowId = id;
-        player.openContainer.addCraftingToCrafters((ICrafting)player);
+        player.openContainer.addCraftingToCrafters(player);
     }
-    
-    public static void openParachestInv(final EntityPlayerMP player, final EntityLanderBase landerInv) {
+
+    public static void openParachestInv(EntityPlayerMP player, EntityLanderBase landerInv) {
         player.getNextWindowId();
         player.closeContainer();
         final int windowId = player.currentWindowId;
-        GalacticraftCore.packetPipeline.sendTo((IPacket)new PacketSimple(PacketSimple.EnumSimplePacket.C_OPEN_PARACHEST_GUI, new Object[] { windowId, 1, landerInv.getEntityId() }), player);
-        player.openContainer = (Container)new ContainerParaChest((IInventory)player.inventory, (IInventory)landerInv);
+        GalacticraftCore.packetPipeline.sendTo(
+                new PacketSimple(
+                        EnumSimplePacket.C_OPEN_PARACHEST_GUI,
+                        new Object[] { windowId, 1, landerInv.getEntityId() }),
+                player);
+        player.openContainer = new ContainerParaChest(player.inventory, landerInv);
         player.openContainer.windowId = windowId;
-        player.openContainer.addCraftingToCrafters((ICrafting)player);
+        player.openContainer.addCraftingToCrafters(player);
     }
-    
+
     public static int nextInternalID() {
-        ++GCCoreUtil.nextID;
+        GCCoreUtil.nextID++;
         return GCCoreUtil.nextID - 1;
     }
-    
-    public static void registerGalacticraftCreature(final Class<? extends Entity> var0, final String var1, final int back, final int fore) {
+
+    public static void registerGalacticraftCreature(Class<? extends Entity> var0, String var1, int back, int fore) {
         registerGalacticraftNonMobEntity(var0, var1, 80, 3, true);
         final int nextEggID = getNextValidEggID();
         if (nextEggID < 65536) {
@@ -62,86 +83,95 @@ public class GCCoreUtil
             EntityList.entityEggs.put(nextEggID, new EntityList.EntityEggInfo(nextEggID, back, fore));
         }
     }
-    
+
     public static int getNextValidEggID() {
         int eggID = 255;
-        while (EntityList.getClassFromID(++eggID) != null) {}
+
+        // Non-global entity IDs - for egg ID purposes - can be greater than 255
+        // The spawn egg will have this metadata. Metadata up to 65535 is acceptable
+        // (see potions).
+
+        do {
+            eggID++;
+        } while (EntityList.getClassFromID(eggID) != null);
+
         return eggID;
     }
-    
-    public static void registerGalacticraftNonMobEntity(final Class<? extends Entity> var0, final String var1, final int trackingDistance, final int updateFreq, final boolean sendVel) {
+
+    @SuppressWarnings("deprecation")
+    public static void registerGalacticraftNonMobEntity(Class<? extends Entity> var0, String var1, int trackingDistance,
+            int updateFreq, boolean sendVel) {
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            LanguageRegistry.instance().addStringLocalization("entity.GalacticraftCore." + var1 + ".name", translate("entity." + var1 + ".name"));
+            LanguageRegistry.instance().addStringLocalization(
+                    "entity.GalacticraftCore." + var1 + ".name",
+                    GCCoreUtil.translate("entity." + var1 + ".name"));
         }
-        EntityRegistry.registerModEntity((Class)var0, var1, nextInternalID(), (Object)GalacticraftCore.instance, trackingDistance, updateFreq, sendVel);
+        EntityRegistry.registerModEntity(
+                var0,
+                var1,
+                nextInternalID(),
+                GalacticraftCore.instance,
+                trackingDistance,
+                updateFreq,
+                sendVel);
     }
-    
-    public static void registerGalacticraftItem(final String key, final Item item) {
+
+    public static void registerGalacticraftItem(String key, Item item) {
         GalacticraftCore.itemList.put(key, new ItemStack(item));
     }
-    
-    public static void registerGalacticraftItem(final String key, final Item item, final int metadata) {
+
+    public static void registerGalacticraftItem(String key, Item item, int metadata) {
         GalacticraftCore.itemList.put(key, new ItemStack(item, 1, metadata));
     }
-    
-    public static void registerGalacticraftItem(final String key, final ItemStack stack) {
+
+    public static void registerGalacticraftItem(String key, ItemStack stack) {
         GalacticraftCore.itemList.put(key, stack);
     }
-    
-    public static void registerGalacticraftBlock(final String key, final Block block) {
+
+    public static void registerGalacticraftBlock(String key, Block block) {
         GalacticraftCore.blocksList.put(key, new ItemStack(block));
     }
-    
-    public static void registerGalacticraftBlock(final String key, final Block block, final int metadata) {
+
+    public static void registerGalacticraftBlock(String key, Block block, int metadata) {
         GalacticraftCore.blocksList.put(key, new ItemStack(block, 1, metadata));
     }
-    
-    public static void registerGalacticraftBlock(final String key, final ItemStack stack) {
+
+    public static void registerGalacticraftBlock(String key, ItemStack stack) {
         GalacticraftCore.blocksList.put(key, stack);
     }
-    
-    public static String translate(final String key) {
+
+    public static String translate(String key) {
         final String result = StatCollector.translateToLocal(key);
-        final int comment = result.indexOf(35);
-        return (comment > 0) ? result.substring(0, comment).trim() : result;
+        final int comment = result.indexOf('#');
+        return comment > 0 ? result.substring(0, comment).trim() : result;
     }
-    
-    public static List<String> translateWithSplit(final String key) {
+
+    public static List<String> translateWithSplit(String key) {
         String translated = translate(key);
-        final int comment = translated.indexOf(35);
-        translated = ((comment > 0) ? translated.substring(0, comment).trim() : translated);
+        final int comment = translated.indexOf('#');
+        translated = comment > 0 ? translated.substring(0, comment).trim() : translated;
         return Arrays.asList(translated.split("\\$"));
     }
-    
-    public static String translateWithFormat(final String key, final Object... values) {
+
+    public static String translateWithFormat(String key, Object... values) {
         final String result = StatCollector.translateToLocalFormatted(key, values);
-        final int comment = result.indexOf(35);
-        return (comment > 0) ? result.substring(0, comment).trim() : result;
+        final int comment = result.indexOf('#');
+        return comment > 0 ? result.substring(0, comment).trim() : result;
     }
-    
-    public static void drawStringRightAligned(final String string, final int x, final int y, final int color, final FontRenderer fontRendererObj) {
+
+    public static void drawStringRightAligned(String string, int x, int y, int color, FontRenderer fontRendererObj) {
         fontRendererObj.drawString(string, x - fontRendererObj.getStringWidth(string), y, color);
     }
-    
-    public static void drawStringCentered(final String string, final int x, final int y, final int color, final FontRenderer fontRendererObj) {
+
+    public static void drawStringCentered(String string, int x, int y, int color, FontRenderer fontRendererObj) {
         fontRendererObj.drawString(string, x - fontRendererObj.getStringWidth(string) / 2, y, color);
     }
-    
-    public static String lowerCaseNoun(final String string) {
+
+    public static String lowerCaseNoun(String string) {
         final Language l = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage();
-        if (l.getLanguageCode().equals("de_DE")) {
+        if ("de_DE".equals(l.getLanguageCode())) {
             return string;
         }
-        return translate(string).toLowerCase();
-    }
-    
-    static {
-        GCCoreUtil.nextID = 0;
-        try {
-            GCCoreUtil.deobfuscated = (Launch.classLoader.getClassBytes("net.minecraft.world.World") != null);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        return GCCoreUtil.translate(string).toLowerCase();
     }
 }

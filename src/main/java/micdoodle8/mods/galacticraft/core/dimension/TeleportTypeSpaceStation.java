@@ -1,38 +1,60 @@
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import micdoodle8.mods.galacticraft.api.world.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import net.minecraft.entity.*;
-import java.util.*;
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraft.util.*;
+import java.util.Random;
 
-public class TeleportTypeSpaceStation implements ITeleportType
-{
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.api.world.ITeleportType;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class TeleportTypeSpaceStation implements ITeleportType {
+
+    @Override
     public boolean useParachute() {
         return false;
     }
-    
-    public Vector3 getPlayerSpawnLocation(final WorldServer world, final EntityPlayerMP player) {
+
+    @Override
+    public Vector3 getPlayerSpawnLocation(WorldServer world, EntityPlayerMP player) {
         return new Vector3(0.5, 65.0, 0.5);
     }
-    
-    public Vector3 getEntitySpawnLocation(final WorldServer world, final Entity player) {
+
+    @Override
+    public Vector3 getEntitySpawnLocation(WorldServer world, Entity player) {
         return new Vector3(0.5, 65.0, 0.5);
     }
-    
-    public Vector3 getParaChestSpawnLocation(final WorldServer world, final EntityPlayerMP player, final Random rand) {
+
+    @Override
+    public Vector3 getParaChestSpawnLocation(WorldServer world, EntityPlayerMP player, Random rand) {
         return null;
     }
-    
-    public void onSpaceDimensionChanged(final World newWorld, final EntityPlayerMP player, final boolean ridingAutoRocket) {
+
+    @Override
+    public void onSpaceDimensionChanged(World newWorld, EntityPlayerMP player, boolean ridingAutoRocket) {
         if (ConfigManagerCore.spaceStationsRequirePermission && !newWorld.isRemote) {
-            player.addChatMessage((IChatComponent)new ChatComponentText(EnumColor.YELLOW + GCCoreUtil.translate("gui.spacestation.typeCommand") + " " + EnumColor.AQUA + "/ssinvite " + GCCoreUtil.translate("gui.spacestation.playername") + " " + EnumColor.YELLOW + GCCoreUtil.translate("gui.spacestation.toAllowEntry")));
+            player.addChatMessage(
+                    new ChatComponentText(
+                            EnumColor.YELLOW + GCCoreUtil.translate("gui.spacestation.typeCommand")
+                                    + " "
+                                    + EnumColor.AQUA
+                                    + "/ssinvite "
+                                    + GCCoreUtil.translate("gui.spacestation.playername")
+                                    + " "
+                                    + EnumColor.YELLOW
+                                    + GCCoreUtil.translate("gui.spacestation.toAllowEntry")));
         }
     }
-    
-    public void setupAdventureSpawn(final EntityPlayerMP player) {
+
+    @Override
+    public void setupAdventureSpawn(EntityPlayerMP player) {
+        // TODO Auto-generated method stub
+
     }
 }

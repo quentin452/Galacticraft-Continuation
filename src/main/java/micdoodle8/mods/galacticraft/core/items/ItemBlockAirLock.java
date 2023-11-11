@@ -1,30 +1,36 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.relauncher.*;
+import net.minecraft.block.Block;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemStack;
 
-public class ItemBlockAirLock extends ItemBlockDesc
-{
-    public ItemBlockAirLock(final Block block) {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+
+public class ItemBlockAirLock extends ItemBlockDesc {
+
+    public ItemBlockAirLock(Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-    
-    public int getMetadata(final int meta) {
+
+    @Override
+    public int getMetadata(int meta) {
         return meta;
     }
-    
-    @SideOnly(Side.CLIENT)
+
     @Override
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    @SideOnly(Side.CLIENT)
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
-    public String getUnlocalizedName(final ItemStack itemstack) {
+
+    @Override
+    public String getUnlocalizedName(ItemStack itemstack) {
         String name = "";
+
         switch (itemstack.getItemDamage()) {
             case 0: {
                 name = "airLockFrame";
@@ -34,14 +40,14 @@ public class ItemBlockAirLock extends ItemBlockDesc
                 name = "airLockController";
                 break;
             }
-            default: {
+            default:
                 name = "null";
-                break;
-            }
         }
-        return "tile." + name;
+
+        return "tile" + "." + name;
     }
-    
+
+    @Override
     public String getUnlocalizedName() {
         return this.field_150939_a.getUnlocalizedName() + ".0";
     }

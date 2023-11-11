@@ -1,9 +1,9 @@
 package micdoodle8.mods.galacticraft.api.block;
 
-import net.minecraft.world.*;
-import net.minecraftforge.common.util.*;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
-public interface IPartialSealableBlock
-{
-    boolean isSealed(final World p0, final int p1, final int p2, final int p3, final ForgeDirection p4);
+public interface IPartialSealableBlock {
+
+    boolean isSealed(World world, int x, int y, int z, ForgeDirection direction);
 }

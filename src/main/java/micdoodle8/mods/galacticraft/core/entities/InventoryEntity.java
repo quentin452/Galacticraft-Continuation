@@ -1,66 +1,78 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-import net.minecraft.inventory.*;
-import net.minecraft.item.*;
-import net.minecraft.world.*;
-import net.minecraft.nbt.*;
-import net.minecraft.entity.player.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.World;
 
-public abstract class InventoryEntity extends NetworkedEntity implements IInventory
-{
-    public ItemStack[] containedItems;
-    
-    public InventoryEntity(final World par1World) {
+public abstract class InventoryEntity extends NetworkedEntity implements IInventory {
+
+    public ItemStack[] containedItems = {};
+
+    public InventoryEntity(World par1World) {
         super(par1World);
-        this.containedItems = new ItemStack[0];
     }
-    
-    protected void readEntityFromNBT(final NBTTagCompound nbt) {
+
+    @Override
+    protected void readEntityFromNBT(NBTTagCompound nbt) {
         final NBTTagList itemList = nbt.getTagList("Items", 10);
         this.containedItems = new ItemStack[this.getSizeInventory()];
+
         for (int i = 0; i < itemList.tagCount(); ++i) {
             final NBTTagCompound itemTag = itemList.getCompoundTagAt(i);
-            final int slotID = itemTag.getByte("Slot") & 0xFF;
+            final int slotID = itemTag.getByte("Slot") & 255;
+
             if (slotID >= 0 && slotID < this.containedItems.length) {
                 this.containedItems[slotID] = ItemStack.loadItemStackFromNBT(itemTag);
             }
         }
     }
-    
-    protected void writeEntityToNBT(final NBTTagCompound nbt) {
+
+    @Override
+    protected void writeEntityToNBT(NBTTagCompound nbt) {
         final NBTTagList itemList = new NBTTagList();
+
         for (int i = 0; i < this.containedItems.length; ++i) {
             if (this.containedItems[i] != null) {
                 final NBTTagCompound itemTag = new NBTTagCompound();
-                itemTag.setByte("Slot", (byte)i);
+                itemTag.setByte("Slot", (byte) i);
                 this.containedItems[i].writeToNBT(itemTag);
-                itemList.appendTag((NBTBase)itemTag);
+                itemList.appendTag(itemTag);
             }
         }
-        nbt.setTag("Items", (NBTBase)itemList);
+
+        nbt.setTag("Items", itemList);
     }
-    
-    public ItemStack getStackInSlot(final int var1) {
+
+    @Override
+    public ItemStack getStackInSlot(int var1) {
         return this.containedItems[var1];
     }
-    
-    public ItemStack decrStackSize(final int slotIndex, final int amount) {
+
+    @Override
+    public ItemStack decrStackSize(int slotIndex, int amount) {
         if (this.containedItems[slotIndex] == null) {
             return null;
         }
+        ItemStack var3;
+
         if (this.containedItems[slotIndex].stackSize <= amount) {
-            final ItemStack var3 = this.containedItems[slotIndex];
+            var3 = this.containedItems[slotIndex];
             this.containedItems[slotIndex] = null;
-            return var3;
-        }
-        final ItemStack var3 = this.containedItems[slotIndex].splitStack(amount);
-        if (this.containedItems[slotIndex].stackSize == 0) {
-            this.containedItems[slotIndex] = null;
+        } else {
+            var3 = this.containedItems[slotIndex].splitStack(amount);
+
+            if (this.containedItems[slotIndex].stackSize == 0) {
+                this.containedItems[slotIndex] = null;
+            }
         }
         return var3;
     }
-    
-    public ItemStack getStackInSlotOnClosing(final int slotIndex) {
+
+    @Override
+    public ItemStack getStackInSlotOnClosing(int slotIndex) {
         if (this.containedItems[slotIndex] != null) {
             final ItemStack stack = this.containedItems[slotIndex];
             this.containedItems[slotIndex] = null;
@@ -68,28 +80,32 @@ public abstract class InventoryEntity extends NetworkedEntity implements IInvent
         }
         return null;
     }
-    
-    public void setInventorySlotContents(final int slotIndex, final ItemStack stack) {
+
+    @Override
+    public void setInventorySlotContents(int slotIndex, ItemStack stack) {
         this.containedItems[slotIndex] = stack;
+
         if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
             stack.stackSize = this.getInventoryStackLimit();
         }
     }
-    
+
+    @Override
     public int getInventoryStackLimit() {
         return 64;
     }
-    
-    public void markDirty() {
-    }
-    
-    public boolean isUseableByPlayer(final EntityPlayer entityplayer) {
+
+    @Override
+    public void markDirty() {}
+
+    @Override
+    public boolean isUseableByPlayer(EntityPlayer entityplayer) {
         return true;
     }
-    
-    public void openInventory() {
-    }
-    
-    public void closeInventory() {
-    }
+
+    @Override
+    public void openInventory() {}
+
+    @Override
+    public void closeInventory() {}
 }

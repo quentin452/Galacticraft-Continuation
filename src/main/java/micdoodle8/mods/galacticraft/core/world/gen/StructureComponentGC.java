@@ -1,59 +1,89 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import net.minecraft.world.gen.structure.*;
-import net.minecraft.world.*;
-import java.util.*;
-import net.minecraft.init.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.block.*;
+import java.util.Random;
 
-public abstract class StructureComponentGC extends StructureComponent
-{
-    public StructureComponentGC(final int var1) {
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntityMobSpawner;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraft.world.gen.structure.StructureComponent;
+
+public abstract class StructureComponentGC extends StructureComponent {
+
+    public StructureComponentGC(int var1) {
         super(var1);
     }
-    
-    public static StructureBoundingBox getComponentToAddBoundingBox(final int x, final int y, final int z, final int lengthOffset, final int heightOffset, final int widthOffset, final int length, final int height, final int width, final int coordBaseMode) {
-        switch (coordBaseMode) {
-            case 0: {
-                return new StructureBoundingBox(x + lengthOffset, y + heightOffset, z + widthOffset, x + length + lengthOffset, y + height + heightOffset, z + width + widthOffset);
-            }
-            case 1: {
-                return new StructureBoundingBox(x - width + widthOffset, y + heightOffset, z + lengthOffset, x + widthOffset, y + height + heightOffset, z + length + lengthOffset);
-            }
-            case 2: {
-                return new StructureBoundingBox(x - length - lengthOffset, y + heightOffset, z - width - widthOffset, x - lengthOffset, y + height + heightOffset, z - widthOffset);
-            }
-            case 3: {
-                return new StructureBoundingBox(x + widthOffset, y + heightOffset, z - length, x + width + widthOffset, y + height + heightOffset, z + lengthOffset);
-            }
-            default: {
-                return new StructureBoundingBox(x + lengthOffset, y + heightOffset, z + widthOffset, x + length + lengthOffset, y + height + heightOffset, z + width + widthOffset);
-            }
-        }
+
+    public static StructureBoundingBox getComponentToAddBoundingBox(int x, int y, int z, int lengthOffset,
+            int heightOffset, int widthOffset, int length, int height, int width, int coordBaseMode) {
+        return switch (coordBaseMode) {
+            case 0 -> new StructureBoundingBox(
+                    x + lengthOffset,
+                    y + heightOffset,
+                    z + widthOffset,
+                    x + length + lengthOffset,
+                    y + height + heightOffset,
+                    z + width + widthOffset);
+            case 1 -> new StructureBoundingBox(
+                    x - width + widthOffset,
+                    y + heightOffset,
+                    z + lengthOffset,
+                    x + widthOffset,
+                    y + height + heightOffset,
+                    z + length + lengthOffset);
+            case 2 -> new StructureBoundingBox(
+                    x - length - lengthOffset,
+                    y + heightOffset,
+                    z - width - widthOffset,
+                    x - lengthOffset,
+                    y + height + heightOffset,
+                    z - widthOffset);
+            case 3 -> new StructureBoundingBox(
+                    x + widthOffset,
+                    y + heightOffset,
+                    z - length,
+                    x + width + widthOffset,
+                    y + height + heightOffset,
+                    z + lengthOffset);
+            default -> new StructureBoundingBox(
+                    x + lengthOffset,
+                    y + heightOffset,
+                    z + widthOffset,
+                    x + length + lengthOffset,
+                    y + height + heightOffset,
+                    z + width + widthOffset);
+        };
     }
-    
-    protected void placeSpawnerAtCurrentPosition(final World var1, final Random var2, final int var3, final int var4, final int var5, final String var6, final StructureBoundingBox var7) {
+
+    protected void placeSpawnerAtCurrentPosition(World var1, Random var2, int var3, int var4, int var5, String var6,
+            StructureBoundingBox var7) {
         final int var8 = this.getXWithOffset(var3, var5);
         final int var9 = this.getYWithOffset(var4);
         final int var10 = this.getZWithOffset(var3, var5);
+
         if (var7.isVecInside(var8, var9, var10) && var1.getBlock(var8, var9, var10) != Blocks.mob_spawner) {
             var1.setBlock(var8, var9, var10, Blocks.mob_spawner, 0, 3);
-            final TileEntityMobSpawner var11 = (TileEntityMobSpawner)var1.getTileEntity(var8, var9, var10);
+            final TileEntityMobSpawner var11 = (TileEntityMobSpawner) var1.getTileEntity(var8, var9, var10);
+
             if (var11 != null) {
                 var11.func_145881_a().setEntityName(var6);
             }
         }
     }
-    
-    protected int[] offsetTowerCoords(final int var1, final int var2, final int var3, final int var4, final int var5) {
+
+    protected int[] offsetTowerCoords(int var1, int var2, int var3, int var4, int var5) {
         final int var6 = this.getXWithOffset(var1, var3);
         final int var7 = this.getYWithOffset(var2);
         final int var8 = this.getZWithOffset(var1, var3);
-        return (var5 == 0) ? new int[] { var6 + 1, var7 - 1, var8 - var4 / 2 } : ((var5 == 1) ? new int[] { var6 + var4 / 2, var7 - 1, var8 + 1 } : ((var5 == 2) ? new int[] { var6 - 1, var7 - 1, var8 + var4 / 2 } : ((var5 == 3) ? new int[] { var6 - var4 / 2, var7 - 1, var8 - 1 } : new int[] { var1, var2, var3 })));
+        return var5 == 0 ? new int[] { var6 + 1, var7 - 1, var8 - var4 / 2 }
+                : var5 == 1 ? new int[] { var6 + var4 / 2, var7 - 1, var8 + 1 }
+                        : var5 == 2 ? new int[] { var6 - 1, var7 - 1, var8 + var4 / 2 }
+                                : var5 == 3 ? new int[] { var6 - var4 / 2, var7 - 1, var8 - 1 }
+                                        : new int[] { var1, var2, var3 };
     }
-    
-    public int[] getOffsetAsIfRotated(final int[] var1, final int var2) {
+
+    public int[] getOffsetAsIfRotated(int[] var1, int var2) {
         final int var3 = this.getCoordBaseMode();
         final int[] var4 = new int[3];
         this.setCoordBaseMode(var2);
@@ -63,64 +93,50 @@ public abstract class StructureComponentGC extends StructureComponent
         this.setCoordBaseMode(var3);
         return var4;
     }
-    
-    protected int getXWithOffset(final int var1, final int var2) {
-        switch (this.getCoordBaseMode()) {
-            case 0: {
-                return this.boundingBox.minX + var1;
-            }
-            case 1: {
-                return this.boundingBox.maxX - var2;
-            }
-            case 2: {
-                return this.boundingBox.maxX - var1;
-            }
-            case 3: {
-                return this.boundingBox.minX + var2;
-            }
-            default: {
-                return var1;
-            }
-        }
+
+    @Override
+    protected int getXWithOffset(int var1, int var2) {
+        return switch (this.getCoordBaseMode()) {
+            case 0 -> this.boundingBox.minX + var1;
+            case 1 -> this.boundingBox.maxX - var2;
+            case 2 -> this.boundingBox.maxX - var1;
+            case 3 -> this.boundingBox.minX + var2;
+            default -> var1;
+        };
     }
-    
-    protected int getZWithOffset(final int var1, final int var2) {
-        switch (this.getCoordBaseMode()) {
-            case 0: {
-                return this.boundingBox.minZ + var2;
-            }
-            case 1: {
-                return this.boundingBox.minZ + var1;
-            }
-            case 2: {
-                return this.boundingBox.maxZ - var2;
-            }
-            case 3: {
-                return this.boundingBox.maxZ - var1;
-            }
-            default: {
-                return var2;
-            }
-        }
+
+    @Override
+    protected int getZWithOffset(int var1, int var2) {
+        return switch (this.getCoordBaseMode()) {
+            case 0 -> this.boundingBox.minZ + var2;
+            case 1 -> this.boundingBox.minZ + var1;
+            case 2 -> this.boundingBox.maxZ - var2;
+            case 3 -> this.boundingBox.maxZ - var1;
+            default -> var2;
+        };
     }
-    
-    protected int getYWithOffset(final int var1) {
+
+    @Override
+    protected int getYWithOffset(int var1) {
         return super.getYWithOffset(var1);
     }
-    
+
     public int getCoordBaseMode() {
         return this.coordBaseMode;
     }
-    
-    public void setCoordBaseMode(final int var1) {
+
+    public void setCoordBaseMode(int var1) {
         this.coordBaseMode = var1;
     }
-    
-    protected Block getBlockAtCurrentPosition(final World var1, final int var2, final int var3, final int var4, final StructureBoundingBox var5) {
+
+    @Override
+    protected Block getBlockAtCurrentPosition(World var1, int var2, int var3, int var4, StructureBoundingBox var5) {
         return super.getBlockAtCurrentPosition(var1, var2, var3, var4, var5);
     }
-    
-    protected void placeBlockAtCurrentPosition(final World world, final Block blockID, final int meta, final int x, final int y, final int z, final StructureBoundingBox bb) {
+
+    @Override
+    protected void placeBlockAtCurrentPosition(World world, Block blockID, int meta, int x, int y, int z,
+            StructureBoundingBox bb) {
         super.placeBlockAtCurrentPosition(world, blockID, meta, x, y, z, bb);
     }
 }

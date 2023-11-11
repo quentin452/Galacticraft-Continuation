@@ -1,37 +1,45 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.tile;
 
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.*;
-import java.util.*;
+import java.util.ArrayList;
 
-public class TileEntityMinerBaseSingle extends TileEntity
-{
+import net.minecraft.tileentity.TileEntity;
+
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
+
+public class TileEntityMinerBaseSingle extends TileEntity {
+
+    @Override
     public void updateEntity() {
         if (!this.worldObj.isRemote) {
-            final ArrayList<TileEntity> attachedBaseBlocks = new ArrayList<TileEntity>();
-        Label_0111:
-            for (int x = this.xCoord; x < this.xCoord + 2; ++x) {
-                for (int y = this.yCoord; y < this.yCoord + 2; ++y) {
-                    for (int z = this.zCoord; z < this.zCoord + 2; ++z) {
+            final ArrayList<TileEntity> attachedBaseBlocks = new ArrayList<>();
+
+            SEARCH: for (int x = this.xCoord; x < this.xCoord + 2; x++) {
+                for (int y = this.yCoord; y < this.yCoord + 2; y++) {
+                    for (int z = this.zCoord; z < this.zCoord + 2; z++) {
                         final TileEntity tile = this.worldObj.getTileEntity(x, y, z);
+
                         if (!(tile instanceof TileEntityMinerBaseSingle)) {
-                            break Label_0111;
+                            break SEARCH;
                         }
                         attachedBaseBlocks.add(tile);
                     }
                 }
             }
+
             if (attachedBaseBlocks.size() == 8) {
-                for (final TileEntity tile2 : attachedBaseBlocks) {
-                    tile2.invalidate();
-                    tile2.getWorldObj().setBlock(tile2.xCoord, tile2.yCoord, tile2.zCoord, AsteroidBlocks.minerBaseFull, 0, 3);
+                for (final TileEntity tile : attachedBaseBlocks) {
+                    tile.invalidate();
+                    tile.getWorldObj()
+                            .setBlock(tile.xCoord, tile.yCoord, tile.zCoord, AsteroidBlocks.minerBaseFull, 0, 3);
                 }
-                for (int x = this.xCoord; x < this.xCoord + 2; ++x) {
-                    for (int y = this.yCoord; y < this.yCoord + 2; ++y) {
-                        for (int z = this.zCoord; z < this.zCoord + 2; ++z) {
+
+                for (int x = this.xCoord; x < this.xCoord + 2; x++) {
+                    for (int y = this.yCoord; y < this.yCoord + 2; y++) {
+                        for (int z = this.zCoord; z < this.zCoord + 2; z++) {
                             final TileEntity tile = this.worldObj.getTileEntity(x, y, z);
+
                             if (tile instanceof TileEntityMinerBase) {
-                                ((TileEntityMinerBase)tile).setMainBlockPos(this.xCoord, this.yCoord, this.zCoord);
+                                ((TileEntityMinerBase) tile).setMainBlockPos(this.xCoord, this.yCoord, this.zCoord);
                             }
                         }
                     }

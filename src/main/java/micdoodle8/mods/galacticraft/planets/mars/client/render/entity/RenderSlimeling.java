@@ -1,133 +1,189 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.entity;
 
-import net.minecraft.client.renderer.entity.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.planets.mars.client.model.*;
-import net.minecraft.client.model.*;
-import micdoodle8.mods.galacticraft.planets.mars.entities.*;
-import net.minecraft.entity.*;
-import org.lwjgl.opengl.*;
-import cpw.mods.fml.client.*;
-import micdoodle8.mods.galacticraft.planets.mars.client.gui.*;
-import net.minecraft.client.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderLiving;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiSlimeling;
+import micdoodle8.mods.galacticraft.planets.mars.client.gui.GuiSlimelingInventory;
+import micdoodle8.mods.galacticraft.planets.mars.client.model.ModelSlimeling;
+import micdoodle8.mods.galacticraft.planets.mars.entities.EntitySlimeling;
 
 @SideOnly(Side.CLIENT)
-public class RenderSlimeling extends RenderLiving
-{
-    private static final ResourceLocation landerTexture;
-    
+public class RenderSlimeling extends RenderLiving {
+
+    private static final ResourceLocation landerTexture = new ResourceLocation(
+            MarsModule.ASSET_PREFIX,
+            "textures/model/slimeling/green.png");
+
     public RenderSlimeling() {
-        super((ModelBase)new ModelSlimeling(16.0f), 0.5f);
-        this.renderPassModel = (ModelBase)new ModelSlimeling(0.0f);
+        super(new ModelSlimeling(16), 0.5F);
+
+        this.renderPassModel = new ModelSlimeling(0.0F);
     }
-    
-    protected ResourceLocation func_110779_a(final EntitySlimeling par1EntityArrow) {
+
+    protected ResourceLocation func_110779_a(EntitySlimeling par1EntityArrow) {
         return RenderSlimeling.landerTexture;
     }
-    
-    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
-        return this.func_110779_a((EntitySlimeling)par1Entity);
+
+    @Override
+    protected ResourceLocation getEntityTexture(Entity par1Entity) {
+        return this.func_110779_a((EntitySlimeling) par1Entity);
     }
-    
-    protected void preRenderCallback(final EntityLivingBase par1EntityLivingBase, final float par2) {
+
+    @Override
+    protected void preRenderCallback(EntityLivingBase par1EntityLivingBase, float par2) {
         super.preRenderCallback(par1EntityLivingBase, par2);
-        GL11.glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-        final EntitySlimeling slimeling = (EntitySlimeling)par1EntityLivingBase;
+
+        GL11.glRotatef(180.0F, 0, 1, 0);
+        final EntitySlimeling slimeling = (EntitySlimeling) par1EntityLivingBase;
+
         GL11.glColor3f(slimeling.getColorRed(), slimeling.getColorGreen(), slimeling.getColorBlue());
         GL11.glScalef(slimeling.getScale(), slimeling.getScale(), slimeling.getScale());
-        GL11.glTranslatef(0.0f, 1.1f, 0.0f);
+        GL11.glTranslatef(0.0F, 1.10F, 0.0F);
     }
-    
-    protected int shouldRenderPass(final EntityLivingBase par1EntityLivingBase, final int par2, final float par3) {
+
+    @Override
+    protected int shouldRenderPass(EntityLivingBase par1EntityLivingBase, int par2, float par3) {
         if (par1EntityLivingBase.isInvisible()) {
             return 0;
         }
         if (par2 == 0) {
             this.setRenderPassModel(this.renderPassModel);
-            GL11.glEnable(2977);
-            GL11.glEnable(3042);
-            GL11.glBlendFunc(770, 771);
+            GL11.glEnable(GL11.GL_NORMALIZE);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             return 1;
         }
         if (par2 == 1) {
-            GL11.glDisable(3042);
-            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         }
+
         return -1;
     }
-    
-    protected void passSpecialRender(final EntityLivingBase par1EntityLivingBase, final double par2, final double par4, final double par6) {
+
+    @Override
+    protected void passSpecialRender(EntityLivingBase par1EntityLivingBase, double par2, double par4, double par6) {
         final Minecraft mc = FMLClientHandler.instance().getClient();
-        if (!mc.gameSettings.hideGUI && !par1EntityLivingBase.isInvisible() && (mc.currentScreen == null || (!(mc.currentScreen instanceof GuiSlimeling) && !(mc.currentScreen instanceof GuiSlimelingInventory)) || !GuiSlimeling.renderingOnGui)) {
-            this.renderLivingLabelWithColor(par1EntityLivingBase, ((EntitySlimeling)par1EntityLivingBase).getName(), par2, par4 + 0.33, par6, 64, 0.0f, 0.0f, 0.0f);
-            int health = (int)Math.floor(((EntitySlimeling)par1EntityLivingBase).getHealth() + 0.6);
-            final int maxHealth = (int)((EntitySlimeling)par1EntityLivingBase).getMaxHealth();
+
+        if (!mc.gameSettings.hideGUI && !par1EntityLivingBase.isInvisible()
+                && (mc.currentScreen == null
+                        || !(mc.currentScreen instanceof GuiSlimeling)
+                                && !(mc.currentScreen instanceof GuiSlimelingInventory)
+                        || !GuiSlimeling.renderingOnGui)) {
+            this.renderLivingLabelWithColor(
+                    par1EntityLivingBase,
+                    ((EntitySlimeling) par1EntityLivingBase).getName(),
+                    par2,
+                    par4 + 0.33,
+                    par6,
+                    64,
+                    0,
+                    0,
+                    0);
+            int health = (int) Math.floor(par1EntityLivingBase.getHealth() + 0.6D);
+            final int maxHealth = (int) par1EntityLivingBase.getMaxHealth();
             if (health > maxHealth) {
                 health = maxHealth;
             }
-            final float difference = health / (float)maxHealth;
-            if (difference < 0.33333f) {
-                this.renderLivingLabelWithColor(par1EntityLivingBase, "" + health + " / " + maxHealth, par2, par4, par6, 64, 1.0f, 0.0f, 0.0f);
-            }
-            else if (difference < 0.66666f) {
-                this.renderLivingLabelWithColor(par1EntityLivingBase, "" + health + " / " + maxHealth, par2, par4, par6, 64, 1.0f, 1.0f, 0.0f);
-            }
-            else {
-                this.renderLivingLabelWithColor(par1EntityLivingBase, "" + health + " / " + maxHealth, par2, par4, par6, 64, 0.0f, 1.0f, 0.0f);
+            final float difference = health / (float) maxHealth;
+
+            if (difference < 0.33333F) {
+                this.renderLivingLabelWithColor(
+                        par1EntityLivingBase,
+                        "" + health + " / " + maxHealth,
+                        par2,
+                        par4,
+                        par6,
+                        64,
+                        1,
+                        0,
+                        0);
+            } else if (difference < 0.66666F) {
+                this.renderLivingLabelWithColor(
+                        par1EntityLivingBase,
+                        "" + health + " / " + maxHealth,
+                        par2,
+                        par4,
+                        par6,
+                        64,
+                        1,
+                        1,
+                        0);
+            } else {
+                this.renderLivingLabelWithColor(
+                        par1EntityLivingBase,
+                        "" + health + " / " + maxHealth,
+                        par2,
+                        par4,
+                        par6,
+                        64,
+                        0,
+                        1,
+                        0);
             }
         }
+
         super.passSpecialRender(par1EntityLivingBase, par2, par4, par6);
-        GL11.glDisable(2977);
-        GL11.glDisable(3042);
+        GL11.glDisable(GL11.GL_NORMALIZE);
+        GL11.glDisable(GL11.GL_BLEND);
     }
-    
-    protected void renderLivingLabelWithColor(final EntityLivingBase par1EntityLivingBase, final String par2Str, final double par3, final double par5, final double par7, final int par9, final float cR, final float cG, final float cB) {
-        final double d3 = par1EntityLivingBase.getDistanceSqToEntity((Entity)this.renderManager.livingPlayer);
+
+    protected void renderLivingLabelWithColor(EntityLivingBase par1EntityLivingBase, String par2Str, double par3,
+            double par5, double par7, int par9, float cR, float cG, float cB) {
+        final double d3 = par1EntityLivingBase.getDistanceSqToEntity(this.renderManager.livingPlayer);
+
         if (d3 <= par9 * par9) {
             final FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
-            final float f = 1.6f;
-            final float f2 = 0.016666668f * f;
+            final float f = 1.6F;
+            final float f1 = 0.016666668F * f;
             GL11.glPushMatrix();
-            GL11.glTranslatef((float)par3 + 0.0f, (float)par5 + par1EntityLivingBase.height + 0.55f, (float)par7);
-            GL11.glNormal3f(0.0f, 1.0f, 0.0f);
-            GL11.glRotatef(-this.renderManager.playerViewY, 0.0f, 1.0f, 0.0f);
-            GL11.glRotatef(this.renderManager.playerViewX, 1.0f, 0.0f, 0.0f);
-            GL11.glScalef(-f2, -f2, f2);
-            GL11.glDisable(2896);
+            GL11.glTranslatef((float) par3 + 0.0F, (float) par5 + par1EntityLivingBase.height + 0.55F, (float) par7);
+            GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+            GL11.glRotatef(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+            GL11.glScalef(-f1, -f1, f1);
+            GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glDepthMask(false);
-            GL11.glDisable(2929);
-            GL11.glEnable(3042);
-            GL11.glBlendFunc(770, 771);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             final Tessellator tessellator = Tessellator.instance;
             byte b0 = 0;
-            if (par2Str.equals("deadmau5")) {
+
+            if ("deadmau5".equals(par2Str)) {
                 b0 = -10;
             }
-            GL11.glDisable(3553);
+
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
             tessellator.startDrawingQuads();
             final int j = fontrenderer.getStringWidth(par2Str) / 2;
-            tessellator.setColorRGBA_F(cR, cG, cB, 0.25f);
-            tessellator.addVertex((double)(-j - 1), (double)(-1 + b0), 0.0);
-            tessellator.addVertex((double)(-j - 1), (double)(8 + b0), 0.0);
-            tessellator.addVertex((double)(j + 1), (double)(8 + b0), 0.0);
-            tessellator.addVertex((double)(j + 1), (double)(-1 + b0), 0.0);
+            tessellator.setColorRGBA_F(cR, cG, cB, 0.25F);
+            tessellator.addVertex(-j - 1, -1 + b0, 0.0D);
+            tessellator.addVertex(-j - 1, 8 + b0, 0.0D);
+            tessellator.addVertex(j + 1, 8 + b0, 0.0D);
+            tessellator.addVertex(j + 1, -1 + b0, 0.0D);
             tessellator.draw();
-            GL11.glEnable(3553);
-            fontrenderer.drawString(par2Str, -fontrenderer.getStringWidth(par2Str) / 2, (int)b0, 553648127);
-            GL11.glEnable(2929);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            fontrenderer.drawString(par2Str, -fontrenderer.getStringWidth(par2Str) / 2, b0, 553648127);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glDepthMask(true);
-            fontrenderer.drawString(par2Str, -fontrenderer.getStringWidth(par2Str) / 2, (int)b0, -1);
-            GL11.glEnable(2896);
-            GL11.glDisable(3042);
-            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            fontrenderer.drawString(par2Str, -fontrenderer.getStringWidth(par2Str) / 2, b0, -1);
+            GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             GL11.glPopMatrix();
         }
-    }
-    
-    static {
-        landerTexture = new ResourceLocation("galacticraftmars", "textures/model/slimeling/green.png");
     }
 }

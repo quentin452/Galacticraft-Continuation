@@ -1,235 +1,272 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.client.renderer.texture.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.energy.tile.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.item.*;
-import java.util.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.List;
+import java.util.Random;
 
-public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc
-{
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityCoalGenerator;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityElectricFurnace;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityEnergyStorageModule;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityIngotCompressor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
+
     public static final int COAL_GENERATOR_METADATA = 0;
     public static final int COMPRESSOR_METADATA = 12;
+
     private IIcon iconMachineSide;
     private IIcon iconOutput;
+
     private IIcon iconCoalGenerator;
     private IIcon iconCompressor;
-    
-    public BlockMachine(final String assetName) {
+
+    public BlockMachine(String assetName) {
         super(GCBlocks.machine);
         this.setBlockName("basicMachine");
-        this.setHardness(1.0f);
+        this.setHardness(1.0F);
         this.setStepSound(Block.soundTypeMetal);
         this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
         this.setBlockName(assetName);
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
+
+    @Override
     public int getRenderType() {
-        return GalacticraftCore.proxy.getBlockRender((Block)this);
+        return GalacticraftCore.proxy.getBlockRender(this);
     }
-    
-    public void registerBlockIcons(final IIconRegister iconRegister) {
+
+    @Override
+    public void registerBlockIcons(IIconRegister iconRegister) {
         this.blockIcon = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine");
         this.iconOutput = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_output");
         this.iconMachineSide = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_side");
+
         this.iconCoalGenerator = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "coalGenerator");
         this.iconCompressor = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "compressor");
     }
-    
-    public void randomDisplayTick(final World par1World, final int x, final int y, final int z, final Random par5Random) {
+
+    @Override
+    public void randomDisplayTick(World par1World, int x, int y, int z, Random par5Random) {
         final TileEntity tile = par1World.getTileEntity(x, y, z);
-        if (tile instanceof TileEntityCoalGenerator) {
-            final TileEntityCoalGenerator tileEntity = (TileEntityCoalGenerator)tile;
-            if (tileEntity.heatGJperTick > 0.0f) {
-                final int metadata = par1World.getBlockMetadata(x, y, z);
-                final float var7 = x + 0.5f;
-                final float var8 = y + 0.0f + par5Random.nextFloat() * 6.0f / 16.0f;
-                final float var9 = z + 0.5f;
-                final float var10 = 0.52f;
-                final float var11 = par5Random.nextFloat() * 0.6f - 0.3f;
-                if (metadata == 0) {
-                    par1World.spawnParticle("smoke", (double)(var7 - var10), (double)var8, (double)(var9 + var11), 0.0, 0.0, 0.0);
-                    par1World.spawnParticle("flame", (double)(var7 - var10), (double)var8, (double)(var9 + var11), 0.0, 0.0, 0.0);
-                }
-                else if (metadata == 1) {
-                    par1World.spawnParticle("smoke", (double)(var7 + var10), (double)var8, (double)(var9 + var11), 0.0, 0.0, 0.0);
-                    par1World.spawnParticle("flame", (double)(var7 + var10), (double)var8, (double)(var9 + var11), 0.0, 0.0, 0.0);
-                }
-                else if (metadata == 2) {
-                    par1World.spawnParticle("smoke", (double)(var7 + var11), (double)var8, (double)(var9 + var10), 0.0, 0.0, 0.0);
-                    par1World.spawnParticle("flame", (double)(var7 + var11), (double)var8, (double)(var9 + var10), 0.0, 0.0, 0.0);
-                }
-                else if (metadata == 3) {
-                    par1World.spawnParticle("smoke", (double)(var7 + var11), (double)var8, (double)(var9 - var10), 0.0, 0.0, 0.0);
-                    par1World.spawnParticle("flame", (double)(var7 + var11), (double)var8, (double)(var9 - var10), 0.0, 0.0, 0.0);
-                }
+
+        if (tile instanceof TileEntityCoalGenerator tileEntity && tileEntity.heatGJperTick > 0) {
+            final int metadata = par1World.getBlockMetadata(x, y, z);
+            final float var7 = x + 0.5F;
+            final float var8 = y + 0.0F + par5Random.nextFloat() * 6.0F / 16.0F;
+            final float var9 = z + 0.5F;
+            final float var10 = 0.52F;
+            final float var11 = par5Random.nextFloat() * 0.6F - 0.3F;
+
+            switch (metadata) {
+                case 0:
+                    par1World.spawnParticle("smoke", var7 - var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
+                    par1World.spawnParticle("flame", var7 - var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
+                    break;
+                case 1:
+                    par1World.spawnParticle("smoke", var7 + var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
+                    par1World.spawnParticle("flame", var7 + var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
+                    break;
+                case 2:
+                    par1World.spawnParticle("smoke", var7 + var11, var8, var9 + var10, 0.0D, 0.0D, 0.0D);
+                    par1World.spawnParticle("flame", var7 + var11, var8, var9 + var10, 0.0D, 0.0D, 0.0D);
+                    break;
+                case 3:
+                    par1World.spawnParticle("smoke", var7 + var11, var8, var9 - var10, 0.0D, 0.0D, 0.0D);
+                    par1World.spawnParticle("flame", var7 + var11, var8, var9 - var10, 0.0D, 0.0D, 0.0D);
+                    break;
+                default:
+                    break;
             }
         }
     }
-    
-    public IIcon getIcon(final IBlockAccess world, final int x, final int y, final int z, final int side) {
-        final int metadata = world.getBlockMetadata(x, y, z);
+
+    @Override
+    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
         return this.getIcon(side, world.getBlockMetadata(x, y, z));
     }
-    
-    public IIcon getIcon(final int side, int metadata) {
+
+    @Override
+    public IIcon getIcon(int side, int metadata) {
         if (side == 0 || side == 1) {
             return this.blockIcon;
         }
-        if (metadata >= 12) {
-            metadata -= 12;
-            if ((metadata == 0 && side == 4) || (metadata == 1 && side == 5) || (metadata == 2 && side == 3) || (metadata == 3 && side == 2)) {
+
+        if (metadata >= BlockMachine.COMPRESSOR_METADATA) {
+            metadata -= BlockMachine.COMPRESSOR_METADATA;
+
+            if (metadata == 0 && side == 4 || metadata == 1 && side == 5
+                    || metadata == 2 && side == 3
+                    || metadata == 3 && side == 2) {
                 return this.iconCompressor;
             }
-        }
-        else {
+        } else {
+            // If it is the front side
             if (side == metadata + 2) {
                 return this.iconOutput;
             }
-            if ((metadata == 0 && side == 4) || (metadata == 1 && side == 5) || (metadata == 2 && side == 3) || (metadata == 3 && side == 2)) {
+            // If it is the back side
+            if (metadata == 0 && side == 4 || metadata == 1 && side == 5
+                    || metadata == 2 && side == 3
+                    || metadata == 3 && side == 2) {
                 return this.iconCoalGenerator;
             }
         }
+
         return this.iconMachineSide;
     }
-    
-    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
+
+    /**
+     * Called when the block is placed in the world.
+     */
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLiving, ItemStack itemStack) {
         final int metadata = world.getBlockMetadata(x, y, z);
-        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
+
+        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
         int change = 0;
+
         switch (angle) {
-            case 0: {
+            case 0:
                 change = 3;
                 break;
-            }
-            case 1: {
+            case 1:
                 change = 1;
                 break;
-            }
-            case 2: {
+            case 2:
                 change = 2;
                 break;
-            }
-            case 3: {
+            case 3:
                 change = 0;
                 break;
-            }
         }
-        world.setBlockMetadataWithNotify(x, y, z, (metadata & 0xC) + change, 3);
+
+        world.setBlockMetadataWithNotify(x, y, z, (metadata & 12) + change, 3);
     }
-    
-    public boolean onUseWrench(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    @Override
+    public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
+            float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
-        final int original = metadata & 0x3;
+        final int original = metadata & 3;
         int change = 0;
+
+        // Re-orient the block
         switch (original) {
-            case 0: {
+            case 0:
                 change = 3;
                 break;
-            }
-            case 3: {
+            case 3:
                 change = 1;
                 break;
-            }
-            case 1: {
+            case 1:
                 change = 2;
                 break;
-            }
-            case 2: {
+            case 2:
                 change = 0;
                 break;
-            }
         }
-        if (metadata < 12) {
+
+        if (metadata < BlockMachine.COMPRESSOR_METADATA) {
             final TileEntity te = par1World.getTileEntity(x, y, z);
             if (te instanceof TileBaseUniversalElectrical) {
-                ((TileBaseUniversalElectrical)te).updateFacing();
+                ((TileBaseUniversalElectrical) te).updateFacing();
             }
         }
-        par1World.setBlockMetadataWithNotify(x, y, z, (metadata & 0xC) + change, 3);
+
+        par1World.setBlockMetadataWithNotify(x, y, z, (metadata & 12) + change, 3);
         return true;
     }
-    
-    public boolean onMachineActivated(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    /**
+     * Called when the block is right clicked by the player
+     */
+    @Override
+    public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
+            float hitX, float hitY, float hitZ) {
         final int metadata = par1World.getBlockMetadata(x, y, z);
-        if (par1World.isRemote) {
-            return true;
+
+        if (!par1World.isRemote) {
+            if (metadata >= BlockMachine.COMPRESSOR_METADATA) {
+                par5EntityPlayer.openGui(GalacticraftCore.instance, -1, par1World, x, y, z);
+                return true;
+            }
+            par5EntityPlayer.openGui(GalacticraftCore.instance, -1, par1World, x, y, z);
         }
-        if (metadata >= 12) {
-            par5EntityPlayer.openGui((Object)GalacticraftCore.instance, -1, par1World, x, y, z);
-            return true;
-        }
-        par5EntityPlayer.openGui((Object)GalacticraftCore.instance, -1, par1World, x, y, z);
+
         return true;
     }
-    
-    public TileEntity createTileEntity(final World world, int metadata) {
-        metadata &= 0xC;
-        if (metadata == 12) {
-            return new TileEntityIngotCompressor();
-        }
-        if (metadata == 4) {
-            return new TileEntityEnergyStorageModule();
-        }
-        if (metadata == 8) {
-            return new TileEntityElectricFurnace();
-        }
-        return new TileEntityCoalGenerator();
+
+    @Override
+    public TileEntity createTileEntity(World world, int metadata) {
+        metadata &= 12;
+        return switch (metadata) {
+            case BlockMachine.COMPRESSOR_METADATA -> new TileEntityIngotCompressor();
+            case 4 -> new TileEntityEnergyStorageModule();
+            case 8 -> new TileEntityElectricFurnace();
+            default -> new TileEntityCoalGenerator();
+        };
     }
-    
+
     public ItemStack getCompressor() {
-        return new ItemStack((Block)this, 1, 12);
+        return new ItemStack(this, 1, BlockMachine.COMPRESSOR_METADATA);
     }
-    
+
     public ItemStack getCoalGenerator() {
-        return new ItemStack((Block)this, 1, 0);
+        return new ItemStack(this, 1, BlockMachine.COAL_GENERATOR_METADATA);
     }
-    
-    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+
+    @Override
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
         par3List.add(this.getCoalGenerator());
         par3List.add(this.getCompressor());
     }
-    
-    public int damageDropped(final int metadata) {
-        return metadata & 0xC;
+
+    @Override
+    public int damageDropped(int metadata) {
+        return metadata & 12;
     }
-    
-    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         final int metadata = this.getDamageValue(world, x, y, z);
-        return new ItemStack((Block)this, 1, metadata);
+
+        return new ItemStack(this, 1, metadata);
     }
-    
+
     @Override
-    public String getShiftDescription(final int meta) {
+    public String getShiftDescription(int meta) {
         switch (meta) {
-            case 0: {
+            case COAL_GENERATOR_METADATA:
                 return GCCoreUtil.translate("tile.coalGenerator.description");
-            }
-            case 12: {
+            case COMPRESSOR_METADATA:
                 return GCCoreUtil.translate("tile.compressor.description");
-            }
-            default: {
-                return "";
-            }
         }
+        return "";
     }
-    
+
     @Override
-    public boolean showDescription(final int meta) {
+    public boolean showDescription(int meta) {
         return true;
     }
 }

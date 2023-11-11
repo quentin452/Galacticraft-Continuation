@@ -1,163 +1,232 @@
 package micdoodle8.mods.galacticraft.core.energy.tile;
 
-import micdoodle8.mods.galacticraft.api.tile.*;
-import micdoodle8.mods.galacticraft.api.transmission.tile.*;
-import micdoodle8.mods.miccore.*;
-import cpw.mods.fml.relauncher.*;
-import micdoodle8.mods.galacticraft.api.power.*;
-import net.minecraftforge.common.util.*;
-import net.minecraft.item.*;
-import net.minecraft.nbt.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.util.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.api.transmission.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.EnumSet;
 
-public abstract class TileBaseElectricBlock extends TileBaseUniversalElectrical implements IDisableableMachine, IConnector
-{
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
-    public boolean disabled;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
-    public int disableCooldown;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
-    public boolean hasEnoughEnergyToRun;
-    public boolean noRedstoneControl;
-    
-    public TileBaseElectricBlock() {
-        this.disabled = false;
-        this.disableCooldown = 0;
-        this.hasEnoughEnergyToRun = false;
-        this.noRedstoneControl = false;
-    }
-    
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.common.Optional.Interface;
+import cpw.mods.fml.relauncher.Side;
+import ic2.api.tile.IWrenchable;
+import micdoodle8.mods.galacticraft.api.tile.IDisableableMachine;
+import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.core.util.RedstoneUtil;
+
+@Interface(modid = "IC2API", iface = "ic2.api.tile.IWrenchable")
+public abstract class TileBaseElectricBlock extends TileBaseUniversalElectrical
+        implements IDisableableMachine, IConnector, IWrenchable {
+    // public int energyPerTick = 200;
+    // private final float ueMaxEnergy;
+
+    @NetworkedField(targetSide = Side.CLIENT)
+    public boolean disabled = false;
+
+    @NetworkedField(targetSide = Side.CLIENT)
+    public int disableCooldown = 0;
+
+    @NetworkedField(targetSide = Side.CLIENT)
+    public boolean hasEnoughEnergyToRun = false;
+
+    public boolean noRedstoneControl = false;
+
     public boolean shouldPullEnergy() {
-        return this.shouldUseEnergy() || this.getEnergyStoredGC((EnergySource)null) < this.getMaxEnergyStoredGC();
+        return this.shouldUseEnergy() || this.getEnergyStoredGC(null) < this.getMaxEnergyStoredGC();
     }
-    
+
     public abstract boolean shouldUseEnergy();
-    
+
     public abstract ForgeDirection getElectricInputDirection();
-    
+
     public abstract ItemStack getBatteryInSlot();
-    
-    public int getScaledElecticalLevel(final int i) {
-        return (int)Math.floor(this.getEnergyStoredGC((EnergySource)null) * i / this.getMaxEnergyStoredGC((EnergySource)null));
+
+    // public TileBaseElectricBlock()
+    // {
+    // this.storage.setMaxReceive(ueWattsPerTick);
+    // this.storage.setMaxExtract(0);
+    // this.storage.setCapacity(maxEnergy);
+    //// this.ueMaxEnergy = maxEnergy;
+    //// this.ueWattsPerTick = ueWattsPerTick;
+    //
+    // /*
+    // * if (PowerFramework.currentFramework != null) { this.bcPowerProvider =
+    // * new GCCoreLinkedPowerProvider(this);
+    // * this.bcPowerProvider.configure(20, 1, 10, 10, 1000); }
+    // */
+    // }
+
+    // @Override
+    // public float getMaxEnergyStored()
+    // {
+    // return this.ueMaxEnergy;
+    // }
+
+    public int getScaledElecticalLevel(int i) {
+        return (int) Math.floor(this.getEnergyStoredGC(null) * i / this.getMaxEnergyStoredGC(null));
+        // - this.ueWattsPerTick;
     }
-    
+
+    // @Override
+    // public float getRequest(ForgeDirection direction)
+    // {
+    // if (this.shouldPullEnergy())
+    // {
+    // return this.ueWattsPerTick * 2;
+    // }
+    // else
+    // {
+    // return 0;
+    // }
+    // }
+    //
+    // @Override
+    // public float getProvide(ForgeDirection direction)
+    // {
+    // return 0;
+    // }
+
     @Override
     public void updateEntity() {
         if (!this.worldObj.isRemote) {
-            if (this.shouldPullEnergy() && this.getEnergyStoredGC((EnergySource)null) < this.getMaxEnergyStoredGC((EnergySource)null) && this.getBatteryInSlot() != null && this.getElectricInputDirection() != null) {
+            if (this.shouldPullEnergy() && this.getEnergyStoredGC(null) < this.getMaxEnergyStoredGC(null)
+                    && this.getBatteryInSlot() != null
+                    && this.getElectricInputDirection() != null) {
                 this.discharge(this.getBatteryInSlot());
             }
-            if (this.getEnergyStoredGC((EnergySource)null) > this.storage.getMaxExtract() && (this.noRedstoneControl || !RedstoneUtil.isBlockReceivingRedstone(this.worldObj, this.xCoord, this.yCoord, this.zCoord))) {
+
+            if (this.getEnergyStoredGC(null) > this.storage.getMaxExtract() && (this.noRedstoneControl
+                    || !RedstoneUtil.isBlockReceivingRedstone(this.worldObj, this.xCoord, this.yCoord, this.zCoord))) {
                 this.hasEnoughEnergyToRun = true;
                 if (this.shouldUseEnergy()) {
                     this.storage.extractEnergyGC(this.storage.getMaxExtract(), false);
-                }
-                else {
+                } else {
                     this.slowDischarge();
                 }
-            }
-            else {
+            } else {
                 this.hasEnoughEnergyToRun = false;
                 this.slowDischarge();
             }
         }
+
         super.updateEntity();
+
         if (!this.worldObj.isRemote && this.disableCooldown > 0) {
-            --this.disableCooldown;
+            this.disableCooldown--;
         }
     }
-    
+
     public void slowDischarge() {
         if (this.ticks % 10 == 0) {
-            this.storage.extractEnergyGC(5.0f, false);
+            this.storage.extractEnergyGC(5F, false);
         }
     }
-    
+
     @Override
-    public void writeToNBT(final NBTTagCompound nbt) {
+    public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
+
         nbt.setBoolean("isDisabled", this.getDisabled(0));
     }
-    
+
     @Override
-    public void readFromNBT(final NBTTagCompound nbt) {
+    public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
+
         this.setDisabled(0, nbt.getBoolean("isDisabled"));
     }
-    
-    public void setDisabled(final int index, final boolean disabled) {
+
+    @Override
+    public void setDisabled(int index, boolean disabled) {
         if (this.disableCooldown == 0) {
             this.disabled = disabled;
             this.disableCooldown = 10;
         }
     }
-    
-    public boolean getDisabled(final int index) {
+
+    @Override
+    public boolean getDisabled(int index) {
         return this.disabled;
     }
-    
-    @Annotations.RuntimeInterface(clazz = "ic2.api.tile.IWrenchable", modID = "IC2")
-    public boolean wrenchCanSetFacing(final EntityPlayer entityPlayer, final int side) {
+
+    @Override
+    public boolean wrenchCanSetFacing(EntityPlayer entityPlayer, int side) {
         return false;
     }
-    
-    @Annotations.RuntimeInterface(clazz = "ic2.api.tile.IWrenchable", modID = "IC2")
+
+    @Override
     public short getFacing() {
-        return (short)this.worldObj.getBlockMetadata(MathHelper.floor_double((double)this.xCoord), MathHelper.floor_double((double)this.yCoord), MathHelper.floor_double((double)this.zCoord));
+        return (short) this.worldObj.getBlockMetadata(
+                MathHelper.floor_double(this.xCoord),
+                MathHelper.floor_double(this.yCoord),
+                MathHelper.floor_double(this.zCoord));
     }
-    
-    @Annotations.RuntimeInterface(clazz = "ic2.api.tile.IWrenchable", modID = "IC2")
-    public void setFacing(final short facing) {
-    }
-    
-    @Annotations.RuntimeInterface(clazz = "ic2.api.tile.IWrenchable", modID = "IC2")
-    public boolean wrenchCanRemove(final EntityPlayer entityPlayer) {
+
+    @Override
+    public void setFacing(short facing) {}
+
+    @Override
+    public boolean wrenchCanRemove(EntityPlayer entityPlayer) {
         return false;
     }
-    
-    @Annotations.RuntimeInterface(clazz = "ic2.api.tile.IWrenchable", modID = "IC2")
+
+    @Override
     public float getWrenchDropRate() {
-        return 1.0f;
+        return 1.0F;
     }
-    
-    @Annotations.RuntimeInterface(clazz = "ic2.api.tile.IWrenchable", modID = "IC2")
-    public ItemStack getWrenchDrop(final EntityPlayer entityPlayer) {
-        return this.getBlockType().getPickBlock((MovingObjectPosition)null, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+
+    @Override
+    public ItemStack getWrenchDrop(EntityPlayer entityPlayer) {
+        return this.getBlockType()
+                .getPickBlock(null, this.worldObj, this.xCoord, this.yCoord, this.zCoord, entityPlayer);
     }
-    
+
     @Override
     public EnumSet<ForgeDirection> getElectricalInputDirections() {
         if (this.getElectricInputDirection() == null) {
             return EnumSet.noneOf(ForgeDirection.class);
         }
+
         return EnumSet.of(this.getElectricInputDirection());
     }
-    
-    public boolean isUseableByPlayer(final EntityPlayer entityplayer) {
-        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && entityplayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
+
+    public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
+                && entityplayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
-    
-    public boolean canConnect(final ForgeDirection direction, final NetworkType type) {
-        return direction != null && !direction.equals((Object)ForgeDirection.UNKNOWN) && type == NetworkType.POWER && direction == this.getElectricInputDirection();
+
+    @Override
+    public boolean canConnect(ForgeDirection direction, NetworkType type) {
+        if (direction == null || ForgeDirection.UNKNOWN.equals(direction) || type != NetworkType.POWER) {
+            return false;
+        }
+
+        return direction == this.getElectricInputDirection();
     }
-    
+
     public String getGUIstatus() {
-        if (!this.noRedstoneControl && RedstoneUtil.isBlockReceivingRedstone(this.worldObj, this.xCoord, this.yCoord, this.zCoord)) {
+        if (!this.noRedstoneControl
+                && RedstoneUtil.isBlockReceivingRedstone(this.worldObj, this.xCoord, this.yCoord, this.zCoord)) {
             return EnumColor.DARK_RED + GCCoreUtil.translate("gui.status.off.name");
         }
-        if (this.getEnergyStoredGC() == 0.0f) {
+
+        if (this.getEnergyStoredGC() == 0) {
             return EnumColor.DARK_RED + GCCoreUtil.translate("gui.status.missingpower.name");
         }
+
         if (this.getDisabled(0)) {
             return EnumColor.ORANGE + GCCoreUtil.translate("gui.status.ready.name");
         }
+
         if (this.getEnergyStoredGC() < this.storage.getMaxExtract()) {
             return EnumColor.ORANGE + GCCoreUtil.translate("gui.status.missingpower.name");
         }
+
         return EnumColor.DARK_GREEN + GCCoreUtil.translate("gui.status.active.name");
     }
 }

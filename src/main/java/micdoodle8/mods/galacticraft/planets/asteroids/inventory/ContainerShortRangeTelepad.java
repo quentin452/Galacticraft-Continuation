@@ -1,75 +1,91 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.inventory;
 
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
-import micdoodle8.mods.galacticraft.api.item.*;
-import micdoodle8.mods.galacticraft.core.inventory.*;
-import net.minecraft.inventory.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 
-public class ContainerShortRangeTelepad extends Container
-{
+import micdoodle8.mods.galacticraft.api.item.IItemElectric;
+import micdoodle8.mods.galacticraft.core.inventory.SlotSpecific;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityShortRangeTelepad;
+
+public class ContainerShortRangeTelepad extends Container {
+
     private final TileEntityShortRangeTelepad tileEntity;
 
-    public ContainerShortRangeTelepad(final InventoryPlayer par1InventoryPlayer, final TileEntityShortRangeTelepad tileEntity) {
+    public ContainerShortRangeTelepad(InventoryPlayer par1InventoryPlayer, TileEntityShortRangeTelepad tileEntity) {
         this.tileEntity = tileEntity;
-        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)tileEntity, 0, 152, 105, new Class[] { IItemElectric.class }));
-        for (int var6 = 0; var6 < 3; ++var6) {
-            for (int var7 = 0; var7 < 9; ++var7) {
-                this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 127 + var6 * 18));
+
+        this.addSlotToContainer(new SlotSpecific(tileEntity, 0, 152, 105, IItemElectric.class));
+
+        int var6;
+        int var7;
+
+        for (var6 = 0; var6 < 3; ++var6) {
+            for (var7 = 0; var7 < 9; ++var7) {
+                this.addSlotToContainer(
+                        new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 127 + var6 * 18));
             }
         }
-        for (int var6 = 0; var6 < 9; ++var6) {
-            this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var6, 8 + var6 * 18, 185));
+
+        for (var6 = 0; var6 < 9; ++var6) {
+            this.addSlotToContainer(new Slot(par1InventoryPlayer, var6, 8 + var6 * 18, 185));
         }
+
         tileEntity.openInventory();
     }
 
-    public void onContainerClosed(final EntityPlayer entityplayer) {
+    @Override
+    public void onContainerClosed(EntityPlayer entityplayer) {
         super.onContainerClosed(entityplayer);
         this.tileEntity.closeInventory();
     }
 
-    public boolean canInteractWith(final EntityPlayer par1EntityPlayer) {
+    @Override
+    public boolean canInteractWith(EntityPlayer par1EntityPlayer) {
         return this.tileEntity.isUseableByPlayer(par1EntityPlayer);
     }
 
-    public ItemStack transferStackInSlot(final EntityPlayer par1EntityPlayer, final int par1) {
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par1) {
         ItemStack var2 = null;
-        final Slot slot = (Slot)  this.inventorySlots.get(par1);
+        final Slot slot = this.inventorySlots.get(par1);
         final int b = this.inventorySlots.size();
+
         if (slot != null && slot.getHasStack()) {
             final ItemStack stack = slot.getStack();
             var2 = stack.copy();
+
             if (par1 == 0) {
                 if (!this.mergeItemStack(stack, b - 36, b, true)) {
                     return null;
                 }
-            }
-            else if (stack.getItem() instanceof IItemElectric) {
+            } else if (stack.getItem() instanceof IItemElectric) {
                 if (!this.mergeItemStack(stack, 0, 1, false)) {
                     return null;
                 }
-            }
-            else if (par1 < b - 9) {
+            } else if (par1 < b - 9) {
                 if (!this.mergeItemStack(stack, b - 9, b, false)) {
                     return null;
                 }
-            }
-            else if (!this.mergeItemStack(stack, b - 36, b - 9, false)) {
+            } else if (!this.mergeItemStack(stack, b - 36, b - 9, false)) {
                 return null;
             }
+
             if (stack.stackSize == 0) {
-                slot.putStack((ItemStack)null);
-            }
-            else {
+                slot.putStack(null);
+            } else {
                 slot.onSlotChanged();
             }
+
             if (stack.stackSize == var2.stackSize) {
                 return null;
             }
+
             slot.onPickupFromSlot(par1EntityPlayer, stack);
         }
+
         return var2;
     }
 }

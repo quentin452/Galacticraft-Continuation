@@ -1,30 +1,32 @@
 package micdoodle8.mods.galacticraft.api.entity;
 
-import net.minecraft.item.*;
+import net.minecraft.item.ItemStack;
 
-public interface ICargoEntity
-{
-    EnumCargoLoadingState addCargo(final ItemStack p0, final boolean p1);
-    
-    RemovalResult removeCargo(final boolean p0);
-    
-    public enum EnumCargoLoadingState
-    {
-        FULL, 
-        EMPTY, 
-        NOTARGET, 
-        NOINVENTORY, 
-        SUCCESS;
+/**
+ * Implement into entities that can be loaded with cargo
+ */
+public interface ICargoEntity {
+
+    enum EnumCargoLoadingState {
+        FULL,
+        EMPTY,
+        NOTARGET,
+        NOINVENTORY,
+        SUCCESS
     }
-    
-    public static class RemovalResult
-    {
+
+    class RemovalResult {
+
         public final EnumCargoLoadingState resultState;
         public final ItemStack resultStack;
-        
-        public RemovalResult(final EnumCargoLoadingState resultState, final ItemStack resultStack) {
+
+        public RemovalResult(EnumCargoLoadingState resultState, ItemStack resultStack) {
             this.resultState = resultState;
             this.resultStack = resultStack;
         }
     }
+
+    EnumCargoLoadingState addCargo(ItemStack stack, boolean doAdd);
+
+    RemovalResult removeCargo(boolean doRemove);
 }

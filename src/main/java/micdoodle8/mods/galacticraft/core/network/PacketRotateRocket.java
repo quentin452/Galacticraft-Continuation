@@ -1,42 +1,46 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import net.minecraft.entity.*;
-import io.netty.channel.*;
-import io.netty.buffer.*;
-import net.minecraft.entity.player.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 
-public class PacketRotateRocket implements IPacket
-{
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+
+public class PacketRotateRocket implements IPacket {
+
     private int entityID;
     private float entityPitch;
     private float entityYaw;
-    
-    public PacketRotateRocket() {
-    }
-    
-    public PacketRotateRocket(final Entity rotateableEntity) {
+
+    public PacketRotateRocket() {}
+
+    public PacketRotateRocket(Entity rotateableEntity) {
         this.entityID = rotateableEntity.getEntityId();
         this.entityPitch = rotateableEntity.rotationPitch;
         this.entityYaw = rotateableEntity.rotationYaw;
     }
-    
-    public void encodeInto(final ChannelHandlerContext context, final ByteBuf buffer) {
+
+    @Override
+    public void encodeInto(ChannelHandlerContext context, ByteBuf buffer) {
         buffer.writeInt(this.entityID);
         buffer.writeFloat(this.entityPitch);
         buffer.writeFloat(this.entityYaw);
     }
-    
-    public void decodeInto(final ChannelHandlerContext context, final ByteBuf buffer) {
+
+    @Override
+    public void decodeInto(ChannelHandlerContext context, ByteBuf buffer) {
         this.entityID = buffer.readInt();
         this.entityPitch = buffer.readFloat();
         this.entityYaw = buffer.readFloat();
     }
-    
-    public void handleClientSide(final EntityPlayer player) {
-    }
-    
-    public void handleServerSide(final EntityPlayer player) {
+
+    @Override
+    public void handleClientSide(EntityPlayer player) {}
+
+    @Override
+    public void handleServerSide(EntityPlayer player) {
         final Entity entity = player.worldObj.getEntityByID(this.entityID);
+
         if (entity != null) {
             entity.rotationPitch = this.entityPitch;
             entity.rotationYaw = this.entityYaw;

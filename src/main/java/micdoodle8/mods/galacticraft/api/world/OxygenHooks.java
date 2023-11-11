@@ -1,14 +1,16 @@
 package micdoodle8.mods.galacticraft.api.world;
 
-import java.lang.reflect.*;
-import net.minecraft.world.*;
-import net.minecraft.util.*;
-import net.minecraft.entity.*;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.*;
+import java.lang.reflect.Method;
 
-public class OxygenHooks
-{
+import net.minecraft.block.Block;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
+
+public class OxygenHooks {
+
     private static Class<?> oxygenUtilClass;
     private static Method combusionTestMethod;
     private static Method breathableAirBlockMethod;
@@ -16,100 +18,166 @@ public class OxygenHooks
     private static Method torchHasOxygenMethod;
     private static Method oxygenBubbleMethod;
     private static Method validOxygenSetupMethod;
-    
-    public static boolean noAtmosphericCombustion(final WorldProvider provider) {
+
+    /**
+     * Test whether fire can burn in this world's atmosphere (outside any oxygen bubble).
+     *
+     * @param provider The WorldProvider for this dimension
+     * @return False if fire burns normally True if fire cannot burn in this world
+     */
+    public static boolean noAtmosphericCombustion(WorldProvider provider) {
         try {
-            if (OxygenHooks.combusionTestMethod == null) {
-                if (OxygenHooks.oxygenUtilClass == null) {
-                    OxygenHooks.oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
+            if (combusionTestMethod == null) {
+                if (oxygenUtilClass == null) {
+                    oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
-                OxygenHooks.combusionTestMethod = OxygenHooks.oxygenUtilClass.getDeclaredMethod("noAtmosphericCombustion", WorldProvider.class);
+                combusionTestMethod = oxygenUtilClass.getDeclaredMethod("noAtmosphericCombustion", WorldProvider.class);
             }
-            return (boolean)OxygenHooks.combusionTestMethod.invoke(null, provider);
-        }
-        catch (Exception e) {
+            return (Boolean) combusionTestMethod.invoke(null, provider);
+        } catch (final Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return false;
     }
-    
-    public static boolean isAABBInBreathableAirBlock(final World world, final AxisAlignedBB bb) {
+
+    /**
+     * Test whether a bounding box (normally a block but it could be an entity) is inside an oxygen bubble or oxygen
+     * sealed space, on an otherwise oxygen-free world. (Do not use this on the Overworld or other oxygen-rich world,,
+     * it will return false negatives!!)
+     * <p>
+     * NOTE: In a complex build where this block is surrounded by air-permeable blocks on all sides (for example
+     * torches, ladders, signs, wires, chests etc etc) then it may have to look quite far to find whether it is in
+     * oxygen or not - it will check up to 5 blocks in each direction. This can impose a performance load in the
+     * unlikely event there are permeable blocks in all directions. It is therefore advisable not to call this every
+     * tick: 1 tick in 5 should be plenty.
+     *
+     * @param world The World
+     * @param bb    AxisAligned BB representing the block (e.g. a torch), or maybe the side of a block
+     * @return True if the bb is in oxygen, otherwise false.
+     */
+    public static boolean isAABBInBreathableAirBlock(World world, AxisAlignedBB bb) {
         try {
-            if (OxygenHooks.breathableAirBlockMethod == null) {
-                if (OxygenHooks.oxygenUtilClass == null) {
-                    OxygenHooks.oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
+            if (breathableAirBlockMethod == null) {
+                if (oxygenUtilClass == null) {
+                    oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
-                OxygenHooks.breathableAirBlockMethod = OxygenHooks.oxygenUtilClass.getDeclaredMethod("isAABBInBreathableAirBlock", World.class, AxisAlignedBB.class);
+                breathableAirBlockMethod = oxygenUtilClass
+                        .getDeclaredMethod("isAABBInBreathableAirBlock", World.class, AxisAlignedBB.class);
             }
-            return (boolean)OxygenHooks.breathableAirBlockMethod.invoke(null, world, bb);
-        }
-        catch (Exception e) {
+            return (Boolean) breathableAirBlockMethod.invoke(null, world, bb);
+        } catch (final Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return false;
     }
-    
-    public static boolean isAABBInBreathableAirBlock(final EntityLivingBase entity) {
+
+    /**
+     * Special version of the oxygen AABB check for living entities. This is based on checking the oxygen contact of a
+     * small box centred at the entity's eye height. The small box has sides equal to half the width of the entity. This
+     * is a good approximation to head size and position for most types of mobs.
+     *
+     * @param entity
+     * @return True if the entity's head is in an oxygen bubble or block, false otherwise
+     */
+    public static boolean isAABBInBreathableAirBlock(EntityLivingBase entity) {
         try {
-            if (OxygenHooks.breathableAirBlockEntityMethod == null) {
-                if (OxygenHooks.oxygenUtilClass == null) {
-                    OxygenHooks.oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
+            if (breathableAirBlockEntityMethod == null) {
+                if (oxygenUtilClass == null) {
+                    oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
-                OxygenHooks.breathableAirBlockEntityMethod = OxygenHooks.oxygenUtilClass.getDeclaredMethod("isAABBInBreathableAirBlock", EntityLivingBase.class);
+                breathableAirBlockEntityMethod = oxygenUtilClass
+                        .getDeclaredMethod("isAABBInBreathableAirBlock", EntityLivingBase.class);
             }
-            return (boolean)OxygenHooks.breathableAirBlockEntityMethod.invoke(null, entity);
-        }
-        catch (Exception e) {
+            return (Boolean) breathableAirBlockEntityMethod.invoke(null, entity);
+        } catch (final Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return false;
     }
-    
-    public static boolean checkTorchHasOxygen(final World world, final Block block, final int x, final int y, final int z) {
+
+    /**
+     * Simplified (better performance) version of the block oxygen check for use with torch blocks and other
+     * oxygen-requiring blocks which can access oxygen on any side.
+     * <p>
+     * NOTE: this does not run an inOxygenBubble() check, you will need to do that also.
+     *
+     * @param world
+     * @param block The block type of this torch being checked - currently unused
+     * @param x     x coordinate of the torch
+     * @param y     y coordinate of the torch
+     * @param z     z coordinate of the torch
+     * @return True if there is a (sealed) oxygen block accessible, otherwise false.
+     */
+    public static boolean checkTorchHasOxygen(World world, Block block, int x, int y, int z) {
         try {
-            if (OxygenHooks.torchHasOxygenMethod == null) {
-                if (OxygenHooks.oxygenUtilClass == null) {
-                    OxygenHooks.oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
+            if (torchHasOxygenMethod == null) {
+                if (oxygenUtilClass == null) {
+                    oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
-                OxygenHooks.torchHasOxygenMethod = OxygenHooks.oxygenUtilClass.getDeclaredMethod("checkTorchHasOxygen", World.class, Block.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
+                torchHasOxygenMethod = oxygenUtilClass.getDeclaredMethod(
+                        "checkTorchHasOxygen",
+                        World.class,
+                        Block.class,
+                        int.class,
+                        int.class,
+                        int.class);
             }
-            return (boolean)OxygenHooks.torchHasOxygenMethod.invoke(null, world, block, x, y, z);
-        }
-        catch (Exception e) {
+            return (Boolean) torchHasOxygenMethod.invoke(null, world, block, x, y, z);
+        } catch (final Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return false;
     }
-    
-    public static boolean inOxygenBubble(final World worldObj, final double avgX, final double avgY, final double avgZ) {
+
+    /**
+     * Test whether a location is inside an Oxygen Bubble from an Oxygen Distributor
+     *
+     * @param worldObj World
+     * @param avgX     avg X, avgY, avgZ are the average co-ordinates of the location
+     * @param avgY     (for example, the central point of a block being tested
+     * @param avgZ     or the average position of the centre of a living entity)
+     * @return True if it is in an oxygen bubble, otherwise false
+     */
+    public static boolean inOxygenBubble(World worldObj, double avgX, double avgY, double avgZ) {
         try {
-            if (OxygenHooks.oxygenBubbleMethod == null) {
-                if (OxygenHooks.oxygenUtilClass == null) {
-                    OxygenHooks.oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
+            if (oxygenBubbleMethod == null) {
+                if (oxygenUtilClass == null) {
+                    oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
-                OxygenHooks.oxygenBubbleMethod = OxygenHooks.oxygenUtilClass.getDeclaredMethod("inOxygenBubble", World.class, Double.TYPE, Double.TYPE, Double.TYPE);
+                oxygenBubbleMethod = oxygenUtilClass
+                        .getDeclaredMethod("inOxygenBubble", World.class, double.class, double.class, double.class);
             }
-            return (boolean)OxygenHooks.oxygenBubbleMethod.invoke(null, worldObj, avgX, avgY, avgZ);
-        }
-        catch (Exception e) {
+            return (Boolean) oxygenBubbleMethod.invoke(null, worldObj, avgX, avgY, avgZ);
+        } catch (final Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return false;
     }
-    
-    public static boolean hasValidOxygenSetup(final EntityPlayerMP player) {
+
+    /**
+     * Test whether a player is wearing a working set of Galacticraft oxygen-breathing apparatus (mask, gear + tank)
+     *
+     * @param player
+     * @return True if the setup is valid, otherwise false
+     */
+    public static boolean hasValidOxygenSetup(EntityPlayerMP player) {
         try {
-            if (OxygenHooks.validOxygenSetupMethod == null) {
-                if (OxygenHooks.oxygenUtilClass == null) {
-                    OxygenHooks.oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
+            if (validOxygenSetupMethod == null) {
+                if (oxygenUtilClass == null) {
+                    oxygenUtilClass = Class.forName("micdoodle8.mods.galacticraft.core.util.OxygenUtil");
                 }
-                OxygenHooks.validOxygenSetupMethod = OxygenHooks.oxygenUtilClass.getDeclaredMethod("hasValidOxygenSetup", EntityPlayerMP.class);
+                validOxygenSetupMethod = oxygenUtilClass.getDeclaredMethod("hasValidOxygenSetup", EntityPlayerMP.class);
             }
-            return (boolean)OxygenHooks.validOxygenSetupMethod.invoke(null, player);
-        }
-        catch (Exception e) {
+            return (Boolean) validOxygenSetupMethod.invoke(null, player);
+        } catch (final Exception e) {
             e.printStackTrace();
-            return false;
         }
+
+        return false;
     }
 }

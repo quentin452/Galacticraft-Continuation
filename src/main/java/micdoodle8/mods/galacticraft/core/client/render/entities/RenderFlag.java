@@ -1,50 +1,55 @@
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import net.minecraft.client.renderer.entity.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.client.model.*;
-import net.minecraft.entity.*;
-import micdoodle8.mods.galacticraft.core.entities.*;
-import org.lwjgl.opengl.*;
-import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.client.model.ModelFlag;
+import micdoodle8.mods.galacticraft.core.entities.EntityFlag;
 
 @SideOnly(Side.CLIENT)
-public class RenderFlag extends Render
-{
-    public static ResourceLocation flagTexture;
+public class RenderFlag extends Render {
+
+    public static ResourceLocation flagTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/flag.png");
+
     protected ModelFlag modelFlag;
-    
+
     public RenderFlag() {
-        this.shadowSize = 1.0f;
+        this.shadowSize = 1F;
         this.modelFlag = new ModelFlag();
     }
-    
-    protected ResourceLocation getEntityTexture(final Entity entity) {
+
+    @Override
+    protected ResourceLocation getEntityTexture(Entity entity) {
         return RenderFlag.flagTexture;
     }
-    
-    public void renderFlag(final EntityFlag entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
+
+    public void renderFlag(EntityFlag entity, double par2, double par4, double par6, float par8, float par9) {
         GL11.glPushMatrix();
         long var10 = entity.getEntityId() * 493286711L;
         var10 = var10 * var10 * 4392167121L + var10 * 98761L;
-        final float var11 = (((var10 >> 16 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        final float var12 = (((var10 >> 20 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        final float var13 = (((var10 >> 24 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        GL11.glTranslatef(var11, var12, var13);
-        GL11.glTranslatef((float)par2, (float)par4, (float)par6);
-        GL11.glRotatef(180.0f - entity.getFacingAngle(), 0.0f, 1.0f, 0.0f);
-        this.bindEntityTexture((Entity)entity);
-        GL11.glScalef(-1.0f, -1.0f, 1.0f);
-        this.modelFlag.render((Entity)entity, 0.0f, 0.0f, -0.1f, 0.0f, 0.0f, 0.0625f);
+        final float var12 = (((var10 >> 16 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        final float var13 = (((var10 >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        final float var14 = (((var10 >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        GL11.glTranslatef(var12, var13, var14);
+
+        GL11.glTranslatef((float) par2, (float) par4, (float) par6);
+        GL11.glRotatef(180.0F - entity.getFacingAngle(), 0.0F, 1.0F, 0.0F);
+        this.bindEntityTexture(entity);
+        GL11.glScalef(-1.0F, -1.0F, 1.0F);
+        this.modelFlag.render(entity, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
         GL11.glPopMatrix();
     }
-    
-    public void doRender(final Entity par1Entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
-        this.renderFlag((EntityFlag)par1Entity, par2, par4, par6, par8, par9);
-    }
-    
-    static {
-        RenderFlag.flagTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/flag.png");
+
+    @Override
+    public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9) {
+        this.renderFlag((EntityFlag) par1Entity, par2, par4, par6, par8, par9);
     }
 }

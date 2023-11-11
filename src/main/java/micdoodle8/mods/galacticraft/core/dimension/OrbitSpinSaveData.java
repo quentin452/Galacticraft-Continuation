@@ -1,44 +1,50 @@
 package micdoodle8.mods.galacticraft.core.dimension;
 
-import net.minecraft.nbt.*;
-import net.minecraft.world.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldSavedData;
 
-public class OrbitSpinSaveData extends WorldSavedData
-{
+public class OrbitSpinSaveData extends WorldSavedData {
+
     public static final String saveDataID = "GCSpinData";
     public NBTTagCompound datacompound;
     private NBTTagCompound alldata;
-    private int dim;
-    
-    public OrbitSpinSaveData(final String s) {
-        super("GCSpinData");
-        this.dim = 0;
+    private int dim = 0;
+
+    public OrbitSpinSaveData(String s) {
+        super(OrbitSpinSaveData.saveDataID);
         this.datacompound = new NBTTagCompound();
     }
-    
-    public void readFromNBT(final NBTTagCompound nbt) {
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
         this.alldata = nbt;
+        // world.loadItemData calls this but can't extract from alldata until we know
+        // the dimension ID
     }
-    
-    public void writeToNBT(final NBTTagCompound nbt) {
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbt) {
         if (this.dim != 0) {
-            nbt.setTag("" + this.dim, (NBTBase)this.datacompound);
+            nbt.setTag("" + this.dim, this.datacompound);
         }
     }
-    
-    public static OrbitSpinSaveData initWorldData(final World world) {
-        OrbitSpinSaveData worldData = (OrbitSpinSaveData)world.loadItemData((Class)OrbitSpinSaveData.class, "GCSpinData");
+
+    public static OrbitSpinSaveData initWorldData(World world) {
+        OrbitSpinSaveData worldData = (OrbitSpinSaveData) world
+                .loadItemData(OrbitSpinSaveData.class, OrbitSpinSaveData.saveDataID);
+
         if (worldData == null) {
             worldData = new OrbitSpinSaveData("");
-            world.setItemData("GCSpinData", (WorldSavedData)worldData);
+            world.setItemData(OrbitSpinSaveData.saveDataID, worldData);
             if (world.provider instanceof WorldProviderSpaceStation) {
                 worldData.dim = world.provider.dimensionId;
-                ((WorldProviderSpaceStation)world.provider).getSpinManager().writeToNBT(worldData.datacompound);
+                ((WorldProviderSpaceStation) world.provider).getSpinManager().writeToNBT(worldData.datacompound);
             }
             worldData.markDirty();
-        }
-        else if (world.provider instanceof WorldProviderSpaceStation) {
+        } else if (world.provider instanceof WorldProviderSpaceStation) {
             worldData.dim = world.provider.dimensionId;
+
             worldData.datacompound = null;
             if (worldData.alldata != null) {
                 worldData.datacompound = worldData.alldata.getCompoundTag("" + worldData.dim);
@@ -47,6 +53,7 @@ public class OrbitSpinSaveData extends WorldSavedData
                 worldData.datacompound = new NBTTagCompound();
             }
         }
+
         return worldData;
     }
 }

@@ -1,47 +1,54 @@
 package micdoodle8.mods.galacticraft.core.client.render.block;
 
-import cpw.mods.fml.client.registry.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.block.*;
-import net.minecraft.client.renderer.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import net.minecraft.client.renderer.tileentity.*;
-import net.minecraft.tileentity.*;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.world.IBlockAccess;
 
-public class BlockRendererParachest implements ISimpleBlockRenderingHandler
-{
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
+
+public class BlockRendererParachest implements ISimpleBlockRenderingHandler {
+
     final int renderID;
-    private final TileEntityParaChest chest;
-    
-    public BlockRendererParachest(final int var1) {
-        this.chest = new TileEntityParaChest();
+
+    public BlockRendererParachest(int var1) {
         this.renderID = var1;
     }
-    
-    public void renderInventoryBlock(final Block var1, final int var2, final int var3, final RenderBlocks var4) {
-        GL11.glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-        GL11.glTranslatef(-0.5f, -0.5f, -0.5f);
-        this.renderChest(var1, var2, (float)var3);
-        GL11.glEnable(32826);
+
+    @Override
+    public void renderInventoryBlock(Block var1, int var2, int var3, RenderBlocks var4) {
+        GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
+        GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+        this.renderChest(var1, var2, var3);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
     }
-    
-    public boolean renderWorldBlock(final IBlockAccess var1, final int var2, final int var3, final int var4, final Block var5, final int var6, final RenderBlocks var7) {
+
+    @Override
+    public boolean renderWorldBlock(IBlockAccess var1, int var2, int var3, int var4, Block var5, int var6,
+            RenderBlocks var7) {
         return false;
     }
-    
-    public boolean shouldRender3DInInventory(final int modelId) {
+
+    @Override
+    public boolean shouldRender3DInInventory(int modelId) {
         return true;
     }
-    
+
+    @Override
     public int getRenderId() {
         return this.renderID;
     }
-    
-    public void renderChest(final Block par1Block, final int par2, final float par3) {
+
+    private final TileEntityParaChest chest = new TileEntityParaChest();
+
+    public void renderChest(Block par1Block, int par2, float par3) {
         if (par1Block == GCBlocks.parachest) {
-            TileEntityRendererDispatcher.instance.renderTileEntityAt((TileEntity)this.chest, 0.0, 0.0, 0.0, 0.0f);
+            TileEntityRendererDispatcher.instance.renderTileEntityAt(this.chest, 0.0D, 0.0D, 0.0D, 0.0F);
         }
     }
 }

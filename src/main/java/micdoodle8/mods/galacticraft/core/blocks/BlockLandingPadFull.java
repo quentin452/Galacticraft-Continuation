@@ -1,113 +1,141 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.api.block.*;
-import net.minecraft.block.material.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.*;
-import java.util.*;
-import net.minecraft.tileentity.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.client.renderer.texture.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.world.*;
-import net.minecraftforge.common.util.*;
-import net.minecraft.util.*;
-import net.minecraft.item.*;
+import java.util.Random;
 
-public class BlockLandingPadFull extends BlockAdvancedTile implements IPartialSealableBlock
-{
-    private IIcon[] icons;
-    
-    public BlockLandingPadFull(final String assetName) {
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IPartialSealableBlock;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.tile.IMultiBlock;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityBuggyFueler;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityLandingPad;
+
+public class BlockLandingPadFull extends BlockAdvancedTile implements IPartialSealableBlock {
+
+    private final IIcon[] icons = new IIcon[3];
+
+    public BlockLandingPadFull(String assetName) {
         super(Material.rock);
-        this.icons = new IIcon[3];
-        this.setHardness(1.0f);
-        this.setResistance(10.0f);
+        this.setHardness(1.0F);
+        this.setResistance(10.0F);
         this.setStepSound(Block.soundTypeMetal);
         this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
         this.setBlockName(assetName);
-        this.maxY = 0.39;
+        this.maxY = 0.39D;
     }
-    
-    public int damageDropped(final int meta) {
+
+    @Override
+    public int damageDropped(int meta) {
         return meta;
     }
-    
-    public int quantityDropped(final Random par1Random) {
+
+    @Override
+    public int quantityDropped(Random par1Random) {
         return 9;
     }
-    
-    public void breakBlock(final World var1, final int var2, final int var3, final int var4, final Block var5, final int var6) {
-        final TileEntity var7 = var1.getTileEntity(var2, var3, var4);
-        if (var7 instanceof IMultiBlock) {
-            ((IMultiBlock)var7).onDestroy(var7);
+
+    @Override
+    public void breakBlock(World var1, int var2, int var3, int var4, Block var5, int var6) {
+        final TileEntity var9 = var1.getTileEntity(var2, var3, var4);
+
+        if (var9 instanceof IMultiBlock) {
+            ((IMultiBlock) var9).onDestroy(var9);
         }
+
         super.breakBlock(var1, var2, var3, var4, var5, var6);
     }
-    
-    public Item getItemDropped(final int par1, final Random par2Random, final int par3) {
+
+    @Override
+    public Item getItemDropped(int par1, Random par2Random, int par3) {
         return Item.getItemFromBlock(GCBlocks.landingPad);
     }
-    
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
-        switch (world.getBlockMetadata(x, y, z)) {
-            case 0: {
-                return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
-            }
-            case 2: {
-                return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
-            }
-            default: {
-                return AxisAlignedBB.getBoundingBox(x + 0.0, y + 0.0, z + 0.0, x + 1.0, y + 0.2, z + 1.0);
-            }
-        }
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
+        return switch (world.getBlockMetadata(x, y, z)) {
+            case 0 -> AxisAlignedBB.getBoundingBox(
+                    x + this.minX,
+                    y + this.minY,
+                    z + this.minZ,
+                    x + this.maxX,
+                    y + this.maxY,
+                    z + this.maxZ);
+            case 2 -> AxisAlignedBB.getBoundingBox(
+                    x + this.minX,
+                    y + this.minY,
+                    z + this.minZ,
+                    x + this.maxX,
+                    y + this.maxY,
+                    z + this.maxZ);
+            default -> AxisAlignedBB.getBoundingBox(x + 0.0D, y + 0.0D, z + 0.0D, x + 1.0D, y + 0.2D, z + 1.0D);
+        };
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
-        switch (world.getBlockMetadata(x, y, z)) {
-            case 0: {
-                return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
-            }
-            case 2: {
-                return AxisAlignedBB.getBoundingBox(x + this.minX, y + this.minY, z + this.minZ, x + this.maxX, y + this.maxY, z + this.maxZ);
-            }
-            default: {
-                return AxisAlignedBB.getBoundingBox(x + 0.0, y + 0.0, z + 0.0, x + 1.0, y + 0.2, z + 1.0);
-            }
-        }
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
+        return switch (world.getBlockMetadata(x, y, z)) {
+            case 0 -> AxisAlignedBB.getBoundingBox(
+                    x + this.minX,
+                    y + this.minY,
+                    z + this.minZ,
+                    x + this.maxX,
+                    y + this.maxY,
+                    z + this.maxZ);
+            case 2 -> AxisAlignedBB.getBoundingBox(
+                    x + this.minX,
+                    y + this.minY,
+                    z + this.minZ,
+                    x + this.maxX,
+                    y + this.maxY,
+                    z + this.maxZ);
+            default -> AxisAlignedBB.getBoundingBox(x + 0.0D, y + 0.0D, z + 0.0D, x + 1.0D, y + 0.2D, z + 1.0D);
+        };
     }
-    
+
+    @Override
     public int getRenderType() {
-        return GalacticraftCore.proxy.getBlockRender((Block)this);
+        return GalacticraftCore.proxy.getBlockRender(this);
     }
-    
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+
+    @Override
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
         this.icons[0] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "launch_pad");
         this.icons[1] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "buggy_fueler");
         this.icons[2] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "buggy_fueler_blank");
         this.blockIcon = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "launch_pad");
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(final int par1, final int par2) {
+    public IIcon getIcon(int par1, int par2) {
         switch (par2) {
-            case 0: {
+            case 0:
                 return this.icons[0];
-            }
-            case 1: {
+            case 1:
                 return this.icons[1];
-            }
-            case 2: {
+            case 2:
                 return this.icons[2];
-            }
-            default: {
-                return this.blockIcon;
-            }
         }
+
+        return this.blockIcon;
     }
-    
-    public boolean canPlaceBlockAt(final World world, final int x, final int y, final int z) {
+
+    @Override
+    public boolean canPlaceBlockAt(World world, int x, int y, int z) {
         for (int x2 = -1; x2 < 2; ++x2) {
             for (int z2 = -1; z2 < 2; ++z2) {
                 if (!super.canPlaceBlockAt(world, x + x2, y, z + z2)) {
@@ -115,49 +143,52 @@ public class BlockLandingPadFull extends BlockAdvancedTile implements IPartialSe
                 }
             }
         }
+
         return true;
     }
-    
-    public boolean hasTileEntity(final int metadata) {
+
+    @Override
+    public boolean hasTileEntity(int metadata) {
         return true;
     }
-    
-    public TileEntity createTileEntity(final World world, final int metadata) {
-        switch (metadata) {
-            case 0: {
-                return new TileEntityLandingPad();
-            }
-            case 1: {
-                return new TileEntityBuggyFueler();
-            }
-            default: {
-                return null;
-            }
-        }
+
+    @Override
+    public TileEntity createTileEntity(World world, int metadata) {
+        return switch (metadata) {
+            case 0 -> new TileEntityLandingPad();
+            case 1 -> new TileEntityBuggyFueler();
+            default -> null;
+        };
     }
-    
-    public void onNeighborBlockChange(final World par1World, final int par2, final int par3, final int par4, final Block par5) {
+
+    @Override
+    public void onNeighborBlockChange(World par1World, int par2, int par3, int par4, Block par5) {
         par1World.markBlockForUpdate(par2, par3, par4);
     }
-    
+
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
-    
+
+    @Override
     public boolean renderAsNormalBlock() {
         return false;
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4, final int par5) {
+    @Override
+    public boolean shouldSideBeRendered(IBlockAccess par1IBlockAccess, int par2, int par3, int par4, int par5) {
         return true;
     }
-    
-    public boolean isSealed(final World world, final int x, final int y, final int z, final ForgeDirection direction) {
+
+    @Override
+    public boolean isSealed(World world, int x, int y, int z, ForgeDirection direction) {
         return direction == ForgeDirection.UP;
     }
-    
-    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         final int metadata = world.getBlockMetadata(x, y, z);
         return new ItemStack(Item.getItemFromBlock(GCBlocks.landingPad), 1, metadata);
     }

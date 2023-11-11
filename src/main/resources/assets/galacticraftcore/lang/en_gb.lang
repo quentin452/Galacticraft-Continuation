@@ -256,9 +256,9 @@ newversion.failed.name=Galacticraft update check failed! Trying again in 15 seco
 newversion.success.name=Galacticraft remote version found:
 
 # KEYBINDINGS
-keybind.map.name=[GC] Galaxy Map
-keybind.spaceshipinv.name=[GC] Open Spaceship Inventory
-keybind.sensortoggle.name=[GC] Toggle Sensor Goggles Mode
+keybind.map.name=Open Galaxy Map
+keybind.spaceshipinv.name=Open Spaceship Inventory
+keybind.sensortoggle.name=Toggle Sensor Goggles Mode
 keybind.vehicleforward.name=[GC] Vehicle Forward Key
 keybind.vehiclebackward.name=[GC] Vehicle Backward Key
 keybind.vehicleleft.name=[GC] Vehicle Left Key
@@ -351,6 +351,7 @@ gui.status.sealed.name=Sealed
 gui.status.unknown.name=Unknown
 gui.status.disabled.name=Disabled
 gui.status.nofuel.name=No Fuel to Load!
+gui.status.wrongfuel.name=Wrong Fuel!
 gui.status.noitems.name=No Items to Load!
 gui.status.notargetload.name=No Target to Load Into!
 gui.status.notargetunload.name=No Target to Unload!
@@ -477,6 +478,7 @@ gui.receiver.cannotAttach=Cannot attach receiver here!
 gui.warning.invalidThermal=Invalid Thermal Protection!
 
 gui.tank.oxygenRemaining=Oxygen Remaining
+gui.tank.infinite=INFINITE
 gui.buggy.storageSpace=Storage Space
 gui.frequencyModule.desc.0=Can receive weak sound
 gui.frequencyModule.desc.1=waves and distant signals
@@ -739,5 +741,6 @@ gc.configgui.keyOverrideToggleAdvGoggles=Set key: Advanced Goggles
 gc.configgui.meteorSpawnMod=Meteor Spawn Modifier
 gc.configgui.meteorBlockDamage=Meteor Block Damage Enabled
 gc.configgui.title=Galacticraft Core Config
+gc.configgui.alwaysDisplayOxygenHUD=Always show Oxygen HUD
 
 # </file>

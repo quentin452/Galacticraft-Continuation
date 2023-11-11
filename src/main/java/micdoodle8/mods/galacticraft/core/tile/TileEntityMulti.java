@@ -1,81 +1,104 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import micdoodle8.mods.galacticraft.api.vector.*;
-import micdoodle8.mods.miccore.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.nbt.*;
-import java.util.*;
+import java.util.ArrayList;
 
-public class TileEntityMulti extends TileEntityAdvanced
-{
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+
+public class TileEntityMulti extends TileEntityAdvanced {
+
+    // The the position of the main block
+    @NetworkedField(targetSide = Side.CLIENT)
     public BlockVec3 mainBlockPosition;
-    
-    public void setMainBlock(final BlockVec3 mainBlock) {
+
+    public void setMainBlock(BlockVec3 mainBlock) {
         this.mainBlockPosition = mainBlock;
+
         if (!this.worldObj.isRemote) {
             this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
         }
     }
-    
+
     public void onBlockRemoval() {
         if (this.mainBlockPosition != null) {
-            final TileEntity tileEntity = this.worldObj.getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
-            if (tileEntity instanceof IMultiBlock) {
-                final IMultiBlock mainBlock = (IMultiBlock)tileEntity;
-                mainBlock.onDestroy((TileEntity)this);
+            final TileEntity tileEntity = this.worldObj
+                    .getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
+
+            if (tileEntity instanceof IMultiBlock mainBlock) {
+                mainBlock.onDestroy(this);
             }
         }
     }
-    
-    public boolean onBlockActivated(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer) {
+
+    public boolean onBlockActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer) {
         if (this.mainBlockPosition != null) {
-            final TileEntity tileEntity = this.worldObj.getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
+            final TileEntity tileEntity = this.worldObj
+                    .getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
+
             if (tileEntity instanceof IMultiBlock) {
-                return ((IMultiBlock)tileEntity).onActivated(par5EntityPlayer);
+                return ((IMultiBlock) tileEntity).onActivated(par5EntityPlayer);
             }
         }
+
         return false;
     }
-    
+
     public TileEntity getMainBlockTile() {
         if (this.mainBlockPosition != null) {
-            return this.worldObj.getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
+            return this.worldObj
+                    .getTileEntity(this.mainBlockPosition.x, this.mainBlockPosition.y, this.mainBlockPosition.z);
         }
+
         return null;
     }
-    
-    public void readFromNBT(final NBTTagCompound nbt) {
+
+    /**
+     * Reads a tile entity from NBT.
+     */
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         this.mainBlockPosition = new BlockVec3(nbt.getCompoundTag("mainBlockPosition"));
     }
-    
-    public void writeToNBT(final NBTTagCompound nbt) {
+
+    /**
+     * Writes a tile entity to NBT.
+     */
+    @Override
+    public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
+
         if (this.mainBlockPosition != null) {
-            nbt.setTag("mainBlockPosition", (NBTBase)this.mainBlockPosition.writeToNBT(new NBTTagCompound()));
+            nbt.setTag("mainBlockPosition", this.mainBlockPosition.writeToNBT(new NBTTagCompound()));
         }
     }
-    
+
+    @Override
     public double getPacketRange() {
-        return 30.0;
+        return 30.0D;
     }
-    
+
+    @Override
     public int getPacketCooldown() {
         return 50;
     }
-    
+
+    @Override
     public boolean isNetworkedTile() {
         return true;
     }
-    
-    public void getNetworkedData(final ArrayList<Object> sendData) {
+
+    @Override
+    public void getNetworkedData(ArrayList<Object> sendData) {
         if (this.mainBlockPosition == null) {
             return;
         }
-        super.getNetworkedData((ArrayList)sendData);
+        super.getNetworkedData(sendData);
     }
 }

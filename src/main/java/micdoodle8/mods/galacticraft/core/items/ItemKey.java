@@ -1,53 +1,60 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import micdoodle8.mods.galacticraft.api.item.*;
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.relauncher.*;
-import java.util.*;
+import java.util.List;
 
-public class ItemKey extends Item implements IKeyItem
-{
-    public static String[] keyTypes;
-    
-    public ItemKey(final String assetName) {
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.item.IKeyItem;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+
+public class ItemKey extends Item implements IKeyItem {
+
+    public static String[] keyTypes = { "T1" };
+
+    public ItemKey(String assetName) {
         this.setMaxStackSize(1);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
         this.setUnlocalizedName(assetName);
         this.setTextureName("arrow");
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-    
-    public String getUnlocalizedName(final ItemStack itemStack) {
+
+    @Override
+    public String getUnlocalizedName(ItemStack itemStack) {
         return this.getUnlocalizedName() + "." + ItemKey.keyTypes[itemStack.getItemDamage()];
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
-    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
-        for (int i = 0; i < ItemKey.keyTypes.length; ++i) {
+
+    @Override
+    public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
+        for (int i = 0; i < ItemKey.keyTypes.length; i++) {
             par3List.add(new ItemStack(par1, 1, i));
         }
     }
-    
-    public int getMetadata(final int par1) {
+
+    @Override
+    public int getMetadata(int par1) {
         return par1;
     }
-    
-    public int getTier(final ItemStack keyStack) {
+
+    @Override
+    public int getTier(ItemStack keyStack) {
         return 1;
-    }
-    
-    static {
-        ItemKey.keyTypes = new String[] { "T1" };
     }
 }

@@ -1,83 +1,96 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.entity;
 
-import net.minecraft.client.renderer.entity.*;
-import net.minecraft.util.*;
-import net.minecraft.client.model.*;
-import micdoodle8.mods.galacticraft.planets.mars.client.model.*;
-import net.minecraft.entity.boss.*;
-import micdoodle8.mods.galacticraft.planets.mars.entities.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.entity.*;
-import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.renderer.entity.RenderLiving;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.boss.BossStatus;
+import net.minecraft.entity.boss.IBossDisplayData;
+import net.minecraft.util.ResourceLocation;
 
-public class RenderCreeperBoss extends RenderLiving
-{
-    private static final ResourceLocation creeperTexture;
-    private static final ResourceLocation powerTexture;
-    private final ModelBase creeperModel;
-    
+import org.lwjgl.opengl.GL11;
+
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.planets.mars.MarsModule;
+import micdoodle8.mods.galacticraft.planets.mars.client.model.ModelCreeperBoss;
+import micdoodle8.mods.galacticraft.planets.mars.entities.EntityCreeperBoss;
+
+public class RenderCreeperBoss extends RenderLiving {
+
+    private static final ResourceLocation creeperTexture = new ResourceLocation(
+            MarsModule.ASSET_PREFIX,
+            "textures/model/creeper.png");
+    private static final ResourceLocation powerTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/power.png");
+    private final ModelBase creeperModel = new ModelCreeperBoss(2.0F);
+
     public RenderCreeperBoss() {
-        super((ModelBase)new ModelCreeperBoss(), 1.0f);
-        this.creeperModel = (ModelBase)new ModelCreeperBoss(2.0f);
+        super(new ModelCreeperBoss(), 1.0F);
     }
-    
-    protected ResourceLocation getEntityTexture(final Entity entity) {
+
+    @Override
+    protected ResourceLocation getEntityTexture(Entity entity) {
         return RenderCreeperBoss.creeperTexture;
     }
-    
-    public void doRender(final EntityLiving par1EntityLiving, final double par2, final double par4, final double par6, final float par8, final float par9) {
-        BossStatus.setBossStatus((IBossDisplayData)par1EntityLiving, false);
+
+    @Override
+    public void doRender(EntityLiving par1EntityLiving, double par2, double par4, double par6, float par8, float par9) {
+        BossStatus.setBossStatus((IBossDisplayData) par1EntityLiving, false);
+
         super.doRender(par1EntityLiving, par2, par4, par6, par8, par9);
     }
-    
-    protected int func_27006_a(final EntityCreeperBoss par1EntityCreeper, final int par2, final float par3) {
+
+    protected int func_27006_a(EntityCreeperBoss par1EntityCreeper, int par2, float par3) {
         if (par1EntityCreeper.headsRemaining == 1) {
             if (par2 == 1) {
                 final float var4 = par1EntityCreeper.ticksExisted + par3;
                 this.bindTexture(RenderCreeperBoss.powerTexture);
-                GL11.glMatrixMode(5890);
+                GL11.glMatrixMode(GL11.GL_TEXTURE);
                 GL11.glLoadIdentity();
-                final float var5 = var4 * 0.01f;
-                final float var6 = var4 * 0.01f;
-                GL11.glTranslatef(var5, var6, 0.0f);
+                final float var5 = var4 * 0.01F;
+                final float var6 = var4 * 0.01F;
+                GL11.glTranslatef(var5, var6, 0.0F);
                 this.setRenderPassModel(this.creeperModel);
-                GL11.glMatrixMode(5888);
-                GL11.glEnable(3042);
-                final float var7 = 0.5f;
-                GL11.glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
-                GL11.glDisable(2896);
-                GL11.glBlendFunc(1, 1);
+                GL11.glMatrixMode(GL11.GL_MODELVIEW);
+                GL11.glEnable(GL11.GL_BLEND);
+                final float var7 = 0.5F;
+                GL11.glColor4f(var7, var7, var7, 1.0F);
+                GL11.glDisable(GL11.GL_LIGHTING);
+                GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
                 return 1;
             }
+
             if (par2 == 2) {
-                GL11.glMatrixMode(5890);
+                GL11.glMatrixMode(GL11.GL_TEXTURE);
                 GL11.glLoadIdentity();
-                GL11.glMatrixMode(5888);
-                GL11.glEnable(2896);
-                GL11.glDisable(3042);
+                GL11.glMatrixMode(GL11.GL_MODELVIEW);
+                GL11.glEnable(GL11.GL_LIGHTING);
+                GL11.glDisable(GL11.GL_BLEND);
             }
         }
+
         return -1;
     }
-    
-    protected void preRenderCallback(final EntityLivingBase par1EntityLiving, final float par2) {
-        GL11.glScalef(4.0f, 4.0f, 4.0f);
+
+    @Override
+    protected void preRenderCallback(EntityLivingBase par1EntityLiving, float par2) {
+        GL11.glScalef(4.0F, 4.0F, 4.0F);
     }
-    
-    protected int getColorMultiplier(final EntityLivingBase par1EntityLivingBase, final float par2, final float par3) {
+
+    @Override
+    protected int getColorMultiplier(EntityLivingBase par1EntityLivingBase, float par2, float par3) {
         return super.getColorMultiplier(par1EntityLivingBase, par2, par3);
     }
-    
-    protected int shouldRenderPass(final EntityLivingBase par1EntityLivingBase, final int par2, final float par3) {
-        return this.func_27006_a((EntityCreeperBoss)par1EntityLivingBase, par2, par3);
+
+    @Override
+    protected int shouldRenderPass(EntityLivingBase par1EntityLivingBase, int par2, float par3) {
+        return this.func_27006_a((EntityCreeperBoss) par1EntityLivingBase, par2, par3);
     }
-    
-    protected int inheritRenderPass(final EntityLivingBase par1EntityLivingBase, final int par2, final float par3) {
+
+    @Override
+    protected int inheritRenderPass(EntityLivingBase par1EntityLivingBase, int par2, float par3) {
         return -1;
-    }
-    
-    static {
-        creeperTexture = new ResourceLocation("galacticraftmars", "textures/model/creeper.png");
-        powerTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/power.png");
     }
 }

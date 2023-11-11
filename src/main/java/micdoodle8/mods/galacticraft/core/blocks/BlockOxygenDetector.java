@@ -1,83 +1,98 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.util.*;
-import net.minecraft.block.material.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.client.renderer.texture.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraftforge.common.util.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
-public class BlockOxygenDetector extends BlockContainer implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc
-{
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenDetector;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class BlockOxygenDetector extends BlockContainer implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
+
     private IIcon iconSide;
     private IIcon iconTop;
-    
-    protected BlockOxygenDetector(final String assetName) {
+
+    protected BlockOxygenDetector(String assetName) {
         super(Material.iron);
-        this.setHardness(1.0f);
+        this.setHardness(1.0F);
         this.setStepSound(Block.soundTypeMetal);
         this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
         this.setBlockName(assetName);
     }
-    
+
+    @Override
     public int getRenderType() {
-        return GalacticraftCore.proxy.getBlockRender((Block)this);
+        return GalacticraftCore.proxy.getBlockRender(this);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
         this.iconTop = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_blank");
         this.iconSide = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "detector_side");
     }
-    
-    public IIcon getIcon(final int side, final int metadata) {
+
+    @Override
+    public IIcon getIcon(int side, int metadata) {
         if (side == 0 || side == 1) {
             return this.iconTop;
         }
         return this.iconSide;
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
-    public TileEntity createNewTileEntity(final World world, final int meta) {
+
+    @Override
+    public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityOxygenDetector();
     }
-    
-    public void updateOxygenState(final World par1World, final int x, final int y, final int z, final boolean valid) {
+
+    public void updateOxygenState(World par1World, int x, int y, int z, boolean valid) {
         if (valid) {
             par1World.setBlockMetadataWithNotify(x, y, z, 1, 3);
-        }
-        else {
+        } else {
             par1World.setBlockMetadataWithNotify(x, y, z, 0, 3);
         }
     }
-    
+
+    @Override
     public boolean canProvidePower() {
         return true;
     }
-    
-    public int isProvidingWeakPower(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4, final int par5) {
-        return (par1IBlockAccess.getBlockMetadata(par2, par3, par4) == 1) ? 15 : 0;
+
+    @Override
+    public int isProvidingWeakPower(IBlockAccess par1IBlockAccess, int par2, int par3, int par4, int par5) {
+        return par1IBlockAccess.getBlockMetadata(par2, par3, par4) == 1 ? 15 : 0;
     }
-    
-    public String getShiftDescription(final int meta) {
+
+    @Override
+    public String getShiftDescription(int meta) {
         return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-    
-    public boolean showDescription(final int meta) {
+
+    @Override
+    public boolean showDescription(int meta) {
         return true;
     }
-    
-    public boolean isSideSolid(final IBlockAccess world, final int x, final int y, final int z, final ForgeDirection side) {
+
+    // Solid block: can places torches on it (like a Redstone Block)
+    @Override
+    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
         return true;
     }
 }

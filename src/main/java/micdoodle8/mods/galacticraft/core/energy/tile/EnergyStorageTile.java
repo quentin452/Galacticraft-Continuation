@@ -1,94 +1,114 @@
 package micdoodle8.mods.galacticraft.core.energy.tile;
 
-import micdoodle8.mods.galacticraft.api.transmission.tile.*;
-import micdoodle8.mods.miccore.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.nbt.*;
-import net.minecraftforge.common.util.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import micdoodle8.mods.galacticraft.api.power.*;
-import micdoodle8.mods.galacticraft.api.transmission.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.ForgeDirection;
 
-public abstract class EnergyStorageTile extends TileEntityAdvanced implements IEnergyHandlerGC, IElectrical
-{
-    public static final float STANDARD_CAPACITY = 16000.0f;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
-    public EnergyStorage storage;
-    public int tierGC;
-    public int poweredByTierGC;
-    
-    public EnergyStorageTile() {
-        this.storage = new EnergyStorage(16000.0f, 10.0f);
-        this.tierGC = 1;
-        this.poweredByTierGC = 1;
-    }
-    
-    public void readFromNBT(final NBTTagCompound nbt) {
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.power.EnergySource;
+import micdoodle8.mods.galacticraft.api.power.EnergySource.EnergySourceAdjacent;
+import micdoodle8.mods.galacticraft.api.power.IEnergyHandlerGC;
+import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import micdoodle8.mods.galacticraft.api.transmission.tile.IElectrical;
+import micdoodle8.mods.galacticraft.core.tile.ReceiverMode;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityAdvanced;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+
+public abstract class EnergyStorageTile extends TileEntityAdvanced implements IEnergyHandlerGC, IElectrical {
+
+    public static final float STANDARD_CAPACITY = 16000F;
+
+    @NetworkedField(targetSide = Side.CLIENT)
+    public EnergyStorage storage = new EnergyStorage(STANDARD_CAPACITY, 10);
+
+    public int tierGC = 1;
+    public int poweredByTierGC = 1;
+
+    @Override
+    public void readFromNBT(NBTTagCompound nbt) {
+
         super.readFromNBT(nbt);
         this.storage.readFromNBT(nbt);
     }
-    
-    public void writeToNBT(final NBTTagCompound nbt) {
+
+    @Override
+    public void writeToNBT(NBTTagCompound nbt) {
+
         super.writeToNBT(nbt);
         this.storage.writeToNBT(nbt);
     }
-    
-    public abstract ReceiverMode getModeFromDirection(final ForgeDirection p0);
-    
-    public float receiveEnergyGC(final EnergySource from, final float amount, final boolean simulate) {
+
+    public abstract ReceiverMode getModeFromDirection(ForgeDirection direction);
+
+    @Override
+    public float receiveEnergyGC(EnergySource from, float amount, boolean simulate) {
         return this.storage.receiveEnergyGC(amount, simulate);
     }
-    
-    public float extractEnergyGC(final EnergySource from, final float amount, final boolean simulate) {
+
+    @Override
+    public float extractEnergyGC(EnergySource from, float amount, boolean simulate) {
         return this.storage.extractEnergyGC(amount, simulate);
     }
-    
-    public boolean nodeAvailable(final EnergySource from) {
-        return from instanceof EnergySource.EnergySourceAdjacent && this.getModeFromDirection(((EnergySource.EnergySourceAdjacent)from).direction) != ReceiverMode.UNDEFINED;
+
+    @Override
+    public boolean nodeAvailable(EnergySource from) {
+        if (!(from instanceof EnergySourceAdjacent)) {
+            return false;
+        }
+
+        return this.getModeFromDirection(((EnergySourceAdjacent) from).direction) != ReceiverMode.UNDEFINED;
     }
-    
-    public float getEnergyStoredGC(final EnergySource from) {
+
+    @Override
+    public float getEnergyStoredGC(EnergySource from) {
         return this.storage.getEnergyStoredGC();
     }
-    
+
     public float getEnergyStoredGC() {
         return this.storage.getEnergyStoredGC();
     }
-    
-    public float getMaxEnergyStoredGC(final EnergySource from) {
+
+    @Override
+    public float getMaxEnergyStoredGC(EnergySource from) {
         return this.storage.getCapacityGC();
     }
-    
+
     public float getMaxEnergyStoredGC() {
         return this.storage.getCapacityGC();
     }
-    
-    public boolean canConnect(final ForgeDirection direction, final NetworkType type) {
+
+    @Override
+    public boolean canConnect(ForgeDirection direction, NetworkType type) {
         return false;
     }
-    
-    public float receiveElectricity(final ForgeDirection from, final float receive, final int tier, final boolean doReceive) {
+
+    // Five methods for compatibility with basic electricity
+    @Override
+    public float receiveElectricity(ForgeDirection from, float receive, int tier, boolean doReceive) {
         this.poweredByTierGC = tier;
         return this.storage.receiveEnergyGC(receive, !doReceive);
     }
-    
-    public float provideElectricity(final ForgeDirection from, final float request, final boolean doProvide) {
+
+    @Override
+    public float provideElectricity(ForgeDirection from, float request, boolean doProvide) {
         return this.storage.extractEnergyGC(request, !doProvide);
     }
-    
-    public float getRequest(final ForgeDirection direction) {
+
+    @Override
+    public float getRequest(ForgeDirection direction) {
         return Math.min(this.storage.getCapacityGC() - this.storage.getEnergyStoredGC(), this.storage.getMaxReceive());
     }
-    
-    public float getProvide(final ForgeDirection direction) {
-        return 0.0f;
+
+    @Override
+    public float getProvide(ForgeDirection direction) {
+        return 0;
     }
-    
+
+    @Override
     public int getTierGC() {
         return this.tierGC;
     }
-    
-    public void setTierGC(final int newTier) {
+
+    public void setTierGC(int newTier) {
         this.tierGC = newTier;
     }
 }

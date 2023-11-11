@@ -1,129 +1,213 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.material.*;
-import net.minecraft.client.renderer.texture.*;
-import net.minecraft.world.*;
-import net.minecraft.util.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
-import java.util.*;
-import net.minecraft.item.*;
-import net.minecraft.init.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.Random;
 
-public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc
-{
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class BlockCheese extends Block implements ItemBlockDesc.IBlockShiftDesc {
+
     IIcon[] cheeseIcons;
-    
+
     public BlockCheese() {
         super(Material.cake);
         this.setTickRandomly(true);
         this.disableStats();
-        this.setHardness(0.5f);
+        this.setHardness(0.5F);
         this.setStepSound(Block.soundTypeCloth);
         this.setBlockName("cheeseBlock");
     }
-    
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
-        (this.cheeseIcons = new IIcon[3])[0] = par1IconRegister.registerIcon("galacticraftmoon:cheese_1");
-        this.cheeseIcons[1] = par1IconRegister.registerIcon("galacticraftmoon:cheese_2");
-        this.cheeseIcons[2] = par1IconRegister.registerIcon("galacticraftmoon:cheese_3");
+
+    @Override
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
+        this.cheeseIcons = new IIcon[3];
+        this.cheeseIcons[0] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "cheese_1");
+        this.cheeseIcons[1] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "cheese_2");
+        this.cheeseIcons[2] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "cheese_3");
     }
-    
-    public void setBlockBoundsBasedOnState(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4) {
+
+    /**
+     * Updates the blocks bounds based on its current state. Args: world, x, y, z
+     */
+    @Override
+    public void setBlockBoundsBasedOnState(IBlockAccess par1IBlockAccess, int par2, int par3, int par4) {
         final int var5 = par1IBlockAccess.getBlockMetadata(par2, par3, par4);
-        final float var6 = 0.0625f;
-        final float var7 = (1 + var5 * 2) / 16.0f;
-        final float var8 = 0.5f;
-        this.setBlockBounds(var7, 0.0f, 0.0625f, 0.9375f, 0.5f, 0.9375f);
+        final float var6 = 0.0625F;
+        final float var7 = (1 + var5 * 2) / 16.0F;
+        final float var8 = 0.5F;
+        this.setBlockBounds(var7, 0.0F, var6, 1.0F - var6, var8, 1.0F - var6);
     }
-    
+
+    /**
+     * Sets the block's bounds for rendering it as an item
+     */
+    @Override
     public void setBlockBoundsForItemRender() {
-        final float var1 = 0.0625f;
-        final float var2 = 0.5f;
-        this.setBlockBounds(0.0625f, 0.0f, 0.0625f, 0.9375f, 0.5f, 0.9375f);
+        final float var1 = 0.0625F;
+        final float var2 = 0.5F;
+        this.setBlockBounds(var1, 0.0F, var1, 1.0F - var1, var2, 1.0F - var1);
     }
-    
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World par1World, final int par2, final int par3, final int par4) {
+
+    /**
+     * Returns a bounding box from the pool of bounding boxes (this means this box can change after the pool has been
+     * cleared to be reused)
+     */
+    @Override
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4) {
         final int var5 = par1World.getBlockMetadata(par2, par3, par4);
-        final float var6 = 0.0625f;
-        final float var7 = (1 + var5 * 2) / 16.0f;
-        final float var8 = 0.5f;
-        return AxisAlignedBB.getBoundingBox((double)(par2 + var7), (double)par3, (double)(par4 + 0.0625f), (double)(par2 + 1 - 0.0625f), (double)(par3 + 0.5f - 0.0625f), (double)(par4 + 1 - 0.0625f));
+        final float var6 = 0.0625F;
+        final float var7 = (1 + var5 * 2) / 16.0F;
+        final float var8 = 0.5F;
+        return AxisAlignedBB
+                .getBoundingBox(par2 + var7, par3, par4 + var6, par2 + 1 - var6, par3 + var8 - var6, par4 + 1 - var6);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World par1World, final int par2, final int par3, final int par4) {
+    /**
+     * Returns the bounding box of the wired rectangular prism to render.
+     */
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4) {
         final int var5 = par1World.getBlockMetadata(par2, par3, par4);
-        final float var6 = 0.0625f;
-        final float var7 = (1 + var5 * 2) / 16.0f;
-        final float var8 = 0.5f;
-        return AxisAlignedBB.getBoundingBox((double)(par2 + var7), (double)par3, (double)(par4 + 0.0625f), (double)(par2 + 1 - 0.0625f), (double)(par3 + 0.5f), (double)(par4 + 1 - 0.0625f));
+        final float var6 = 0.0625F;
+        final float var7 = (1 + var5 * 2) / 16.0F;
+        final float var8 = 0.5F;
+        return AxisAlignedBB
+                .getBoundingBox(par2 + var7, par3, par4 + var6, par2 + 1 - var6, par3 + var8, par4 + 1 - var6);
     }
-    
-    public IIcon getIcon(final int par1, final int par2) {
-        return (par1 == 1) ? this.cheeseIcons[0] : ((par1 == 0) ? this.cheeseIcons[0] : ((par2 > 0 && par1 == 4) ? this.cheeseIcons[2] : this.cheeseIcons[1]));
+
+    /**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    @Override
+    public IIcon getIcon(int par1, int par2) {
+        return par1 == 1 ? this.cheeseIcons[0]
+                : par1 == 0 ? this.cheeseIcons[0] : par2 > 0 && par1 == 4 ? this.cheeseIcons[2] : this.cheeseIcons[1];
     }
-    
+
+    /**
+     * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
+     */
+    @Override
     public boolean renderAsNormalBlock() {
         return false;
     }
-    
+
+    /**
+     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two
+     * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
+     */
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
-    
-    public boolean onBlockActivated(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer, final int par6, final float par7, final float par8, final float par9) {
+
+    /**
+     * Called upon block activation (right click on the block.)
+     */
+    @Override
+    public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer,
+            int par6, float par7, float par8, float par9) {
         this.eatCakeSlice(par1World, par2, par3, par4, par5EntityPlayer);
         return true;
     }
-    
-    public void onBlockClicked(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer) {
+
+    /**
+     * Called when the block is clicked by a player. Args: x, y, z, entityPlayer
+     */
+    @Override
+    public void onBlockClicked(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer) {
         this.eatCakeSlice(par1World, par2, par3, par4, par5EntityPlayer);
     }
-    
-    private void eatCakeSlice(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer) {
+
+    /**
+     * Heals the player and removes a slice from the cake.
+     */
+    private void eatCakeSlice(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer) {
         if (par5EntityPlayer.canEat(false)) {
-            par5EntityPlayer.getFoodStats().addStats(2, 0.1f);
+            par5EntityPlayer.getFoodStats().addStats(2, 0.1F);
             final int l = par1World.getBlockMetadata(par2, par3, par4) + 1;
+
             if (l >= 6) {
                 par1World.setBlockToAir(par2, par3, par4);
-            }
-            else {
+            } else {
                 par1World.setBlockMetadataWithNotify(par2, par3, par4, l, 2);
             }
         }
     }
-    
-    public boolean canPlaceBlockAt(final World par1World, final int par2, final int par3, final int par4) {
+
+    /**
+     * Checks to see if its valid to put this block at the specified coordinates. Args: world, x, y, z
+     */
+    @Override
+    public boolean canPlaceBlockAt(World par1World, int par2, int par3, int par4) {
         return super.canPlaceBlockAt(par1World, par2, par3, par4) && this.canBlockStay(par1World, par2, par3, par4);
     }
-    
-    public void onNeighborBlockChange(final World par1World, final int par2, final int par3, final int par4, final Block par5) {
+
+    /**
+     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
+     * their own) Args: x, y, z, neighbor blockID
+     */
+    @Override
+    public void onNeighborBlockChange(World par1World, int par2, int par3, int par4, Block par5) {
         if (!this.canBlockStay(par1World, par2, par3, par4)) {
             par1World.setBlockToAir(par2, par3, par4);
         }
     }
-    
-    public boolean canBlockStay(final World par1World, final int par2, final int par3, final int par4) {
+
+    /**
+     * Can this block stay at this position. Similar to canPlaceBlockAt except gets checked often with plants.
+     */
+    @Override
+    public boolean canBlockStay(World par1World, int par2, int par3, int par4) {
         return par1World.getBlock(par2, par3 - 1, par4).getMaterial().isSolid();
     }
-    
-    public int quantityDropped(final Random par1Random) {
+
+    /**
+     * Returns the quantity of items to drop on block destruction.
+     */
+    @Override
+    public int quantityDropped(Random par1Random) {
         return 0;
     }
-    
-    public Item getItemDropped(final int par1, final Random par2Random, final int par3) {
+
+    /**
+     * Returns the ID of the items to drop on destruction.
+     */
+    @Override
+    public Item getItemDropped(int par1, Random par2Random, int par3) {
         return Item.getItemFromBlock(Blocks.air);
     }
-    
-    public String getShiftDescription(final int meta) {
+
+    // @Override
+    // @SideOnly(Side.CLIENT)
+    // public ItemStack getPickBlock(MovingObjectPosition target, World world, int
+    // x, int y, int z)
+    // {
+    // return new ItemStack(GCItems.cheeseBlock);
+    // }
+
+    @Override
+    public String getShiftDescription(int meta) {
         return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-    
-    public boolean showDescription(final int meta) {
+
+    @Override
+    public boolean showDescription(int meta) {
         return true;
     }
 }

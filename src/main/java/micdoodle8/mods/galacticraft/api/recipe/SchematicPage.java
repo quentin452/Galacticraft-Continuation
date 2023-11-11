@@ -1,8 +1,12 @@
 package micdoodle8.mods.galacticraft.api.recipe;
 
-public abstract class SchematicPage implements ISchematicPage
-{
-    public int compareTo(final ISchematicPage o) {
+/**
+ * Reference implementation of {@link ISchematicPage}. Use/extend this or implement your own.
+ */
+public abstract class SchematicPage implements ISchematicPage {
+
+    @Override
+    public int compareTo(ISchematicPage o) {
         if (this.getPageID() > o.getPageID()) {
             return 1;
         }

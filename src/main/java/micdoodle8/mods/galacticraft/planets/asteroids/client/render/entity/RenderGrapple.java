@@ -1,65 +1,94 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.entity;
 
-import net.minecraft.client.renderer.entity.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.entities.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.entity.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.client.render.item.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.util.*;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 
-public class RenderGrapple extends Render
-{
-    public void doRender(final EntityGrapple grapple, final double x, final double y, final double z, final float par8, final float partialTicks) {
-        GL11.glDisable(32826);
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import micdoodle8.mods.galacticraft.planets.asteroids.client.render.item.ItemRendererGrappleHook;
+import micdoodle8.mods.galacticraft.planets.asteroids.entities.EntityGrapple;
+
+public class RenderGrapple extends Render {
+
+    public void doRender(EntityGrapple grapple, double x, double y, double z, float par8, float partialTicks) {
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         GL11.glPushMatrix();
-        final Vec3 vec3 = Vec3.createVectorHelper(0.0, -0.2, 0.0);
+
+        final Vec3 vec3 = Vec3.createVectorHelper(0.0D, -0.2D, 0.0D);
         final EntityPlayer shootingEntity = grapple.getShootingEntity();
+
         if (shootingEntity != null && grapple.getPullingEntity()) {
-            final double d3 = shootingEntity.prevPosX + (shootingEntity.posX - shootingEntity.prevPosX) * partialTicks + vec3.xCoord;
-            final double d4 = shootingEntity.prevPosY + (shootingEntity.posY - shootingEntity.prevPosY) * partialTicks + vec3.yCoord;
-            final double d5 = shootingEntity.prevPosZ + (shootingEntity.posZ - shootingEntity.prevPosZ) * partialTicks + vec3.zCoord;
+            final double d3 = shootingEntity.prevPosX + (shootingEntity.posX - shootingEntity.prevPosX) * partialTicks
+                    + vec3.xCoord;
+            final double d4 = shootingEntity.prevPosY + (shootingEntity.posY - shootingEntity.prevPosY) * partialTicks
+                    + vec3.yCoord;
+            final double d5 = shootingEntity.prevPosZ + (shootingEntity.posZ - shootingEntity.prevPosZ) * partialTicks
+                    + vec3.zCoord;
+
             final Tessellator tessellator = Tessellator.instance;
-            GL11.glDisable(3553);
-            GL11.glDisable(2896);
-            tessellator.startDrawing(3);
-            tessellator.setColorOpaque_F(0.79607844f, 0.79607844f, 0.7529412f);
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.setColorOpaque_F(203.0F / 255.0F, 203.0F / 255.0F, 192.0F / 255.0F);
             final byte b2 = 16;
-            final double d6 = grapple.prevPosX + (grapple.posX - grapple.prevPosX) * partialTicks;
-            final double d7 = grapple.prevPosY + (grapple.posY - grapple.prevPosY) * partialTicks + 0.25;
-            final double d8 = grapple.prevPosZ + (grapple.posZ - grapple.prevPosZ) * partialTicks;
-            final double d9 = (float)(d3 - d6);
-            final double d10 = (float)(d4 - d7);
-            final double d11 = (float)(d5 - d8);
-            tessellator.addTranslation(0.0f, -0.2f, 0.0f);
+
+            final double d14 = grapple.prevPosX + (grapple.posX - grapple.prevPosX) * partialTicks;
+            final double d8 = grapple.prevPosY + (grapple.posY - grapple.prevPosY) * partialTicks + 0.25D;
+            final double d10 = grapple.prevPosZ + (grapple.posZ - grapple.prevPosZ) * partialTicks;
+            final double d11 = (float) (d3 - d14);
+            final double d12 = (float) (d4 - d8);
+            final double d13 = (float) (d5 - d10);
+            tessellator.addTranslation(0, -0.2F, 0);
+
             for (int i = 0; i <= b2; ++i) {
-                final float f12 = i / (float)b2;
-                tessellator.addVertex(x + d9 * f12, y + d10 * (f12 * f12 + f12) * 0.5 + 0.15, z + d11 * f12);
+                final float f12 = (float) i / (float) b2;
+                tessellator.addVertex(x + d11 * f12, y + d12 * (f12 * f12 + f12) * 0.5D + 0.15D, z + d13 * f12);
             }
+
             tessellator.draw();
-            tessellator.setTranslation(0.0, 0.0, 0.0);
-            GL11.glEnable(2896);
-            GL11.glEnable(3553);
+            tessellator.setTranslation(0, 0, 0);
+            GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
         }
-        GL11.glTranslatef((float)x, (float)y, (float)z);
-        GL11.glRotatef(grapple.prevRotationYaw + (grapple.rotationYaw - grapple.prevRotationYaw) * partialTicks - 90.0f, 0.0f, 1.0f, 0.0f);
-        GL11.glRotatef(grapple.prevRotationPitch + (grapple.rotationPitch - grapple.prevRotationPitch) * partialTicks - 180.0f, 0.0f, 0.0f, 1.0f);
-        GL11.glRotatef(grapple.prevRotationRoll + (grapple.rotationRoll - grapple.prevRotationRoll) * partialTicks, 1.0f, 0.0f, 0.0f);
-        this.bindEntityTexture((Entity)grapple);
+
+        GL11.glTranslatef((float) x, (float) y, (float) z);
+        GL11.glRotatef(
+                grapple.prevRotationYaw + (grapple.rotationYaw - grapple.prevRotationYaw) * partialTicks - 90.0F,
+                0.0F,
+                1.0F,
+                0.0F);
+        GL11.glRotatef(
+                grapple.prevRotationPitch + (grapple.rotationPitch - grapple.prevRotationPitch) * partialTicks - 180,
+                0.0F,
+                0.0F,
+                1.0F);
+        GL11.glRotatef(
+                grapple.prevRotationRoll + (grapple.rotationRoll - grapple.prevRotationRoll) * partialTicks,
+                1.0F,
+                0.0F,
+                0.0F);
+        this.bindEntityTexture(grapple);
         ItemRendererGrappleHook.modelGrapple.renderAll();
+
         GL11.glPopMatrix();
     }
-    
-    protected ResourceLocation getEntityTexture(final EntityGrapple grapple) {
+
+    protected ResourceLocation getEntityTexture(EntityGrapple grapple) {
         return ItemRendererGrappleHook.grappleTexture;
     }
-    
-    protected ResourceLocation getEntityTexture(final Entity entity) {
-        return this.getEntityTexture((EntityGrapple)entity);
+
+    @Override
+    protected ResourceLocation getEntityTexture(Entity entity) {
+        return this.getEntityTexture((EntityGrapple) entity);
     }
-    
-    public void doRender(final Entity entity, final double x, final double y, final double z, final float par8, final float partialTicks) {
-        this.doRender((EntityGrapple)entity, x, y, z, par8, partialTicks);
+
+    @Override
+    public void doRender(Entity entity, double x, double y, double z, float par8, float partialTicks) {
+        this.doRender((EntityGrapple) entity, x, y, z, par8, partialTicks);
     }
 }

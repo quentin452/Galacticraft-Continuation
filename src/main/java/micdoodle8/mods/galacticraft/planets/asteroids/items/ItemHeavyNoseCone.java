@@ -1,57 +1,71 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import net.minecraft.client.renderer.texture.*;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 
-public class ItemHeavyNoseCone extends Item
-{
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+
+public class ItemHeavyNoseCone extends Item {
+
     public IIcon[] icons;
-    
-    public ItemHeavyNoseCone(final String assetName) {
+
+    public ItemHeavyNoseCone(String assetName) {
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
         this.setUnlocalizedName(assetName);
         this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
     public boolean requiresMultipleRenderPasses() {
         return true;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamageForRenderPass(final int par1, final int par2) {
-        return (par2 == 0) ? this.icons[0] : this.icons[1];
+    public IIcon getIconFromDamageForRenderPass(int par1, int par2) {
+        return par2 == 0 ? this.icons[0] : this.icons[1];
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(final IIconRegister iconRegister) {
-        (this.icons = new IIcon[2])[0] = iconRegister.registerIcon("galacticraftasteroids:heavyNoseCone");
-        this.icons[1] = iconRegister.registerIcon("galacticraftasteroids:heavyNoseCone.0");
+    public void registerIcons(IIconRegister iconRegister) {
+        this.icons = new IIcon[2];
+        this.icons[0] = iconRegister.registerIcon(AsteroidsModule.TEXTURE_PREFIX + "heavyNoseCone");
+        this.icons[1] = iconRegister.registerIcon(AsteroidsModule.TEXTURE_PREFIX + "heavyNoseCone.0");
     }
-    
-    public IIcon getIconFromDamage(final int damage) {
+
+    @Override
+    public IIcon getIconFromDamage(int damage) {
         if (this.icons.length > damage) {
             return this.icons[damage];
         }
+
         return super.getIconFromDamage(damage);
     }
-    
-    public int getMetadata(final int par1) {
+
+    @Override
+    public int getMetadata(int par1) {
         return par1;
     }
 }

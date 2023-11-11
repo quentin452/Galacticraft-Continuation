@@ -1,60 +1,69 @@
 package micdoodle8.mods.galacticraft.core.client.render.tile;
 
-import net.minecraft.client.renderer.tileentity.*;
-import net.minecraft.client.renderer.texture.*;
-import cpw.mods.fml.client.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.util.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraftforge.client.model.*;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.model.AdvancedModelLoader;
+import net.minecraftforge.client.model.IModelCustom;
 
-public class TileEntityDishRenderer extends TileEntitySpecialRenderer
-{
-    private static final ResourceLocation textureSupport;
-    private static final ResourceLocation textureFork;
-    private static final ResourceLocation textureDish;
-    private static final IModelCustom modelSupport;
-    private static final IModelCustom modelFork;
-    private static final IModelCustom modelDish;
-    private TextureManager renderEngine;
-    
-    public TileEntityDishRenderer() {
-        this.renderEngine = FMLClientHandler.instance().getClient().renderEngine;
-    }
-    
-    public void renderTileEntityAt(final TileEntity var1, final double par2, final double par4, final double par6, final float partialTickTime) {
-        final TileEntityDish dish = (TileEntityDish)var1;
-        final float time = (dish.ticks + partialTickTime) % 1440.0f;
-        final EntityPlayer player = (EntityPlayer)FMLClientHandler.instance().getClient().thePlayer;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityDish;
+
+public class TileEntityDishRenderer extends TileEntitySpecialRenderer {
+
+    private static final ResourceLocation textureSupport = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/telesupport.png");
+    private static final ResourceLocation textureFork = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/telefork.png");
+    private static final ResourceLocation textureDish = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/teledish.png");
+    private static final IModelCustom modelSupport = AdvancedModelLoader
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/telesupport.obj"));
+    private static final IModelCustom modelFork = AdvancedModelLoader
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/telefork.obj"));
+    private static final IModelCustom modelDish = AdvancedModelLoader
+            .loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/teledish.obj"));
+    private final TextureManager renderEngine = FMLClientHandler.instance().getClient().renderEngine;
+
+    @Override
+    public void renderTileEntityAt(TileEntity var1, double par2, double par4, double par6, float partialTickTime) {
+        final TileEntityDish dish = (TileEntityDish) var1;
+        final float time = (dish.ticks + partialTickTime) % 1440F;
+
         GL11.glPushMatrix();
-        GL11.glEnable(32826);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glTranslatef((float)par2, (float)par4, (float)par6);
-        GL11.glTranslatef(1.0f, 1.0f, 1.0f);
-        GL11.glScalef(2.0f, 2.0f, 2.0f);
-        this.renderEngine.bindTexture(TileEntityDishRenderer.textureSupport);
-        TileEntityDishRenderer.modelSupport.renderAll();
-        GL11.glRotatef(time / 4.0f, 0.0f, -1.0f, 0.0f);
-        this.renderEngine.bindTexture(TileEntityDishRenderer.textureFork);
-        TileEntityDishRenderer.modelFork.renderAll();
-        GL11.glTranslatef(0.0f, 2.3f, 0.0f);
-        GL11.glRotatef((MathHelper.sin(time / 144.0f) + 1.0f) * 22.5f, 1.0f, 0.0f, 0.0f);
-        GL11.glTranslatef(0.0f, -2.3f, 0.0f);
-        this.renderEngine.bindTexture(TileEntityDishRenderer.textureDish);
-        TileEntityDishRenderer.modelDish.renderAll();
-        GL11.glDisable(32826);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glTranslatef((float) par2, (float) par4, (float) par6);
+        GL11.glTranslatef(1.0F, 1.0F, 1.0F);
+        GL11.glScalef(2.0F, 2.0F, 2.0F);
+
+        this.renderEngine.bindTexture(textureSupport);
+        modelSupport.renderAll();
+        GL11.glRotatef(time / 4, 0, -1, 0);
+        this.renderEngine.bindTexture(textureFork);
+        modelFork.renderAll();
+
+        // float celestialAngle = (dish.getWorldObj().getCelestialAngle(1.0F) -
+        // 0.784690560F) * 360.0F;
+        // float celestialAngle2 = dish.getWorldObj().getCelestialAngle(1.0F) * 360.0F;
+
+        GL11.glTranslatef(0.0F, 2.3F, 0.0F);
+        GL11.glRotatef((MathHelper.sin(time / 144) + 1.0F) * 22.5F, 1.0F, 0.0F, 0.0F);
+        GL11.glTranslatef(0.0F, -2.3F, 0.0F);
+
+        this.renderEngine.bindTexture(textureDish);
+        modelDish.renderAll();
+
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
         GL11.glPopMatrix();
-    }
-    
-    static {
-        textureSupport = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/telesupport.png");
-        textureFork = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/telefork.png");
-        textureDish = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/teledish.png");
-        modelSupport = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/telesupport.obj"));
-        modelFork = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/telefork.obj"));
-        modelDish = AdvancedModelLoader.loadModel(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "models/teledish.obj"));
     }
 }

@@ -1,129 +1,149 @@
 package micdoodle8.mods.galacticraft.core.entities.player;
 
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import micdoodle8.mods.galacticraft.api.entity.*;
-import micdoodle8.mods.galacticraft.core.dimension.*;
-import micdoodle8.mods.galacticraft.core.entities.*;
-import micdoodle8.mods.galacticraft.core.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.dimension.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.items.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.planets.mars.items.*;
-import net.minecraft.entity.*;
-import micdoodle8.mods.galacticraft.core.event.*;
-import net.minecraftforge.common.*;
-import cpw.mods.fml.common.eventhandler.*;
-import net.minecraft.util.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.MinecraftForge;
 
-public class PlayerServer implements IPlayerServer
-{
-    boolean updatingRidden;
-    
-    public PlayerServer() {
-        this.updatingRidden = false;
-    }
-    
-    public void clonePlayer(final EntityPlayerMP player, final EntityPlayer oldPlayer, final boolean keepInv) {
+import micdoodle8.mods.galacticraft.api.entity.IIgnoreShift;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.dimension.WorldProviderMoon;
+import micdoodle8.mods.galacticraft.core.entities.EntityCelestialFake;
+import micdoodle8.mods.galacticraft.core.event.EventWakePlayer;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityTelemetry;
+import micdoodle8.mods.galacticraft.core.util.DamageSourceGC;
+import micdoodle8.mods.galacticraft.planets.asteroids.dimension.WorldProviderAsteroids;
+import micdoodle8.mods.galacticraft.planets.asteroids.items.ItemArmorAsteroids;
+import micdoodle8.mods.galacticraft.planets.mars.items.ItemArmorMars;
+
+public class PlayerServer implements IPlayerServer {
+
+    boolean updatingRidden = false;
+
+    @Override
+    public void clonePlayer(EntityPlayerMP player, EntityPlayer oldPlayer, boolean keepInv) {
         if (oldPlayer instanceof EntityPlayerMP) {
-            GCPlayerStats.get(player).copyFrom(GCPlayerStats.get((EntityPlayerMP)oldPlayer), keepInv || player.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory"));
-            TileEntityTelemetry.updateLinkedPlayer((EntityPlayerMP)oldPlayer, player);
+            GCPlayerStats.get(player).copyFrom(
+                    GCPlayerStats.get((EntityPlayerMP) oldPlayer),
+                    keepInv || player.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory"));
+            TileEntityTelemetry.updateLinkedPlayer((EntityPlayerMP) oldPlayer, player);
         }
     }
-    
-    public void updateRiddenPre(final EntityPlayerMP player) {
+
+    @Override
+    public void updateRiddenPre(EntityPlayerMP player) {
         this.updatingRidden = true;
     }
-    
-    public void updateRiddenPost(final EntityPlayerMP player) {
+
+    @Override
+    public void updateRiddenPost(EntityPlayerMP player) {
         this.updatingRidden = false;
     }
-    
-    public boolean mountEntity(final EntityPlayerMP player, final Entity par1Entity) {
-        return this.updatingRidden && player.ridingEntity instanceof IIgnoreShift && ((IIgnoreShift)player.ridingEntity).shouldIgnoreShiftExit();
+
+    @Override
+    public boolean mountEntity(EntityPlayerMP player, Entity par1Entity) {
+        return this.updatingRidden && player.ridingEntity instanceof IIgnoreShift
+                && ((IIgnoreShift) player.ridingEntity).shouldIgnoreShiftExit();
     }
-    
-    public void moveEntity(final EntityPlayerMP player, final double par1, final double par3, final double par5) {
-        if (player.worldObj.provider instanceof WorldProviderMoon && !player.worldObj.isRemote && player.ridingEntity == null) {
+
+    @Override
+    public void moveEntity(EntityPlayerMP player, double par1, double par3, double par5) {
+        // If the player is on the moon, not airbourne and not riding anything
+        if (player.worldObj.provider instanceof WorldProviderMoon && !player.worldObj.isRemote
+                && player.ridingEntity == null) {
             GCPlayerHandler.updateFeet(player, par1, par5);
         }
     }
-    
-    public boolean wakeUpPlayer(final EntityPlayerMP player, final boolean par1, final boolean par2, final boolean par3) {
+
+    @Override
+    public boolean wakeUpPlayer(EntityPlayerMP player, boolean par1, boolean par2, boolean par3) {
         return this.wakeUpPlayer(player, par1, par2, par3, false);
     }
-    
-    public float attackEntityFrom(final EntityPlayerMP player, final DamageSource par1DamageSource, float par2) {
+
+    @Override
+    public float attackEntityFrom(EntityPlayerMP player, DamageSource par1DamageSource, float par2) {
+        // No damage while in Celestial Selection screen
         if (player.ridingEntity instanceof EntityCelestialFake) {
-            return -1.0f;
+            return -1;
         }
+
         if (GalacticraftCore.isPlanetsLoaded) {
             if (par1DamageSource == DamageSource.outOfWorld) {
                 if (player.worldObj.provider instanceof WorldProviderAsteroids) {
-                    if (player.posY > -120.0) {
-                        return -1.0f;
+                    if (player.posY > -120D) {
+                        return -1;
                     }
-                    if (player.posY > -180.0) {
-                        par2 /= 2.0f;
+                    if (player.posY > -180D) {
+                        par2 /= 2;
                     }
                 }
-            }
-            else if (par1DamageSource == DamageSource.fall || par1DamageSource == DamageSourceGC.spaceshipCrash) {
+            } else if (par1DamageSource == DamageSource.fall || par1DamageSource == DamageSourceGC.spaceshipCrash) {
                 int titaniumCount = 0;
                 if (player.inventory != null) {
-                    for (int i = 0; i < 4; ++i) {
+                    for (int i = 0; i < 4; i++) {
                         final ItemStack armorPiece = player.getCurrentArmor(i);
                         if (armorPiece != null && armorPiece.getItem() instanceof ItemArmorAsteroids) {
-                            ++titaniumCount;
+                            titaniumCount++;
                         }
                     }
                 }
                 if (titaniumCount == 4) {
                     titaniumCount = 5;
                 }
-                par2 *= (float)(1.0 - 0.15 * titaniumCount);
+                par2 *= 1 - 0.15D * titaniumCount;
             }
         }
+
         return par2;
     }
-    
-    public void knockBack(final EntityPlayerMP player, final Entity p_70653_1_, final float p_70653_2_, final double impulseX, final double impulseZ) {
+
+    @Override
+    public void knockBack(EntityPlayerMP player, Entity p_70653_1_, float p_70653_2_, double impulseX,
+            double impulseZ) {
         int deshCount = 0;
         if (player.inventory != null && GalacticraftCore.isPlanetsLoaded) {
-            for (int i = 0; i < 4; ++i) {
+            for (int i = 0; i < 4; i++) {
                 final ItemStack armorPiece = player.getCurrentArmor(i);
                 if (armorPiece != null && armorPiece.getItem() instanceof ItemArmorMars) {
-                    ++deshCount;
+                    deshCount++;
                 }
             }
         }
-        if (player.getRNG().nextDouble() >= player.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).getAttributeValue()) {
-            player.isAirBorne = (deshCount < 2);
+
+        if (player.getRNG().nextDouble()
+                >= player.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).getAttributeValue()) {
+            player.isAirBorne = deshCount < 2;
             final float f1 = MathHelper.sqrt_double(impulseX * impulseX + impulseZ * impulseZ);
-            final float f2 = 0.4f - deshCount * 0.05f;
-            final double d1 = 2.0 - deshCount * 0.15;
+            final float f2 = 0.4F - deshCount * 0.05F;
+            final double d1 = 2.0D - deshCount * 0.15D;
             player.motionX /= d1;
             player.motionY /= d1;
             player.motionZ /= d1;
             player.motionX -= f2 * impulseX / f1;
             player.motionY += f2;
             player.motionZ -= f2 * impulseZ / f1;
-            if (player.motionY > 0.4) {
-                player.motionY = 0.4;
+
+            if (player.motionY > 0.4D) {
+                player.motionY = 0.4D;
             }
         }
     }
-    
-    public boolean wakeUpPlayer(final EntityPlayerMP player, final boolean par1, final boolean par2, final boolean par3, final boolean bypass) {
+
+    public boolean wakeUpPlayer(EntityPlayerMP player, boolean par1, boolean par2, boolean par3, boolean bypass) {
         final ChunkCoordinates c = player.playerLocation;
+
         if (c != null) {
-            final EventWakePlayer event = new EventWakePlayer((EntityPlayer)player, c.posX, c.posY, c.posZ, par1, par2, par3, bypass);
-            MinecraftForge.EVENT_BUS.post((Event)event);
-            if (bypass || event.result == null || event.result == EntityPlayer.EnumStatus.OK) {
-                return false;
-            }
+            final EventWakePlayer event = new EventWakePlayer(player, c.posX, c.posY, c.posZ, par1, par2, par3, bypass);
+            MinecraftForge.EVENT_BUS.post(event);
+
+            return !bypass && event.result != null && event.result != EntityPlayer.EnumStatus.OK;
         }
+
         return true;
     }
 }

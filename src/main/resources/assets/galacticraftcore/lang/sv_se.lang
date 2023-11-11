@@ -425,7 +425,7 @@ gui.telemetryFailWearingIt.message=Denna frekvensmodul är i konflikt med den du
 
 gui.rocketType.0=Lastutrymme: 18
 gui.rocketType.1=Lastutrymme: 36
-gui.rocketType.2=Lastutrymme: 56
+gui.rocketType.2=Lastutrymme: 54
 gui.rocketType.3=Fulltankad
 
 gui.spacestation.typeCommand=Skriv
@@ -445,6 +445,7 @@ gui.receiver.cannotAttach=Motagare kan inte sättas här!
 gui.warning.invalidThermal=Undermåligt temperaturskydd!
 
 gui.tank.oxygenRemaining=Mängd
+gui.tank.infinite=OÄNDLIG
 gui.buggy.storageSpace=Lastutrymme
 gui.frequencyModule.desc.0=Känner av svaga ljudvågor
 gui.frequencyModule.desc.1=samt fjärrläser signaler.

@@ -1,88 +1,166 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.*;
-import net.minecraft.block.material.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
-import java.lang.reflect.*;
+import java.lang.reflect.Method;
 
-public abstract class BlockAdvanced extends BlockContainer
-{
-    public BlockAdvanced(final Material material) {
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
+/**
+ * An advanced block class that is to be extended for wrenching capabilities.
+ */
+public abstract class BlockAdvanced extends BlockContainer {
+
+    public BlockAdvanced(Material material) {
         super(material);
         this.setHardness(0.6f);
-        this.setResistance(2.5f);
+        this.setResistance(2.5F);
+        // A default blast resistance for GC machines and tiles, similar to a bookshelf
     }
-    
-    public boolean onBlockActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    /**
+     * DO NOT OVERRIDE THIS FUNCTION! Called when the block is right clicked by the player. This modified version
+     * detects electric items and wrench actions on your machine block. Do not override this function. Use
+     * onMachineActivated instead! (It does the same thing)
+     *
+     * @param world The World Object.
+     * @param x     , y, z The coordinate of the block.
+     * @param side  The side the player clicked on.
+     * @param hitX  , hitY, hitZ The position the player clicked on relative to the block.
+     */
+    @Override
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
+            float hitY, float hitZ) {
+        /**
+         * Check if the player is holding a wrench or an electric item. If so, call the wrench event.
+         */
         if (this.isUsableWrench(entityPlayer, entityPlayer.inventory.getCurrentItem(), x, y, z)) {
             this.damageWrench(entityPlayer, entityPlayer.inventory.getCurrentItem(), x, y, z);
-            if (entityPlayer.isSneaking() && this.onSneakUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) {
-                return true;
-            }
-            if (this.onUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) {
+
+            if ((entityPlayer.isSneaking()
+                    && this.onSneakUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ))
+                    || this.onUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) {
                 return true;
             }
         }
-        return (entityPlayer.isSneaking() && this.onSneakMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) || this.onMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
+
+        if (entityPlayer.isSneaking()
+                && this.onSneakMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ)) {
+            return true;
+        }
+
+        return this.onMachineActivated(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
     }
-    
-    public boolean isUsableWrench(final EntityPlayer entityPlayer, final ItemStack itemStack, final int x, final int y, final int z) {
+
+    /**
+     * A function that denotes if an itemStack is a wrench that can be used. Override this for more wrench
+     * compatibility. Compatible with Buildcraft and IC2 wrench API via reflection.
+     *
+     * @return True if it is a wrench.
+     */
+    public boolean isUsableWrench(EntityPlayer entityPlayer, ItemStack itemStack, int x, int y, int z) {
         if (entityPlayer != null && itemStack != null) {
             final Class<? extends Item> wrenchClass = itemStack.getItem().getClass();
+
+            /**
+             * UE and Buildcraft
+             */
             try {
-                final Method methodCanWrench = wrenchClass.getMethod("canWrench", EntityPlayer.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
-                return (boolean)methodCanWrench.invoke(itemStack.getItem(), entityPlayer, x, y, z);
-            }
-            catch (NoClassDefFoundError noClassDefFoundError) {}
-            catch (Exception ex) {}
+                final Method methodCanWrench = wrenchClass
+                        .getMethod("canWrench", EntityPlayer.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
+                return (Boolean) methodCanWrench.invoke(itemStack.getItem(), entityPlayer, x, y, z);
+            } catch (final NoClassDefFoundError | Exception e) {}
+
+            /**
+             * Industrialcraft
+             */
             try {
-                if (wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrench") || wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrenchElectric")) {
+                if (wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrench")
+                        || wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrenchElectric")) {
                     return itemStack.getItemDamage() < itemStack.getMaxDamage();
                 }
-            }
-            catch (Exception ex2) {}
+            } catch (final Exception e) {}
         }
+
         return false;
     }
-    
-    public boolean damageWrench(final EntityPlayer entityPlayer, final ItemStack itemStack, final int x, final int y, final int z) {
+
+    /**
+     * This function damages a wrench. Works with Buildcraft and Industrialcraft wrenches.
+     *
+     * @return True if damage was successfull.
+     */
+    public boolean damageWrench(EntityPlayer entityPlayer, ItemStack itemStack, int x, int y, int z) {
         if (this.isUsableWrench(entityPlayer, itemStack, x, y, z)) {
             final Class<? extends Item> wrenchClass = itemStack.getItem().getClass();
+
+            /**
+             * UE and Buildcraft
+             */
             try {
-                final Method methodWrenchUsed = wrenchClass.getMethod("wrenchUsed", EntityPlayer.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
+                final Method methodWrenchUsed = wrenchClass
+                        .getMethod("wrenchUsed", EntityPlayer.class, Integer.TYPE, Integer.TYPE, Integer.TYPE);
                 methodWrenchUsed.invoke(itemStack.getItem(), entityPlayer, x, y, z);
                 return true;
-            }
-            catch (Exception ex) {
-                try {
-                    if (wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrench") || wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrenchElectric")) {
-                        final Method methodWrenchDamage = wrenchClass.getMethod("damage", ItemStack.class, Integer.TYPE, EntityPlayer.class);
-                        methodWrenchDamage.invoke(itemStack.getItem(), itemStack, 1, entityPlayer);
-                        return true;
-                    }
-                    return false;
+            } catch (final Exception e) {}
+
+            /**
+             * Industrialcraft
+             */
+            try {
+                if (wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrench")
+                        || wrenchClass == Class.forName("ic2.core.item.tool.ItemToolWrenchElectric")) {
+                    final Method methodWrenchDamage = wrenchClass
+                            .getMethod("damage", ItemStack.class, Integer.TYPE, EntityPlayer.class);
+                    methodWrenchDamage.invoke(itemStack.getItem(), itemStack, 1, entityPlayer);
+                    return true;
                 }
-                catch (Exception ex2) {}
-            }
+            } catch (final Exception e) {}
         }
+
         return false;
     }
-    
-    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    /**
+     * Called when the machine is right clicked by the player
+     *
+     * @return True if something happens
+     */
+    public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
+            float hitY, float hitZ) {
         return false;
     }
-    
-    public boolean onSneakMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    /**
+     * Called when the machine is being wrenched by a player while sneaking.
+     *
+     * @return True if something happens
+     */
+    public boolean onSneakMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side,
+            float hitX, float hitY, float hitZ) {
         return false;
     }
-    
-    public boolean onUseWrench(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    /**
+     * Called when a player uses a wrench on the machine
+     *
+     * @return True if some happens
+     */
+    public boolean onUseWrench(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
+            float hitY, float hitZ) {
         return false;
     }
-    
-    public boolean onSneakUseWrench(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
+
+    /**
+     * Called when a player uses a wrench on the machine while sneaking. Only works with the UE wrench.
+     *
+     * @return True if some happens
+     */
+    public boolean onSneakUseWrench(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
+            float hitY, float hitZ) {
         return this.onUseWrench(world, x, y, z, entityPlayer, side, hitX, hitY, hitZ);
     }
 }

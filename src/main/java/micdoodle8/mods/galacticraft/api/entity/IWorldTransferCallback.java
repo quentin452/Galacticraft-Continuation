@@ -1,8 +1,8 @@
 package micdoodle8.mods.galacticraft.api.entity;
 
-import net.minecraft.world.*;
+import net.minecraft.world.World;
 
-public interface IWorldTransferCallback
-{
-    void onWorldTransferred(final World p0);
+public interface IWorldTransferCallback {
+
+    void onWorldTransferred(World world);
 }

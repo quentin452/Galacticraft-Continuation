@@ -1,89 +1,127 @@
 package micdoodle8.mods.galacticraft.core.client;
 
-import micdoodle8.mods.galacticraft.core.wrappers.*;
-import net.minecraft.util.*;
-import net.minecraft.entity.player.*;
-import org.lwjgl.opengl.*;
-import cpw.mods.fml.client.*;
-import net.minecraft.client.renderer.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.core.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-public class FootprintRenderer
-{
-    public Map<Long, List<Footprint>> footprints;
-    private static final ResourceLocation footprintTexture;
-    
-    public FootprintRenderer() {
-        this.footprints = new HashMap<Long, List<Footprint>>();
-    }
-    
-    public void renderFootprints(final EntityPlayer player, final float partialTicks) {
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
+
+public class FootprintRenderer {
+
+    public Map<Long, List<Footprint>> footprints = new HashMap<>();
+    private static final ResourceLocation footprintTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/misc/footprint.png");
+
+    public void renderFootprints(EntityPlayer player, float partialTicks) {
         GL11.glPushMatrix();
         final double interpPosX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
         final double interpPosY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
         final double interpPosZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
         FMLClientHandler.instance().getClient().renderEngine.bindTexture(FootprintRenderer.footprintTexture);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glDepthMask(true);
-        GL11.glEnable(2929);
-        GL11.glEnable(3553);
-        GL11.glDisable(2884);
-        GL11.glEnable(3042);
-        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_CULL_FACE);
+
+        GL11.glEnable(GL11.GL_BLEND);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         final Tessellator tessellator = Tessellator.instance;
-        final float f7 = 1.0f;
-        final float f8 = 0.0f;
-        final float f9 = 0.0f;
-        final float f10 = 1.0f;
-        final float f11 = 0.4f;
-        GL11.glAlphaFunc(516, 0.1f);
+        final float f7 = 1.0F;
+        final float f6 = 0.0F;
+        final float f8 = 0.0F;
+        final float f9 = 1.0F;
+
+        GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
+
         for (final List<Footprint> footprintList : this.footprints.values()) {
             for (final Footprint footprint : footprintList) {
                 if (footprint.dimension == player.worldObj.provider.dimensionId) {
                     GL11.glPushMatrix();
-                    final float ageScale = footprint.age / 3200.0f;
+                    final float ageScale = footprint.age / (float) Footprint.MAX_AGE;
                     tessellator.startDrawingQuads();
-                    final float f12 = (float)(footprint.position.x - interpPosX);
-                    final float f13 = (float)(footprint.position.y - interpPosY) + 0.001f;
-                    final float f14 = (float)(footprint.position.z - interpPosZ);
-                    GL11.glTranslatef(f12, f13, f14);
-                    tessellator.setBrightness((int)(100.0f + ageScale * 155.0f));
-                    GL11.glColor4f(1.0f - ageScale, 1.0f - ageScale, 1.0f - ageScale, 1.0f - ageScale);
-                    final double footprintScale = 0.5;
-                    tessellator.addVertexWithUV(0.0 + Math.sin((45.0f - footprint.rotation) * 3.141592653589793 / 180.0) * footprintScale, 0.0, 0.0 + Math.cos((45.0f - footprint.rotation) * 3.141592653589793 / 180.0) * footprintScale, (double)f7, (double)f10);
-                    tessellator.addVertexWithUV(0.0 + Math.sin((135.0f - footprint.rotation) * 3.141592653589793 / 180.0) * footprintScale, 0.0, 0.0 + Math.cos((135.0f - footprint.rotation) * 3.141592653589793 / 180.0) * footprintScale, (double)f7, (double)f9);
-                    tessellator.addVertexWithUV(0.0 + Math.sin((225.0f - footprint.rotation) * 3.141592653589793 / 180.0) * footprintScale, 0.0, 0.0 + Math.cos((225.0f - footprint.rotation) * 3.141592653589793 / 180.0) * footprintScale, (double)f8, (double)f9);
-                    tessellator.addVertexWithUV(0.0 + Math.sin((315.0f - footprint.rotation) * 3.141592653589793 / 180.0) * footprintScale, 0.0, 0.0 + Math.cos((315.0f - footprint.rotation) * 3.141592653589793 / 180.0) * footprintScale, (double)f8, (double)f10);
+
+                    final float f11 = (float) (footprint.position.x - interpPosX);
+                    final float f12 = (float) (footprint.position.y - interpPosY) + 0.001F;
+                    final float f13 = (float) (footprint.position.z - interpPosZ);
+
+                    GL11.glTranslatef(f11, f12, f13);
+
+                    tessellator.setBrightness((int) (100 + ageScale * 155));
+                    GL11.glColor4f(1 - ageScale, 1 - ageScale, 1 - ageScale, 1 - ageScale);
+                    final double footprintScale = 0.5F;
+                    tessellator.addVertexWithUV(
+                            0 + Math.sin((45 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                            0,
+                            0 + Math.cos((45 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                            f7,
+                            f9);
+                    tessellator.addVertexWithUV(
+                            0 + Math.sin((135 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                            0,
+                            0 + Math.cos((135 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                            f7,
+                            f8);
+                    tessellator.addVertexWithUV(
+                            0 + Math.sin((225 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                            0,
+                            0 + Math.cos((225 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                            f6,
+                            f8);
+                    tessellator.addVertexWithUV(
+                            0 + Math.sin((315 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                            0,
+                            0 + Math.cos((315 - footprint.rotation) * Math.PI / 180.0D) * footprintScale,
+                            f6,
+                            f9);
+
                     tessellator.draw();
                     GL11.glPopMatrix();
                 }
             }
         }
-        GL11.glDisable(3042);
-        GL11.glEnable(2884);
+
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glPopMatrix();
     }
-    
-    public void addFootprint(final long chunkKey, final Footprint footprint) {
+
+    public void addFootprint(long chunkKey, Footprint footprint) {
         List<Footprint> footprintList = this.footprints.get(chunkKey);
+
         if (footprintList == null) {
-            footprintList = new ArrayList<Footprint>();
+            footprintList = new ArrayList<>();
         }
+
         footprintList.add(new Footprint(footprint.dimension, footprint.position, footprint.rotation, footprint.owner));
         this.footprints.put(chunkKey, footprintList);
     }
-    
-    public void addFootprint(final long chunkKey, final int dimension, final Vector3 position, final float rotation, final String owner) {
+
+    public void addFootprint(long chunkKey, int dimension, Vector3 position, float rotation, String owner) {
         this.addFootprint(chunkKey, new Footprint(dimension, position, rotation, owner));
     }
-    
-    public void setFootprints(final long chunkKey, final List<Footprint> prints) {
+
+    public void setFootprints(long chunkKey, List<Footprint> prints) {
         List<Footprint> footprintList = this.footprints.get(chunkKey);
+
         if (footprintList == null) {
-            footprintList = new ArrayList<Footprint>();
+            footprintList = new ArrayList<>();
         }
+
         final Iterator<Footprint> i = footprintList.iterator();
         while (i.hasNext()) {
             final Footprint print = i.next();
@@ -91,11 +129,8 @@ public class FootprintRenderer
                 i.remove();
             }
         }
+
         footprintList.addAll(prints);
         this.footprints.put(chunkKey, footprintList);
-    }
-    
-    static {
-        footprintTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/misc/footprint.png");
     }
 }

@@ -1,60 +1,121 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import net.minecraft.inventory.*;
-import micdoodle8.mods.miccore.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.api.world.*;
-import net.minecraft.world.*;
-import net.minecraftforge.common.*;
-import net.minecraft.world.chunk.*;
-import net.minecraft.block.*;
-import net.minecraft.nbt.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.energy.item.*;
-import net.minecraftforge.common.util.*;
-import mekanism.api.gas.*;
-import java.util.*;
+import java.util.EnumSet;
 
-public class TileEntityOxygenCollector extends TileEntityOxygen implements IInventory, ISidedInventory
-{
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.EnumPlantType;
+import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class TileEntityOxygenCollector extends TileEntityOxygen implements IInventory, ISidedInventory {
+
     public boolean active;
     public static final int OUTPUT_PER_TICK = 100;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public float lastOxygenCollected;
-    private ItemStack[] containingItems;
-    private boolean noAtmosphericOxygen;
-    private boolean isInitialised;
-    private boolean producedLastTick;
-    
+
+    private ItemStack[] containingItems = new ItemStack[1];
+    private boolean noAtmosphericOxygen = true;
+    private boolean isInitialised = false;
+    private boolean producedLastTick = false;
+
     public TileEntityOxygenCollector() {
-        super(6000.0f, 0.0f);
-        this.containingItems = new ItemStack[1];
-        this.noAtmosphericOxygen = true;
-        this.isInitialised = false;
-        this.producedLastTick = false;
+        super(6000, 0);
         this.noRedstoneControl = true;
     }
-    
-    public int getCappedScaledOxygenLevel(final int scale) {
-        return (int)Math.max(Math.min(Math.floor(this.storedOxygen / (double)this.maxOxygen * scale), scale), 0.0);
+
+    @Override
+    public int getCappedScaledOxygenLevel(int scale) {
+        return (int) Math
+                .max(Math.min(Math.floor((double) this.storedOxygen / (double) this.maxOxygen * scale), scale), 0);
     }
-    
+
+    @Override
     public void updateEntity() {
         super.updateEntity();
+
         if (!this.worldObj.isRemote) {
-            this.producedLastTick = (this.storedOxygen < this.maxOxygen);
+            this.producedLastTick = this.storedOxygen < this.maxOxygen;
+
             this.produceOxygen();
+
+            // if (this.getEnergyStored() > 0)
+            // {
+            // int gasToSend = Math.min(this.storedOxygen,
+            // GCCoreTileEntityOxygenCollector.OUTPUT_PER_TICK);
+            // GasStack toSend = new GasStack(GalacticraftCore.gasOxygen,
+            // gasToSend);
+            // this.storedOxygen -= GasTransmission.emitGasToNetwork(toSend,
+            // this, this.getOxygenOutputDirection());
+            //
+            // Vector3 thisVec = new Vector3(this);
+            // TileEntity tileEntity =
+            // thisVec.modifyPositionFromSide(this.getOxygenOutputDirection()).getTileEntity(this.worldObj);
+            //
+            // if (tileEntity instanceof IGasAcceptor)
+            // {
+            // if (((IGasAcceptor)
+            // tileEntity).canReceiveGas(this.getOxygenOutputDirection().getOpposite(),
+            // GalacticraftCore.gasOxygen))
+            // {
+            // double sendingGas = 0;
+            //
+            // if (this.storedOxygen >=
+            // GCCoreTileEntityOxygenCollector.OUTPUT_PER_TICK)
+            // {
+            // sendingGas = GCCoreTileEntityOxygenCollector.OUTPUT_PER_TICK;
+            // }
+            // else
+            // {
+            // sendingGas = this.storedOxygen;
+            // }
+            //
+            // this.storedOxygen -= sendingGas - ((IGasAcceptor)
+            // tileEntity).receiveGas(new GasStack(GalacticraftCore.gasOxygen,
+            // (int) Math.floor(sendingGas)));
+            // }
+            // }
+            // }
+
+            // Approximately once every 40 ticks, search out oxygen producing blocks
             if (this.worldObj.rand.nextInt(10) == 0) {
                 if (this.hasEnoughEnergyToRun) {
-                    float nearbyLeaves = 0.0f;
+                    // The later calculations are more efficient if power is a float, so
+                    // there are fewer casts
+                    float nearbyLeaves = 0;
+
                     if (!this.isInitialised) {
-                        this.noAtmosphericOxygen = (this.worldObj.provider instanceof IGalacticraftWorldProvider && !((IGalacticraftWorldProvider)this.worldObj.provider).isGasPresent(IAtmosphericGas.OXYGEN));
+                        this.noAtmosphericOxygen = this.worldObj.provider instanceof IGalacticraftWorldProvider
+                                && !((IGalacticraftWorldProvider) this.worldObj.provider)
+                                        .isGasPresent(IAtmosphericGas.OXYGEN);
                         this.isInitialised = true;
                     }
+
                     if (this.noAtmosphericOxygen) {
-                        if (this.xCoord > -29999995 && this.xCoord < 2999995 && this.zCoord > -29999995 && this.zCoord < 29999995) {
+                        // Pre-test to see if close to the map edges, so code
+                        // doesn't have to continually test for map edges inside the
+                        // loop
+                        if (this.xCoord > -29999995 && this.xCoord < 2999995
+                                && this.zCoord > -29999995
+                                && this.zCoord < 29999995) {
+                            // Test the y coordinates, so code doesn't have to keep
+                            // testing that either
                             int miny = this.yCoord - 5;
                             int maxy = this.yCoord + 5;
                             if (miny < 0) {
@@ -63,92 +124,125 @@ public class TileEntityOxygenCollector extends TileEntityOxygen implements IInve
                             if (maxy >= this.worldObj.getHeight()) {
                                 maxy = this.worldObj.getHeight() - 1;
                             }
-                            for (int x = this.xCoord - 5; x <= this.xCoord + 5; ++x) {
+
+                            // Loop the x and the z first, so the y loop will be at
+                            // fixed (x,z) coordinates meaning fixed chunk
+                            // coordinates
+                            for (int x = this.xCoord - 5; x <= this.xCoord + 5; x++) {
                                 final int chunkx = x >> 4;
-                                final int intrachunkx = x & 0xF;
+                                final int intrachunkx = x & 15;
+                                // Preload the first chunk for the z loop - there
+                                // can be a maximum of 2 chunks in the z loop
                                 int chunkz = this.zCoord - 5 >> 4;
                                 Chunk chunk = this.worldObj.getChunkFromChunkCoords(chunkx, chunkz);
-                                for (int z = this.zCoord - 5; z <= this.zCoord + 5; ++z) {
+                                for (int z = this.zCoord - 5; z <= this.zCoord + 5; z++) {
                                     if (z >> 4 != chunkz) {
+                                        // moved across z chunk boundary into a new
+                                        // chunk, so load the new chunk
                                         chunkz = z >> 4;
                                         chunk = this.worldObj.getChunkFromChunkCoords(chunkx, chunkz);
                                     }
-                                    for (int y = miny; y <= maxy; ++y) {
-                                        final Block block = chunk.getBlock(intrachunkx, y, z & 0xF);
-                                        if (!(block instanceof BlockAir) && (block.isLeaves((IBlockAccess)this.worldObj, x, y, z) || (block instanceof IPlantable && ((IPlantable)block).getPlantType((IBlockAccess)this.worldObj, x, y, z) == EnumPlantType.Crop))) {
-                                            nearbyLeaves += 0.75f;
+                                    for (int y = miny; y <= maxy; y++) {
+                                        // chunk.getBlockID is like world.getBlock
+                                        // but faster - needs to be given
+                                        // intra-chunk coordinates though
+                                        final Block block = chunk.getBlock(intrachunkx, y, z & 15);
+                                        // Test for the two most common blocks (air
+                                        // and breatheable air) without looking up
+                                        // in the blocksList
+                                        if (!(block instanceof BlockAir) && (block.isLeaves(this.worldObj, x, y, z)
+                                                || block instanceof IPlantable
+                                                        && ((IPlantable) block).getPlantType(this.worldObj, x, y, z)
+                                                                == EnumPlantType.Crop)) {
+                                            nearbyLeaves += 0.075F * 10F;
                                         }
                                     }
                                 }
                             }
                         }
+                    } else {
+                        nearbyLeaves = 9.3F * 10F;
                     }
-                    else {
-                        nearbyLeaves = 93.0f;
-                    }
-                    nearbyLeaves = (float)Math.floor(nearbyLeaves);
-                    this.lastOxygenCollected = nearbyLeaves / 10.0f;
-                    this.storedOxygen = (float)(int)Math.max(Math.min(this.storedOxygen + nearbyLeaves, this.maxOxygen), 0.0f);
-                }
-                else {
-                    this.lastOxygenCollected = 0.0f;
+
+                    nearbyLeaves = (float) Math.floor(nearbyLeaves);
+
+                    this.lastOxygenCollected = nearbyLeaves / 10F;
+
+                    this.storedOxygen = (int) Math.max(Math.min(this.storedOxygen + nearbyLeaves, this.maxOxygen), 0);
+                } else {
+                    this.lastOxygenCollected = 0;
                 }
             }
         }
     }
-    
-    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+
+    @Override
+    public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
         super.readFromNBT(par1NBTTagCompound);
+
         final NBTTagList var2 = par1NBTTagCompound.getTagList("Items", 10);
         this.containingItems = new ItemStack[this.getSizeInventory()];
+
         for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
             final NBTTagCompound var4 = var2.getCompoundTagAt(var3);
-            final int var5 = var4.getByte("Slot") & 0xFF;
+            final int var5 = var4.getByte("Slot") & 255;
+
             if (var5 < this.containingItems.length) {
                 this.containingItems[var5] = ItemStack.loadItemStackFromNBT(var4);
             }
         }
     }
-    
-    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+
+    @Override
+    public void writeToNBT(NBTTagCompound par1NBTTagCompound) {
         super.writeToNBT(par1NBTTagCompound);
+
         final NBTTagList list = new NBTTagList();
+
         for (int var3 = 0; var3 < this.containingItems.length; ++var3) {
             if (this.containingItems[var3] != null) {
                 final NBTTagCompound var4 = new NBTTagCompound();
-                var4.setByte("Slot", (byte)var3);
+                var4.setByte("Slot", (byte) var3);
                 this.containingItems[var3].writeToNBT(var4);
-                list.appendTag((NBTBase)var4);
+                list.appendTag(var4);
             }
         }
-        par1NBTTagCompound.setTag("Items", (NBTBase)list);
+
+        par1NBTTagCompound.setTag("Items", list);
     }
-    
+
+    @Override
     public int getSizeInventory() {
         return this.containingItems.length;
     }
-    
-    public ItemStack getStackInSlot(final int par1) {
+
+    @Override
+    public ItemStack getStackInSlot(int par1) {
         return this.containingItems[par1];
     }
-    
-    public ItemStack decrStackSize(final int par1, final int par2) {
+
+    @Override
+    public ItemStack decrStackSize(int par1, int par2) {
         if (this.containingItems[par1] == null) {
             return null;
         }
+        ItemStack var3;
+
         if (this.containingItems[par1].stackSize <= par2) {
-            final ItemStack var3 = this.containingItems[par1];
+            var3 = this.containingItems[par1];
             this.containingItems[par1] = null;
-            return var3;
-        }
-        final ItemStack var3 = this.containingItems[par1].splitStack(par2);
-        if (this.containingItems[par1].stackSize == 0) {
-            this.containingItems[par1] = null;
+        } else {
+            var3 = this.containingItems[par1].splitStack(par2);
+
+            if (this.containingItems[par1].stackSize == 0) {
+                this.containingItems[par1] = null;
+            }
         }
         return var3;
     }
-    
-    public ItemStack getStackInSlotOnClosing(final int par1) {
+
+    @Override
+    public ItemStack getStackInSlotOnClosing(int par1) {
         if (this.containingItems[par1] != null) {
             final ItemStack var2 = this.containingItems[par1];
             this.containingItems[par1] = null;
@@ -156,93 +250,104 @@ public class TileEntityOxygenCollector extends TileEntityOxygen implements IInve
         }
         return null;
     }
-    
-    public void setInventorySlotContents(final int par1, final ItemStack par2ItemStack) {
+
+    @Override
+    public void setInventorySlotContents(int par1, ItemStack par2ItemStack) {
         this.containingItems[par1] = par2ItemStack;
+
         if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit()) {
             par2ItemStack.stackSize = this.getInventoryStackLimit();
         }
     }
-    
+
+    @Override
     public String getInventoryName() {
         return GCCoreUtil.translate("container.oxygencollector.name");
     }
-    
+
+    @Override
     public int getInventoryStackLimit() {
         return 64;
     }
-    
-    public boolean isUseableByPlayer(final EntityPlayer par1EntityPlayer) {
-        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5, this.zCoord + 0.5) <= 64.0;
+
+    @Override
+    public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer) {
+        return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this
+                && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
     }
-    
-    public void openInventory() {
-    }
-    
-    public void closeInventory() {
-    }
-    
-    public int[] getAccessibleSlotsFromSide(final int side) {
+
+    @Override
+    public void openInventory() {}
+
+    @Override
+    public void closeInventory() {}
+
+    // ISidedInventory Implementation:
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(int side) {
         return new int[] { 0 };
     }
-    
-    public boolean canInsertItem(final int slotID, final ItemStack itemstack, final int side) {
+
+    @Override
+    public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
         return this.isItemValidForSlot(slotID, itemstack);
     }
-    
-    public boolean canExtractItem(final int slotID, final ItemStack itemstack, final int side) {
+
+    @Override
+    public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
         return slotID == 0;
     }
-    
+
+    @Override
     public boolean hasCustomInventoryName() {
         return true;
     }
-    
-    public boolean isItemValidForSlot(final int slotID, final ItemStack itemstack) {
+
+    @Override
+    public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
         return slotID == 0 && ItemElectricBase.isElectricItem(itemstack.getItem());
     }
-    
+
+    @Override
     public boolean shouldUseEnergy() {
-        return this.storedOxygen > 0.0f && this.producedLastTick;
+        return this.storedOxygen > 0F && this.producedLastTick;
     }
-    
+
+    @Override
     public ForgeDirection getElectricInputDirection() {
         return ForgeDirection.getOrientation(this.getBlockMetadata() + 2);
     }
-    
+
+    @Override
     public ItemStack getBatteryInSlot() {
         return this.getStackInSlot(0);
     }
-    
+
+    @Override
     public boolean shouldPullOxygen() {
         return false;
     }
-    
-    public boolean canReceiveGas(final ForgeDirection side, final Gas type) {
-        return false;
-    }
-    
-    public int receiveGas(final ForgeDirection side, final GasStack stack, final boolean doTransfer) {
-        return 0;
-    }
-    
-    public int receiveGas(final ForgeDirection side, final GasStack stack) {
-        return 0;
-    }
-    
+
+    @Override
     public boolean shouldUseOxygen() {
         return false;
     }
-    
+
+    @Override
     public EnumSet<ForgeDirection> getOxygenInputDirections() {
         return EnumSet.noneOf(ForgeDirection.class);
     }
-    
+
+    @Override
     public EnumSet<ForgeDirection> getOxygenOutputDirections() {
         return EnumSet.of(this.getElectricInputDirection().getOpposite());
     }
-    
-    public float getOxygenProvide(final ForgeDirection direction) {
-        return this.getOxygenOutputDirections().contains(direction) ? Math.min(500.0f, this.getOxygenStored()) : 0.0f;
+
+    @Override
+    public float getOxygenProvide(ForgeDirection direction) {
+        return this.getOxygenOutputDirections().contains(direction)
+                ? Math.min(TileEntityOxygenStorageModule.OUTPUT_PER_TICK, this.getOxygenStored())
+                : 0.0F;
     }
 }

@@ -1,177 +1,196 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.client.renderer.texture.*;
-import java.util.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.*;
-import net.minecraft.item.*;
-import net.minecraft.nbt.*;
-import net.minecraft.util.*;
+import java.util.List;
 
-public class ItemBasic extends Item
-{
-    public static final String[] names;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class ItemBasic extends Item {
+
+    public static final String[] names = { "solar_module_0", "solar_module_1", "rawSilicon", "ingotCopper", "ingotTin",
+            "ingotAluminum", "compressedCopper", "compressedTin", "compressedAluminum", "compressedSteel",
+            "compressedBronze", "compressedIron", "waferSolar", "waferBasic", "waferAdvanced", "dehydratedApple",
+            "dehydratedCarrot", "dehydratedMelon", "dehydratedPotato", "frequencyModule", "ambientThermalController" };
     public static final int WAFER_BASIC = 13;
     public static final int WAFER_ADVANCED = 14;
-    protected IIcon[] icons;
-    
-    public ItemBasic(final String assetName) {
-        this.icons = new IIcon[ItemBasic.names.length];
+
+    protected IIcon[] icons = new IIcon[ItemBasic.names.length];
+
+    public ItemBasic(String assetName) {
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
         this.setUnlocalizedName(assetName);
         this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(final IIconRegister iconRegister) {
+    public void registerIcons(IIconRegister iconRegister) {
         int i = 0;
+
         for (final String name : ItemBasic.names) {
-            this.icons[i++] = iconRegister.registerIcon(this.getIconString() + "." + name);
+            this.icons[i] = iconRegister.registerIcon(this.getIconString() + "." + name);
+            i++;
         }
     }
-    
-    public String getUnlocalizedName(final ItemStack itemStack) {
+
+    @Override
+    public String getUnlocalizedName(ItemStack itemStack) {
         if (itemStack.getItemDamage() > 14 && itemStack.getItemDamage() < 19) {
             return this.getUnlocalizedName() + ".cannedFood";
         }
+
         return this.getUnlocalizedName() + "." + ItemBasic.names[itemStack.getItemDamage()];
     }
-    
-    public IIcon getIconFromDamage(final int damage) {
+
+    @Override
+    public IIcon getIconFromDamage(int damage) {
         if (this.icons.length > damage) {
             return this.icons[damage];
         }
+
         return super.getIconFromDamage(damage);
     }
-    
-    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
-        for (int i = 0; i < ItemBasic.names.length; ++i) {
+
+    @Override
+    public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
+        for (int i = 0; i < ItemBasic.names.length; i++) {
             par3List.add(new ItemStack(par1, 1, i));
         }
     }
-    
-    public int getMetadata(final int par1) {
+
+    @Override
+    public int getMetadata(int par1) {
         return par1;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
+    public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List<String> par3List,
+            boolean par4) {
         if (par1ItemStack.getItemDamage() > 14 && par1ItemStack.getItemDamage() < 19) {
-            par3List.add(EnumColor.BRIGHT_GREEN + GCCoreUtil.translate(this.getUnlocalizedName() + "." + ItemBasic.names[par1ItemStack.getItemDamage()] + ".name"));
-        }
-        else if (par1ItemStack.getItemDamage() == 19) {
+            par3List.add(
+                    EnumColor.BRIGHT_GREEN + GCCoreUtil.translate(
+                            this.getUnlocalizedName() + "."
+                                    + ItemBasic.names[par1ItemStack.getItemDamage()]
+                                    + ".name"));
+        } else if (par1ItemStack.getItemDamage() == 19) {
             par3List.add(EnumColor.AQUA + GCCoreUtil.translate("gui.frequencyModule.desc.0"));
             par3List.add(EnumColor.AQUA + GCCoreUtil.translate("gui.frequencyModule.desc.1"));
         }
     }
-    
-    public int getHealAmount(final ItemStack par1ItemStack) {
-        switch (par1ItemStack.getItemDamage()) {
-            case 15: {
-                return 8;
-            }
-            case 16: {
-                return 8;
-            }
-            case 17: {
-                return 4;
-            }
-            case 18: {
-                return 2;
-            }
-            default: {
-                return 0;
-            }
-        }
+
+    public int getHealAmount(ItemStack par1ItemStack) {
+        return switch (par1ItemStack.getItemDamage()) {
+            case 15 -> 8;
+            case 16 -> 8;
+            case 17 -> 4;
+            case 18 -> 2;
+            default -> 0;
+        };
     }
-    
-    public float getSaturationModifier(final ItemStack par1ItemStack) {
-        switch (par1ItemStack.getItemDamage()) {
-            case 15: {
-                return 0.3f;
-            }
-            case 16: {
-                return 0.6f;
-            }
-            case 17: {
-                return 0.3f;
-            }
-            case 18: {
-                return 0.3f;
-            }
-            default: {
-                return 0.0f;
-            }
-        }
+
+    public float getSaturationModifier(ItemStack par1ItemStack) {
+        return switch (par1ItemStack.getItemDamage()) {
+            case 15 -> 0.3F;
+            case 16 -> 0.6F;
+            case 17 -> 0.3F;
+            case 18 -> 0.3F;
+            default -> 0.0F;
+        };
     }
-    
-    public ItemStack onEaten(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer) {
+
+    @Override
+    public ItemStack onEaten(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer) {
         if (par1ItemStack.getItemDamage() > 14 && par1ItemStack.getItemDamage() < 19) {
             --par1ItemStack.stackSize;
-            par3EntityPlayer.getFoodStats().addStats(this.getHealAmount(par1ItemStack), this.getSaturationModifier(par1ItemStack));
-            par2World.playSoundAtEntity((Entity)par3EntityPlayer, "random.burp", 0.5f, par2World.rand.nextFloat() * 0.1f + 0.9f);
+            par3EntityPlayer.getFoodStats()
+                    .addStats(this.getHealAmount(par1ItemStack), this.getSaturationModifier(par1ItemStack));
+            par2World
+                    .playSoundAtEntity(par3EntityPlayer, "random.burp", 0.5F, par2World.rand.nextFloat() * 0.1F + 0.9F);
             if (!par2World.isRemote) {
-                par3EntityPlayer.entityDropItem(new ItemStack(GCItems.canister, 1, 0), 0.0f);
+                par3EntityPlayer.entityDropItem(new ItemStack(GCItems.canister, 1, 0), 0.0F);
             }
             return par1ItemStack;
         }
+
         return super.onEaten(par1ItemStack, par2World, par3EntityPlayer);
     }
-    
-    public int getMaxItemUseDuration(final ItemStack par1ItemStack) {
+
+    @Override
+    public int getMaxItemUseDuration(ItemStack par1ItemStack) {
         if (par1ItemStack.getItemDamage() > 14 && par1ItemStack.getItemDamage() < 19) {
             return 32;
         }
+
         return super.getMaxItemUseDuration(par1ItemStack);
     }
-    
-    public EnumAction getItemUseAction(final ItemStack par1ItemStack) {
+
+    @Override
+    public EnumAction getItemUseAction(ItemStack par1ItemStack) {
         if (par1ItemStack.getItemDamage() > 14 && par1ItemStack.getItemDamage() < 19) {
             return EnumAction.eat;
         }
+
         return super.getItemUseAction(par1ItemStack);
     }
-    
-    public ItemStack onItemRightClick(final ItemStack par1ItemStack, final World par2World, final EntityPlayer par3EntityPlayer) {
-        if (par1ItemStack.getItemDamage() > 14 && par1ItemStack.getItemDamage() < 19 && par3EntityPlayer.canEat(false)) {
+
+    @Override
+    public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer) {
+        if (par1ItemStack.getItemDamage() > 14 && par1ItemStack.getItemDamage() < 19
+                && par3EntityPlayer.canEat(false)) {
             par3EntityPlayer.setItemInUse(par1ItemStack, this.getMaxItemUseDuration(par1ItemStack));
         }
+
         return par1ItemStack;
     }
-    
-    public boolean onLeftClickEntity(final ItemStack itemStack, final EntityPlayer player, final Entity entity) {
+
+    @Override
+    public boolean onLeftClickEntity(ItemStack itemStack, EntityPlayer player, Entity entity) {
         if (itemStack.getItemDamage() != 19) {
             return false;
         }
+
+        // Frequency module
         if (!player.worldObj.isRemote && entity != null && !(entity instanceof EntityPlayer)) {
             if (itemStack.stackTagCompound == null) {
                 itemStack.setTagCompound(new NBTTagCompound());
             }
+
             itemStack.stackTagCompound.setLong("linkedUUIDMost", entity.getUniqueID().getMostSignificantBits());
             itemStack.stackTagCompound.setLong("linkedUUIDLeast", entity.getUniqueID().getLeastSignificantBits());
-            player.addChatMessage((IChatComponent)new ChatComponentText(GCCoreUtil.translate("gui.tracking.message")));
+
+            player.addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.tracking.message")));
             return true;
         }
         return false;
-    }
-    
-    static {
-        names = new String[] { "solar_module_0", "solar_module_1", "rawSilicon", "ingotCopper", "ingotTin", "ingotAluminum", "compressedCopper", "compressedTin", "compressedAluminum", "compressedSteel", "compressedBronze", "compressedIron", "waferSolar", "waferBasic", "waferAdvanced", "dehydratedApple", "dehydratedCarrot", "dehydratedMelon", "dehydratedPotato", "frequencyModule", "ambientThermalController" };
     }
 }

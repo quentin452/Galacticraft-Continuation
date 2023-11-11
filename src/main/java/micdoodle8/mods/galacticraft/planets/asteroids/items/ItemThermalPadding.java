@@ -1,92 +1,110 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.items;
 
-import micdoodle8.mods.galacticraft.api.item.*;
-import net.minecraft.util.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.client.renderer.texture.*;
-import java.util.*;
+import java.util.List;
 
-public class ItemThermalPadding extends Item implements IItemThermal
-{
-    public static String[] names;
-    protected IIcon[] icons;
-    
-    public ItemThermalPadding(final String assetName) {
-        this.icons = new IIcon[ItemThermalPadding.names.length];
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.item.IItemThermal;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+
+public class ItemThermalPadding extends Item implements IItemThermal {
+
+    public static String[] names = { "thermalHelm", "thermalChestplate", "thermalLeggings", "thermalBoots",
+            "thermalHelm0", "thermalChestplate0", "thermalLeggings0", "thermalBoots0" };
+    protected IIcon[] icons = new IIcon[ItemThermalPadding.names.length];
+
+    public ItemThermalPadding(String assetName) {
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
         this.setMaxStackSize(1);
         this.setUnlocalizedName(assetName);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamageForRenderPass(final int damage, final int pass) {
+    public IIcon getIconFromDamageForRenderPass(int damage, int pass) {
         if (pass == 1 && this.icons.length > damage + 4) {
             return this.icons[damage + 4];
         }
+
         return this.getIconFromDamage(damage);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
     public boolean requiresMultipleRenderPasses() {
         return true;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
+
     @SideOnly(Side.CLIENT)
+    @Override
     public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(final IIconRegister iconRegister) {
+    public void registerIcons(IIconRegister iconRegister) {
         int i = 0;
+
         for (final String name : ItemThermalPadding.names) {
-            this.icons[i++] = iconRegister.registerIcon("galacticraftasteroids:" + name);
+            this.icons[i] = iconRegister.registerIcon(AsteroidsModule.TEXTURE_PREFIX + name);
+            i++;
         }
     }
-    
-    public IIcon getIconFromDamage(final int damage) {
+
+    @Override
+    public IIcon getIconFromDamage(int damage) {
         if (this.icons.length > damage) {
             return this.icons[damage];
         }
+
         return super.getIconFromDamage(damage);
     }
-    
-    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
-        for (int i = 0; i < ItemThermalPadding.names.length / 2; ++i) {
+
+    @Override
+    public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
+        for (int i = 0; i < ItemThermalPadding.names.length / 2; i++) {
             par3List.add(new ItemStack(par1, 1, i));
         }
     }
-    
-    public String getUnlocalizedName(final ItemStack par1ItemStack) {
+
+    @Override
+    public String getUnlocalizedName(ItemStack par1ItemStack) {
         if (this.icons.length > par1ItemStack.getItemDamage()) {
             return "item." + ItemThermalPadding.names[par1ItemStack.getItemDamage()];
         }
+
         return "unnamed";
     }
-    
-    public int getMetadata(final int par1) {
+
+    @Override
+    public int getMetadata(int par1) {
         return par1;
     }
-    
+
+    @Override
     public int getThermalStrength() {
         return 1;
     }
-    
-    public boolean isValidForSlot(final ItemStack stack, final int armorSlot) {
+
+    @Override
+    public boolean isValidForSlot(ItemStack stack, int armorSlot) {
         return stack.getItemDamage() == armorSlot;
-    }
-    
-    static {
-        ItemThermalPadding.names = new String[] { "thermalHelm", "thermalChestplate", "thermalLeggings", "thermalBoots", "thermalHelm0", "thermalChestplate0", "thermalLeggings0", "thermalBoots0" };
     }
 }

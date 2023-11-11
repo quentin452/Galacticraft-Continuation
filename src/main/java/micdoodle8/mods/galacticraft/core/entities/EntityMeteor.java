@@ -1,31 +1,41 @@
 package micdoodle8.mods.galacticraft.core.entities;
 
-import net.minecraft.entity.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.core.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraft.block.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.util.*;
-import net.minecraft.nbt.*;
+import java.util.Iterator;
+import java.util.List;
 
-public class EntityMeteor extends Entity
-{
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSourceIndirect;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.StatCollector;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.Explosion;
+import net.minecraft.world.World;
+
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+
+public class EntityMeteor extends Entity {
+
     public EntityLiving shootingEntity;
     public int size;
 
-    public EntityMeteor(final World world) {
+    public EntityMeteor(World world) {
         super(world);
-        this.setSize(1.0f, 1.0f);
+        this.setSize(1.0F, 1.0F);
     }
 
-    public EntityMeteor(final World world, final double x, final double y, final double z, final double motX, final double motY, final double motZ, final int size) {
+    public EntityMeteor(World world, double x, double y, double z, double motX, double motY, double motZ, int size) {
         this(world);
         this.size = size;
-        this.setSize(1.0f, 1.0f);
+        this.setSize(1.0F, 1.0F);
         this.setLocationAndAngles(x, y, z, this.rotationYaw, this.rotationPitch);
         this.setPosition(x, y, z);
         this.motionX = motX;
@@ -34,91 +44,145 @@ public class EntityMeteor extends Entity
         this.setSize(size);
     }
 
+    @Override
     public void onUpdate() {
-        this.setRotation(this.rotationYaw + 2.0f, this.rotationPitch + 2.0f);
+        this.setRotation(this.rotationYaw + 2F, this.rotationPitch + 2F);
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
-        this.motionY -= 0.03999999910593033;
+        this.motionY -= 0.03999999910593033D;
         this.moveEntity(this.motionX, this.motionY, this.motionZ);
+
         if (this.worldObj.isRemote) {
             this.spawnParticles();
         }
+
         Vec3 var15 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-        Vec3 var16 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        MovingObjectPosition var17 = this.worldObj.func_147447_a(var15, var16, true, true, false);
+        Vec3 var2 = Vec3
+                .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+        MovingObjectPosition var3 = this.worldObj.func_147447_a(var15, var2, true, true, false);
         var15 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-        var16 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        if (var17 != null) {
-            var16 = Vec3.createVectorHelper(var17.hitVec.xCoord, var17.hitVec.yCoord, var17.hitVec.zCoord);
+        var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+
+        if (var3 != null) {
+            var2 = Vec3.createVectorHelper(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
         }
-        Entity var18 = null;
-        final List<?> var19 = (List<?>)this.worldObj.getEntitiesWithinAABBExcludingEntity((Entity)this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(2.0, 2.0, 2.0));
-        double var20 = 0.0;
-        for (final Entity var22 : (Iterable<Entity>)var19) {
-            if (var22.canBeCollidedWith() && !var22.isEntityEqual(this.shootingEntity)) {
-                final float var23 = 0.01f;
-                final AxisAlignedBB var24 = var22.getBoundingBox().expand(0.009999999776482582, 0.009999999776482582, 0.009999999776482582);
-                final MovingObjectPosition var25 = var24.calculateIntercept(var15, var16);
-                if (var25 == null) {
-                    continue;
+
+        Entity var4 = null;
+        final List<?> var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(
+                this,
+                this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(2.0D, 2.0D, 2.0D));
+        double var6 = 0.0D;
+        final Iterator<?> var8 = var5.iterator();
+
+        while (var8.hasNext()) {
+            final Entity var9 = (Entity) var8.next();
+
+            if (var9.canBeCollidedWith() && !var9.isEntityEqual(this.shootingEntity)) {
+                final float var10 = 0.01F;
+                final AxisAlignedBB var11 = var9.boundingBox.expand(var10, var10, var10);
+                final MovingObjectPosition var12 = var11.calculateIntercept(var15, var2);
+
+                if (var12 != null) {
+                    final double var13 = var15.distanceTo(var12.hitVec);
+
+                    if (var13 < var6 || var6 == 0.0D) {
+                        var4 = var9;
+                        var6 = var13;
+                    }
                 }
-                final double var26 = var15.distanceTo(var25.hitVec);
-                if (var26 >= var20 && var20 != 0.0) {
-                    continue;
-                }
-                var18 = var22;
-                var20 = var26;
             }
         }
-        if (var18 != null) {
-            var17 = new MovingObjectPosition(var18);
+
+        if (var4 != null) {
+            var3 = new MovingObjectPosition(var4);
         }
-        if (var17 != null) {
-            this.onImpact(var17);
+
+        if (var3 != null) {
+            this.onImpact(var3);
         }
-        if (this.posY <= -20.0 || this.posY >= 400.0) {
+
+        if (this.posY <= -20 || this.posY >= 400) {
             this.setDead();
         }
     }
 
     protected void spawnParticles() {
-        GalacticraftCore.proxy.spawnParticle("distanceSmoke", new Vector3(this.posX, this.posY + 1.0 + Math.random(), this.posZ), new Vector3(0.0, 0.0, 0.0), new Object[0]);
-        GalacticraftCore.proxy.spawnParticle("distanceSmoke", new Vector3(this.posX + Math.random() / 2.0, this.posY + 1.0 + Math.random() / 2.0, this.posZ), new Vector3(0.0, 0.0, 0.0), new Object[0]);
-        GalacticraftCore.proxy.spawnParticle("distanceSmoke", new Vector3(this.posX, this.posY + 1.0 + Math.random(), this.posZ + Math.random()), new Vector3(0.0, 0.0, 0.0), new Object[0]);
-        GalacticraftCore.proxy.spawnParticle("distanceSmoke", new Vector3(this.posX - Math.random() / 2.0, this.posY + 1.0 + Math.random() / 2.0, this.posZ), new Vector3(0.0, 0.0, 0.0), new Object[0]);
-        GalacticraftCore.proxy.spawnParticle("distanceSmoke", new Vector3(this.posX, this.posY + 1.0 + Math.random(), this.posZ - Math.random()), new Vector3(0.0, 0.0, 0.0), new Object[0]);
+        GalacticraftCore.proxy.spawnParticle(
+                "distanceSmoke",
+                new Vector3(this.posX, this.posY + 1D + Math.random(), this.posZ),
+                new Vector3(0.0D, 0.0D, 0.0D),
+                new Object[] {});
+        GalacticraftCore.proxy.spawnParticle(
+                "distanceSmoke",
+                new Vector3(this.posX + Math.random() / 2, this.posY + 1D + Math.random() / 2, this.posZ),
+                new Vector3(0.0D, 0.0D, 0.0D),
+                new Object[] {});
+        GalacticraftCore.proxy.spawnParticle(
+                "distanceSmoke",
+                new Vector3(this.posX, this.posY + 1D + Math.random(), this.posZ + Math.random()),
+                new Vector3(0.0D, 0.0D, 0.0D),
+                new Object[] {});
+        GalacticraftCore.proxy.spawnParticle(
+                "distanceSmoke",
+                new Vector3(this.posX - Math.random() / 2, this.posY + 1D + Math.random() / 2, this.posZ),
+                new Vector3(0.0D, 0.0D, 0.0D),
+                new Object[] {});
+        GalacticraftCore.proxy.spawnParticle(
+                "distanceSmoke",
+                new Vector3(this.posX, this.posY + 1D + Math.random(), this.posZ - Math.random()),
+                new Vector3(0.0D, 0.0D, 0.0D),
+                new Object[] {});
     }
 
-    protected void onImpact(final MovingObjectPosition movingObjPos) {
+    protected void onImpact(MovingObjectPosition movingObjPos) {
         if (!this.worldObj.isRemote) {
             if (movingObjPos != null) {
-                final Block b = this.worldObj.getBlock(movingObjPos.blockX, movingObjPos.blockY + 1, movingObjPos.blockZ);
-                if (b != null && b.isAir((IBlockAccess)this.worldObj, movingObjPos.blockX, movingObjPos.blockY + 1, movingObjPos.blockZ)) {
-                    this.worldObj.setBlock(movingObjPos.blockX, movingObjPos.blockY + 1, movingObjPos.blockZ, GCBlocks.fallenMeteor, 0, 3);
+                final Block b = this.worldObj
+                        .getBlock(movingObjPos.blockX, movingObjPos.blockY + 1, movingObjPos.blockZ);
+                if (b != null
+                        && b.isAir(this.worldObj, movingObjPos.blockX, movingObjPos.blockY + 1, movingObjPos.blockZ)) {
+                    this.worldObj.setBlock(
+                            movingObjPos.blockX,
+                            movingObjPos.blockY + 1,
+                            movingObjPos.blockZ,
+                            GCBlocks.fallenMeteor,
+                            0,
+                            3);
                 }
+
                 if (movingObjPos.entityHit != null) {
-                    movingObjPos.entityHit.attackEntityFrom(causeMeteorDamage(this, (Entity)this.shootingEntity), ConfigManagerCore.hardMode ? 12.0f : 6.0f);
+                    movingObjPos.entityHit.attackEntityFrom(
+                            EntityMeteor.causeMeteorDamage(this, this.shootingEntity),
+                            ConfigManagerCore.hardMode ? 12F : 6F);
                 }
             }
-            this.worldObj.newExplosion((Entity)this, this.posX, this.posY, this.posZ, (float)(this.size / 3 + 2), false, true);
+
+            this.worldObj.newExplosion(this, this.posX, this.posY, this.posZ, this.size / 3 + 2, false, true);
         }
+
         this.setDead();
     }
 
-    public boolean func_145774_a(final Explosion p_145774_1_, final World p_145774_2_, final int p_145774_3_, final int p_145774_4_, final int p_145774_5_, final Block p_145774_6_, final float p_145774_7_) {
+    @Override
+    public boolean func_145774_a(Explosion explosionIn, World worldIn, int x, int y, int z, Block blockIn,
+            float unused) {
         return ConfigManagerCore.meteorBlockDamageEnabled;
     }
 
-    public static DamageSource causeMeteorDamage(final EntityMeteor par0EntityMeteor, final Entity par1Entity) {
-        if (par1Entity != null && par1Entity instanceof EntityPlayer) {
-            StatCollector.translateToLocalFormatted("death.meteor", new Object[] { ((EntityPlayer)par1Entity).getGameProfile().getName() + " was hit by a meteor! That's gotta hurt!" });
+    public static DamageSource causeMeteorDamage(EntityMeteor par0EntityMeteor, Entity par1Entity) {
+        if (par1Entity instanceof EntityPlayer) {
+            StatCollector.translateToLocalFormatted(
+                    "death." + "meteor",
+                    ((EntityPlayer) par1Entity).getGameProfile().getName()
+                            + " was hit by a meteor! That's gotta hurt!");
         }
-        return new EntityDamageSourceIndirect("explosion", (Entity)par0EntityMeteor, par1Entity).setProjectile();
+        return new EntityDamageSourceIndirect("explosion", par0EntityMeteor, par1Entity).setProjectile();
     }
 
+    @Override
     protected void entityInit() {
-        this.dataWatcher.addObject(16, (Object)this.size);
+        this.dataWatcher.addObject(16, this.size);
         this.noClip = true;
     }
 
@@ -126,13 +190,16 @@ public class EntityMeteor extends Entity
         return this.dataWatcher.getWatchableObjectInt(16);
     }
 
-    public void setSize(final int par1) {
-        this.dataWatcher.updateObject(16, (Object)par1);
+    /**
+     * Sets the state of creeper, -1 to idle and 1 to be 'in fuse'
+     */
+    public void setSize(int par1) {
+        this.dataWatcher.updateObject(16, Integer.valueOf(par1));
     }
 
-    protected void readEntityFromNBT(final NBTTagCompound par1NBTTagCompound) {
-    }
+    @Override
+    protected void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {}
 
-    protected void writeEntityToNBT(final NBTTagCompound par1NBTTagCompound) {
-    }
+    @Override
+    protected void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {}
 }

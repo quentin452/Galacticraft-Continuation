@@ -1,143 +1,219 @@
 package micdoodle8.mods.galacticraft.core.client.gui.element;
 
-import net.minecraft.client.gui.*;
-import micdoodle8.mods.galacticraft.core.client.gui.screen.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import net.minecraft.client.*;
-import net.minecraft.util.*;
-import org.lwjgl.input.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.client.renderer.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ResourceLocation;
 
-public class GuiElementSlider extends GuiButton
-{
-    private SmallFontRenderer customFontRenderer;
-    private Vector3 firstColor;
-    private Vector3 lastColor;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.client.gui.screen.SmallFontRenderer;
+import micdoodle8.mods.galacticraft.core.util.ColorUtil;
+
+public class GuiElementSlider extends GuiButton {
+
+    private final SmallFontRenderer customFontRenderer;
+    private final Vector3 firstColor;
+    private final Vector3 lastColor;
     private final boolean isVertical;
     private int sliderPos;
-    
-    public GuiElementSlider(final int id, final int x, final int y, final int width, final int height, final boolean vertical, final Vector3 firstColor, final Vector3 lastColor) {
+
+    public GuiElementSlider(int id, int x, int y, int width, int height, boolean vertical, Vector3 firstColor,
+            Vector3 lastColor) {
         this(id, x, y, width, height, vertical, firstColor, lastColor, "");
     }
-    
-    public GuiElementSlider(final int id, final int x, final int y, final int width, final int height, final boolean vertical, final Vector3 firstColor, final Vector3 lastColor, final String displayString) {
+
+    public GuiElementSlider(int id, int x, int y, int width, int height, boolean vertical, Vector3 firstColor,
+            Vector3 lastColor, String displayString) {
         super(id, x, y, width, height, displayString);
         this.isVertical = vertical;
         this.firstColor = firstColor;
         this.lastColor = lastColor;
-        this.customFontRenderer = new SmallFontRenderer(Minecraft.getMinecraft().gameSettings, new ResourceLocation("textures/font/ascii.png"), Minecraft.getMinecraft().renderEngine, false);
+        this.customFontRenderer = new SmallFontRenderer(
+                Minecraft.getMinecraft().gameSettings,
+                new ResourceLocation("textures/font/ascii.png"),
+                Minecraft.getMinecraft().renderEngine,
+                false);
     }
-    
-    public void drawButton(final Minecraft par1Minecraft, final int par2, final int par3) {
+
+    @Override
+    public void drawButton(Minecraft par1Minecraft, int par2, int par3) {
         if (this.visible) {
-            this.field_146123_n = (par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + this.width && par3 < this.yPosition + this.height);
+            this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition
+                    && par2 < this.xPosition + this.width
+                    && par3 < this.yPosition + this.height;
+
             if (Mouse.isButtonDown(0) && this.field_146123_n) {
                 if (this.isVertical) {
                     this.sliderPos = par3 - this.yPosition;
-                }
-                else {
+                } else {
                     this.sliderPos = par2 - this.xPosition;
                 }
             }
-            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-            GL11.glDisable(3553);
-            GL11.glEnable(3042);
-            GL11.glDisable(3008);
+
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glDisable(GL11.GL_ALPHA_TEST);
             OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-            GL11.glShadeModel(7425);
+            GL11.glShadeModel(GL11.GL_SMOOTH);
             final Tessellator tessellator = Tessellator.instance;
+
             if (this.isVertical) {
                 tessellator.startDrawingQuads();
-                tessellator.setColorRGBA_F(0.0f, 0.0f, 0.0f, 1.0f);
-                tessellator.addVertex(this.xPosition + (double)this.width, (double)this.yPosition, (double)this.zLevel);
-                tessellator.addVertex((double)this.xPosition, (double)this.yPosition, (double)this.zLevel);
-                tessellator.addVertex((double)this.xPosition, this.yPosition + (double)this.height, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + (double)this.width, this.yPosition + (double)this.height, (double)this.zLevel);
+                tessellator.setColorRGBA_F(0, 0, 0, 1.0F);
+                tessellator.addVertex((double) this.xPosition + this.width, this.yPosition, this.zLevel);
+                tessellator.addVertex(this.xPosition, this.yPosition, this.zLevel);
+                tessellator.addVertex(this.xPosition, (double) this.yPosition + this.height, this.zLevel);
+                tessellator.addVertex(
+                        (double) this.xPosition + this.width,
+                        (double) this.yPosition + this.height,
+                        this.zLevel);
                 tessellator.draw();
+
                 tessellator.startDrawingQuads();
-                tessellator.setColorRGBA_F(this.firstColor.floatX(), this.firstColor.floatY(), this.firstColor.floatZ(), 1.0f);
-                tessellator.addVertex(this.xPosition + (double)this.width - 1.0, this.yPosition + 1.0, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + 1.0, this.yPosition + 1.0, (double)this.zLevel);
-                tessellator.setColorRGBA_F(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0f);
-                tessellator.addVertex(this.xPosition + 1.0, this.yPosition + (double)this.height - 1.0, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + (double)this.width - 1.0, this.yPosition + (double)this.height - 1.0, (double)this.zLevel);
+                tessellator.setColorRGBA_F(
+                        this.firstColor.floatX(),
+                        this.firstColor.floatY(),
+                        this.firstColor.floatZ(),
+                        1.0F);
+                tessellator
+                        .addVertex((double) this.xPosition + this.width - 1, (double) this.yPosition + 1, this.zLevel);
+                tessellator.addVertex((double) this.xPosition + 1, (double) this.yPosition + 1, this.zLevel);
+                tessellator.setColorRGBA_F(
+                        this.lastColor.floatX(),
+                        this.lastColor.floatY(),
+                        this.lastColor.floatZ(),
+                        1.0F);
+                tessellator
+                        .addVertex((double) this.xPosition + 1, (double) this.yPosition + this.height - 1, this.zLevel);
+                tessellator.addVertex(
+                        (double) this.xPosition + this.width - 1,
+                        (double) this.yPosition + this.height - 1,
+                        this.zLevel);
                 tessellator.draw();
+
                 tessellator.startDrawingQuads();
-                tessellator.setColorRGBA_F(1.0f, 1.0f, 1.0f, 1.0f);
-                tessellator.addVertex(this.xPosition + (double)this.width, this.yPosition + (double)this.sliderPos - 1.0, (double)this.zLevel);
-                tessellator.addVertex((double)this.xPosition, this.yPosition + (double)this.sliderPos - 1.0, (double)this.zLevel);
-                tessellator.addVertex((double)this.xPosition, this.yPosition + (double)this.sliderPos + 1.0, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + (double)this.width, this.yPosition + (double)this.sliderPos + 1.0, (double)this.zLevel);
-                tessellator.draw();
-            }
-            else {
+                tessellator.setColorRGBA_F(1, 1, 1, 1.0F);
+                tessellator.addVertex(
+                        (double) this.xPosition + this.width,
+                        (double) this.yPosition + this.sliderPos - 1,
+                        this.zLevel);
+                tessellator.addVertex(this.xPosition, (double) this.yPosition + this.sliderPos - 1, this.zLevel);
+                tessellator.addVertex(this.xPosition, (double) this.yPosition + this.sliderPos + 1, this.zLevel);
+                tessellator.addVertex(
+                        (double) this.xPosition + this.width,
+                        (double) this.yPosition + this.sliderPos + 1,
+                        this.zLevel);
+            } else {
                 tessellator.startDrawingQuads();
-                tessellator.setColorRGBA_F(0.0f, 0.0f, 0.0f, 1.0f);
-                tessellator.addVertex(this.xPosition + (double)this.width, (double)this.yPosition, (double)this.zLevel);
-                tessellator.addVertex((double)this.xPosition, (double)this.yPosition, (double)this.zLevel);
-                tessellator.addVertex((double)this.xPosition, this.yPosition + (double)this.height, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + (double)this.width, this.yPosition + (double)this.height, (double)this.zLevel);
+                tessellator.setColorRGBA_F(0, 0, 0, 1.0F);
+                tessellator.addVertex((double) this.xPosition + this.width, this.yPosition, this.zLevel);
+                tessellator.addVertex(this.xPosition, this.yPosition, this.zLevel);
+                tessellator.addVertex(this.xPosition, (double) this.yPosition + this.height, this.zLevel);
+                tessellator.addVertex(
+                        (double) this.xPosition + this.width,
+                        (double) this.yPosition + this.height,
+                        this.zLevel);
                 tessellator.draw();
+
                 tessellator.startDrawingQuads();
-                tessellator.setColorRGBA_F(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0f);
-                tessellator.addVertex(this.xPosition + (double)this.width - 1.0, this.yPosition + 1.0, (double)this.zLevel);
-                tessellator.setColorRGBA_F(this.firstColor.floatX(), this.firstColor.floatY(), this.firstColor.floatZ(), 1.0f);
-                tessellator.addVertex(this.xPosition + 1.0, this.yPosition + 1.0, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + 1.0, this.yPosition + (double)this.height - 1.0, (double)this.zLevel);
-                tessellator.setColorRGBA_F(this.lastColor.floatX(), this.lastColor.floatY(), this.lastColor.floatZ(), 1.0f);
-                tessellator.addVertex(this.xPosition + (double)this.width - 1.0, this.yPosition + (double)this.height - 1.0, (double)this.zLevel);
+                tessellator.setColorRGBA_F(
+                        this.lastColor.floatX(),
+                        this.lastColor.floatY(),
+                        this.lastColor.floatZ(),
+                        1.0F);
+                tessellator
+                        .addVertex((double) this.xPosition + this.width - 1, (double) this.yPosition + 1, this.zLevel);
+                tessellator.setColorRGBA_F(
+                        this.firstColor.floatX(),
+                        this.firstColor.floatY(),
+                        this.firstColor.floatZ(),
+                        1.0F);
+                tessellator.addVertex((double) this.xPosition + 1, (double) this.yPosition + 1, this.zLevel);
+                tessellator
+                        .addVertex((double) this.xPosition + 1, (double) this.yPosition + this.height - 1, this.zLevel);
+                tessellator.setColorRGBA_F(
+                        this.lastColor.floatX(),
+                        this.lastColor.floatY(),
+                        this.lastColor.floatZ(),
+                        1.0F);
+                tessellator.addVertex(
+                        (double) this.xPosition + this.width - 1,
+                        (double) this.yPosition + this.height - 1,
+                        this.zLevel);
                 tessellator.draw();
-                GL11.glShadeModel(7424);
-                GL11.glDisable(3042);
-                GL11.glEnable(3008);
-                GL11.glEnable(3553);
+
+                GL11.glShadeModel(GL11.GL_FLAT);
+                GL11.glDisable(GL11.GL_BLEND);
+                GL11.glEnable(GL11.GL_ALPHA_TEST);
+                GL11.glEnable(GL11.GL_TEXTURE_2D);
+
                 if (this.displayString != null && this.displayString.length() > 0) {
                     GL11.glPushMatrix();
-                    GL11.glTranslatef((float)(this.xPosition + this.width / 2), (float)(this.yPosition + this.height / 2), 0.0f);
-                    GL11.glScalef(0.5f, 0.5f, 1.0f);
-                    GL11.glTranslatef((float)(-1 * (this.xPosition + this.width / 2)), (float)(-1 * (this.yPosition + this.height / 2)), 0.0f);
-                    this.customFontRenderer.drawString(this.displayString, this.xPosition + this.width / 2 - this.customFontRenderer.getStringWidth(this.displayString) / 2, this.yPosition + this.height / 2 - 3, ColorUtil.to32BitColor(255, 240, 240, 240));
+                    GL11.glTranslatef(this.xPosition + this.width / 2, this.yPosition + this.height / 2, 0.0F);
+                    GL11.glScalef(0.5F, 0.5F, 1.0F);
+                    GL11.glTranslatef(
+                            -1 * (this.xPosition + this.width / 2),
+                            -1 * (this.yPosition + this.height / 2),
+                            0.0F);
+                    this.customFontRenderer.drawString(
+                            this.displayString,
+                            this.xPosition + this.width / 2
+                                    - this.customFontRenderer.getStringWidth(this.displayString) / 2,
+                            this.yPosition + this.height / 2 - 3,
+                            ColorUtil.to32BitColor(255, 240, 240, 240));
                     GL11.glPopMatrix();
                 }
-                GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                GL11.glDisable(3553);
-                GL11.glEnable(3042);
-                GL11.glDisable(3008);
+
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                GL11.glDisable(GL11.GL_TEXTURE_2D);
+                GL11.glEnable(GL11.GL_BLEND);
+                GL11.glDisable(GL11.GL_ALPHA_TEST);
                 OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-                GL11.glShadeModel(7425);
+                GL11.glShadeModel(GL11.GL_SMOOTH);
+
                 tessellator.startDrawingQuads();
-                tessellator.setColorRGBA_F(1.0f, 1.0f, 1.0f, 1.0f);
-                tessellator.addVertex(this.xPosition + (double)this.sliderPos + 1.0, (double)this.yPosition, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + (double)this.sliderPos - 1.0, (double)this.yPosition, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + (double)this.sliderPos - 1.0, this.yPosition + (double)this.height, (double)this.zLevel);
-                tessellator.addVertex(this.xPosition + (double)this.sliderPos + 1.0, this.yPosition + (double)this.height, (double)this.zLevel);
-                tessellator.draw();
+                tessellator.setColorRGBA_F(1, 1, 1, 1.0F);
+                tessellator.addVertex((double) this.xPosition + this.sliderPos + 1, this.yPosition, this.zLevel);
+                tessellator.addVertex((double) this.xPosition + this.sliderPos - 1, this.yPosition, this.zLevel);
+                tessellator.addVertex(
+                        (double) this.xPosition + this.sliderPos - 1,
+                        (double) this.yPosition + this.height,
+                        this.zLevel);
+                tessellator.addVertex(
+                        (double) this.xPosition + this.sliderPos + 1,
+                        (double) this.yPosition + this.height,
+                        this.zLevel);
             }
-            GL11.glShadeModel(7424);
-            GL11.glDisable(3042);
-            GL11.glEnable(3008);
-            GL11.glEnable(3553);
+            tessellator.draw();
+
+            GL11.glShadeModel(GL11.GL_FLAT);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
         }
     }
-    
-    public void setSliderPos(final float pos) {
-        this.sliderPos = (int)Math.floor(this.height * pos);
+
+    public void setSliderPos(float pos) {
+        this.sliderPos = (int) Math.floor(this.height * pos);
     }
-    
+
     public int getSliderPos() {
         return this.sliderPos;
     }
-    
+
     public float getNormalizedValue() {
-        return this.sliderPos / (float)this.height;
+        return this.sliderPos / (float) this.height;
     }
-    
+
     public double getColorValueD() {
-        return this.sliderPos * 255.0 / (this.height - 1);
+        return this.sliderPos * 255.0D / (this.height - 1);
     }
-    
+
     public int getButtonHeight() {
         return this.height;
     }

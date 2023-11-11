@@ -1,70 +1,88 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.api.recipe.*;
-import net.minecraft.inventory.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
-public class ContainerSchematic extends Container
-{
-    public InventorySchematic craftMatrix;
-    public IInventory craftResult;
+import micdoodle8.mods.galacticraft.api.recipe.ISchematicItem;
+
+public class ContainerSchematic extends Container {
+
+    public InventorySchematic craftMatrix = new InventorySchematic(this);
+    public IInventory craftResult = new InventoryCraftResult();
     private final World worldObj;
 
-    public ContainerSchematic(final InventoryPlayer par1InventoryPlayer, final int x, final int y, final int z) {
-        this.craftMatrix = new InventorySchematic(this);
-        this.craftResult = (IInventory)new InventoryCraftResult();
+    public ContainerSchematic(InventoryPlayer par1InventoryPlayer, int x, int y, int z) {
         this.worldObj = par1InventoryPlayer.player.worldObj;
-        this.addSlotToContainer((Slot)new SlotSpecific((IInventory)this.craftMatrix, 0, 80, 1, new Class[] { ISchematicItem.class }));
-        for (int var6 = 0; var6 < 3; ++var6) {
-            for (int var7 = 0; var7 < 9; ++var7) {
-                this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 111 + var6 * 18 - 59 + 16));
+        this.addSlotToContainer(new SlotSpecific(this.craftMatrix, 0, 80, 1, ISchematicItem.class));
+        int var6;
+        int var7;
+
+        // Player inv:
+
+        for (var6 = 0; var6 < 3; ++var6) {
+            for (var7 = 0; var7 < 9; ++var7) {
+                this.addSlotToContainer(
+                        new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 111 + var6 * 18 - 59 + 16));
             }
         }
-        for (int var6 = 0; var6 < 9; ++var6) {
-            this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var6, 8 + var6 * 18, 126));
+
+        for (var6 = 0; var6 < 9; ++var6) {
+            this.addSlotToContainer(new Slot(par1InventoryPlayer, var6, 8 + var6 * 18, 169 - 59 + 16));
         }
-        this.onCraftMatrixChanged((IInventory)this.craftMatrix);
+
+        this.onCraftMatrixChanged(this.craftMatrix);
     }
 
-    public void onContainerClosed(final EntityPlayer par1EntityPlayer) {
+    @Override
+    public void onContainerClosed(EntityPlayer par1EntityPlayer) {
         super.onContainerClosed(par1EntityPlayer);
+
         if (!this.worldObj.isRemote) {
             for (int var2 = 0; var2 < 1; ++var2) {
                 final ItemStack var3 = this.craftMatrix.getStackInSlotOnClosing(var2);
+
                 if (var3 != null) {
-                    par1EntityPlayer.entityDropItem(var3, 0.0f);
+                    par1EntityPlayer.entityDropItem(var3, 0.0F);
                 }
             }
         }
     }
 
-    public boolean canInteractWith(final EntityPlayer entityplayer) {
+    @Override
+    public boolean canInteractWith(EntityPlayer entityplayer) {
         return true;
     }
 
-    public ItemStack transferStackInSlot(final EntityPlayer par1EntityPlayer, final int par2) {
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2) {
         ItemStack var3 = null;
-        final Slot var4 = (Slot)  this.inventorySlots.get(par2);
+        final Slot var4 = this.inventorySlots.get(par2);
+
         if (var4 != null && var4.getHasStack()) {
             final ItemStack var5 = var4.getStack();
             var3 = var5.copy();
+
             if (par2 < 1) {
                 if (!this.mergeItemStack(var5, 1, this.inventorySlots.size(), true)) {
                     return null;
                 }
-            }
-            else if (!this.mergeItemStack(var5, 0, 1, false)) {
+            } else if (!this.mergeItemStack(var5, 0, 1, false)) {
                 return null;
             }
+
             if (var5.stackSize == 0) {
-                var4.putStack((ItemStack)null);
-            }
-            else {
+                var4.putStack(null);
+            } else {
                 var4.onSlotChanged();
             }
         }
+
         return var3;
     }
 }

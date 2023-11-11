@@ -1,161 +1,166 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
-import net.minecraftforge.client.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.api.prefab.entity.*;
-import net.minecraft.client.model.*;
-import net.minecraft.client.renderer.entity.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.item.*;
-import org.lwjgl.opengl.*;
-import cpw.mods.fml.client.*;
-import net.minecraft.entity.*;
-import micdoodle8.mods.galacticraft.api.entity.*;
-import micdoodle8.mods.galacticraft.core.entities.*;
-import org.lwjgl.*;
-import net.minecraft.entity.player.*;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelChest;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.IItemRenderer;
 
-public class ItemRendererTier1Rocket implements IItemRenderer
-{
-    protected static final ResourceLocation chestTexture;
+import org.lwjgl.Sys;
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.api.entity.IRocketType.EnumRocketType;
+import micdoodle8.mods.galacticraft.api.prefab.entity.EntitySpaceshipBase;
+import micdoodle8.mods.galacticraft.core.entities.EntityTier1Rocket;
+
+public class ItemRendererTier1Rocket implements IItemRenderer {
+
+    protected static final ResourceLocation chestTexture = new ResourceLocation("textures/entity/chest/normal.png");
+
     protected EntitySpaceshipBase spaceship;
     protected ModelBase modelSpaceship;
-    protected final ModelChest chestModel;
-    protected static RenderItem drawItems;
+    protected final ModelChest chestModel = new ModelChest();
+
+    protected static RenderItem drawItems = new RenderItem();
+
     protected ResourceLocation texture;
-    
-    public ItemRendererTier1Rocket(final EntitySpaceshipBase spaceship, final ModelBase model, final ResourceLocation texture) {
-        this.chestModel = new ModelChest();
+
+    public ItemRendererTier1Rocket(EntitySpaceshipBase spaceship, ModelBase model, ResourceLocation texture) {
         this.spaceship = spaceship;
         this.modelSpaceship = model;
         this.texture = texture;
     }
-    
-    protected void renderSpaceship(final IItemRenderer.ItemRenderType type, final RenderBlocks render, final ItemStack item, final float translateX, final float translateY, final float translateZ) {
+
+    protected void renderSpaceship(ItemRenderType type, RenderBlocks render, ItemStack item, float translateX,
+            float translateY, float translateZ) {
         GL11.glPushMatrix();
+
         this.transform(item, type);
+
         FMLClientHandler.instance().getClient().renderEngine.bindTexture(this.texture);
-        this.modelSpaceship.render((Entity)this.spaceship, 0.0f, 0.0f, -0.1f, 0.0f, 0.0f, 0.0625f);
+        this.modelSpaceship.render(this.spaceship, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
         GL11.glPopMatrix();
-        if (type == IItemRenderer.ItemRenderType.INVENTORY) {
-            final int index = Math.min(Math.max(item.getItemDamage(), 0), IRocketType.EnumRocketType.values().length - 1);
-            if (IRocketType.EnumRocketType.values()[index].getInventorySpace() > 3) {
+
+        if (type == ItemRenderType.INVENTORY) {
+            final int index = Math.min(Math.max(item.getItemDamage(), 0), EnumRocketType.values().length - 1);
+            if (EnumRocketType.values()[index].getInventorySpace() > 3) {
                 final ModelChest modelChest = this.chestModel;
                 FMLClientHandler.instance().getClient().renderEngine.bindTexture(ItemRendererTier1Rocket.chestTexture);
+
                 GL11.glPushMatrix();
-                GL11.glDisable(2929);
-                GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                GL11.glScalef(0.5f, -0.5f, -0.5f);
-                GL11.glTranslatef(1.5f, 1.95f, 1.7f);
+                GL11.glDisable(GL11.GL_DEPTH_TEST);
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                GL11.glScalef(0.5F, -0.5F, -0.5F);
+                GL11.glTranslatef(1.5F, 1.95F, 1.7F);
                 final short short1 = 0;
-                GL11.glRotatef(0.0f, 0.0f, 1.0f, 0.0f);
-                GL11.glTranslatef(-1.5f, -1.5f, -1.5f);
-                float f1 = 0.0f;
-                f1 = 1.0f - f1;
-                f1 = 1.0f - f1 * f1 * f1;
-                modelChest.chestLid.rotateAngleX = -(f1 * 3.1415927f / 2.0f);
-                modelChest.chestBelow.render(0.0625f);
-                modelChest.chestLid.render(0.0625f);
-                modelChest.chestKnob.render(0.0625f);
-                GL11.glEnable(2929);
+
+                GL11.glRotatef(short1, 0.0F, 1.0F, 0.0F);
+                GL11.glTranslatef(-1.5F, -1.5F, -1.5F);
+                float f1 = 0;
+                f1 = 1.0F - f1;
+                f1 = 1.0F - f1 * f1 * f1;
+                modelChest.chestLid.rotateAngleX = -(f1 * (float) Math.PI / 2.0F);
+
+                modelChest.chestBelow.render(0.0625F);
+                modelChest.chestLid.render(0.0625F);
+                modelChest.chestKnob.render(0.0625F);
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
                 GL11.glPopMatrix();
-                GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             }
         }
     }
-    
-    public void transform(final ItemStack itemstack, final IItemRenderer.ItemRenderType type) {
-        final EntityPlayer player = (EntityPlayer)FMLClientHandler.instance().getClient().thePlayer;
+
+    public void transform(ItemStack itemstack, ItemRenderType type) {
+        final EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
         long var10 = this.spaceship.getEntityId() * 493286711L;
         var10 = var10 * var10 * 4392167121L + var10 * 98761L;
-        final float var11 = (((var10 >> 16 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        final float var12 = (((var10 >> 20 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        final float var13 = (((var10 >> 24 & 0x7L) + 0.5f) / 8.0f - 0.5f) * 0.004f;
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED) {
-            GL11.glRotatef(70.0f, 1.0f, 0.0f, 0.0f);
-            GL11.glRotatef(-10.0f, 0.0f, 1.0f, 0.0f);
-            GL11.glRotatef(50.0f, 0.0f, 1.0f, 1.0f);
-            GL11.glTranslatef(0.0f, 2.0f, 0.0f);
-            GL11.glScalef(5.2f, 5.2f, 5.2f);
-            if (player != null && player.ridingEntity != null && player.ridingEntity instanceof EntityTier1Rocket) {
-                GL11.glScalef(0.0f, 0.0f, 0.0f);
+        final float var12 = (((var10 >> 16 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        final float var13 = (((var10 >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+        final float var14 = (((var10 >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
+
+        if (type == ItemRenderType.EQUIPPED) {
+            GL11.glRotatef(70, 1.0F, 0, 0);
+            GL11.glRotatef(-10, 0.0F, 1, 0);
+            GL11.glRotatef(50, 0.0F, 1, 1);
+            GL11.glTranslatef(0F, 2.0F, 0F);
+            GL11.glScalef(5.2F, 5.2F, 5.2F);
+
+            if (player != null && player.ridingEntity instanceof EntityTier1Rocket) {
+                GL11.glScalef(0.0F, 0.0F, 0.0F);
             }
         }
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED_FIRST_PERSON) {
-            GL11.glTranslatef(-0.5f, 4.2f, 0.0f);
-            GL11.glRotatef(28.0f, 0.0f, 0.0f, 1.0f);
-            GL11.glRotatef(230.0f, 0.0f, 1.0f, 0.0f);
-            GL11.glRotatef(73.0f, 1.0f, 0.0f, 0.0f);
-            GL11.glScalef(5.2f, 5.2f, 5.2f);
-            if (player != null && player.ridingEntity != null && player.ridingEntity instanceof EntityTier1Rocket) {
-                GL11.glScalef(0.0f, 0.0f, 0.0f);
+
+        if (type == ItemRenderType.EQUIPPED_FIRST_PERSON) {
+            GL11.glTranslatef(-0.5F, 4.2F, 0F);
+            GL11.glRotatef(28, 0.0F, 0, 1);
+            GL11.glRotatef(50 + 180, 0.0F, 1, 0);
+            GL11.glRotatef(73, 1.0F, 0, 0);
+            GL11.glScalef(5.2F, 5.2F, 5.2F);
+
+            if (player != null && player.ridingEntity instanceof EntityTier1Rocket) {
+                GL11.glScalef(0.0F, 0.0F, 0.0F);
             }
         }
-        GL11.glTranslatef(var11, var12 - 0.1f, var13);
-        GL11.glScalef(-0.4f, -0.4f, 0.4f);
-        if (type == IItemRenderer.ItemRenderType.INVENTORY || type == IItemRenderer.ItemRenderType.ENTITY) {
-            if (type == IItemRenderer.ItemRenderType.INVENTORY) {
-                GL11.glRotatef(85.0f, 1.0f, 0.0f, 1.0f);
-                GL11.glRotatef(20.0f, 1.0f, 0.0f, 0.0f);
-                GL11.glScalef(0.9f, 0.9f, 0.9f);
+
+        GL11.glTranslatef(var12, var13 - 0.1F, var14);
+        GL11.glScalef(-0.4F, -0.4F, 0.4F);
+
+        if (type == ItemRenderType.INVENTORY || type == ItemRenderType.ENTITY) {
+            if (type == ItemRenderType.INVENTORY) {
+                GL11.glRotatef(85F, 1F, 0F, 1F);
+                GL11.glRotatef(20F, 1F, 0F, 0F);
+                GL11.glScalef(0.9F, 0.9F, 0.9F);
+            } else {
+                GL11.glTranslatef(0, -0.9F, 0);
+                GL11.glScalef(0.5F, 0.5F, 0.5F);
             }
-            else {
-                GL11.glTranslatef(0.0f, -0.9f, 0.0f);
-                GL11.glScalef(0.5f, 0.5f, 0.5f);
-            }
-            GL11.glScalef(1.3f, 1.3f, 1.3f);
-            GL11.glTranslatef(0.0f, -0.6f, 0.0f);
-            GL11.glRotatef(Sys.getTime() / 30.0f % 360.0f, 0.0f, 1.0f, 0.0f);
-        }
-    }
-    
-    public boolean handleRenderType(final ItemStack item, final IItemRenderer.ItemRenderType type) {
-        switch (type) {
-            case ENTITY: {
-                return true;
-            }
-            case EQUIPPED: {
-                return true;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                return true;
-            }
-            case INVENTORY: {
-                return true;
-            }
-            default: {
-                return false;
-            }
+
+            GL11.glScalef(1.3F, 1.3F, 1.3F);
+            GL11.glTranslatef(0, -0.6F, 0);
+            GL11.glRotatef(Sys.getTime() / 30F % 360F, 0F, 1F, 0F);
         }
     }
-    
-    public boolean shouldUseRenderHelper(final IItemRenderer.ItemRenderType type, final ItemStack item, final IItemRenderer.ItemRendererHelper helper) {
+
+    /**
+     * IItemRenderer implementation *
+     */
+    @Override
+    public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+        return switch (type) {
+            case ENTITY -> true;
+            case EQUIPPED -> true;
+            case EQUIPPED_FIRST_PERSON -> true;
+            case INVENTORY -> true;
+            default -> false;
+        };
+    }
+
+    @Override
+    public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
         return true;
     }
-    
-    public void renderItem(final IItemRenderer.ItemRenderType type, final ItemStack item, final Object... data) {
+
+    @Override
+    public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         switch (type) {
-            case EQUIPPED: {
-                this.renderSpaceship(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED:
+                this.renderSpaceship(type, (RenderBlocks) data[0], item, -0.5f, -0.5f, -0.5f);
                 break;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                this.renderSpaceship(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED_FIRST_PERSON:
+                this.renderSpaceship(type, (RenderBlocks) data[0], item, -0.5f, -0.5f, -0.5f);
                 break;
-            }
-            case INVENTORY: {
-                this.renderSpaceship(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case INVENTORY:
+                this.renderSpaceship(type, (RenderBlocks) data[0], item, -0.5f, -0.5f, -0.5f);
                 break;
-            }
-            case ENTITY: {
-                this.renderSpaceship(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case ENTITY:
+                this.renderSpaceship(type, (RenderBlocks) data[0], item, -0.5f, -0.5f, -0.5f);
                 break;
-            }
+            default:
         }
-    }
-    
-    static {
-        chestTexture = new ResourceLocation("textures/entity/chest/normal.png");
-        ItemRendererTier1Rocket.drawItems = new RenderItem();
     }
 }

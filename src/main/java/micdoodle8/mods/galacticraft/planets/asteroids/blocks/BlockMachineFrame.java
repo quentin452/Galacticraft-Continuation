@@ -1,64 +1,86 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import net.minecraft.block.*;
-import net.minecraft.util.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.block.material.*;
-import net.minecraft.client.renderer.texture.*;
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.*;
-import java.util.*;
-import net.minecraft.item.*;
+import java.util.List;
+import java.util.Random;
 
-public class BlockMachineFrame extends Block
-{
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+
+public class BlockMachineFrame extends Block {
+
     @SideOnly(Side.CLIENT)
     private IIcon[] blockIcons;
-    
-    public BlockMachineFrame(final String assetName) {
+
+    public BlockMachineFrame(String assetName) {
         super(Material.rock);
-        this.blockHardness = 3.0f;
+        this.blockHardness = 3.0F;
         this.setBlockName(assetName);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
-        (this.blockIcons = new IIcon[1])[0] = par1IconRegister.registerIcon("galacticraftasteroids:machineframe");
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
+        this.blockIcons = new IIcon[1];
+        this.blockIcons[0] = par1IconRegister.registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machineframe");
         this.blockIcon = this.blockIcons[0];
     }
-    
+
     @SideOnly(Side.CLIENT)
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(final int side, final int meta) {
+    @Override
+    public IIcon getIcon(int side, int meta) {
         if (meta < 0 || meta >= this.blockIcons.length) {
             return this.blockIcon;
         }
+
         return this.blockIcons[meta];
     }
-    
-    public Item getItemDropped(final int meta, final Random random, final int par3) {
-        return super.getItemDropped(meta, random, par3);
+
+    @Override
+    public Item getItemDropped(int meta, Random random, int par3) {
+        return switch (meta) {
+            default -> super.getItemDropped(meta, random, par3);
+        };
     }
-    
-    public int damageDropped(final int meta) {
+
+    @Override
+    public int damageDropped(int meta) {
         return meta;
     }
-    
-    public int quantityDropped(final int meta, final int fortune, final Random random) {
-        return 1;
+
+    @Override
+    public int quantityDropped(int meta, int fortune, Random random) {
+        return switch (meta) {
+            default -> 1;
+        };
     }
-    
+
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
-        for (int var4 = 0; var4 < this.blockIcons.length; ++var4) {
+    @Override
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
+        int var4;
+
+        for (var4 = 0; var4 < this.blockIcons.length; ++var4) {
             par3List.add(new ItemStack(par1, 1, var4));
         }
     }

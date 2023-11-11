@@ -1,10 +1,12 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.world.gen;
 
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.*;
-import net.minecraft.world.biome.*;
+import net.minecraft.world.biome.BiomeGenBase;
 
-public class WorldChunkManagerAsteroids extends WorldChunkManagerSpace
-{
+import micdoodle8.mods.galacticraft.api.prefab.world.gen.WorldChunkManagerSpace;
+
+public class WorldChunkManagerAsteroids extends WorldChunkManagerSpace {
+
+    @Override
     public BiomeGenBase getBiome() {
         return BiomeGenBaseAsteroids.asteroid;
     }

@@ -1,25 +1,29 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import net.minecraft.creativetab.*;
-import net.minecraft.item.*;
-import cpw.mods.fml.relauncher.*;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 
-public class CreativeTabGC extends CreativeTabs
-{
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+public class CreativeTabGC extends CreativeTabs {
+
     private final Item itemForTab;
     private final int metaForTab;
-    
-    public CreativeTabGC(final int par1, final String par2Str, final Item itemForTab, final int metaForTab) {
+
+    public CreativeTabGC(int par1, String par2Str, Item itemForTab, int metaForTab) {
         super(par1, par2Str);
         this.itemForTab = itemForTab;
         this.metaForTab = metaForTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
     public Item getTabIconItem() {
         return this.itemForTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
     public int func_151243_f() {
         return this.metaForTab;

@@ -1,72 +1,89 @@
 package micdoodle8.mods.galacticraft.core.inventory;
 
-import micdoodle8.mods.galacticraft.core.energy.tile.*;
-import micdoodle8.mods.galacticraft.api.item.*;
-import net.minecraft.inventory.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 
-public class ContainerCargoLoader extends Container
-{
-    private TileBaseElectricBlock tileEntity;
+import micdoodle8.mods.galacticraft.api.item.IItemElectric;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlock;
 
-    public ContainerCargoLoader(final InventoryPlayer par1InventoryPlayer, final IInventory cargoLoader) {
-        this.tileEntity = (TileBaseElectricBlock)cargoLoader;
-        this.addSlotToContainer((Slot)new SlotSpecific(cargoLoader, 0, 10, 27, new Class[] { IItemElectric.class }));
-        for (int var6 = 0; var6 < 2; ++var6) {
-            for (int var7 = 0; var7 < 7; ++var7) {
+public class ContainerCargoLoader extends Container {
+
+    private final TileBaseElectricBlock tileEntity;
+
+    public ContainerCargoLoader(InventoryPlayer par1InventoryPlayer, IInventory cargoLoader) {
+        this.tileEntity = (TileBaseElectricBlock) cargoLoader;
+        this.addSlotToContainer(new SlotSpecific(cargoLoader, 0, 10, 27, IItemElectric.class));
+
+        int var6;
+        int var7;
+
+        for (var6 = 0; var6 < 2; ++var6) {
+            for (var7 = 0; var7 < 7; ++var7) {
                 this.addSlotToContainer(new Slot(cargoLoader, var7 + var6 * 7 + 1, 38 + var7 * 18, 27 + var6 * 18));
             }
         }
-        for (int var6 = 0; var6 < 3; ++var6) {
-            for (int var7 = 0; var7 < 9; ++var7) {
-                this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 124 + var6 * 18));
+
+        // Player inv:
+
+        for (var6 = 0; var6 < 3; ++var6) {
+            for (var7 = 0; var7 < 9; ++var7) {
+                this.addSlotToContainer(
+                        new Slot(par1InventoryPlayer, var7 + var6 * 9 + 9, 8 + var7 * 18, 124 + var6 * 18));
             }
         }
-        for (int var6 = 0; var6 < 9; ++var6) {
-            this.addSlotToContainer(new Slot((IInventory)par1InventoryPlayer, var6, 8 + var6 * 18, 182));
+
+        for (var6 = 0; var6 < 9; ++var6) {
+            this.addSlotToContainer(new Slot(par1InventoryPlayer, var6, 8 + var6 * 18, 66 + 116));
         }
     }
 
-    public boolean canInteractWith(final EntityPlayer var1) {
+    @Override
+    public boolean canInteractWith(EntityPlayer var1) {
         return this.tileEntity.isUseableByPlayer(var1);
     }
 
-    public ItemStack transferStackInSlot(final EntityPlayer par1EntityPlayer, final int par2) {
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2) {
         ItemStack var3 = null;
-        final Slot slot = (Slot) this.inventorySlots.get(par2);
+        final Slot slot = this.inventorySlots.get(par2);
+
         if (slot != null && slot.getHasStack()) {
-            final ItemStack var4 = slot.getStack();
-            var3 = var4.copy();
+            final ItemStack var5 = slot.getStack();
+            var3 = var5.copy();
+
             if (par2 < 15) {
-                if (!this.mergeItemStack(var4, 15, 51, true)) {
+                if (!this.mergeItemStack(var5, 15, 51, true)) {
                     return null;
                 }
-            }
-            else if (var4.getItem() instanceof IItemElectric) {
-                if (!this.mergeItemStack(var4, 0, 1, false)) {
+            } else if (var5.getItem() instanceof IItemElectric) {
+                if (!this.mergeItemStack(var5, 0, 1, false)) {
                     return null;
                 }
-            }
-            else if (par2 < 42) {
-                if (!this.mergeItemStack(var4, 1, 15, false) && !this.mergeItemStack(var4, 42, 51, false)) {
+            } else if (par2 < 42) {
+                if (!this.mergeItemStack(var5, 1, 15, false) && !this.mergeItemStack(var5, 42, 51, false)) {
                     return null;
                 }
-            }
-            else if (!this.mergeItemStack(var4, 1, 15, false) && !this.mergeItemStack(var4, 15, 42, false)) {
+            } else if (!this.mergeItemStack(var5, 1, 15, false) && !this.mergeItemStack(var5, 15, 42, false)) {
                 return null;
             }
-            if (var4.stackSize == 0) {
-                slot.putStack((ItemStack)null);
-            }
-            else {
+
+            if (var5.stackSize == 0) {
+                slot.putStack(null);
+            } else {
                 slot.onSlotChanged();
             }
-            if (var4.stackSize == var3.stackSize) {
+
+            if (var5.stackSize == var3.stackSize) {
                 return null;
             }
-            slot.onPickupFromSlot(par1EntityPlayer, var4);
+
+            slot.onPickupFromSlot(par1EntityPlayer, var5);
         }
+
         return var3;
     }
 }

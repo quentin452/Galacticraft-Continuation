@@ -1,10 +1,16 @@
 package micdoodle8.mods.galacticraft.api.block;
 
-import net.minecraft.world.*;
+import net.minecraft.world.World;
 
-public interface IOxygenReliantBlock
-{
-    void onOxygenRemoved(final World p0, final int p1, final int p2, final int p3);
-    
-    void onOxygenAdded(final World p0, final int p1, final int p2, final int p3);
+/**
+ * If block requires updates when oxygen is added and removed, implement this into your block class.
+ * <p>
+ * It is recommended that blocks implementing this should be set to tick randomly, and should override @updateTick()
+ * also to carry out oxygen checks.
+ */
+public interface IOxygenReliantBlock {
+
+    void onOxygenRemoved(World world, int x, int y, int z);
+
+    void onOxygenAdded(World world, int x, int y, int z);
 }

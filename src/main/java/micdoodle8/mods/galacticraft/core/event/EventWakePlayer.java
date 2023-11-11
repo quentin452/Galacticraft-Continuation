@@ -1,13 +1,15 @@
 package micdoodle8.mods.galacticraft.core.event;
 
-import net.minecraftforge.event.entity.player.*;
-import cpw.mods.fml.common.eventhandler.*;
-import net.minecraft.entity.player.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayer.EnumStatus;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+
+import cpw.mods.fml.common.eventhandler.Cancelable;
 
 @Cancelable
-public class EventWakePlayer extends PlayerEvent
-{
-    public EntityPlayer.EnumStatus result;
+public class EventWakePlayer extends PlayerEvent {
+
+    public EnumStatus result = null;
     public final int x;
     public final int y;
     public final int z;
@@ -15,10 +17,10 @@ public class EventWakePlayer extends PlayerEvent
     public final boolean flag2;
     public final boolean flag3;
     public final boolean bypassed;
-    
-    public EventWakePlayer(final EntityPlayer player, final int x, final int y, final int z, final boolean flag1, final boolean flag2, final boolean flag3, final boolean bypassed) {
+
+    public EventWakePlayer(EntityPlayer player, int x, int y, int z, boolean flag1, boolean flag2, boolean flag3,
+            boolean bypassed) {
         super(player);
-        this.result = null;
         this.x = x;
         this.y = y;
         this.z = z;

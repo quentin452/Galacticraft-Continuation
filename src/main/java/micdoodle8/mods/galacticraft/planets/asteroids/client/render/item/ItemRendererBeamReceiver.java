@@ -1,102 +1,106 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.item;
 
-import net.minecraftforge.client.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.item.*;
-import org.lwjgl.opengl.*;
-import cpw.mods.fml.client.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile.*;
-import org.lwjgl.*;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.IItemRenderer;
 
-public class ItemRendererBeamReceiver implements IItemRenderer
-{
-    private void renderBeamReceiver(final IItemRenderer.ItemRenderType type, final RenderBlocks render, final ItemStack item, final float translateX, final float translateY, final float translateZ) {
+import org.lwjgl.Sys;
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.planets.asteroids.client.render.tile.TileEntityBeamReceiverRenderer;
+
+public class ItemRendererBeamReceiver implements IItemRenderer {
+
+    private void renderBeamReceiver(ItemRenderType type) {
         GL11.glPushMatrix();
         this.transform(type);
-        GL11.glColor3f(1.0f, 1.0f, 1.0f);
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(TileEntityBeamReceiverRenderer.receiverTexture);
+
+        GL11.glColor3f(1.0F, 1.0F, 1.0F);
+
+        FMLClientHandler.instance().getClient().renderEngine
+                .bindTexture(TileEntityBeamReceiverRenderer.receiverTexture);
         TileEntityBeamReceiverRenderer.receiverModel.renderPart("Main");
         TileEntityBeamReceiverRenderer.receiverModel.renderPart("Ring");
-        GL11.glColor3f(0.6f, 0.3f, 0.0f);
-        GL11.glDisable(3553);
-        GL11.glDisable(2884);
+
+        GL11.glColor3f(0.6F, 0.3F, 0.0F);
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_CULL_FACE);
         TileEntityBeamReceiverRenderer.receiverModel.renderPart("Receiver");
-        GL11.glEnable(3553);
-        GL11.glEnable(2884);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_CULL_FACE);
+
         GL11.glPopMatrix();
     }
-    
-    public void transform(final IItemRenderer.ItemRenderType type) {
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED) {
-            GL11.glTranslatef(1.0f, -0.2f, 0.9f);
-            GL11.glRotatef(185.0f, 1.0f, 0.0f, 0.0f);
-            GL11.glRotatef(40.0f, 0.0f, 1.0f, 0.0f);
-            GL11.glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
-            GL11.glScalef(3.2f, 3.2f, 3.2f);
+
+    public void transform(ItemRenderType type) {
+        if (type == ItemRenderType.EQUIPPED) {
+            GL11.glTranslatef(1.0F, -0.2F, 0.9F);
+            GL11.glRotatef(185, 1, 0, 0);
+            GL11.glRotatef(40, 0, 1, 0);
+            GL11.glRotatef(0, 0, 0, 1);
+            GL11.glScalef(3.2F, 3.2F, 3.2F);
         }
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED_FIRST_PERSON) {
-            GL11.glScalef(2.0f, 2.0f, 2.0f);
-            GL11.glTranslatef(-0.1f, 1.0f, 0.35f);
+
+        if (type == ItemRenderType.EQUIPPED_FIRST_PERSON) {
+            GL11.glScalef(2.0F, 2.0F, 2.0F);
+            GL11.glTranslatef(-0.1F, 1.0F, 0.35F);
         }
-        GL11.glScalef(-0.4f, -0.4f, 0.4f);
-        if (type == IItemRenderer.ItemRenderType.INVENTORY || type == IItemRenderer.ItemRenderType.ENTITY) {
-            if (type == IItemRenderer.ItemRenderType.INVENTORY) {
-                GL11.glTranslatef(0.0f, 2.45f, -0.8f);
-                GL11.glScalef(3.0f, 3.0f, 3.0f);
-                GL11.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
-                GL11.glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+
+        GL11.glScalef(-0.4F, -0.4F, 0.4F);
+
+        if (type == ItemRenderType.INVENTORY || type == ItemRenderType.ENTITY) {
+            if (type == ItemRenderType.INVENTORY) {
+                GL11.glTranslatef(0.0F, 2.45F, -0.8F);
+                GL11.glScalef(3.0F, 3.0F, 3.0F);
+                GL11.glRotatef(180, 0, 0, 1);
+                GL11.glRotatef(-90, 0, 1, 0);
+            } else {
+                GL11.glTranslatef(0, -3.9F, 0);
+                GL11.glRotatef(Sys.getTime() / 90F % 360F, 0F, 1F, 0F);
+                GL11.glScalef(4.0F, 4.0F, 4.0F);
             }
-            else {
-                GL11.glTranslatef(0.0f, -3.9f, 0.0f);
-                GL11.glRotatef(Sys.getTime() / 90.0f % 360.0f, 0.0f, 1.0f, 0.0f);
-                GL11.glScalef(4.0f, 4.0f, 4.0f);
-            }
-            GL11.glScalef(1.3f, 1.3f, 1.3f);
-        }
-    }
-    
-    public boolean handleRenderType(final ItemStack item, final IItemRenderer.ItemRenderType type) {
-        switch (type) {
-            case ENTITY: {
-                return true;
-            }
-            case EQUIPPED: {
-                return true;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                return true;
-            }
-            case INVENTORY: {
-                return true;
-            }
-            default: {
-                return false;
-            }
+
+            GL11.glScalef(1.3F, 1.3F, 1.3F);
         }
     }
-    
-    public boolean shouldUseRenderHelper(final IItemRenderer.ItemRenderType type, final ItemStack item, final IItemRenderer.ItemRendererHelper helper) {
+
+    /**
+     * IItemRenderer implementation *
+     */
+    @Override
+    public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+        return switch (type) {
+            case ENTITY -> true;
+            case EQUIPPED -> true;
+            case EQUIPPED_FIRST_PERSON -> true;
+            case INVENTORY -> true;
+            default -> false;
+        };
+    }
+
+    @Override
+    public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
         return true;
     }
-    
-    public void renderItem(final IItemRenderer.ItemRenderType type, final ItemStack item, final Object... data) {
+
+    @Override
+    public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         switch (type) {
-            case EQUIPPED: {
-                this.renderBeamReceiver(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED:
+                this.renderBeamReceiver(type);
                 break;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                this.renderBeamReceiver(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED_FIRST_PERSON:
+                this.renderBeamReceiver(type);
                 break;
-            }
-            case INVENTORY: {
-                this.renderBeamReceiver(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case INVENTORY:
+                this.renderBeamReceiver(type);
                 break;
-            }
-            case ENTITY: {
-                this.renderBeamReceiver(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case ENTITY:
+                this.renderBeamReceiver(type);
                 break;
-            }
+            default:
+                break;
         }
     }
 }

@@ -1,28 +1,36 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import net.minecraft.block.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.relauncher.*;
+import net.minecraft.block.Block;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemSlab;
+import net.minecraft.item.ItemStack;
 
-public class ItemBlockSlabGC extends ItemSlab
-{
-    public ItemBlockSlabGC(final Block block, final BlockSlabGC singleSlab, final BlockSlabGC doubleSlab) {
-        super(block, (BlockSlab)singleSlab, (BlockSlab)doubleSlab, block == doubleSlab);
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.blocks.BlockSlabGC;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+
+public class ItemBlockSlabGC extends ItemSlab {
+
+    public ItemBlockSlabGC(Block block, BlockSlabGC singleSlab, BlockSlabGC doubleSlab) {
+        super(block, singleSlab, doubleSlab, block == doubleSlab);
     }
-    
-    public int getMetadata(final int meta) {
-        return meta & 0x7;
+
+    @Override
+    public int getMetadata(int meta) {
+        return meta & 7;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
-    public String getUnlocalizedName(final ItemStack itemStack) {
-        final BlockSlabGC slab = (BlockSlabGC)Block.getBlockFromItem(itemStack.getItem());
-        return super.getUnlocalizedName() + "." + new StringBuilder().append(slab.func_150002_b(itemStack.getItemDamage())).toString();
+
+    @Override
+    public String getUnlocalizedName(ItemStack itemStack) {
+        final BlockSlabGC slab = (BlockSlabGC) Block.getBlockFromItem(itemStack.getItem());
+        return super.getUnlocalizedName() + "."
+                + new StringBuilder().append(slab.func_150002_b(itemStack.getItemDamage())).toString();
     }
 }

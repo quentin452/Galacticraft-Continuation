@@ -1,26 +1,34 @@
 package micdoodle8.mods.galacticraft.core.energy.tile;
 
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.core.tick.*;
-import micdoodle8.mods.galacticraft.api.transmission.grid.*;
-import micdoodle8.mods.galacticraft.core.energy.grid.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import net.minecraftforge.common.util.*;
-import micdoodle8.mods.galacticraft.api.transmission.tile.*;
-import micdoodle8.mods.galacticraft.api.transmission.*;
-import net.minecraft.util.*;
-import cpw.mods.fml.relauncher.*;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.common.util.ForgeDirection;
 
-public abstract class TileBaseConductor extends TileEntityAdvanced implements IConductor
-{
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import micdoodle8.mods.galacticraft.api.transmission.grid.IElectricityNetwork;
+import micdoodle8.mods.galacticraft.api.transmission.grid.IGridNetwork;
+import micdoodle8.mods.galacticraft.api.transmission.tile.IConductor;
+import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
+import micdoodle8.mods.galacticraft.api.transmission.tile.INetworkProvider;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.energy.grid.EnergyNetwork;
+import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityAdvanced;
+
+/**
+ * This tile entity pre-fabricated for all conductors.
+ *
+ * @author Calclavia
+ */
+public abstract class TileBaseConductor extends TileEntityAdvanced implements IConductor {
+
     private IGridNetwork network;
-    public TileEntity[] adjacentConnections;
 
-    public TileBaseConductor() {
-        this.adjacentConnections = null;
-    }
+    public TileEntity[] adjacentConnections = null;
 
+    @Override
     public void validate() {
         super.validate();
         if (!this.worldObj.isRemote) {
@@ -28,72 +36,102 @@ public abstract class TileBaseConductor extends TileEntityAdvanced implements IC
         }
     }
 
+    @Override
     public void invalidate() {
         if (!this.worldObj.isRemote) {
             this.getNetwork().split(this);
         }
+
         super.invalidate();
     }
 
+    @Override
     public void onChunkUnload() {
         super.invalidate();
         super.onChunkUnload();
     }
 
+    @Override
     public boolean canUpdate() {
         return false;
     }
 
+    @Override
     public IElectricityNetwork getNetwork() {
         if (this.network == null) {
             final EnergyNetwork network = new EnergyNetwork();
             network.getTransmitters().add(this);
-            this.setNetwork((IGridNetwork)network);
+            this.setNetwork(network);
         }
-        return (IElectricityNetwork)this.network;
+
+        return (IElectricityNetwork) this.network;
     }
 
-    public void setNetwork(final IGridNetwork network) {
+    @Override
+    public void setNetwork(IGridNetwork network) {
         this.network = network;
     }
 
+    @Override
     public void refresh() {
         if (!this.worldObj.isRemote) {
             this.adjacentConnections = null;
+
             this.getNetwork().refresh();
-            final BlockVec3 thisVec = new BlockVec3((TileEntity)this);
+
+            final BlockVec3 thisVec = new BlockVec3(this);
             for (final ForgeDirection side : ForgeDirection.VALID_DIRECTIONS) {
                 final TileEntity tileEntity = thisVec.getTileEntityOnSide(this.worldObj, side);
-                if (tileEntity != null && tileEntity.getClass() == this.getClass() && tileEntity instanceof INetworkProvider && !this.getNetwork().equals(((INetworkProvider)tileEntity).getNetwork())) {
-                    ((INetworkProvider)tileEntity).getNetwork().merge((Object)this.getNetwork());
+
+                if (tileEntity != null && tileEntity.getClass() == this.getClass()
+                        && tileEntity instanceof INetworkProvider
+                        && !this.getNetwork().equals(((INetworkProvider) tileEntity).getNetwork())) {
+                    ((INetworkProvider) tileEntity).getNetwork().merge(this.getNetwork());
                 }
             }
         }
     }
 
+    @Override
     public TileEntity[] getAdjacentConnections() {
+        /**
+         * Cache the adjacentConnections.
+         */
         if (this.adjacentConnections == null) {
             this.adjacentConnections = new TileEntity[6];
-            final BlockVec3 thisVec = new BlockVec3((TileEntity)this);
-            for (int i = 0; i < 6; ++i) {
+
+            final BlockVec3 thisVec = new BlockVec3(this);
+            for (int i = 0; i < 6; i++) {
                 final TileEntity tileEntity = thisVec.getTileEntityOnSide(this.worldObj, i);
-                if (tileEntity instanceof IConnector && ((IConnector)tileEntity).canConnect(ForgeDirection.getOrientation(i ^ 0x1), NetworkType.POWER)) {
+
+                if (tileEntity instanceof IConnector && ((IConnector) tileEntity)
+                        .canConnect(ForgeDirection.getOrientation(i ^ 1), NetworkType.POWER)) {
                     this.adjacentConnections[i] = tileEntity;
                 }
             }
         }
+
         return this.adjacentConnections;
     }
 
-    public boolean canConnect(final ForgeDirection direction, final NetworkType type) {
+    @Override
+    public boolean canConnect(ForgeDirection direction, NetworkType type) {
         return type == NetworkType.POWER;
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getRenderBoundingBox() {
-        return AxisAlignedBB.getBoundingBox((double)this.xCoord, (double)this.yCoord, (double)this.zCoord, (double)(this.xCoord + 1), (double)(this.yCoord + 1), (double)(this.zCoord + 1));
+        return AxisAlignedBB.getBoundingBox(
+                this.xCoord,
+                this.yCoord,
+                this.zCoord,
+                this.xCoord + 1,
+                this.yCoord + 1,
+                this.zCoord + 1);
     }
 
+    @Override
     public NetworkType getNetworkType() {
         return NetworkType.POWER;
     }

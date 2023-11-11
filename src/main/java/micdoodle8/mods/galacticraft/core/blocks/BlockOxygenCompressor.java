@@ -1,28 +1,36 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.material.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.client.renderer.texture.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.energy.tile.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraftforge.common.util.*;
-import net.minecraft.entity.*;
-import net.minecraft.item.*;
-import java.util.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.List;
 
-public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBlockDesc.IBlockShiftDesc
-{
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseUniversalElectrical;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenCompressor;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenDecompressor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBlockDesc.IBlockShiftDesc {
+
     public static final int OXYGEN_COMPRESSOR_METADATA = 0;
     public static final int OXYGEN_DECOMPRESSOR_METADATA = 4;
+
     private IIcon iconMachineSide;
     private IIcon iconCompressor1;
     private IIcon iconCompressor2;
@@ -30,191 +38,208 @@ public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBloc
     private IIcon iconOxygenInput;
     private IIcon iconOxygenOutput;
     private IIcon iconInput;
-    
-    public BlockOxygenCompressor(final boolean isActive, final String assetName) {
+
+    public BlockOxygenCompressor(boolean isActive, String assetName) {
         super(Material.rock);
-        this.setHardness(1.0f);
+        this.setHardness(1.0F);
         this.setStepSound(Block.soundTypeMetal);
         this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
         this.setBlockName(assetName);
     }
-    
+
+    @Override
     public int getRenderType() {
-        return GalacticraftCore.proxy.getBlockRender((Block)this);
+        return GalacticraftCore.proxy.getBlockRender(this);
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
         this.iconMachineSide = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_blank");
         this.iconCompressor1 = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_compressor_1");
         this.iconCompressor2 = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_compressor_2");
-        this.iconDecompressor = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_decompressor_1");
+        this.iconDecompressor = par1IconRegister
+                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_decompressor_1");
         this.iconOxygenInput = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_oxygen_input");
-        this.iconOxygenOutput = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_oxygen_output");
+        this.iconOxygenOutput = par1IconRegister
+                .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_oxygen_output");
         this.iconInput = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "machine_input");
     }
-    
-    public boolean onUseWrench(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
-        int original;
-        final int metadata = original = par1World.getBlockMetadata(x, y, z);
-        if (metadata >= 4) {
-            original -= 4;
+
+    @Override
+    public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
+            float hitX, float hitY, float hitZ) {
+        final int metadata = par1World.getBlockMetadata(x, y, z);
+        int original = metadata;
+
+        if (metadata >= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA) {
+            original -= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA;
+        } else if (metadata >= BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA) {
+            original -= BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA;
         }
-        else if (metadata >= 0) {
-            original += 0;
-        }
+
         int meta = 0;
+
+        // Re-orient the block
         switch (original) {
-            case 0: {
+            case 0:
                 meta = 3;
                 break;
-            }
-            case 3: {
+            case 3:
                 meta = 1;
                 break;
-            }
-            case 1: {
+            case 1:
                 meta = 2;
                 break;
-            }
-            case 2: {
+            case 2:
                 meta = 0;
                 break;
-            }
         }
-        if (metadata >= 4) {
-            meta += 4;
+
+        if (metadata >= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA) {
+            meta += BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA;
+        } else if (metadata >= BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA) {
+            meta += BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA;
         }
-        else if (metadata >= 0) {
-            meta += 0;
-        }
+
         final TileEntity te = par1World.getTileEntity(x, y, z);
         if (te instanceof TileBaseUniversalElectrical) {
-            ((TileBaseUniversalElectrical)te).updateFacing();
+            ((TileBaseUniversalElectrical) te).updateFacing();
         }
+
         par1World.setBlockMetadataWithNotify(x, y, z, meta, 3);
         return true;
     }
-    
-    public boolean onMachineActivated(final World world, final int x, final int y, final int z, final EntityPlayer entityPlayer, final int side, final float hitX, final float hitY, final float hitZ) {
-        entityPlayer.openGui((Object)GalacticraftCore.instance, -1, world, x, y, z);
+
+    @Override
+    public boolean onMachineActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float hitX,
+            float hitY, float hitZ) {
+        entityPlayer.openGui(GalacticraftCore.instance, -1, world, x, y, z);
         return true;
     }
-    
-    public TileEntity createTileEntity(final World world, final int metadata) {
-        if (metadata >= 4) {
+
+    @Override
+    public TileEntity createTileEntity(World world, int metadata) {
+        if (metadata >= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA) {
             return new TileEntityOxygenDecompressor();
         }
-        if (metadata >= 0) {
+        if (metadata >= BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA) {
             return new TileEntityOxygenCompressor();
         }
         return null;
     }
-    
-    public IIcon getIcon(final int side, int metadata) {
+
+    @Override
+    public IIcon getIcon(int side, int metadata) {
         if (side == 0 || side == 1) {
             return this.iconMachineSide;
         }
-        if (metadata >= 4) {
-            metadata -= 4;
+
+        if (metadata >= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA) {
+            metadata -= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA;
+
             if (side == metadata + 2) {
                 return this.iconInput;
             }
             if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
                 return this.iconOxygenOutput;
-            }
-            if ((metadata == 0 && side == 5) || (metadata == 3 && side == 3) || (metadata == 1 && side == 4) || (metadata == 2 && side == 2)) {
-                return this.iconCompressor2;
-            }
-            return this.iconDecompressor;
+            } else if (metadata == 0 && side == 5 || metadata == 3 && side == 3
+                    || metadata == 1 && side == 4
+                    || metadata == 2 && side == 2) {
+                        return this.iconCompressor2;
+                    } else {
+                        return this.iconDecompressor;
+                    }
         }
-        else {
-            if (metadata < 0) {
-                return this.iconMachineSide;
-            }
-            metadata += 0;
-            if (side == metadata + 2) {
-                return this.iconInput;
-            }
-            if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
-                return this.iconOxygenInput;
-            }
-            if ((metadata == 0 && side == 5) || (metadata == 3 && side == 3) || (metadata == 1 && side == 4) || (metadata == 2 && side == 2)) {
-                return this.iconCompressor2;
-            }
-            return this.iconCompressor1;
+        if (metadata < BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA) {
+            return this.iconMachineSide;
         }
+        metadata -= BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA;
+
+        if (side == metadata + 2) {
+            return this.iconInput;
+        } else if (side == ForgeDirection.getOrientation(metadata + 2).getOpposite().ordinal()) {
+            return this.iconOxygenInput;
+        } else if (metadata == 0 && side == 5 || metadata == 3 && side == 3
+                || metadata == 1 && side == 4
+                || metadata == 2 && side == 2) {
+                    return this.iconCompressor2;
+                } else {
+                    return this.iconCompressor1;
+                }
     }
-    
-    public void onBlockPlacedBy(final World world, final int x, final int y, final int z, final EntityLivingBase entityLiving, final ItemStack itemStack) {
-        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
+
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLiving, ItemStack itemStack) {
+        final int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
         int change = 0;
+
         switch (angle) {
-            case 0: {
+            case 0:
                 change = 3;
                 break;
-            }
-            case 1: {
+            case 1:
                 change = 1;
                 break;
-            }
-            case 2: {
+            case 2:
                 change = 2;
                 break;
-            }
-            case 3: {
+            case 3:
                 change = 0;
                 break;
-            }
         }
-        if (itemStack.getItemDamage() >= 4) {
-            change += 4;
+
+        if (itemStack.getItemDamage() >= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA) {
+            change += BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA;
+        } else if (itemStack.getItemDamage() >= BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA) {
+            change += BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA;
         }
-        else if (itemStack.getItemDamage() >= 0) {
-            change += 0;
-        }
+
         world.setBlockMetadataWithNotify(x, y, z, change, 3);
     }
-    
-    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
-        par3List.add(new ItemStack((Block)this, 1, 0));
-        par3List.add(new ItemStack((Block)this, 1, 4));
+
+    @Override
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
+        par3List.add(new ItemStack(this, 1, BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA));
+        par3List.add(new ItemStack(this, 1, BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA));
     }
-    
-    public int damageDropped(final int metadata) {
-        if (metadata >= 4) {
-            return 4;
+
+    @Override
+    public int damageDropped(int metadata) {
+        if (metadata >= BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA) {
+            return BlockOxygenCompressor.OXYGEN_DECOMPRESSOR_METADATA;
         }
-        if (metadata >= 0) {
-            return 0;
+        if (metadata >= BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA) {
+            return BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA;
         }
         return 0;
     }
-    
-    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         final int metadata = this.getDamageValue(world, x, y, z);
-        return new ItemStack((Block)this, 1, metadata);
+
+        return new ItemStack(this, 1, metadata);
     }
-    
-    public String getShiftDescription(final int meta) {
+
+    @Override
+    public String getShiftDescription(int meta) {
         switch (meta) {
-            case 0: {
+            case OXYGEN_COMPRESSOR_METADATA:
                 return GCCoreUtil.translate("tile.oxygenCompressor.description");
-            }
-            case 4: {
+            case OXYGEN_DECOMPRESSOR_METADATA:
                 return GCCoreUtil.translate("tile.oxygenDecompressor.description");
-            }
-            default: {
-                return "";
-            }
         }
+        return "";
     }
-    
-    public boolean showDescription(final int meta) {
+
+    @Override
+    public boolean showDescription(int meta) {
         return true;
     }
 }

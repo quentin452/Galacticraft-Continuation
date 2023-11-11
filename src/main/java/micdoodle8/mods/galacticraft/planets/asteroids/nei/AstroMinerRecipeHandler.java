@@ -1,106 +1,127 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.nei;
 
-import codechicken.nei.recipe.*;
-import net.minecraft.util.*;
-import org.lwjgl.opengl.*;
-import codechicken.lib.gui.*;
-import net.minecraft.item.*;
-import codechicken.nei.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.client.gui.*;
-import java.util.*;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
-public class AstroMinerRecipeHandler extends TemplateRecipeHandler
-{
-    private static final ResourceLocation rocketGuiTexture;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+import codechicken.lib.gui.GuiDraw;
+import codechicken.nei.NEIServerUtils;
+import codechicken.nei.PositionedStack;
+import codechicken.nei.recipe.TemplateRecipeHandler;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import micdoodle8.mods.galacticraft.planets.asteroids.client.gui.GuiSchematicAstroMiner;
+
+public class AstroMinerRecipeHandler extends TemplateRecipeHandler {
+
+    private static final ResourceLocation rocketGuiTexture = GuiSchematicAstroMiner.schematicTexture;
+    public static final int x = -1;
+    public static final int y = 0;
+    public static final int tX = 3;
+    public static final int tY = 16;
+    public static final int w = 168;
+    public static final int h = 96;
 
     public String getRecipeId() {
         return "galacticraft.astroMiner";
     }
 
+    @Override
     public int recipiesPerPage() {
         return 1;
     }
 
-    public Set<Map.Entry<ArrayList<PositionedStack>, PositionedStack>> getRecipes() {
+    public Set<Entry<ArrayList<PositionedStack>, PositionedStack>> getRecipes() {
         return NEIGalacticraftAsteroidsConfig.getAstroMinerRecipes();
     }
 
-    public void drawBackground(final int recipe) {
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    @Override
+    public void drawBackground(int recipe) {
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GuiDraw.changeTexture(AstroMinerRecipeHandler.rocketGuiTexture);
-        GuiDraw.drawTexturedModalRect(0, -8, 3, 32, 168, 104);
+        GuiDraw.drawTexturedModalRect(x, y, tX, tY, w, h);
     }
 
+    @Override
     public void loadTransferRects() {
+        this.transferRects.add(new RecipeTransferRect(new Rectangle(282, 36, 38, 69), this.getRecipeId()));
     }
 
-    public void loadCraftingRecipes(final String outputId, final Object... results) {
+    @Override
+    public void loadCraftingRecipes(String outputId, Object... results) {
         if (outputId.equals(this.getRecipeId())) {
             for (final Map.Entry<ArrayList<PositionedStack>, PositionedStack> irecipe : this.getRecipes()) {
-                this.arecipes.add(new CachedRocketRecipe(irecipe.getKey(), irecipe.getValue()));
+                this.arecipes.add(new CachedRocketRecipe(irecipe));
             }
-        }
-        else {
+        } else {
             super.loadCraftingRecipes(outputId, results);
         }
     }
 
-    public void loadCraftingRecipes(final ItemStack result) {
+    @Override
+    public void loadCraftingRecipes(ItemStack result) {
         for (final Map.Entry<ArrayList<PositionedStack>, PositionedStack> irecipe : this.getRecipes()) {
             if (NEIServerUtils.areStacksSameTypeCrafting(irecipe.getValue().item, result)) {
-                this.arecipes.add(new CachedRocketRecipe(irecipe.getKey(), irecipe.getValue()));
+                this.arecipes.add(new CachedRocketRecipe(irecipe));
             }
         }
     }
 
-    public void loadUsageRecipes(final ItemStack ingredient) {
+    @Override
+    public void loadUsageRecipes(ItemStack ingredient) {
         for (final Map.Entry<ArrayList<PositionedStack>, PositionedStack> irecipe : this.getRecipes()) {
             for (final PositionedStack pstack : irecipe.getKey()) {
                 if (NEIServerUtils.areStacksSameTypeCrafting(ingredient, pstack.item)) {
-                    this.arecipes.add(new CachedRocketRecipe(irecipe.getKey(), irecipe.getValue()));
+                    this.arecipes.add(new CachedRocketRecipe(irecipe));
                     break;
                 }
             }
         }
     }
 
-    public String getRecipeName() {
-        return GCCoreUtil.translate("tile.rocketWorkbench.name");
-    }
+    public class CachedRocketRecipe extends TemplateRecipeHandler.CachedRecipe {
 
-    public String getGuiTexture() {
-        return "galacticraftasteroids:textures/gui/schematic_astro_miner.png";
-    }
-
-    public void drawForeground(final int recipe) {
-    }
-
-    static {
-        rocketGuiTexture = GuiSchematicAstroMiner.schematicTexture;
-    }
-
-    public class CachedRocketRecipe extends TemplateRecipeHandler.CachedRecipe
-    {
         public ArrayList<PositionedStack> input;
         public PositionedStack output;
 
+        @Override
         public ArrayList<PositionedStack> getIngredients() {
             return this.input;
         }
 
+        @Override
         public PositionedStack getResult() {
             return this.output;
         }
 
-        public CachedRocketRecipe(final ArrayList<PositionedStack> pstack1, final PositionedStack pstack2) {
-            super();
+        public CachedRocketRecipe(ArrayList<PositionedStack> pstack1, PositionedStack pstack2) {
             this.input = pstack1;
             this.output = pstack2;
         }
 
-        public CachedRocketRecipe(final AstroMinerRecipeHandler this$0, final Map.Entry<ArrayList<PositionedStack>, PositionedStack> recipe) {
+        public CachedRocketRecipe(Map.Entry<ArrayList<PositionedStack>, PositionedStack> recipe) {
             this(recipe.getKey(), recipe.getValue());
         }
     }
+
+    @Override
+    public String getRecipeName() {
+        return EnumColor.INDIGO + GCCoreUtil.translate("tile.rocketWorkbench.name");
+    }
+
+    @Override
+    public String getGuiTexture() {
+        return AsteroidsModule.TEXTURE_PREFIX + "textures/gui/schematic_rocket_GS1_Miner.png";
+    }
+
+    @Override
+    public void drawForeground(int recipe) {}
 }

@@ -1,71 +1,79 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import micdoodle8.mods.galacticraft.core.energy.tile.*;
-import net.minecraft.inventory.*;
-import micdoodle8.mods.miccore.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.api.recipe.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.entity.item.*;
-import net.minecraft.entity.*;
-import net.minecraft.nbt.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import micdoodle8.mods.galacticraft.core.energy.item.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInventory implements ISidedInventory
-{
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.recipe.CircuitFabricatorRecipes;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlockWithInventory;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.items.ItemBasic;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInventory implements ISidedInventory {
+
     public static final int PROCESS_TIME_REQUIRED = 300;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
-    public int processTicks;
-    private ItemStack producingStack;
+
+    @NetworkedField(targetSide = Side.CLIENT)
+    public int processTicks = 0;
+
+    private ItemStack producingStack = null;
     private long ticks;
-    private ItemStack[] containingItems;
-    
+
+    private ItemStack[] containingItems = new ItemStack[7];
+
     public TileEntityCircuitFabricator() {
-        this.processTicks = 0;
-        this.producingStack = null;
-        this.containingItems = new ItemStack[7];
-        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 40.0f : 20.0f);
+        this.storage.setMaxExtract(ConfigManagerCore.hardMode ? 40 : 20);
     }
-    
+
+    @Override
     public void updateEntity() {
         super.updateEntity();
+
         this.updateInput();
+
         if (!this.worldObj.isRemote) {
             boolean updateInv = false;
-            if (this.hasEnoughEnergyToRun) {
-                if (this.canCompress()) {
-                    ++this.processTicks;
-                    if (this.processTicks == 300) {
-                        this.worldObj.playSoundEffect((double)this.xCoord, (double)this.yCoord, (double)this.zCoord, "random.anvil_land", 0.2f, 0.5f);
-                        this.processTicks = 0;
-                        this.compressItems();
-                        updateInv = true;
-                    }
-                }
-                else {
+
+            if (this.hasEnoughEnergyToRun && this.canCompress()) {
+                ++this.processTicks;
+
+                if (this.processTicks == TileEntityCircuitFabricator.PROCESS_TIME_REQUIRED) {
+                    this.worldObj
+                            .playSoundEffect(this.xCoord, this.yCoord, this.zCoord, "random.anvil_land", 0.2F, 0.5F);
                     this.processTicks = 0;
+                    this.compressItems();
+                    updateInv = true;
                 }
-            }
-            else {
+            } else {
                 this.processTicks = 0;
             }
+
             if (updateInv) {
                 this.markDirty();
             }
         }
+
         if (this.ticks >= Long.MAX_VALUE) {
-            this.ticks = 0L;
+            this.ticks = 0;
         }
-        ++this.ticks;
+
+        this.ticks++;
     }
-    
+
     public void updateInput() {
-        this.producingStack = CircuitFabricatorRecipes.getOutputForInput((ItemStack[])Arrays.copyOfRange(this.containingItems, 1, 6));
+        this.producingStack = CircuitFabricatorRecipes
+                .getOutputForInput(Arrays.copyOfRange(this.containingItems, 1, 6));
     }
-    
+
     private boolean canCompress() {
         final ItemStack itemstack = this.producingStack;
         if (itemstack == null) {
@@ -77,104 +85,127 @@ public class TileEntityCircuitFabricator extends TileBaseElectricBlockWithInvent
         if (this.containingItems[6] != null && !this.containingItems[6].isItemEqual(itemstack)) {
             return false;
         }
-        final int result = (this.containingItems[6] == null) ? 0 : (this.containingItems[6].stackSize + itemstack.stackSize);
+        final int result = this.containingItems[6] == null ? 0
+                : this.containingItems[6].stackSize + itemstack.stackSize;
         return result <= this.getInventoryStackLimit() && result <= itemstack.getMaxStackSize();
     }
-    
+
     public void compressItems() {
         if (this.canCompress()) {
             final ItemStack resultItemStack = this.producingStack.copy();
             if (ConfigManagerCore.quickMode && resultItemStack.getItem() == GCItems.basicItem) {
-                if (resultItemStack.getItemDamage() == 13) {
+                if (resultItemStack.getItemDamage() == ItemBasic.WAFER_BASIC) {
                     resultItemStack.stackSize = 5;
-                }
-                else if (resultItemStack.getItemDamage() == 14) {
+                } else if (resultItemStack.getItemDamage() == ItemBasic.WAFER_ADVANCED) {
                     resultItemStack.stackSize = 2;
                 }
             }
+
             if (this.containingItems[6] == null) {
                 this.containingItems[6] = resultItemStack;
-            }
-            else if (this.containingItems[6].isItemEqual(resultItemStack)) {
+            } else if (this.containingItems[6].isItemEqual(resultItemStack)) {
                 if (this.containingItems[6].stackSize + resultItemStack.stackSize > 64) {
-                    for (int i = 0; i < this.containingItems[6].stackSize + resultItemStack.stackSize - 64; ++i) {
-                        final float var = 0.7f;
-                        final double dx = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
-                        final double dy = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
-                        final double dz = this.worldObj.rand.nextFloat() * var + (1.0f - var) * 0.5;
-                        final EntityItem entityitem = new EntityItem(this.worldObj, this.xCoord + dx, this.yCoord + dy, this.zCoord + dz, new ItemStack(resultItemStack.getItem(), 1, resultItemStack.getItemDamage()));
+                    for (int i = 0; i < this.containingItems[6].stackSize + resultItemStack.stackSize - 64; i++) {
+                        final float var = 0.7F;
+                        final double dx = this.worldObj.rand.nextFloat() * var + (1.0F - var) * 0.5D;
+                        final double dy = this.worldObj.rand.nextFloat() * var + (1.0F - var) * 0.5D;
+                        final double dz = this.worldObj.rand.nextFloat() * var + (1.0F - var) * 0.5D;
+                        final EntityItem entityitem = new EntityItem(
+                                this.worldObj,
+                                this.xCoord + dx,
+                                this.yCoord + dy,
+                                this.zCoord + dz,
+                                new ItemStack(resultItemStack.getItem(), 1, resultItemStack.getItemDamage()));
+
                         entityitem.delayBeforeCanPickup = 10;
-                        this.worldObj.spawnEntityInWorld((Entity)entityitem);
+
+                        this.worldObj.spawnEntityInWorld(entityitem);
                     }
                     this.containingItems[6].stackSize = 64;
-                }
-                else {
-                    final ItemStack itemStack = this.containingItems[6];
-                    itemStack.stackSize += resultItemStack.stackSize;
+                } else {
+                    this.containingItems[6].stackSize += resultItemStack.stackSize;
                 }
             }
         }
-        for (int j = 1; j < 6; ++j) {
-            this.decrStackSize(j, 1);
+
+        for (int i = 1; i < 6; i++) {
+            this.decrStackSize(i, 1);
         }
     }
-    
-    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+
+    @Override
+    public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
         super.readFromNBT(par1NBTTagCompound);
         this.processTicks = par1NBTTagCompound.getInteger("smeltingTicks");
         this.containingItems = this.readStandardItemsFromNBT(par1NBTTagCompound);
     }
-    
-    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+
+    @Override
+    public void writeToNBT(NBTTagCompound par1NBTTagCompound) {
         super.writeToNBT(par1NBTTagCompound);
         par1NBTTagCompound.setInteger("smeltingTicks", this.processTicks);
         this.writeStandardItemsToNBT(par1NBTTagCompound);
     }
-    
+
+    @Override
     protected ItemStack[] getContainingItems() {
         return this.containingItems;
     }
-    
+
+    @Override
     public String getInventoryName() {
         return GCCoreUtil.translate("tile.machine2.5.name");
     }
-    
+
+    @Override
     public boolean hasCustomInventoryName() {
         return true;
     }
-    
-    public boolean isItemValidForSlot(final int slotID, final ItemStack itemStack) {
+
+    @Override
+    public boolean isItemValidForSlot(int slotID, ItemStack itemStack) {
         if (slotID == 0) {
             return itemStack != null && ItemElectricBase.isElectricItem(itemStack.getItem());
         }
+
         if (slotID > 5) {
             return false;
         }
+
         final ArrayList<ItemStack> list = CircuitFabricatorRecipes.slotValidItems.get(slotID - 1);
+
         for (final ItemStack test : list) {
             if (test.isItemEqual(itemStack)) {
                 return true;
             }
         }
+
         return false;
     }
-    
-    public int[] getAccessibleSlotsFromSide(final int side) {
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(int side) {
         if (side == 0) {
             return new int[] { 6 };
         }
-        final boolean siliconFlag = this.containingItems[2] != null && (this.containingItems[3] == null || this.containingItems[3].stackSize < this.containingItems[2].stackSize);
+
+        // Offer whichever silicon slot has less silicon
+        final boolean siliconFlag = this.containingItems[2] != null && (this.containingItems[3] == null
+                || this.containingItems[3].stackSize < this.containingItems[2].stackSize);
         return siliconFlag ? new int[] { 0, 1, 3, 4, 5 } : new int[] { 0, 1, 2, 4, 5 };
     }
-    
-    public boolean canInsertItem(final int slotID, final ItemStack par2ItemStack, final int par3) {
+
+    @Override
+    public boolean canInsertItem(int slotID, ItemStack par2ItemStack, int par3) {
         return slotID < 6 && this.isItemValidForSlot(slotID, par2ItemStack);
     }
-    
-    public boolean canExtractItem(final int slotID, final ItemStack par2ItemStack, final int par3) {
+
+    @Override
+    public boolean canExtractItem(int slotID, ItemStack par2ItemStack, int par3) {
         return slotID == 6;
     }
-    
+
+    @Override
     public boolean shouldUseEnergy() {
         return this.processTicks > 0;
     }

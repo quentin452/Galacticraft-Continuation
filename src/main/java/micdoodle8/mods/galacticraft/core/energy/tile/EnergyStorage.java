@@ -1,119 +1,142 @@
 package micdoodle8.mods.galacticraft.core.energy.tile;
 
-import micdoodle8.mods.galacticraft.api.power.*;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTTagCompound;
 
-public class EnergyStorage implements IEnergyStorageGC
-{
+import micdoodle8.mods.galacticraft.api.power.IEnergyStorageGC;
+
+public class EnergyStorage implements IEnergyStorageGC {
+
     protected float energy;
     protected float capacity;
     protected float maxReceive;
     protected float maxExtract;
     protected float maxExtractRemaining;
-    
-    public EnergyStorage(final float capacity) {
-        this(capacity, 60.0f, 30.0f);
+
+    public EnergyStorage(float capacity) {
+        this(capacity, 60, 30);
     }
-    
-    public EnergyStorage(final float capacity, final float maxTransfer) {
-        this(capacity, 2.5f * maxTransfer, maxTransfer);
+
+    public EnergyStorage(float capacity, float maxTransfer) {
+        this(capacity, 2.5F * maxTransfer, maxTransfer);
     }
-    
-    public EnergyStorage(final float capacity, final float maxReceive, final float maxExtract) {
+
+    public EnergyStorage(float capacity, float maxReceive, float maxExtract) {
         this.capacity = capacity;
         this.maxReceive = maxReceive;
         this.maxExtract = maxExtract;
         this.maxExtractRemaining = maxExtract;
     }
-    
-    public EnergyStorage readFromNBT(final NBTTagCompound nbt) {
+
+    public EnergyStorage readFromNBT(NBTTagCompound nbt) {
         this.energy = nbt.getFloat("EnergyF");
         return this;
     }
-    
-    public NBTTagCompound writeToNBT(final NBTTagCompound nbt) {
-        if (this.energy < 0.0f) {
-            this.energy = 0.0f;
+
+    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+        if (this.energy < 0) {
+            this.energy = 0;
         }
+
         nbt.setFloat("EnergyF", Math.min(this.energy, this.capacity));
         return nbt;
     }
-    
-    public void setCapacity(final float capacity) {
+
+    public void setCapacity(float capacity) {
         this.capacity = capacity;
+
         if (this.energy > capacity) {
             this.energy = capacity;
         }
     }
-    
-    public void setMaxReceive(final float maxReceive) {
+
+    /*
+     * Sets the maximum energy transfer rate on input Call this AFTER setMaxExtract().
+     */
+    public void setMaxReceive(float maxReceive) {
         this.maxReceive = maxReceive;
     }
-    
-    public void setMaxExtract(final float maxExtract) {
+
+    /*
+     * Sets the energy consumption rate in gJ/t (For machines, this is the energy used per tick.) (For energy sources,
+     * this is the maximum output.) Also sets the receive rate at a default value of 2 * the energy consumption rate -
+     * so the machine's energy store can charge up even while it is working. If that is not required, call
+     * setMaxReceive() AFTER calling setMaxExtract().
+     */
+    public void setMaxExtract(float maxExtract) {
         this.maxExtract = maxExtract;
         this.maxExtractRemaining = maxExtract;
-        this.maxReceive = 2.5f * maxExtract;
+        this.maxReceive = 2.5F * maxExtract;
     }
-    
-    public void setEnergyStored(final float energy) {
-        this.energy = Math.max(0.0f, Math.min(energy, this.capacity));
+
+    public void setEnergyStored(float energy) {
+        this.energy = Math.max(0, Math.min(energy, this.capacity));
     }
-    
+
     public float getMaxReceive() {
         return this.maxReceive;
     }
-    
+
     public float getMaxExtract() {
         return this.maxExtract;
     }
-    
-    public float receiveEnergyGC(final float maxReceive, final boolean simulate) {
+
+    @Override
+    public float receiveEnergyGC(float maxReceive, boolean simulate) {
         final float energyReceived = Math.min(this.capacity - this.energy, Math.min(this.maxReceive, maxReceive));
+
         if (!simulate) {
             this.energy += energyReceived;
         }
+
         return energyReceived;
     }
-    
-    public float receiveEnergyGC(final float amount) {
+
+    public float receiveEnergyGC(float amount) {
         final float energyReceived = Math.min(this.capacity - this.energy, Math.min(this.maxReceive, amount));
         this.energy += energyReceived;
         return energyReceived;
     }
-    
-    public float extractEnergyGC(final float amount, final boolean simulate) {
+
+    @Override
+    public float extractEnergyGC(float amount, boolean simulate) {
         final float energyExtracted = Math.min(this.energy, Math.min(this.maxExtractRemaining, amount));
+
         if (!simulate) {
             this.energy -= energyExtracted;
         }
+
         return energyExtracted;
     }
-    
-    public float extractEnergyGCnoMax(final float amount, final boolean simulate) {
+
+    public float extractEnergyGCnoMax(float amount, boolean simulate) {
         final float energyExtracted = Math.min(this.energy, amount);
+
         if (!simulate) {
             this.energy -= energyExtracted;
         }
+
         return energyExtracted;
     }
-    
+
+    @Override
     public float getEnergyStoredGC() {
         return this.energy;
     }
-    
+
+    @Override
     public float getCapacityGC() {
         return this.capacity;
     }
-    
+
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (obj == null) {
             return false;
         }
-        if (obj instanceof EnergyStorage) {
-            final EnergyStorage storage = (EnergyStorage)obj;
-            return storage.getEnergyStoredGC() == this.energy && storage.getCapacityGC() == this.capacity && storage.getMaxReceive() == this.maxReceive && storage.getMaxExtract() == this.maxExtract;
+        if (obj instanceof EnergyStorage storage) {
+            return storage.getEnergyStoredGC() == this.energy && storage.getCapacityGC() == this.capacity
+                    && storage.getMaxReceive() == this.maxReceive
+                    && storage.getMaxExtract() == this.maxExtract;
         }
         return false;
     }

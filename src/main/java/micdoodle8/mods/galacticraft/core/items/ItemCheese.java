@@ -1,34 +1,41 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.client.renderer.texture.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemStack;
 
-public class ItemCheese extends ItemFood
-{
-    public ItemCheese(final int par1, final float par2, final boolean par3) {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+
+public class ItemCheese extends ItemFood {
+
+    public ItemCheese(int par1, float par2, boolean par3) {
         super(par1, par2, par3);
         this.setUnlocalizedName("cheeseCurd");
     }
-    
-    public ItemCheese(final int par1, final boolean par2) {
-        this(par1, 0.6f, par2);
+
+    public ItemCheese(int par1, boolean par2) {
+        this(par1, 0.6F, par2);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(final IIconRegister iconRegister) {
-        this.itemIcon = iconRegister.registerIcon("galacticraftmoon:cheese_curd");
+    public void registerIcons(IIconRegister iconRegister) {
+        this.itemIcon = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "cheese_curd");
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
 }

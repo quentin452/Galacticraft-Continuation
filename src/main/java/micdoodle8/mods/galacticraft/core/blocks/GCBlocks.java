@@ -1,18 +1,39 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraft.init.*;
-import net.minecraftforge.oredict.*;
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.registry.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.material.*;
+import java.util.ArrayList;
 
-public class GCBlocks
-{
+import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.registry.GameRegistry;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockAirLock;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockAluminumWire;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockArclamp;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockBase;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockCargoLoader;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockCheese;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDummy;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockEnclosed;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockGC;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockLandingPad;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockMachine;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockMoon;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockOxygenCompressor;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockSlabGC;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockSolar;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockThruster;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockWallGC;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class GCBlocks {
+
     public static Block breatheableAir;
     public static Block brightAir;
     public static Block brightBreatheableAir;
@@ -61,57 +82,68 @@ public class GCBlocks
     public static Block moonStoneStairs;
     public static Block moonBricksStairs;
     public static Block wallGC;
-    public static final Material machine;
-    public static ArrayList<Block> hiddenBlocks;
-    public static ArrayList<Block> otherModTorchesLit;
-    
+
+    public static final Material machine = new Material(MapColor.ironColor);
+
+    public static ArrayList<Block> hiddenBlocks = new ArrayList<>();
+    public static ArrayList<Block> otherModTorchesLit = new ArrayList<>();
+
     public static void initBlocks() {
-        GCBlocks.breatheableAir = (Block)new BlockBreathableAir("breatheableAir");
-        GCBlocks.brightAir = (Block)new BlockBrightAir("brightAir");
-        GCBlocks.brightBreatheableAir = (Block)new BlockBrightBreathableAir("brightBreathableAir");
-        GCBlocks.brightLamp = (Block)new BlockBrightLamp("arclamp");
-        GCBlocks.treasureChestTier1 = (Block)new BlockT1TreasureChest("treasureChest");
-        GCBlocks.landingPad = (Block)new BlockLandingPad("landingPad");
-        GCBlocks.landingPadFull = (Block)new BlockLandingPadFull("landingPadFull");
-        GCBlocks.unlitTorch = (Block)new BlockUnlitTorch(false, "unlitTorch");
-        GCBlocks.unlitTorchLit = (Block)new BlockUnlitTorch(true, "unlitTorchLit");
-        GCBlocks.oxygenDistributor = (Block)new BlockOxygenDistributor("distributor");
-        GCBlocks.oxygenPipe = (Block)new BlockOxygenPipe("oxygenPipe");
-        GCBlocks.oxygenCollector = (Block)new BlockOxygenCollector("oxygenCollector");
-        GCBlocks.nasaWorkbench = (Block)new BlockNasaWorkbench("rocketWorkbench");
-        GCBlocks.fallenMeteor = (Block)new BlockFallenMeteor("fallenMeteor");
-        GCBlocks.basicBlock = (Block)new BlockBasic("gcBlockCore");
-        GCBlocks.airLockFrame = (Block)new BlockAirLockFrame("airLockFrame");
-        GCBlocks.airLockSeal = (Block)new BlockAirLockWall("airLockSeal");
-        GCBlocks.refinery = (Block)new BlockRefinery("refinery");
-        GCBlocks.oxygenCompressor = (Block)new BlockOxygenCompressor(false, "oxygenCompressor");
-        GCBlocks.fuelLoader = (Block)new BlockFuelLoader("fuelLoader");
-        GCBlocks.spaceStationBase = (Block)new BlockSpaceStationBase("spaceStationBase");
-        GCBlocks.fakeBlock = (Block)new BlockMulti("dummyblock");
-        GCBlocks.oxygenSealer = (Block)new BlockOxygenSealer("sealer");
-        GCBlocks.sealableBlock = (Block)new BlockEnclosed("enclosed");
-        GCBlocks.oxygenDetector = (Block)new BlockOxygenDetector("oxygenDetector");
-        GCBlocks.cargoLoader = (Block)new BlockCargoLoader("cargo");
-        GCBlocks.parachest = (Block)new BlockParaChest("parachest");
-        GCBlocks.solarPanel = (Block)new BlockSolar("solar");
-        GCBlocks.radioTelescope = (Block)new BlockDish("dish");
-        GCBlocks.machineBase = (Block)new BlockMachine("machine");
-        GCBlocks.machineBase2 = (Block)new BlockMachine2("machine2");
-        GCBlocks.machineTiered = (Block)new BlockMachineTiered("machineTiered");
-        GCBlocks.aluminumWire = (Block)new BlockAluminumWire("aluminumWire");
-        GCBlocks.glowstoneTorch = (Block)new BlockGlowstoneTorch("glowstoneTorch");
-        GCBlocks.blockMoon = (Block)new BlockBasicMoon();
-        GCBlocks.cheeseBlock = (Block)new BlockCheese();
-        GCBlocks.spinThruster = (Block)new BlockSpinThruster("spinThruster");
-        GCBlocks.screen = (Block)new BlockScreen("viewScreen");
-        GCBlocks.telemetry = (Block)new BlockTelemetry("telemetry");
-        GCBlocks.slabGCHalf = (Block)new BlockSlabGC("slabGCHalf", false, Material.rock);
-        GCBlocks.slabGCDouble = (Block)new BlockSlabGC("slabGCDouble", true, Material.rock);
-        GCBlocks.tinStairs1 = new BlockStairsGC("tinStairs1", GCBlocks.blockMoon, BlockStairsGC.StairsCategoryGC.TIN1).setHardness(2.0f);
-        GCBlocks.tinStairs2 = new BlockStairsGC("tinStairs2", GCBlocks.blockMoon, BlockStairsGC.StairsCategoryGC.TIN2).setHardness(2.0f);
-        GCBlocks.moonStoneStairs = new BlockStairsGC("moonStoneStairs", GCBlocks.blockMoon, BlockStairsGC.StairsCategoryGC.MOON_STONE).setHardness(1.5f);
-        GCBlocks.moonBricksStairs = new BlockStairsGC("moonBricksStairs", GCBlocks.blockMoon, BlockStairsGC.StairsCategoryGC.MOON_BRICKS).setHardness(4.0f);
-        GCBlocks.wallGC = (Block)new BlockWallGC("wallGC", GCBlocks.blockMoon);
+        GCBlocks.breatheableAir = new BlockBreathableAir("breatheableAir");
+        GCBlocks.brightAir = new BlockBrightAir("brightAir");
+        GCBlocks.brightBreatheableAir = new BlockBrightBreathableAir("brightBreathableAir");
+        GCBlocks.brightLamp = new BlockBrightLamp("arclamp");
+        GCBlocks.treasureChestTier1 = new BlockT1TreasureChest("treasureChest");
+        GCBlocks.landingPad = new BlockLandingPad("landingPad");
+        GCBlocks.landingPadFull = new BlockLandingPadFull("landingPadFull");
+        GCBlocks.unlitTorch = new BlockUnlitTorch(false, "unlitTorch");
+        GCBlocks.unlitTorchLit = new BlockUnlitTorch(true, "unlitTorchLit");
+        GCBlocks.oxygenDistributor = new BlockOxygenDistributor("distributor");
+        GCBlocks.oxygenPipe = new BlockOxygenPipe("oxygenPipe");
+        GCBlocks.oxygenCollector = new BlockOxygenCollector("oxygenCollector");
+        GCBlocks.nasaWorkbench = new BlockNasaWorkbench("rocketWorkbench");
+        GCBlocks.fallenMeteor = new BlockFallenMeteor("fallenMeteor");
+        GCBlocks.basicBlock = new BlockBasic("gcBlockCore");
+        GCBlocks.airLockFrame = new BlockAirLockFrame("airLockFrame");
+        GCBlocks.airLockSeal = new BlockAirLockWall("airLockSeal");
+        GCBlocks.refinery = new BlockRefinery("refinery");
+        GCBlocks.oxygenCompressor = new BlockOxygenCompressor(false, "oxygenCompressor");
+        GCBlocks.fuelLoader = new BlockFuelLoader("fuelLoader");
+        GCBlocks.spaceStationBase = new BlockSpaceStationBase("spaceStationBase");
+        GCBlocks.fakeBlock = new BlockMulti("dummyblock");
+        GCBlocks.oxygenSealer = new BlockOxygenSealer("sealer");
+        GCBlocks.sealableBlock = new BlockEnclosed("enclosed");
+        GCBlocks.oxygenDetector = new BlockOxygenDetector("oxygenDetector");
+        GCBlocks.cargoLoader = new BlockCargoLoader("cargo");
+        GCBlocks.parachest = new BlockParaChest("parachest");
+        GCBlocks.solarPanel = new BlockSolar("solar");
+        GCBlocks.radioTelescope = new BlockDish("dish");
+        GCBlocks.machineBase = new BlockMachine("machine");
+        GCBlocks.machineBase2 = new BlockMachine2("machine2");
+        GCBlocks.machineTiered = new BlockMachineTiered("machineTiered");
+        GCBlocks.aluminumWire = new BlockAluminumWire("aluminumWire");
+        GCBlocks.glowstoneTorch = new BlockGlowstoneTorch("glowstoneTorch");
+        GCBlocks.blockMoon = new BlockBasicMoon();
+        GCBlocks.cheeseBlock = new BlockCheese();
+        GCBlocks.spinThruster = new BlockSpinThruster("spinThruster");
+        GCBlocks.screen = new BlockScreen("viewScreen");
+        GCBlocks.telemetry = new BlockTelemetry("telemetry");
+        GCBlocks.slabGCHalf = new BlockSlabGC("slabGCHalf", false, Material.rock);
+        GCBlocks.slabGCDouble = new BlockSlabGC("slabGCDouble", true, Material.rock);
+        GCBlocks.tinStairs1 = new BlockStairsGC("tinStairs1", blockMoon, BlockStairsGC.StairsCategoryGC.TIN1)
+                .setHardness(2.0F);
+        GCBlocks.tinStairs2 = new BlockStairsGC("tinStairs2", blockMoon, BlockStairsGC.StairsCategoryGC.TIN2)
+                .setHardness(2.0F);
+        GCBlocks.moonStoneStairs = new BlockStairsGC(
+                "moonStoneStairs",
+                blockMoon,
+                BlockStairsGC.StairsCategoryGC.MOON_STONE).setHardness(1.5F);
+        GCBlocks.moonBricksStairs = new BlockStairsGC(
+                "moonBricksStairs",
+                blockMoon,
+                BlockStairsGC.StairsCategoryGC.MOON_BRICKS).setHardness(4.0F);
+        GCBlocks.wallGC = new BlockWallGC("wallGC", blockMoon);
+
         GCCoreUtil.registerGalacticraftBlock("rocketLaunchPad", GCBlocks.landingPad, 0);
         GCCoreUtil.registerGalacticraftBlock("buggyFuelingPad", GCBlocks.landingPad, 1);
         GCCoreUtil.registerGalacticraftBlock("oxygenCollector", GCBlocks.oxygenCollector);
@@ -167,6 +199,8 @@ public class GCBlocks
         GCCoreUtil.registerGalacticraftBlock("telemetry", GCBlocks.telemetry);
         GCCoreUtil.registerGalacticraftBlock("arclamp", GCBlocks.brightLamp);
         GCCoreUtil.registerGalacticraftBlock("treasureChestTier1", GCBlocks.treasureChestTier1);
+
+        // Hide certain items from NEI
         GCBlocks.hiddenBlocks.add(GCBlocks.airLockSeal);
         GCBlocks.hiddenBlocks.add(GCBlocks.breatheableAir);
         GCBlocks.hiddenBlocks.add(GCBlocks.brightBreatheableAir);
@@ -177,10 +211,19 @@ public class GCBlocks
         GCBlocks.hiddenBlocks.add(GCBlocks.fakeBlock);
         GCBlocks.hiddenBlocks.add(GCBlocks.spaceStationBase);
         GCBlocks.hiddenBlocks.add(GCBlocks.slabGCDouble);
-        registerBlocks();
-        setHarvestLevels();
-        BlockUnlitTorch.register((BlockUnlitTorch)GCBlocks.unlitTorch, (BlockUnlitTorch)GCBlocks.unlitTorchLit, Blocks.torch);
-        doOtherModsTorches();
+
+        // Register blocks before register ores, so that the ItemStack picks up the
+        // correct item
+        GCBlocks.registerBlocks();
+        GCBlocks.setHarvestLevels();
+
+        // Complete registration of various types of torches
+        BlockUnlitTorch.register(
+                (BlockUnlitTorch) GCBlocks.unlitTorch,
+                (BlockUnlitTorch) GCBlocks.unlitTorchLit,
+                Blocks.torch);
+        GCBlocks.doOtherModsTorches();
+
         OreDictionary.registerOre("oreCopper", new ItemStack(GCBlocks.basicBlock, 1, 5));
         OreDictionary.registerOre("oreCopper", new ItemStack(GCBlocks.blockMoon, 1, 0));
         OreDictionary.registerOre("oreTin", new ItemStack(GCBlocks.basicBlock, 1, 6));
@@ -190,50 +233,55 @@ public class GCBlocks
         OreDictionary.registerOre("oreNaturalAluminum", new ItemStack(GCBlocks.basicBlock, 1, 7));
         OreDictionary.registerOre("oreSilicon", new ItemStack(GCBlocks.basicBlock, 1, 8));
         OreDictionary.registerOre("oreCheese", new ItemStack(GCBlocks.blockMoon, 1, 2));
+
         OreDictionary.registerOre("blockCopper", new ItemStack(GCBlocks.basicBlock, 1, 9));
         OreDictionary.registerOre("blockTin", new ItemStack(GCBlocks.basicBlock, 1, 10));
         OreDictionary.registerOre("blockAluminum", new ItemStack(GCBlocks.basicBlock, 1, 11));
         OreDictionary.registerOre("blockAluminium", new ItemStack(GCBlocks.basicBlock, 1, 11));
     }
-    
+
     private static void doOtherModsTorches() {
+        BlockUnlitTorch torch;
+        BlockUnlitTorch torchLit;
+
         if (Loader.isModLoaded("TConstruct")) {
             Block modTorch = null;
             try {
                 try {
-                    final Class clazz = Class.forName("slimeknights.tconstruct.gadgets.TinkerGadgets");
-                    modTorch = (Block)clazz.getField("stoneTorch").get(null);
+                    // This is the more recent TConstruct class
+                    final Class<?> clazz = Class.forName("slimeknights.tconstruct.gadgets.TinkerGadgets");
+                    modTorch = (Block) clazz.getField("stoneTorch").get(null);
+                } catch (final Exception e) {
+                    // This is the older TConstruct class
+                    final Class<?> clazz = Class.forName("tconstruct.world.TinkerWorld");
+                    modTorch = (Block) clazz.getField("stoneTorch").get(null);
                 }
-                catch (Exception e) {
-                    final Class clazz2 = Class.forName("tconstruct.world.TinkerWorld");
-                    modTorch = (Block)clazz2.getField("stoneTorch").get(null);
-                }
-            }
-            catch (Exception ex) {}
+            } catch (final Exception e) {}
             if (modTorch != null) {
-                final BlockUnlitTorch torch = new BlockUnlitTorch(false, "unlitTorch_Stone");
-                final BlockUnlitTorch torchLit = new BlockUnlitTorch(true, "unlitTorchLit_Stone");
-                GCBlocks.hiddenBlocks.add((Block)torch);
-                GCBlocks.hiddenBlocks.add((Block)torchLit);
-                GCBlocks.otherModTorchesLit.add((Block)torchLit);
-                GameRegistry.registerBlock((Block)torch, (Class)ItemBlockGC.class, torch.getUnlocalizedName());
-                GameRegistry.registerBlock((Block)torchLit, (Class)ItemBlockGC.class, torchLit.getUnlocalizedName());
+                torch = new BlockUnlitTorch(false, "unlitTorch_Stone");
+                torchLit = new BlockUnlitTorch(true, "unlitTorchLit_Stone");
+                GCBlocks.hiddenBlocks.add(torch);
+                GCBlocks.hiddenBlocks.add(torchLit);
+                GCBlocks.otherModTorchesLit.add(torchLit);
+                GameRegistry.registerBlock(torch, ItemBlockGC.class, torch.getUnlocalizedName());
+                GameRegistry.registerBlock(torchLit, ItemBlockGC.class, torchLit.getUnlocalizedName());
                 BlockUnlitTorch.register(torch, torchLit, modTorch);
             }
         }
     }
-    
+
     public static void setHarvestLevels() {
-        GCBlocks.basicBlock.setHarvestLevel("pickaxe", 2, 5);
-        GCBlocks.basicBlock.setHarvestLevel("pickaxe", 2, 6);
-        GCBlocks.basicBlock.setHarvestLevel("pickaxe", 2, 7);
-        GCBlocks.basicBlock.setHarvestLevel("pickaxe", 1, 8);
+        GCBlocks.basicBlock.setHarvestLevel("pickaxe", 2, 5); // Copper ore
+        GCBlocks.basicBlock.setHarvestLevel("pickaxe", 2, 6); // Tin ore
+        GCBlocks.basicBlock.setHarvestLevel("pickaxe", 2, 7); // Aluminium ore
+        GCBlocks.basicBlock.setHarvestLevel("pickaxe", 1, 8); // Silicon ore
         GCBlocks.fallenMeteor.setHarvestLevel("pickaxe", 3);
-        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 2, 0);
-        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 2, 1);
-        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 1, 2);
-        GCBlocks.blockMoon.setHarvestLevel("shovel", 0, 3);
-        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 1, 4);
+        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 2, 0); // Copper ore
+        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 2, 1); // Tin ore
+        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 1, 2); // Cheese ore
+        GCBlocks.blockMoon.setHarvestLevel("shovel", 0, 3); // Moon dirt
+        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 1, 4); // Moon rock
+
         GCBlocks.slabGCHalf.setHarvestLevel("pickaxe", 1, 0);
         GCBlocks.slabGCHalf.setHarvestLevel("pickaxe", 1, 1);
         GCBlocks.slabGCHalf.setHarvestLevel("pickaxe", 1, 2);
@@ -256,64 +304,143 @@ public class GCBlocks
         GCBlocks.wallGC.setHarvestLevel("pickaxe", 3, 3);
         GCBlocks.wallGC.setHarvestLevel("pickaxe", 0, 4);
         GCBlocks.wallGC.setHarvestLevel("pickaxe", 3, 5);
-        for (int num = 5; num < 14; ++num) {
+
+        for (int num = 5; num < 14; num++) {
+            // Various types of Moon top dirt
             GCBlocks.blockMoon.setHarvestLevel("shovel", 0, num);
         }
-        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 3, 14);
+
+        GCBlocks.blockMoon.setHarvestLevel("pickaxe", 3, 14); // Moon dungeon brick (actually unharvestable)
     }
-    
+
     public static void registerBlocks() {
-        GameRegistry.registerBlock(GCBlocks.landingPad, (Class)ItemBlockLandingPad.class, GCBlocks.landingPad.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.landingPadFull, (Class)ItemBlockGC.class, GCBlocks.landingPadFull.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.unlitTorch, (Class)ItemBlock.class, GCBlocks.unlitTorch.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.unlitTorchLit, (Class)ItemBlock.class, GCBlocks.unlitTorchLit.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.breatheableAir, (Class)ItemBlockGC.class, GCBlocks.breatheableAir.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.brightAir, (Class)ItemBlockGC.class, GCBlocks.brightAir.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.brightBreatheableAir, (Class)ItemBlockGC.class, GCBlocks.brightBreatheableAir.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.oxygenCollector, (Class)ItemBlockDesc.class, GCBlocks.oxygenCollector.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.oxygenCompressor, (Class)ItemBlockOxygenCompressor.class, GCBlocks.oxygenCompressor.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.oxygenDistributor, (Class)ItemBlockDesc.class, GCBlocks.oxygenDistributor.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.oxygenSealer, (Class)ItemBlockDesc.class, GCBlocks.oxygenSealer.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.oxygenDetector, (Class)ItemBlockDesc.class, GCBlocks.oxygenDetector.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.oxygenPipe, (Class)ItemBlockDesc.class, GCBlocks.oxygenPipe.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.refinery, (Class)ItemBlockDesc.class, GCBlocks.refinery.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.fuelLoader, (Class)ItemBlockDesc.class, GCBlocks.fuelLoader.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.cargoLoader, (Class)ItemBlockCargoLoader.class, GCBlocks.cargoLoader.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.nasaWorkbench, (Class)ItemBlockDesc.class, GCBlocks.nasaWorkbench.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.basicBlock, (Class)ItemBlockBase.class, GCBlocks.basicBlock.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.airLockFrame, (Class)ItemBlockAirLock.class, GCBlocks.airLockFrame.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.airLockSeal, (Class)ItemBlockGC.class, GCBlocks.airLockSeal.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.sealableBlock, (Class)ItemBlockEnclosed.class, GCBlocks.sealableBlock.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.spaceStationBase, (Class)ItemBlockGC.class, GCBlocks.spaceStationBase.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.fakeBlock, (Class)ItemBlockDummy.class, GCBlocks.fakeBlock.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.parachest, (Class)ItemBlockDesc.class, GCBlocks.parachest.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.solarPanel, (Class)ItemBlockSolar.class, GCBlocks.solarPanel.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.radioTelescope, (Class)ItemBlockGC.class, GCBlocks.radioTelescope.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.machineBase, (Class)ItemBlockMachine.class, GCBlocks.machineBase.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.machineBase2, (Class)ItemBlockMachine.class, GCBlocks.machineBase2.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.machineTiered, (Class)ItemBlockMachine.class, GCBlocks.machineTiered.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.aluminumWire, (Class)ItemBlockAluminumWire.class, GCBlocks.aluminumWire.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.glowstoneTorch, (Class)ItemBlockDesc.class, GCBlocks.glowstoneTorch.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.fallenMeteor, (Class)ItemBlockDesc.class, GCBlocks.fallenMeteor.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.blockMoon, (Class)ItemBlockMoon.class, GCBlocks.blockMoon.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.cheeseBlock, (Class)ItemBlockCheese.class, GCBlocks.cheeseBlock.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.spinThruster, (Class)ItemBlockThruster.class, GCBlocks.spinThruster.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.screen, (Class)ItemBlockDesc.class, GCBlocks.screen.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.telemetry, (Class)ItemBlockDesc.class, GCBlocks.telemetry.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.brightLamp, (Class)ItemBlockArclamp.class, GCBlocks.brightLamp.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.treasureChestTier1, (Class)ItemBlockDesc.class, GCBlocks.treasureChestTier1.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.tinStairs1, (Class)ItemBlockGC.class, GCBlocks.tinStairs1.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.tinStairs2, (Class)ItemBlockGC.class, GCBlocks.tinStairs2.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.moonStoneStairs, (Class)ItemBlockGC.class, GCBlocks.moonStoneStairs.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.moonBricksStairs, (Class)ItemBlockGC.class, GCBlocks.moonBricksStairs.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.wallGC, (Class)ItemBlockWallGC.class, GCBlocks.wallGC.getUnlocalizedName());
-        GameRegistry.registerBlock(GCBlocks.slabGCHalf, (Class)ItemBlockSlabGC.class, GCBlocks.slabGCHalf.getUnlocalizedName().replace("tile.", ""), new Object[] { GCBlocks.slabGCHalf, GCBlocks.slabGCDouble });
-        GameRegistry.registerBlock(GCBlocks.slabGCDouble, (Class)ItemBlockSlabGC.class, GCBlocks.slabGCDouble.getUnlocalizedName().replace("tile.", ""), new Object[] { GCBlocks.slabGCHalf, GCBlocks.slabGCDouble });
-    }
-    
-    static {
-        machine = new Material(MapColor.ironColor);
-        GCBlocks.hiddenBlocks = new ArrayList<Block>();
-        GCBlocks.otherModTorchesLit = new ArrayList<Block>();
+        GameRegistry.registerBlock(
+                GCBlocks.landingPad,
+                ItemBlockLandingPad.class,
+                GCBlocks.landingPad.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.landingPadFull,
+                ItemBlockGC.class,
+                GCBlocks.landingPadFull.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.unlitTorch, ItemBlock.class, GCBlocks.unlitTorch.getUnlocalizedName());
+        GameRegistry
+                .registerBlock(GCBlocks.unlitTorchLit, ItemBlock.class, GCBlocks.unlitTorchLit.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.breatheableAir,
+                ItemBlockGC.class,
+                GCBlocks.breatheableAir.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.brightAir, ItemBlockGC.class, GCBlocks.brightAir.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.brightBreatheableAir,
+                ItemBlockGC.class,
+                GCBlocks.brightBreatheableAir.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.oxygenCollector,
+                ItemBlockDesc.class,
+                GCBlocks.oxygenCollector.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.oxygenCompressor,
+                ItemBlockOxygenCompressor.class,
+                GCBlocks.oxygenCompressor.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.oxygenDistributor,
+                ItemBlockDesc.class,
+                GCBlocks.oxygenDistributor.getUnlocalizedName());
+        GameRegistry
+                .registerBlock(GCBlocks.oxygenSealer, ItemBlockDesc.class, GCBlocks.oxygenSealer.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.oxygenDetector,
+                ItemBlockDesc.class,
+                GCBlocks.oxygenDetector.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.oxygenPipe, ItemBlockDesc.class, GCBlocks.oxygenPipe.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.refinery, ItemBlockDesc.class, GCBlocks.refinery.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.fuelLoader, ItemBlockDesc.class, GCBlocks.fuelLoader.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.cargoLoader,
+                ItemBlockCargoLoader.class,
+                GCBlocks.cargoLoader.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.nasaWorkbench,
+                ItemBlockDesc.class,
+                GCBlocks.nasaWorkbench.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.basicBlock, ItemBlockBase.class, GCBlocks.basicBlock.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.airLockFrame,
+                ItemBlockAirLock.class,
+                GCBlocks.airLockFrame.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.airLockSeal, ItemBlockGC.class, GCBlocks.airLockSeal.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.sealableBlock,
+                ItemBlockEnclosed.class,
+                GCBlocks.sealableBlock.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.spaceStationBase,
+                ItemBlockGC.class,
+                GCBlocks.spaceStationBase.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.fakeBlock, ItemBlockDummy.class, GCBlocks.fakeBlock.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.parachest, ItemBlockDesc.class, GCBlocks.parachest.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.solarPanel, ItemBlockSolar.class, GCBlocks.solarPanel.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.radioTelescope,
+                ItemBlockGC.class,
+                GCBlocks.radioTelescope.getUnlocalizedName());
+        GameRegistry
+                .registerBlock(GCBlocks.machineBase, ItemBlockMachine.class, GCBlocks.machineBase.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.machineBase2,
+                ItemBlockMachine.class,
+                GCBlocks.machineBase2.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.machineTiered,
+                ItemBlockMachine.class,
+                GCBlocks.machineTiered.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.aluminumWire,
+                ItemBlockAluminumWire.class,
+                GCBlocks.aluminumWire.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.glowstoneTorch,
+                ItemBlockDesc.class,
+                GCBlocks.glowstoneTorch.getUnlocalizedName());
+        GameRegistry
+                .registerBlock(GCBlocks.fallenMeteor, ItemBlockDesc.class, GCBlocks.fallenMeteor.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.blockMoon, ItemBlockMoon.class, GCBlocks.blockMoon.getUnlocalizedName());
+        GameRegistry
+                .registerBlock(GCBlocks.cheeseBlock, ItemBlockCheese.class, GCBlocks.cheeseBlock.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.spinThruster,
+                ItemBlockThruster.class,
+                GCBlocks.spinThruster.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.screen, ItemBlockDesc.class, GCBlocks.screen.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.telemetry, ItemBlockDesc.class, GCBlocks.telemetry.getUnlocalizedName());
+        GameRegistry
+                .registerBlock(GCBlocks.brightLamp, ItemBlockArclamp.class, GCBlocks.brightLamp.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.treasureChestTier1,
+                ItemBlockDesc.class,
+                GCBlocks.treasureChestTier1.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.tinStairs1, ItemBlockGC.class, GCBlocks.tinStairs1.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.tinStairs2, ItemBlockGC.class, GCBlocks.tinStairs2.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.moonStoneStairs,
+                ItemBlockGC.class,
+                GCBlocks.moonStoneStairs.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.moonBricksStairs,
+                ItemBlockGC.class,
+                GCBlocks.moonBricksStairs.getUnlocalizedName());
+        GameRegistry.registerBlock(GCBlocks.wallGC, ItemBlockWallGC.class, GCBlocks.wallGC.getUnlocalizedName());
+        GameRegistry.registerBlock(
+                GCBlocks.slabGCHalf,
+                ItemBlockSlabGC.class,
+                GCBlocks.slabGCHalf.getUnlocalizedName().replace("tile.", ""),
+                GCBlocks.slabGCHalf,
+                GCBlocks.slabGCDouble);
+        GameRegistry.registerBlock(
+                GCBlocks.slabGCDouble,
+                ItemBlockSlabGC.class,
+                GCBlocks.slabGCDouble.getUnlocalizedName().replace("tile.", ""),
+                GCBlocks.slabGCHalf,
+                GCBlocks.slabGCDouble);
     }
 }

@@ -423,7 +423,7 @@ gui.telemetryFailWearingIt.message=I'll need to take off my Frequency Module if 
 
 gui.rocketType.0=Raktárhely: 18
 gui.rocketType.1=Raktárhely: 36
-gui.rocketType.2=Raktárhely: 56
+gui.rocketType.2=Raktárhely: 54
 gui.rocketType.3=Előre feltöltve
 
 gui.spacestation.typeCommand=Írja be hogy
@@ -443,6 +443,7 @@ gui.receiver.cannotAttach=Ide nem lehet vevőt csatolni.
 gui.warning.invalidThermal=Invalid Thermal Protection! ##NEEDS TRANSLATE##
 
 gui.tank.oxygenRemaining=Levegő Mennyisége
+gui.tank.infinite=VÉGTELEN
 gui.buggy.storageSpace=Teherkapacitás
 gui.frequencyModule.desc.0=Képes észlelni halk hanghullámokat
 gui.frequencyModule.desc.1=és távoli jeleket

@@ -1,40 +1,50 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.schematic;
 
-import micdoodle8.mods.galacticraft.api.recipe.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.planets.mars.items.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.client.gui.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.client.gui.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.inventory.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.inventory.*;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
 
-public class SchematicAstroMiner implements ISchematicPage
-{
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.recipe.ISchematicPage;
+import micdoodle8.mods.galacticraft.core.Constants;
+import micdoodle8.mods.galacticraft.planets.GuiIdsPlanets;
+import micdoodle8.mods.galacticraft.planets.asteroids.ConfigManagerAsteroids;
+import micdoodle8.mods.galacticraft.planets.asteroids.client.gui.GuiSchematicAstroMiner;
+import micdoodle8.mods.galacticraft.planets.asteroids.inventory.ContainerSchematicAstroMiner;
+import micdoodle8.mods.galacticraft.planets.mars.items.MarsItems;
+
+public class SchematicAstroMiner implements ISchematicPage {
+
+    @Override
     public int getPageID() {
         return ConfigManagerAsteroids.idSchematicRocketT3 + 1;
     }
-    
+
+    @Override
     public int getGuiID() {
-        return 5 + "GalacticraftMars".hashCode();
+        return GuiIdsPlanets.NASA_WORKBENCH_ASTRO_MINER + Constants.MOD_ID_PLANETS.hashCode();
     }
-    
+
+    @Override
     public ItemStack getRequiredItem() {
         return new ItemStack(MarsItems.schematic, 1, 2);
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public GuiScreen getResultScreen(final EntityPlayer player, final int x, final int y, final int z) {
-        return (GuiScreen)new GuiSchematicAstroMiner(player.inventory, x, y, z);
+    @Override
+    public GuiScreen getResultScreen(EntityPlayer player, int x, int y, int z) {
+        return new GuiSchematicAstroMiner(player.inventory, x, y, z);
     }
-    
-    public Container getResultContainer(final EntityPlayer player, final int x, final int y, final int z) {
-        return (Container)new ContainerSchematicAstroMiner(player.inventory, x, y, z);
+
+    @Override
+    public Container getResultContainer(EntityPlayer player, int x, int y, int z) {
+        return new ContainerSchematicAstroMiner(player.inventory, x, y, z);
     }
-    
-    public int compareTo(final ISchematicPage o) {
+
+    @Override
+    public int compareTo(ISchematicPage o) {
         if (this.getPageID() > o.getPageID()) {
             return 1;
         }

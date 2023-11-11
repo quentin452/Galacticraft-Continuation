@@ -426,7 +426,7 @@ gui.telemetryFailWearingIt.message=Frekans Modülünü çıkarmam gerek çünkü
 
 gui.rocketType.0=Depolama Alanı: 18
 gui.rocketType.1=Depolama Alanı: 36
-gui.rocketType.2=Depolama Alanı: 56
+gui.rocketType.2=Depolama Alanı: 54
 gui.rocketType.3=Sınırsız Yakıt
 
 gui.spacestation.typeCommand=Tür
@@ -446,6 +446,7 @@ gui.receiver.cannotAttach=Buraya alıcı takamazsınız!
 gui.warning.invalidThermal=Termal korumanız geçersizdir!
 
 gui.tank.oxygenRemaining=Kalan Oksijen
+gui.tank.infinite=SONSUZ
 gui.buggy.storageSpace=Depolama Alanı
 gui.frequencyModule.desc.0=Zayıf sesleri alabilirsiniz
 gui.frequencyModule.desc.1=dalgaları ve uzak sinyalleride

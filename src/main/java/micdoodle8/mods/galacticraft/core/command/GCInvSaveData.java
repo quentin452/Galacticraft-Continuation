@@ -1,38 +1,39 @@
 package micdoodle8.mods.galacticraft.core.command;
 
-import net.minecraft.world.*;
-import net.minecraft.item.*;
-import java.util.*;
-import net.minecraft.nbt.*;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.WorldSavedData;
 
-public class GCInvSaveData extends WorldSavedData
-{
+public class GCInvSaveData extends WorldSavedData {
+
     public static final String SAVE_ID = "GCInv_savefile";
-    
+
     public GCInvSaveData() {
-        super("GCInv_savefile");
+        super(SAVE_ID);
     }
-    
-    public GCInvSaveData(final String name) {
+
+    public GCInvSaveData(String name) {
         super(name);
     }
-    
-    public void readFromNBT(final NBTTagCompound filedata) {
+
+    @Override
+    public void readFromNBT(NBTTagCompound filedata) {
         for (final Object obj : filedata.func_150296_c()) {
-            if (obj instanceof NBTTagList) {
-                final NBTTagList entry = (NBTTagList)obj;
-                final String name = entry.toString();
+            if (obj instanceof NBTTagList entry) {
+                final String name = entry.toString(); // TODO See if this is equivilent to 1.6's getName function
                 final ItemStack[] saveinv = new ItemStack[6];
                 if (entry.tagCount() > 0) {
-                    for (int j = 0; j < entry.tagCount(); ++j) {
-                        final NBTTagCompound obj2 = entry.getCompoundTagAt(j);
-                        if (obj2 != null) {
-                            final int i = obj2.getByte("Slot") & 0x7;
+                    for (int j = 0; j < entry.tagCount(); j++) {
+                        final NBTTagCompound obj1 = entry.getCompoundTagAt(j);
+
+                        if (obj1 != null) {
+                            final int i = obj1.getByte("Slot") & 7;
                             if (i >= 6) {
                                 System.out.println("GCInv error retrieving savefile: slot was outside range 0-5");
                                 return;
                             }
-                            saveinv[i] = ItemStack.loadItemStackFromNBT(obj2);
+                            saveinv[i] = ItemStack.loadItemStackFromNBT(obj1);
                         }
                     }
                 }
@@ -40,20 +41,22 @@ public class GCInvSaveData extends WorldSavedData
             }
         }
     }
-    
-    public void writeToNBT(final NBTTagCompound toSave) {
+
+    @Override
+    public void writeToNBT(NBTTagCompound toSave) {
         for (final String name : CommandGCInv.savedata.keySet()) {
             final NBTTagList par1NBTTagList = new NBTTagList();
             final ItemStack[] saveinv = CommandGCInv.savedata.get(name);
-            for (int i = 0; i < 6; ++i) {
+
+            for (int i = 0; i < 6; i++) {
                 if (saveinv[i] != null) {
                     final NBTTagCompound nbttagcompound = new NBTTagCompound();
-                    nbttagcompound.setByte("Slot", (byte)(i + 200));
+                    nbttagcompound.setByte("Slot", (byte) (i + 200));
                     saveinv[i].writeToNBT(nbttagcompound);
-                    par1NBTTagList.appendTag((NBTBase)nbttagcompound);
+                    par1NBTTagList.appendTag(nbttagcompound);
                 }
             }
-            toSave.setTag(name, (NBTBase)par1NBTTagList);
+            toSave.setTag(name, par1NBTTagList);
         }
     }
 }

@@ -1,9 +1,9 @@
 package micdoodle8.mods.galacticraft.api;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 
-public class GalacticraftConfigAccess
-{
+public class GalacticraftConfigAccess {
+
     private static Field quickMode;
     private static Field hardMode;
     private static Field adventureMode;
@@ -11,103 +11,95 @@ public class GalacticraftConfigAccess
     private static Field adventureMobDropsAndSpawning;
     private static Field adventureSpawnHandling;
     private static Field adventureAsteroidPopulation;
-    
+
     public static boolean getQuickMode() {
-        if (GalacticraftConfigAccess.quickMode == null) {
+        if (quickMode == null) {
             setup();
         }
+
         try {
-            return GalacticraftConfigAccess.quickMode.getBoolean(null);
-        }
-        catch (Exception ex) {
-            return false;
-        }
+            return quickMode.getBoolean(null);
+        } catch (final Exception e) {}
+        return false;
     }
-    
+
     public static boolean getHardMode() {
-        if (GalacticraftConfigAccess.quickMode == null) {
+        if (quickMode == null) {
             setup();
         }
+
         try {
-            return GalacticraftConfigAccess.hardMode.getBoolean(null);
-        }
-        catch (Exception ex) {
-            return false;
-        }
+            return hardMode.getBoolean(null);
+        } catch (final Exception e) {}
+        return false;
     }
-    
+
     public static boolean getChallengeMode() {
-        if (GalacticraftConfigAccess.quickMode == null) {
+        if (quickMode == null) {
             setup();
         }
+
         try {
-            return GalacticraftConfigAccess.adventureMode.getBoolean(null);
-        }
-        catch (Exception ex) {
-            return false;
-        }
+            return adventureMode.getBoolean(null);
+        } catch (final Exception e) {}
+        return false;
     }
-    
+
     public static boolean getChallengeRecipes() {
-        if (GalacticraftConfigAccess.quickMode == null) {
+        if (quickMode == null) {
             setup();
         }
+
         try {
-            return GalacticraftConfigAccess.adventureRecipes.getBoolean(null);
-        }
-        catch (Exception ex) {
-            return false;
-        }
+            return adventureRecipes.getBoolean(null);
+        } catch (final Exception e) {}
+        return false;
     }
-    
+
     public static boolean getChallengeMobDropsAndSpawning() {
-        if (GalacticraftConfigAccess.quickMode == null) {
+        if (quickMode == null) {
             setup();
         }
+
         try {
-            return GalacticraftConfigAccess.adventureMobDropsAndSpawning.getBoolean(null);
-        }
-        catch (Exception ex) {
-            return false;
-        }
+            return adventureMobDropsAndSpawning.getBoolean(null);
+        } catch (final Exception e) {}
+        return false;
     }
-    
+
     public static boolean getChallengeSpawnHandling() {
-        if (GalacticraftConfigAccess.quickMode == null) {
+        if (quickMode == null) {
             setup();
         }
+
         try {
-            return GalacticraftConfigAccess.adventureSpawnHandling.getBoolean(null);
-        }
-        catch (Exception ex) {
-            return false;
-        }
+            return adventureSpawnHandling.getBoolean(null);
+        } catch (final Exception e) {}
+        return false;
     }
-    
+
     public static boolean getChallengeAsteroidPopulation() {
-        if (GalacticraftConfigAccess.quickMode == null) {
+        if (quickMode == null) {
             setup();
         }
+
         try {
-            return GalacticraftConfigAccess.adventureAsteroidPopulation.getBoolean(null);
-        }
-        catch (Exception ex) {
-            return false;
-        }
+            return adventureAsteroidPopulation.getBoolean(null);
+        } catch (final Exception e) {}
+        return false;
     }
-    
+
     private static void setup() {
         try {
             final Class<?> GCConfig = Class.forName("micdoodle8.mods.galacticraft.core.util.ConfigManagerCore");
-            GalacticraftConfigAccess.quickMode = GCConfig.getField("quickMode");
-            GalacticraftConfigAccess.hardMode = GCConfig.getField("hardMode");
-            GalacticraftConfigAccess.adventureMode = GCConfig.getField("challengeMode");
-            GalacticraftConfigAccess.adventureRecipes = GCConfig.getField("challengeRecipes");
-            GalacticraftConfigAccess.adventureMobDropsAndSpawning = GCConfig.getField("challengeMobDropsAndSpawning");
-            GalacticraftConfigAccess.adventureSpawnHandling = GCConfig.getField("challengeSpawnHandling");
-            GalacticraftConfigAccess.adventureAsteroidPopulation = GCConfig.getField("challengeAsteroidPopulation");
-        }
-        catch (Exception e) {
+            quickMode = GCConfig.getField("quickMode");
+            hardMode = GCConfig.getField("hardMode");
+            adventureMode = GCConfig.getField("challengeMode");
+            adventureRecipes = GCConfig.getField("challengeRecipes");
+            adventureMobDropsAndSpawning = GCConfig.getField("challengeMobDropsAndSpawning");
+            adventureSpawnHandling = GCConfig.getField("challengeSpawnHandling");
+            adventureAsteroidPopulation = GCConfig.getField("challengeAsteroidPopulation");
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }

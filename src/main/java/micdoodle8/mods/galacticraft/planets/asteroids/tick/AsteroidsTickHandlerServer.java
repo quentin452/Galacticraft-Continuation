@@ -1,37 +1,39 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.tick;
 
-import micdoodle8.mods.galacticraft.planets.asteroids.dimension.*;
-import cpw.mods.fml.common.gameevent.*;
-import cpw.mods.fml.common.*;
-import net.minecraft.server.*;
-import net.minecraft.world.*;
-import cpw.mods.fml.common.eventhandler.*;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 
-public class AsteroidsTickHandlerServer
-{
-    public static ShortRangeTelepadHandler spaceRaceData;
-    
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import micdoodle8.mods.galacticraft.planets.asteroids.dimension.ShortRangeTelepadHandler;
+
+public class AsteroidsTickHandlerServer {
+
+    public static ShortRangeTelepadHandler spaceRaceData = null;
+
     public static void restart() {
-        AsteroidsTickHandlerServer.spaceRaceData = null;
+        spaceRaceData = null;
     }
-    
+
     @SubscribeEvent
-    public void onServerTick(final TickEvent.ServerTickEvent event) {
+    public void onServerTick(TickEvent.ServerTickEvent event) {
         final MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        // Prevent issues when clients switch to LAN servers
         if (server == null) {
             return;
         }
+
         if (event.phase == TickEvent.Phase.START && AsteroidsTickHandlerServer.spaceRaceData == null) {
-            final World world = (World)server.worldServerForDimension(0);
-            AsteroidsTickHandlerServer.spaceRaceData = (ShortRangeTelepadHandler)world.mapStorage.loadData((Class)ShortRangeTelepadHandler.class, "ShortRangeTelepads");
+            final World world = server.worldServerForDimension(0);
+            AsteroidsTickHandlerServer.spaceRaceData = (ShortRangeTelepadHandler) world.mapStorage
+                    .loadData(ShortRangeTelepadHandler.class, ShortRangeTelepadHandler.saveDataID);
+
             if (AsteroidsTickHandlerServer.spaceRaceData == null) {
-                AsteroidsTickHandlerServer.spaceRaceData = new ShortRangeTelepadHandler("ShortRangeTelepads");
-                world.mapStorage.setData("ShortRangeTelepads", (WorldSavedData)AsteroidsTickHandlerServer.spaceRaceData);
+                AsteroidsTickHandlerServer.spaceRaceData = new ShortRangeTelepadHandler(
+                        ShortRangeTelepadHandler.saveDataID);
+                world.mapStorage.setData(ShortRangeTelepadHandler.saveDataID, AsteroidsTickHandlerServer.spaceRaceData);
             }
         }
-    }
-    
-    static {
-        AsteroidsTickHandlerServer.spaceRaceData = null;
     }
 }

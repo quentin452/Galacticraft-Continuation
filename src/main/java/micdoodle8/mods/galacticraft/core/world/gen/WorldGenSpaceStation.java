@@ -1,14 +1,17 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import net.minecraft.world.gen.feature.*;
-import net.minecraft.world.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import net.minecraft.init.*;
+import java.util.Random;
 
-public class WorldGenSpaceStation extends WorldGenerator
-{
-    public boolean generate(final World world, final Random rand, final int i, final int j, final int k) {
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.WorldGenerator;
+
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+
+public class WorldGenSpaceStation extends WorldGenerator {
+
+    @Override
+    public boolean generate(World world, Random rand, int i, int j, int k) {
         world.setBlock(i + 0, j + 0, k + 0, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 0, j + 0, k + 1, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 0, j + 0, k + 2, GCBlocks.basicBlock, 4, 3);
@@ -49,6 +52,7 @@ public class WorldGenSpaceStation extends WorldGenerator
         world.setBlock(i + 3, j + 0, k + 5, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 3, j + 0, k + 6, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 3, j + 1, k + 0, GCBlocks.basicBlock, 4, 3);
+
         world.setBlock(i + 3, j + 1, k + 6, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 4, j + 0, k + 0, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 4, j + 0, k + 1, GCBlocks.basicBlock, 4, 3);
@@ -166,6 +170,9 @@ public class WorldGenSpaceStation extends WorldGenerator
         world.setBlock(i + 10, j + 1, k + 4, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 10, j + 1, k + 5, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 10, j + 1, k + 6, GCBlocks.basicBlock, 4, 3);
+
+        // world.setBlock(i + 10, j + 2, k + 3, 3, 0, 3);
+
         world.setBlock(i + 10, j + 5, k + 0, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 10, j + 5, k + 6, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 10, j + 6, k + 0, GCBlocks.basicBlock, 4, 3);
@@ -246,6 +253,7 @@ public class WorldGenSpaceStation extends WorldGenerator
         world.setBlock(i + 13, j + 6, k + 4, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 13, j + 6, k + 5, GCBlocks.basicBlock, 4, 3);
         world.setBlock(i + 13, j + 6, k + 6, GCBlocks.basicBlock, 4, 3);
+
         return true;
     }
 }

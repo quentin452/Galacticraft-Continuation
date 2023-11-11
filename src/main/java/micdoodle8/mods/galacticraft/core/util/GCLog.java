@@ -1,25 +1,27 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import org.apache.logging.log4j.*;
-import cpw.mods.fml.relauncher.*;
+import org.apache.logging.log4j.Level;
 
-public class GCLog
-{
-    public static void info(final String message) {
-        FMLRelaunchLog.log("Galacticraft", Level.INFO, message);
+import cpw.mods.fml.relauncher.FMLRelaunchLog;
+import micdoodle8.mods.galacticraft.core.Constants;
+
+public class GCLog {
+
+    public static void info(String message) {
+        FMLRelaunchLog.log(Constants.MOD_NAME_SIMPLE, Level.INFO, message);
     }
 
-    public static void severe(final String message) {
-        FMLRelaunchLog.log("Galacticraft", Level.ERROR, message);
+    public static void severe(String message) {
+        FMLRelaunchLog.log(Constants.MOD_NAME_SIMPLE, Level.ERROR, message);
     }
 
-    public static void debug(final String message) {
+    public static void debug(String message) {
         if (ConfigManagerCore.enableDebug) {
-            FMLRelaunchLog.log("Galacticraft", Level.INFO, "Debug: " + message);
+            FMLRelaunchLog.log(Constants.MOD_NAME_SIMPLE, Level.INFO, "Debug: " + message);
         }
     }
 
-    public static void exception(final Exception e) {
-        FMLRelaunchLog.log("Galacticraft", Level.ERROR, e.getMessage());
+    public static void exception(Exception e) {
+        FMLRelaunchLog.log(Constants.MOD_NAME_SIMPLE, Level.ERROR, e.getMessage());
     }
 }

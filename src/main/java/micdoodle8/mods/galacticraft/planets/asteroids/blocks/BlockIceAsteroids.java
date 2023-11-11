@@ -1,101 +1,121 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import net.minecraft.block.material.*;
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.stats.*;
-import net.minecraft.block.*;
-import net.minecraft.enchantment.*;
-import net.minecraft.entity.*;
-import net.minecraft.item.*;
-import net.minecraftforge.event.*;
-import micdoodle8.mods.galacticraft.api.world.*;
-import net.minecraft.init.*;
-import java.util.*;
-import net.minecraft.world.*;
-import net.minecraft.client.renderer.texture.*;
+import java.util.ArrayList;
+import java.util.Random;
 
-public class BlockIceAsteroids extends BlockBreakable
-{
-    public BlockIceAsteroids(final String assetName) {
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockBreakable;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.event.ForgeEventFactory;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+
+public class BlockIceAsteroids extends BlockBreakable {
+
+    public BlockIceAsteroids(String assetName) {
         super(assetName, Material.ice, false);
-        this.slipperiness = 0.98f;
+        this.slipperiness = 0.98F;
         this.setTickRandomly(true);
         this.setCreativeTab(CreativeTabs.tabBlock);
-        this.setBlockTextureName("galacticraftasteroids:" + assetName);
-        this.setHardness(0.5f);
+        this.setBlockTextureName(AsteroidsModule.TEXTURE_PREFIX + assetName);
+        this.setHardness(0.5F);
         this.setBlockName(assetName);
-        this.setStepSound(BlockIceAsteroids.soundTypeGlass);
+        this.setStepSound(soundTypeGlass);
     }
-    
+
     @SideOnly(Side.CLIENT)
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
     public int getRenderBlockPass() {
         return 1;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(final IBlockAccess world, final int x, final int y, final int z, final int side) {
+    public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side) {
         return super.shouldSideBeRendered(world, x, y, z, 1 - side);
     }
-    
-    public void harvestBlock(final World world, final EntityPlayer player, final int x, final int y, final int z, final int meta) {
-        player.addStat(StatList.mineBlockStatArray[Block.getIdFromBlock((Block)this)], 1);
-        player.addExhaustion(0.025f);
-        if (this.canSilkHarvest(world, player, x, y, z, meta) && EnchantmentHelper.getSilkTouchModifier((EntityLivingBase)player)) {
-            final ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+
+    @Override
+    public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta) {
+        player.addStat(StatList.mineBlockStatArray[Block.getIdFromBlock(this)], 1);
+        player.addExhaustion(0.025F);
+
+        if (this.canSilkHarvest(world, player, x, y, z, meta) && EnchantmentHelper.getSilkTouchModifier(player)) {
+            final ArrayList<ItemStack> items = new ArrayList<>();
             final ItemStack itemstack = this.createStackedBlock(meta);
+
             if (itemstack != null) {
                 items.add(itemstack);
             }
-            ForgeEventFactory.fireBlockHarvesting((ArrayList)items, world, (Block)this, x, y, z, meta, 0, 1.0f, true, player);
+
+            ForgeEventFactory.fireBlockHarvesting(items, world, this, x, y, z, meta, 0, 1.0f, true, player);
             for (final ItemStack is : items) {
                 this.dropBlockAsItem(world, x, y, z, is);
             }
-        }
-        else {
+        } else {
             if (world.provider.isHellWorld || world.provider instanceof IGalacticraftWorldProvider) {
                 world.setBlockToAir(x, y, z);
                 return;
             }
-            final int i1 = EnchantmentHelper.getFortuneModifier((EntityLivingBase)player);
+
+            final int i1 = EnchantmentHelper.getFortuneModifier(player);
             this.harvesters.set(player);
             this.dropBlockAsItem(world, x, y, z, meta, i1);
             this.harvesters.set(null);
             final Material material = world.getBlock(x, y - 1, z).getMaterial();
+
             if (material.blocksMovement() || material.isLiquid()) {
-                world.setBlock(x, y, z, (Block)Blocks.flowing_water);
+                world.setBlock(x, y, z, Blocks.flowing_water);
             }
         }
     }
-    
-    public int quantityDropped(final Random rand) {
+
+    @Override
+    public int quantityDropped(Random rand) {
         return 0;
     }
-    
-    public void updateTick(final World world, final int x, final int y, final int z, final Random rand) {
+
+    @Override
+    public void updateTick(World world, int x, int y, int z, Random rand) {
         if (world.getSavedLightValue(EnumSkyBlock.Block, x, y, z) > 13) {
             if (world.provider.isHellWorld || world.provider instanceof IGalacticraftWorldProvider) {
                 world.setBlockToAir(x, y, z);
                 return;
             }
+
             this.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
             world.setBlock(x, y, z, Blocks.water);
         }
     }
-    
+
+    @Override
     public int getMobilityFlag() {
         return 0;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(final IIconRegister iconRegister) {
+    public void registerBlockIcons(IIconRegister iconRegister) {
         this.blockIcon = iconRegister.registerIcon(this.getTextureName());
     }
 }

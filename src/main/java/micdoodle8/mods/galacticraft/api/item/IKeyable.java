@@ -1,15 +1,34 @@
 package micdoodle8.mods.galacticraft.api.item;
 
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 
-public interface IKeyable
-{
+/**
+ * Implement into tile entities that do something upon being activated by a key
+ */
+public interface IKeyable {
+
+    /**
+     * @return -1 for any tier, or return tier required for key activated to pass
+     */
     int getTierOfKeyRequired();
-    
-    boolean onValidKeyActivated(final EntityPlayer p0, final ItemStack p1, final int p2);
-    
-    boolean onActivatedWithoutKey(final EntityPlayer p0, final int p1);
-    
+
+    /**
+     * called when key of correct tier is clicked
+     *
+     * @param key  the key itemstack
+     * @param face the block face clicked
+     * @return true if something was done, false if not
+     */
+    boolean onValidKeyActivated(EntityPlayer player, ItemStack key, int face);
+
+    /**
+     * called when player is not holding correct tier of key, or any key at all
+     *
+     * @param key the key itemstack
+     * @return true if something was done, false if not
+     */
+    boolean onActivatedWithoutKey(EntityPlayer player, int face);
+
     boolean canBreak();
 }

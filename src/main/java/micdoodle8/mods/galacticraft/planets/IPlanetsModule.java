@@ -1,29 +1,35 @@
 package micdoodle8.mods.galacticraft.planets;
 
-import cpw.mods.fml.common.event.*;
-import java.util.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.world.*;
-import net.minecraftforge.common.config.*;
+import java.util.List;
 
-public interface IPlanetsModule
-{
-    void preInit(final FMLPreInitializationEvent p0);
-    
-    void init(final FMLInitializationEvent p0);
-    
-    void postInit(final FMLPostInitializationEvent p0);
-    
-    void serverInit(final FMLServerStartedEvent p0);
-    
-    void serverStarting(final FMLServerStartingEvent p0);
-    
-    void getGuiIDs(final List<Integer> p0);
-    
-    Object getGuiElement(final Side p0, final int p1, final EntityPlayer p2, final World p3, final int p4, final int p5, final int p6);
-    
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+import net.minecraftforge.common.config.Configuration;
+
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.relauncher.Side;
+
+public interface IPlanetsModule {
+
+    void preInit(FMLPreInitializationEvent event);
+
+    void init(FMLInitializationEvent event);
+
+    void postInit(FMLPostInitializationEvent event);
+
+    void serverInit(FMLServerStartedEvent event);
+
+    void serverStarting(FMLServerStartingEvent event);
+
+    void getGuiIDs(List<Integer> idList);
+
+    Object getGuiElement(Side side, int ID, EntityPlayer player, World world, int x, int y, int z);
+
     Configuration getConfiguration();
-    
+
     void syncConfig();
 }

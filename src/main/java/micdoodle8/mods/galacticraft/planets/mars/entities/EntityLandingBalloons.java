@@ -1,218 +1,249 @@
 package micdoodle8.mods.galacticraft.planets.mars.entities;
 
-import micdoodle8.mods.galacticraft.core.entities.*;
-import micdoodle8.mods.galacticraft.api.entity.*;
-import net.minecraft.world.*;
-import net.minecraft.nbt.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.entity.*;
-import micdoodle8.mods.galacticraft.planets.mars.util.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import net.minecraft.client.particle.*;
-import cpw.mods.fml.relauncher.*;
-import java.util.*;
-import io.netty.buffer.*;
-import net.minecraft.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
 
-public class EntityLandingBalloons extends EntityLanderBase implements IIgnoreShift, ICameraZoomEntity
-{
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import micdoodle8.mods.galacticraft.api.entity.ICameraZoomEntity;
+import micdoodle8.mods.galacticraft.api.entity.IIgnoreShift;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+import micdoodle8.mods.galacticraft.core.entities.EntityLanderBase;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.mars.util.MarsUtil;
+
+public class EntityLandingBalloons extends EntityLanderBase implements IIgnoreShift, ICameraZoomEntity {
+
     private int groundHitCount;
     private float rotationPitchSpeed;
     private float rotationYawSpeed;
-    
-    public EntityLandingBalloons(final World world) {
-        super(world, 0.0f);
-        this.setSize(2.0f, 2.0f);
+
+    public EntityLandingBalloons(World world) {
+        super(world, 0F);
+        this.setSize(2.0F, 2.0F);
         this.rotationPitchSpeed = this.rand.nextFloat();
         this.rotationYawSpeed = this.rand.nextFloat();
     }
-    
-    public EntityLandingBalloons(final EntityPlayerMP player) {
-        super(player, 0.0f);
-        this.setSize(2.0f, 2.0f);
+
+    public EntityLandingBalloons(EntityPlayerMP player) {
+        super(player, 0F);
+        this.setSize(2.0F, 2.0F);
     }
-    
+
+    @Override
     public double getMountedYOffset() {
         return super.getMountedYOffset() - 0.9;
     }
-    
+
+    @Override
     public float getRotateOffset() {
-        return -20.0f;
+        // Signal no rotate
+        return -20.0F;
     }
-    
+
+    @Override
     public void onUpdate() {
         if (this.riddenByEntity != null) {
             this.riddenByEntity.onGround = false;
         }
+
         super.onUpdate();
+
         if (this.riddenByEntity != null) {
             this.riddenByEntity.onGround = false;
         }
+
         if (!this.onGround) {
             this.rotationPitch += this.rotationPitchSpeed;
             this.rotationYaw += this.rotationYawSpeed;
         }
     }
-    
-    protected void readEntityFromNBT(final NBTTagCompound nbt) {
+
+    @Override
+    protected void readEntityFromNBT(NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
         this.groundHitCount = nbt.getInteger("GroundHitCount");
     }
-    
-    protected void writeEntityToNBT(final NBTTagCompound nbt) {
+
+    @Override
+    protected void writeEntityToNBT(NBTTagCompound nbt) {
         super.writeEntityToNBT(nbt);
         nbt.setInteger("GroundHitCount", this.groundHitCount);
     }
-    
+
+    @Override
     public String getInventoryName() {
         return GCCoreUtil.translate("container.marsLander.name");
     }
-    
+
+    @Override
     public boolean hasCustomInventoryName() {
         return true;
     }
-    
-    public boolean interactFirst(final EntityPlayer var1) {
+
+    @Override
+    public boolean interactFirst(EntityPlayer var1) {
         if (this.worldObj.isRemote) {
             if (!this.onGround) {
                 return false;
             }
+
             if (this.riddenByEntity != null) {
-                this.riddenByEntity.mountEntity((Entity)this);
+                this.riddenByEntity.mountEntity(this);
             }
+
             return true;
         }
-        else {
-            if (this.riddenByEntity == null && this.groundHitCount >= 14 && var1 instanceof EntityPlayerMP) {
-                MarsUtil.openParachestInventory((EntityPlayerMP)var1, this);
-                return true;
-            }
-            if (!(var1 instanceof EntityPlayerMP)) {
-                return true;
-            }
+        if (this.riddenByEntity == null && this.onGround && var1 instanceof EntityPlayerMP) {
+            MarsUtil.openParachestInventory((EntityPlayerMP) var1, this);
+        } else if (var1 instanceof EntityPlayerMP) {
             if (!this.onGround) {
                 return false;
             }
-            var1.mountEntity((Entity)null);
-            return true;
+
+            var1.mountEntity(null);
         }
+        return true;
     }
-    
-    public boolean pressKey(final int key) {
-        return this.onGround && false;
+
+    @Override
+    public boolean pressKey(int key) {
+        return false;
     }
-    
+
+    @Override
     public boolean shouldMove() {
-        return this.ticks >= 40L && this.hasReceivedPacket && ((this.riddenByEntity != null && this.groundHitCount < 14) || !this.onGround);
+        if (this.ticks < 40 || !this.hasReceivedPacket) {
+            return false;
+        }
+
+        return this.riddenByEntity != null && this.groundHitCount < 14 || !this.onGround;
     }
-    
+
+    @Override
     public boolean shouldSpawnParticles() {
         return false;
     }
-    
+
+    @Override
     public Map<Vector3, Vector3> getParticleMap() {
         return null;
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public EntityFX getParticle(final Random rand, final double x, final double y, final double z, final double motX, final double motY, final double motZ) {
+    @Override
+    public EntityFX getParticle(Random rand, double x, double y, double z, double motX, double motY, double motZ) {
         return null;
     }
-    
+
+    @Override
     public void tickInAir() {
         if (this.worldObj.isRemote) {
             if (this.groundHitCount == 0) {
-                this.motionY = -this.posY / 50.0;
-            }
-            else if (this.groundHitCount < 14 || this.shouldMove()) {
-                this.motionY *= 0.95;
-                this.motionY -= 0.08;
-            }
-            else if (!this.shouldMove()) {
-                final float n = 0.0f;
-                this.rotationYawSpeed = n;
-                this.rotationPitchSpeed = n;
-                final double motionY = n;
-                this.motionZ = motionY;
-                this.motionX = motionY;
-                this.motionY = motionY;
+                this.motionY = -this.posY / 50.0D;
+            } else if (this.groundHitCount < 14 || this.shouldMove()) {
+                this.motionY *= 0.95D;
+                this.motionY -= 0.08D;
+            } else if (!this.shouldMove()) {
+                this.motionY = this.motionX = this.motionZ = this.rotationPitchSpeed = this.rotationYawSpeed = 0.0F;
             }
         }
     }
-    
-    public void tickOnGround() {
-    }
-    
-    public void onGroundHit() {
-    }
-    
+
+    @Override
+    public void tickOnGround() {}
+
+    @Override
+    public void onGroundHit() {}
+
+    @Override
     public Vector3 getMotionVec() {
         if (this.onGround && this.groundHitCount < 14) {
-            ++this.groundHitCount;
-            final double mag = 1.0 / this.groundHitCount * 4.0;
+            this.groundHitCount++;
+            final double mag = 1.0D / this.groundHitCount * 4.0D;
             double mX = this.rand.nextDouble() - 0.5;
-            double mY = 1.0;
+            double mY = 1.0D;
             double mZ = this.rand.nextDouble() - 0.5;
-            mX *= mag / 3.0;
+            mX *= mag / 3.0D;
             mY *= mag;
-            mZ *= mag / 3.0;
+            mZ *= mag / 3.0D;
             return new Vector3(mX, mY, mZ);
         }
-        if (this.ticks >= 40L && this.ticks < 45L) {
+
+        if (this.ticks >= 40 && this.ticks < 45) {
             this.motionY = this.getInitialMotionY();
         }
+
         if (!this.shouldMove()) {
-            return new Vector3(0.0, 0.0, 0.0);
+            return new Vector3(0, 0, 0);
         }
-        return new Vector3(this.motionX, (this.ticks < 40L) ? 0.0 : this.motionY, this.motionZ);
+
+        return new Vector3(this.motionX, this.ticks < 40 ? 0 : this.motionY, this.motionZ);
     }
-    
+
+    @Override
     public ArrayList<Object> getNetworkedData() {
-        final ArrayList<Object> objList = new ArrayList<Object>();
-        objList.addAll(super.getNetworkedData());
-        if ((this.worldObj.isRemote && this.hasReceivedPacket && this.groundHitCount <= 14) || (!this.worldObj.isRemote && this.groundHitCount == 14)) {
+        final ArrayList<Object> objList = new ArrayList<>(super.getNetworkedData());
+        if (this.worldObj.isRemote && this.hasReceivedPacket && this.groundHitCount <= 14
+                || !this.worldObj.isRemote && this.groundHitCount == 14) {
             objList.add(this.groundHitCount);
         }
         return objList;
     }
-    
+
+    @Override
     public int getPacketTickSpacing() {
         return 5;
     }
-    
+
+    @Override
     public double getPacketSendDistance() {
-        return 50.0;
+        return 50.0D;
     }
-    
-    public void readNetworkedData(final ByteBuf buffer) {
+
+    @Override
+    public void readNetworkedData(ByteBuf buffer) {
         try {
             super.readNetworkedData(buffer);
+
             if (buffer.readableBytes() > 0) {
                 this.groundHitCount = buffer.readInt();
             }
-        }
-        catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
-    
-    public boolean allowDamageSource(final DamageSource damageSource) {
+
+    @Override
+    public boolean allowDamageSource(DamageSource damageSource) {
         return this.groundHitCount > 0 && super.allowDamageSource(damageSource);
     }
-    
+
+    @Override
     public double getInitialMotionY() {
-        return 0.0;
+        return 0;
     }
-    
+
+    @Override
     public float getCameraZoom() {
-        return 15.0f;
+        return 15.0F;
     }
-    
+
+    @Override
     public boolean defaultThirdPerson() {
         return true;
     }
-    
+
+    @Override
     public boolean shouldIgnoreShiftExit() {
         return this.groundHitCount < 14 || !this.onGround;
     }

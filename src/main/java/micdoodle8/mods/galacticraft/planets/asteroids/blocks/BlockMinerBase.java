@@ -1,79 +1,95 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.blocks;
 
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.material.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.client.renderer.texture.*;
-import cpw.mods.fml.relauncher.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.util.*;
-import java.util.*;
-import net.minecraft.item.*;
-import net.minecraft.world.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.tile.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.Random;
 
-public class BlockMinerBase extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc
-{
-    public BlockMinerBase(final String assetName) {
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.blocks.BlockTileGC;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import micdoodle8.mods.galacticraft.planets.asteroids.tile.TileEntityMinerBaseSingle;
+
+public class BlockMinerBase extends BlockTileGC implements ItemBlockDesc.IBlockShiftDesc {
+
+    public BlockMinerBase(String assetName) {
         super(Material.rock);
-        this.blockHardness = 3.0f;
+        this.blockHardness = 3.0F;
         this.setBlockName(assetName);
-        this.setBlockTextureName("galacticraftasteroids:machineframe");
+        this.setBlockTextureName(AsteroidsModule.TEXTURE_PREFIX + "machineframe");
         this.setCreativeTab(CreativeTabs.tabBlock);
-        this.setStepSound(BlockMinerBase.soundTypeMetal);
+        this.setStepSound(soundTypeMetal);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
-        this.blockIcon = par1IconRegister.registerIcon("galacticraftasteroids:machineframe");
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
+        this.blockIcon = par1IconRegister.registerIcon(AsteroidsModule.TEXTURE_PREFIX + "machineframe");
     }
-    
+
     @SideOnly(Side.CLIENT)
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(final int side, final int meta) {
+    @Override
+    public IIcon getIcon(int side, int meta) {
         return this.blockIcon;
     }
-    
-    public Item getItemDropped(final int meta, final Random random, final int par3) {
+
+    @Override
+    public Item getItemDropped(int meta, Random random, int par3) {
         return super.getItemDropped(0, random, par3);
     }
-    
-    public int damageDropped(final int meta) {
+
+    @Override
+    public int damageDropped(int meta) {
         return 0;
     }
-    
-    public int quantityDropped(final int meta, final int fortune, final Random random) {
+
+    @Override
+    public int quantityDropped(int meta, int fortune, Random random) {
         return 1;
     }
-    
+
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
-    
-    public TileEntity createTileEntity(final World world, final int metadata) {
+
+    @Override
+    public TileEntity createTileEntity(World world, int metadata) {
         return new TileEntityMinerBaseSingle();
     }
-    
-    public int onBlockPlaced(final World world, final int x, final int y, final int z, final int side, final float hitX, final float hitY, final float hitZ, final int meta) {
+
+    @Override
+    public int onBlockPlaced(World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int meta) {
         return 0;
     }
-    
-    public boolean canPlaceBlockOnSide(final World world, final int x, final int y, final int z, final int side) {
+
+    @Override
+    public boolean canPlaceBlockOnSide(World world, int x, int y, int z, int side) {
         return true;
     }
-    
-    public String getShiftDescription(final int meta) {
+
+    @Override
+    public String getShiftDescription(int meta) {
         return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-    
-    public boolean showDescription(final int meta) {
+
+    @Override
+    public boolean showDescription(int meta) {
         return true;
     }
 }

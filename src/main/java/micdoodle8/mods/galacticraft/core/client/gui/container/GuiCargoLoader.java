@@ -1,103 +1,170 @@
 package micdoodle8.mods.galacticraft.core.client.gui.container;
 
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.client.gui.*;
-import micdoodle8.mods.galacticraft.core.client.gui.element.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.inventory.*;
-import net.minecraft.inventory.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.core.*;
-import micdoodle8.mods.galacticraft.core.network.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import org.lwjgl.opengl.*;
-import micdoodle8.mods.galacticraft.core.energy.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class GuiCargoLoader extends GuiContainerGC
-{
-    public static final ResourceLocation loaderTexture;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.client.gui.element.GuiElementInfoRegion;
+import micdoodle8.mods.galacticraft.core.energy.EnergyDisplayHelper;
+import micdoodle8.mods.galacticraft.core.inventory.ContainerCargoLoader;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityCargoLoader;
+import micdoodle8.mods.galacticraft.core.util.EnumColor;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class GuiCargoLoader extends GuiContainerGC {
+
+    public static final ResourceLocation loaderTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/gui/cargo_loader.png");
+
     private final TileEntityCargoLoader cargoLoader;
+
     private GuiButton buttonLoadItems;
-    private GuiElementInfoRegion electricInfoRegion;
-    
-    public GuiCargoLoader(final InventoryPlayer par1InventoryPlayer, final TileEntityCargoLoader par2TileEntityAirDistributor) {
-        super(new ContainerCargoLoader(par1InventoryPlayer, (IInventory)par2TileEntityAirDistributor));
-        this.electricInfoRegion = new GuiElementInfoRegion((this.width - this.xSize) / 2 + 107, (this.height - this.ySize) / 2 + 101, 56, 9, new ArrayList<String>(), this.width, this.height, this);
+    private final GuiElementInfoRegion electricInfoRegion = new GuiElementInfoRegion(
+            (this.width - this.xSize) / 2 + 107,
+            (this.height - this.ySize) / 2 + 101,
+            56,
+            9,
+            new ArrayList<String>(),
+            this.width,
+            this.height,
+            this);
+
+    public GuiCargoLoader(InventoryPlayer par1InventoryPlayer, TileEntityCargoLoader par2TileEntityAirDistributor) {
+        super(new ContainerCargoLoader(par1InventoryPlayer, par2TileEntityAirDistributor));
         this.cargoLoader = par2TileEntityAirDistributor;
         this.ySize = 201;
     }
-    
-    protected void actionPerformed(final GuiButton par1GuiButton) {
+
+    @Override
+    protected void actionPerformed(GuiButton par1GuiButton) {
         switch (par1GuiButton.id) {
-            case 0: {
-                GalacticraftCore.packetPipeline.sendToServer(new PacketSimple(PacketSimple.EnumSimplePacket.S_UPDATE_DISABLEABLE_BUTTON, new Object[] { this.cargoLoader.xCoord, this.cargoLoader.yCoord, this.cargoLoader.zCoord, 0 }));
+            case 0:
+                GalacticraftCore.packetPipeline.sendToServer(
+                        new PacketSimple(
+                                EnumSimplePacket.S_UPDATE_DISABLEABLE_BUTTON,
+                                new Object[] { this.cargoLoader.xCoord, this.cargoLoader.yCoord,
+                                        this.cargoLoader.zCoord, 0 }));
                 break;
-            }
         }
     }
-    
+
+    @Override
     public void initGui() {
         super.initGui();
-        final List<String> electricityDesc = new ArrayList<String>();
+        final List<String> electricityDesc = new ArrayList<>();
         electricityDesc.add(GCCoreUtil.translate("gui.energyStorage.desc.0"));
-        electricityDesc.add(EnumColor.YELLOW + GCCoreUtil.translate("gui.energyStorage.desc.1") + (int)Math.floor(this.cargoLoader.getEnergyStoredGC()) + " / " + (int)Math.floor(this.cargoLoader.getMaxEnergyStoredGC()));
+        electricityDesc.add(
+                EnumColor.YELLOW + GCCoreUtil.translate("gui.energyStorage.desc.1")
+                        + ((int) Math.floor(this.cargoLoader.getEnergyStoredGC()) + " / "
+                                + (int) Math.floor(this.cargoLoader.getMaxEnergyStoredGC())));
         this.electricInfoRegion.tooltipStrings = electricityDesc;
         this.electricInfoRegion.xPosition = (this.width - this.xSize) / 2 + 107;
         this.electricInfoRegion.yPosition = (this.height - this.ySize) / 2 + 101;
         this.electricInfoRegion.parentWidth = this.width;
         this.electricInfoRegion.parentHeight = this.height;
         this.infoRegions.add(this.electricInfoRegion);
-        final List<String> batterySlotDesc = new ArrayList<String>();
+        final List<String> batterySlotDesc = new ArrayList<>();
         batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.0"));
         batterySlotDesc.add(GCCoreUtil.translate("gui.batterySlot.desc.1"));
-        this.infoRegions.add(new GuiElementInfoRegion((this.width - this.xSize) / 2 + 9, (this.height - this.ySize) / 2 + 26, 18, 18, batterySlotDesc, this.width, this.height, this));
-        this.buttonList.add(this.buttonLoadItems = new GuiButton(0, this.width / 2 - 1, this.height / 2 - 23, 76, 20, GCCoreUtil.translate("gui.button.loaditems.name")));
+        this.infoRegions.add(
+                new GuiElementInfoRegion(
+                        (this.width - this.xSize) / 2 + 9,
+                        (this.height - this.ySize) / 2 + 26,
+                        18,
+                        18,
+                        batterySlotDesc,
+                        this.width,
+                        this.height,
+                        this));
+        this.buttonList.add(
+                this.buttonLoadItems = new GuiButton(
+                        0,
+                        this.width / 2 - 1,
+                        this.height / 2 - 23,
+                        76,
+                        20,
+                        GCCoreUtil.translate("gui.button.loaditems.name")));
     }
-    
-    protected void drawGuiContainerForegroundLayer(final int par1, final int par2) {
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(int par1, int par2) {
         final int offsetX = -17;
         final int offsetY = 45;
         this.fontRendererObj.drawString(this.cargoLoader.getInventoryName(), 60, 12, 4210752);
-        this.buttonLoadItems.enabled = (this.cargoLoader.disableCooldown == 0);
-        this.buttonLoadItems.displayString = (this.cargoLoader.getDisabled(0) ? GCCoreUtil.translate("gui.button.loaditems.name") : GCCoreUtil.translate("gui.button.stoploading.name"));
-        this.fontRendererObj.drawString(GCCoreUtil.translate("gui.message.status.name") + ": " + this.getStatus(), 28 + offsetX, 22 + offsetY, 4210752);
+        this.buttonLoadItems.enabled = this.cargoLoader.disableCooldown == 0;
+        this.buttonLoadItems.displayString = !this.cargoLoader.getDisabled(0)
+                ? GCCoreUtil.translate("gui.button.stoploading.name")
+                : GCCoreUtil.translate("gui.button.loaditems.name");
+        this.fontRendererObj.drawString(
+                GCCoreUtil.translate("gui.message.status.name") + ": " + this.getStatus(),
+                28 + offsetX,
+                45 + 23 - 46 + offsetY,
+                4210752);
+        // this.fontRendererObj.drawString("" +
+        // this.cargoLoader.storage.getMaxExtract(), 28 + offsetX, 56 + 23 - 46 +
+        // offsetY, 4210752);
         this.fontRendererObj.drawString(GCCoreUtil.translate("container.inventory"), 8, this.ySize - 90, 4210752);
     }
-    
+
     private String getStatus() {
         if (this.cargoLoader.outOfItems) {
             return EnumColor.DARK_RED + GCCoreUtil.translate("gui.status.noitems.name");
         }
+
         if (this.cargoLoader.noTarget) {
             return EnumColor.DARK_RED + GCCoreUtil.translate("gui.status.notargetload.name");
         }
+
         if (this.cargoLoader.targetNoInventory) {
             return EnumColor.DARK_RED + GCCoreUtil.translate("gui.status.noinvtarget.name");
         }
+
         if (this.cargoLoader.targetFull) {
             return EnumColor.DARK_RED + GCCoreUtil.translate("gui.status.targetfull.name");
         }
+
         return this.cargoLoader.getGUIstatus();
     }
-    
-    protected void drawGuiContainerBackgroundLayer(final float var1, final int var2, final int var3) {
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(GuiCargoLoader.loaderTexture);
-        final int var4 = (this.width - this.xSize) / 2;
-        final int var5 = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(var4, var5 + 5, 0, 0, this.xSize, this.ySize);
-        final List<String> electricityDesc = new ArrayList<String>();
+        final int var5 = (this.width - this.xSize) / 2;
+        final int var6 = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(var5, var6 + 5, 0, 0, this.xSize, this.ySize);
+
+        final List<String> electricityDesc = new ArrayList<>();
         electricityDesc.add(GCCoreUtil.translate("gui.energyStorage.desc.0"));
-        EnergyDisplayHelper.getEnergyDisplayTooltip(this.cargoLoader.getEnergyStoredGC(), this.cargoLoader.getMaxEnergyStoredGC(), electricityDesc);
+        EnergyDisplayHelper.getEnergyDisplayTooltip(
+                this.cargoLoader.getEnergyStoredGC(),
+                this.cargoLoader.getMaxEnergyStoredGC(),
+                electricityDesc);
+        // electricityDesc.add(EnumColor.YELLOW +
+        // GCCoreUtil.translate("gui.energyStorage.desc.1") + ((int)
+        // Math.floor(this.cargoLoader.getEnergyStoredGC()) + " / " + (int)
+        // Math.floor(this.cargoLoader.getMaxEnergyStoredGC())));
         this.electricInfoRegion.tooltipStrings = electricityDesc;
-        if (this.cargoLoader.getEnergyStoredGC() > 0.0f) {
-            this.drawTexturedModalRect(var4 + 94, var5 + 101, 176, 0, 11, 10);
+
+        if (this.cargoLoader.getEnergyStoredGC() > 0) {
+            this.drawTexturedModalRect(var5 + 94, var6 + 101, 176, 0, 11, 10);
         }
-        this.drawTexturedModalRect(var4 + 108, var5 + 102, 187, 0, Math.min(this.cargoLoader.getScaledElecticalLevel(54), 54), 7);
-    }
-    
-    static {
-        loaderTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/gui/cargo_loader.png");
+
+        this.drawTexturedModalRect(
+                var5 + 108,
+                var6 + 102,
+                187,
+                0,
+                Math.min(this.cargoLoader.getScaledElecticalLevel(54), 54),
+                7);
     }
 }

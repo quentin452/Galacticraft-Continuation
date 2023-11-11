@@ -1,34 +1,63 @@
 package micdoodle8.mods.galacticraft.core.command;
 
-import net.minecraft.command.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.util.*;
-import net.minecraft.entity.player.*;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
 
-public class CommandGCHelp extends CommandBase
-{
-    public String getCommandUsage(final ICommandSender var1) {
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
+
+public class CommandGCHelp extends CommandBase {
+
+    @Override
+    public String getCommandUsage(ICommandSender var1) {
         return "/" + this.getCommandName();
     }
-    
+
+    @Override
     public int getRequiredPermissionLevel() {
         return 0;
     }
-    
-    public boolean canCommandSenderUseCommand(final ICommandSender par1ICommandSender) {
+
+    @Override
+    public boolean canCommandSenderUseCommand(ICommandSender par1ICommandSender) {
         return true;
     }
-    
+
+    @Override
     public String getCommandName() {
         return "gchelp";
     }
-    
-    public void processCommand(final ICommandSender icommandsender, final String[] astring) {
-        final EntityPlayerMP playerBase = PlayerUtil.getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
+
+    @Override
+    public void processCommand(ICommandSender icommandsender, String[] astring) {
+        final EntityPlayerMP playerBase = PlayerUtil
+                .getPlayerBaseServerFromPlayerUsername(icommandsender.getCommandSenderName(), true);
         if (playerBase == null) {
             return;
         }
-        playerBase.addChatMessage(IChatComponent.Serializer.func_150699_a("[{\"text\":\"" + GCCoreUtil.translate("gui.message.help1") + ": \",\"color\":\"white\"},{\"text\":\" " + EnumColor.BRIGHT_GREEN + "wiki." + GalacticraftCore.PREFIX + "com/wiki\",\"color\":\"green\",\"hoverEvent\":{\"action\":\"show_text\",\"value\":{\"text\":\"" + GCCoreUtil.translate("gui.message.clicklink") + "\",\"color\":\"yellow\"}},\"clickEvent\":{\"action\":\"open_url\",\"value\":\"http://wiki." + GalacticraftCore.PREFIX + "com/wiki\"}}]"));
+        playerBase.addChatMessage(
+                new ChatComponentTranslation("gui.message.help1")
+                        .setChatStyle(new ChatStyle().setColor(EnumChatFormatting.WHITE)).appendSibling(
+                                new ChatComponentText(" wiki." + GalacticraftCore.PREFIX + "com/wiki/Galacticraft")
+                                        .setChatStyle(
+                                                new ChatStyle().setColor(EnumChatFormatting.GREEN).setChatHoverEvent(
+                                                        new HoverEvent(
+                                                                HoverEvent.Action.SHOW_TEXT,
+                                                                new ChatComponentTranslation("gui.message.clicklink")
+                                                                        .setChatStyle(
+                                                                                new ChatStyle().setColor(
+                                                                                        EnumChatFormatting.YELLOW))))
+                                                        .setChatClickEvent(
+                                                                new ClickEvent(
+                                                                        ClickEvent.Action.OPEN_URL,
+                                                                        "https://wiki." + GalacticraftCore.PREFIX
+                                                                                + "com/wiki/Galacticraft")))));
     }
 }

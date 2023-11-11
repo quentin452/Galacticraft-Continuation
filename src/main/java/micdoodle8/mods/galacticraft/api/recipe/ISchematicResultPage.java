@@ -1,6 +1,12 @@
 package micdoodle8.mods.galacticraft.api.recipe;
 
-public interface ISchematicResultPage
-{
-    void setPageIndex(final int p0);
+/**
+ * Implement into GUI classes for the unlocked pages
+ */
+public interface ISchematicResultPage {
+
+    /**
+     * Sets the integer index in the set of pages the player has unlocked
+     */
+    void setPageIndex(int index);
 }

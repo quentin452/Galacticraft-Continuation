@@ -1,49 +1,58 @@
 package micdoodle8.mods.galacticraft.core.world.gen.dungeon;
 
-import net.minecraft.world.*;
-import net.minecraftforge.common.util.*;
-import net.minecraft.block.*;
-import java.util.*;
+import java.util.Random;
 
-public abstract class DungeonRoom
-{
+import net.minecraft.block.Block;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+public abstract class DungeonRoom {
+
     public final MapGenDungeon dungeonInstance;
     public World worldObj;
+
+    // Min Corner, Lower, Left, Back
     public int posX;
     public int posY;
     public int posZ;
+
+    // East = 0, North = 1, South = 2, West = 3, Up = 4, Down = 5.
+    // North is z++, East is x++.
     public ForgeDirection entranceDir;
-    
-    public DungeonRoom(final MapGenDungeon dungeon, final int posX, final int posY, final int posZ, final ForgeDirection entranceDir) {
+
+    public DungeonRoom(MapGenDungeon dungeon, int posX, int posY, int posZ, ForgeDirection entranceDir) {
         this.dungeonInstance = dungeon;
-        this.worldObj = ((dungeon != null) ? dungeon.worldObj : null);
+        this.worldObj = dungeon != null ? dungeon.worldObj : null;
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
         this.entranceDir = entranceDir;
     }
-    
-    public abstract void generate(final Block[] p0, final byte[] p1, final int p2, final int p3);
-    
+
+    public abstract void generate(Block[] chunk, byte[] meta, int cx, int cz);
+
     public abstract DungeonBoundingBox getBoundingBox();
-    
-    protected abstract DungeonRoom makeRoom(final MapGenDungeon p0, final int p1, final int p2, final int p3, final ForgeDirection p4);
-    
-    protected abstract void handleTileEntities(final Random p0);
-    
-    public static DungeonRoom makeRoom(final MapGenDungeon dungeon, final Random rand, final int x, final int y, final int z, final ForgeDirection dir) {
+
+    protected abstract DungeonRoom makeRoom(MapGenDungeon dungeon, int x, int y, int z, ForgeDirection dir);
+
+    protected abstract void handleTileEntities(Random rand);
+
+    public static DungeonRoom makeRoom(MapGenDungeon dungeon, Random rand, int x, int y, int z, ForgeDirection dir) {
         return dungeon.otherRooms.get(rand.nextInt(dungeon.otherRooms.size())).makeRoom(dungeon, x, y, z, dir);
     }
-    
-    public static DungeonRoom makeBossRoom(final MapGenDungeon dungeon, final Random rand, final int x, final int y, final int z, final ForgeDirection dir) {
+
+    public static DungeonRoom makeBossRoom(MapGenDungeon dungeon, Random rand, int x, int y, int z,
+            ForgeDirection dir) {
         return dungeon.bossRooms.get(rand.nextInt(dungeon.bossRooms.size())).makeRoom(dungeon, x, y, z, dir);
     }
-    
-    public static DungeonRoom makeTreasureRoom(final MapGenDungeon dungeon, final Random rand, final int x, final int y, final int z, final ForgeDirection dir) {
+
+    public static DungeonRoom makeTreasureRoom(MapGenDungeon dungeon, Random rand, int x, int y, int z,
+            ForgeDirection dir) {
         return dungeon.treasureRooms.get(rand.nextInt(dungeon.treasureRooms.size())).makeRoom(dungeon, x, y, z, dir);
     }
-    
-    protected boolean placeBlock(final Block[] blocks, final byte[] metas, int x, final int y, int z, int cx, int cz, final Block id, final int meta) {
+
+    protected boolean placeBlock(Block[] blocks, byte[] metas, int x, int y, int z, int cx, int cz, Block id,
+            int meta) {
         if (MapGenDungeon.useArrays) {
             cx *= 16;
             cz *= 16;
@@ -54,15 +63,14 @@ public abstract class DungeonRoom
             }
             final int index = this.getIndex(x, y, z);
             blocks[index] = id;
-            metas[index] = (byte)meta;
-        }
-        else {
+            metas[index] = (byte) meta;
+        } else {
             this.worldObj.setBlock(x, y, z, id, meta, 0);
         }
         return true;
     }
-    
-    private int getIndex(final int x, final int y, final int z) {
+
+    private int getIndex(int x, int y, int z) {
         return (x * 16 + z) * 256 + y;
     }
 }

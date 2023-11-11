@@ -1,37 +1,50 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.api.block.*;
-import net.minecraft.block.material.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.client.renderer.texture.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.*;
-import java.util.*;
-import net.minecraft.item.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.util.*;
+import java.util.List;
+import java.util.Random;
 
-public class BlockBasic extends Block implements IDetectableResource
-{
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+
+/**
+ * Metadata: 3 = Tin Decoration Block 1 4 = Tin Decoration Block 2 5 = Copper Ore 6 = Tin Ore 7 = Aluminium Ore 8 =
+ * Silicon Ore 9 = Copper Block 10 = Tin Block 11 = Aluminium Block 12 = Meteoric Iron Block
+ */
+public class BlockBasic extends Block implements IDetectableResource {
+
     IIcon[] iconBuffer;
 
-    protected BlockBasic(final String assetName) {
+    protected BlockBasic(String assetName) {
         super(Material.rock);
-        this.setHardness(1.0f);
-        this.blockResistance = 15.0f;
+        this.setHardness(1.0F);
+        this.blockResistance = 15F;
         this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
         this.setBlockName(assetName);
     }
 
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
 
-    public void registerBlockIcons(final IIconRegister iconRegister) {
-        (this.iconBuffer = new IIcon[12])[0] = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "deco_aluminium_2");
+    @Override
+    public void registerBlockIcons(IIconRegister iconRegister) {
+        this.iconBuffer = new IIcon[12];
+        this.iconBuffer[0] = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "deco_aluminium_2");
         this.iconBuffer[1] = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "deco_aluminium_4");
         this.iconBuffer[2] = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "deco_aluminium_1");
         this.iconBuffer[3] = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "deco_aluminium_4");
@@ -45,127 +58,123 @@ public class BlockBasic extends Block implements IDetectableResource
         this.iconBuffer[11] = iconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "deco_meteoriron_block");
     }
 
-    public IIcon getIcon(final int side, final int meta) {
-        switch (meta) {
-            case 3: {
-                switch (side) {
-                    case 0: {
-                        return this.iconBuffer[1];
-                    }
-                    case 1: {
-                        return this.iconBuffer[0];
-                    }
-                    default: {
-                        return this.iconBuffer[2];
-                    }
-                }
-            }
-            case 4: {
-                return this.iconBuffer[3];
-            }
-            case 5: {
-                return this.iconBuffer[4];
-            }
-            case 6: {
-                return this.iconBuffer[5];
-            }
-            case 7: {
-                return this.iconBuffer[6];
-            }
-            case 8: {
-                return this.iconBuffer[7];
-            }
-            case 9: {
-                return this.iconBuffer[8];
-            }
-            case 10: {
-                return this.iconBuffer[9];
-            }
-            case 11: {
-                return this.iconBuffer[10];
-            }
-            case 12: {
-                return this.iconBuffer[11];
-            }
-            default: {
-                return (meta < this.iconBuffer.length) ? this.iconBuffer[meta] : this.iconBuffer[0];
-            }
+    @Override
+    public IIcon getIcon(int side, int meta) {
+        return switch (meta) {
+            case 3 -> switch (side) {
+                    case 0 -> this.iconBuffer[1];
+                    case 1 -> this.iconBuffer[0];
+                    default -> this.iconBuffer[2];
+                };
+            case 4 -> this.iconBuffer[3];
+            case 5 -> this.iconBuffer[4];
+            case 6 -> this.iconBuffer[5];
+            case 7 -> this.iconBuffer[6];
+            case 8 -> this.iconBuffer[7];
+            case 9 -> this.iconBuffer[8];
+            case 10 -> this.iconBuffer[9];
+            case 11 -> this.iconBuffer[10];
+            case 12 -> this.iconBuffer[11];
+            default -> meta < this.iconBuffer.length ? this.iconBuffer[meta] : this.iconBuffer[0];
+        };
+    }
+
+    @Override
+    public Item getItemDropped(int meta, Random random, int par3) {
+        return switch (meta) {
+            case 8 -> GCItems.basicItem;
+            default -> Item.getItemFromBlock(this);
+        };
+    }
+
+    @Override
+    public int damageDropped(int meta) {
+        return switch (meta) {
+            case 8 -> 2;
+            default -> meta;
+        };
+    }
+
+    @Override
+    public int getDamageValue(World worldIn, int x, int y, int z) {
+        return worldIn.getBlockMetadata(x, y, z);
+    }
+
+    @Override
+    public int quantityDropped(int meta, int fortune, Random random) {
+        if (fortune <= 0 || Item.getItemFromBlock(this) == this.getItemDropped(meta, random, fortune)) {
+            return this.quantityDropped(random);
         }
-    }
+        int j = random.nextInt(fortune + 2) - 1;
 
-    public Item getItemDropped(final int meta, final Random random, final int par3) {
-        if (meta == 8) {
-            return GCItems.basicItem;
+        if (j < 0) {
+            j = 0;
         }
-        return Item.getItemFromBlock((Block) this);
+
+        return this.quantityDropped(random) * (j + 1);
     }
 
-    public int damageDropped(final int meta) {
-        if (meta == 8) {
-            return 2;
-        }
-        return meta;
-    }
-
-    public int getDamageValue(final World p_149643_1_, final int p_149643_2_, final int p_149643_3_, final int p_149643_4_) {
-        return p_149643_1_.getBlockMetadata(p_149643_2_, p_149643_3_, p_149643_4_);
-    }
-
-    public int quantityDropped(final int meta, final int fortune, final Random random) {
-        if (fortune > 0 && Item.getItemFromBlock((Block)this) != this.getItemDropped(meta, random, fortune)) {
-            int j = random.nextInt(fortune + 2) - 1;
-            if (j < 0) {
-                j = 0;
-            }
-            return this.quantityDropped(random) * (j + 1);
-        }
-        return this.quantityDropped(random);
-    }
-
-    public float getExplosionResistance(final Entity par1Entity, final World world, final int x, final int y, final int z, final double explosionX, final double explosionY, final double explosionZ) {
+    @Override
+    public float getExplosionResistance(Entity par1Entity, World world, int x, int y, int z, double explosionX,
+            double explosionY, double explosionZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
+
         if (metadata < 5) {
-            return 2.0f;
+            return 2.0F;
+            // Decoration blocks are soft, like cauldrons or wood
         }
         if (metadata == 12) {
-            return 8.0f;
+            return 8.0F;
+            // Meteoric Iron is tougher than diamond
         }
         if (metadata > 8) {
-            return 6.0f;
+            return 6.0F;
+            // Blocks of metal are tough - like diamond blocks in vanilla
         }
-        return this.blockResistance / 5.0f;
+
+        return this.blockResistance / 5.0F;
     }
 
-    public float getBlockHardness(final World par1World, final int par2, final int par3, final int par4) {
+    @Override
+    public float getBlockHardness(World par1World, int par2, int par3, int par4) {
         final int meta = par1World.getBlockMetadata(par2, par3, par4);
-        if (meta == 5 || meta == 6) {
-            return 5.0f;
+
+        switch (meta) {
+            case 5:
+            case 6:
+                return 5.0F;
+            case 7:
+                return 6.0F;
+            case 8:
+                return 3.0F;
+            default:
+                break;
         }
-        if (meta == 7) {
-            return 6.0f;
-        }
-        if (meta == 8) {
-            return 3.0f;
-        }
+
         return this.blockHardness;
     }
 
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+    @Override
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
         for (int var4 = 3; var4 < 13; ++var4) {
             par3List.add(new ItemStack(par1, 1, var4));
         }
     }
 
-    public boolean isValueable(final int metadata) {
+    @Override
+    public boolean isValueable(int metadata) {
         return metadata >= 5 && metadata <= 8;
     }
 
-    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+    @SuppressWarnings("deprecation")
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         final int metadata = world.getBlockMetadata(x, y, z);
         if (metadata == 8) {
             return new ItemStack(Item.getItemFromBlock(this), 1, metadata);
         }
+
         return super.getPickBlock(target, world, x, y, z);
     }
 }

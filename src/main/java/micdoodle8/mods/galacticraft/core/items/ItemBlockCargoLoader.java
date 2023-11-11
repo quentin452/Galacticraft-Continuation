@@ -1,28 +1,31 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import net.minecraft.block.*;
-import net.minecraft.item.*;
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
 
-public class ItemBlockCargoLoader extends ItemBlockDesc
-{
-    public ItemBlockCargoLoader(final Block block) {
+public class ItemBlockCargoLoader extends ItemBlockDesc {
+
+    public ItemBlockCargoLoader(Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-    
-    public String getUnlocalizedName(final ItemStack par1ItemStack) {
+
+    @Override
+    public String getUnlocalizedName(ItemStack par1ItemStack) {
         String name = "";
+
         if (par1ItemStack.getItemDamage() < 4) {
             name = "loader";
-        }
-        else {
+        } else {
             name = "unloader";
         }
+
         return this.field_150939_a.getUnlocalizedName() + "." + name;
     }
-    
-    public int getMetadata(final int damage) {
+
+    @Override
+    public int getMetadata(int damage) {
         return damage;
     }
 }

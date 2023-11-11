@@ -1,10 +1,13 @@
 package micdoodle8.mods.galacticraft.api.item;
 
-import net.minecraft.item.*;
+import net.minecraft.item.ItemStack;
 
-public interface IItemOxygenSupply
-{
-    float discharge(final ItemStack p0, final float p1);
-    
-    int getOxygenStored(final ItemStack p0);
+public interface IItemOxygenSupply {
+
+    /*
+     * Returns the amount of gas that this oxygen item is able to supply
+     */
+    float discharge(ItemStack itemStack, float amount);
+
+    int getOxygenStored(ItemStack theItem);
 }

@@ -1,157 +1,199 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.material.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.world.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.inventory.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.entity.item.*;
-import net.minecraft.nbt.*;
-import net.minecraft.entity.*;
-import net.minecraftforge.common.util.*;
-import net.minecraft.entity.passive.*;
-import net.minecraft.util.*;
-import java.util.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.client.renderer.texture.*;
-import cpw.mods.fml.relauncher.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import java.util.Iterator;
+import java.util.Random;
 
-public class BlockParaChest extends BlockContainer implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc
-{
-    private final Random random;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.passive.EntityOcelot;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
-    protected BlockParaChest(final String assetName) {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityParaChest;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class BlockParaChest extends BlockContainer implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
+
+    private final Random random = new Random();
+
+    protected BlockParaChest(String assetName) {
         super(Material.wood);
-        this.random = new Random();
-        this.setHardness(3.0f);
+        this.setHardness(3.0F);
         this.setStepSound(Block.soundTypeWood);
-        this.setBlockBounds(0.0625f, 0.0f, 0.0625f, 0.9375f, 0.875f, 0.9375f);
+        this.setBlockBounds(0.0625F, 0.0F, 0.0625F, 0.9375F, 0.875F, 0.9375F);
         this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
         this.setBlockName(assetName);
     }
 
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
 
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
 
+    @Override
     public boolean renderAsNormalBlock() {
         return false;
     }
 
+    @Override
     public int getRenderType() {
-        return GalacticraftCore.proxy.getBlockRender((Block)this);
+        return GalacticraftCore.proxy.getBlockRender(this);
     }
 
-    public void onBlockAdded(final World par1World, final int par2, final int par3, final int par4) {
+    @Override
+    public void onBlockAdded(World par1World, int par2, int par3, int par4) {
         super.onBlockAdded(par1World, par2, par3, par4);
     }
 
-    public boolean onBlockActivated(final World par1World, final int par2, final int par3, final int par4, final EntityPlayer par5EntityPlayer, final int par6, final float par7, final float par8, final float par9) {
+    @Override
+    public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer,
+            int par6, float par7, float par8, float par9) {
         if (par1World.isRemote) {
             return true;
         }
         final IInventory iinventory = this.getInventory(par1World, par2, par3, par4);
+
         if (iinventory != null && par5EntityPlayer instanceof EntityPlayerMP) {
-            par5EntityPlayer.openGui((Object)GalacticraftCore.instance, -1, par1World, par2, par3, par4);
+            par5EntityPlayer.openGui(GalacticraftCore.instance, -1, par1World, par2, par3, par4);
         }
+
         return true;
     }
 
-    public void onBlockPlacedBy(final World par1World, final int par2, final int par3, final int par4, final EntityLivingBase par5EntityLivingBase, final ItemStack par6ItemStack) {
+    @Override
+    public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLivingBase,
+            ItemStack par6ItemStack) {
         super.onBlockPlacedBy(par1World, par2, par3, par4, par5EntityLivingBase, par6ItemStack);
     }
 
-    public void onNeighborBlockChange(final World par1World, final int par2, final int par3, final int par4, final Block par5) {
-        final TileEntityParaChest tileentitychest = (TileEntityParaChest)par1World.getTileEntity(par2, par3, par4);
+    @Override
+    public void onNeighborBlockChange(World par1World, int par2, int par3, int par4, Block par5) {
+        final TileEntityParaChest tileentitychest = (TileEntityParaChest) par1World.getTileEntity(par2, par3, par4);
+
         if (tileentitychest != null) {
             tileentitychest.updateContainingBlockInfo();
         }
     }
 
-    public boolean canPlaceBlockAt(final World par1World, final int par2, final int par3, final int par4) {
+    @Override
+    public boolean canPlaceBlockAt(World par1World, int par2, int par3, int par4) {
         return super.canPlaceBlockAt(par1World, par2, par3, par4);
     }
 
-    public void breakBlock(final World par1World, final int par2, final int par3, final int par4, final Block par5, final int par6) {
-        final TileEntityParaChest tileentitychest = (TileEntityParaChest)par1World.getTileEntity(par2, par3, par4);
+    @Override
+    public void breakBlock(World par1World, int par2, int par3, int par4, Block par5, int par6) {
+        final TileEntityParaChest tileentitychest = (TileEntityParaChest) par1World.getTileEntity(par2, par3, par4);
+
         if (tileentitychest != null) {
             for (int j1 = 0; j1 < tileentitychest.getSizeInventory(); ++j1) {
                 final ItemStack itemstack = tileentitychest.getStackInSlot(j1);
+
                 if (itemstack != null) {
-                    final float f = this.random.nextFloat() * 0.8f + 0.1f;
-                    final float f2 = this.random.nextFloat() * 0.8f + 0.1f;
-                    final float f3 = this.random.nextFloat() * 0.8f + 0.1f;
-                    while (itemstack.stackSize > 0) {
+                    final float f = this.random.nextFloat() * 0.8F + 0.1F;
+                    final float f1 = this.random.nextFloat() * 0.8F + 0.1F;
+                    EntityItem entityitem;
+
+                    for (final float f2 = this.random.nextFloat() * 0.8F + 0.1F; itemstack.stackSize > 0; par1World
+                            .spawnEntityInWorld(entityitem)) {
                         int k1 = this.random.nextInt(21) + 10;
+
                         if (k1 > itemstack.stackSize) {
                             k1 = itemstack.stackSize;
                         }
-                        final ItemStack itemStack = itemstack;
-                        itemStack.stackSize -= k1;
-                        final EntityItem entityitem = new EntityItem(par1World, (double)(par2 + f), (double)(par3 + f2), (double)(par4 + f3), new ItemStack(itemstack.getItem(), k1, itemstack.getItemDamage()));
-                        final float f4 = 0.05f;
-                        entityitem.motionX = (float)this.random.nextGaussian() * f4;
-                        entityitem.motionY = (float)this.random.nextGaussian() * f4 + 0.2f;
-                        entityitem.motionZ = (float)this.random.nextGaussian() * f4;
+
+                        itemstack.stackSize -= k1;
+                        entityitem = new EntityItem(
+                                par1World,
+                                par2 + f,
+                                par3 + f1,
+                                par4 + f2,
+                                new ItemStack(itemstack.getItem(), k1, itemstack.getItemDamage()));
+                        final float f3 = 0.05F;
+                        entityitem.motionX = (float) this.random.nextGaussian() * f3;
+                        entityitem.motionY = (float) this.random.nextGaussian() * f3 + 0.2F;
+                        entityitem.motionZ = (float) this.random.nextGaussian() * f3;
+
                         if (itemstack.hasTagCompound()) {
-                            entityitem.getEntityItem().setTagCompound((NBTTagCompound)itemstack.getTagCompound().copy());
+                            entityitem.getEntityItem()
+                                    .setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
                         }
-                        par1World.spawnEntityInWorld((Entity)entityitem);
                     }
                 }
             }
+
             par1World.func_147453_f(par2, par3, par4, par5);
         }
+
         super.breakBlock(par1World, par2, par3, par4, par5, par6);
     }
 
-    public IInventory getInventory(final World par1World, final int par2, final int par3, final int par4) {
+    public IInventory getInventory(World par1World, int par2, int par3, int par4) {
         final Object object = par1World.getTileEntity(par2, par3, par4);
-        if (object == null) {
+
+        if (object == null || par1World.isSideSolid(par2, par3 + 1, par4, ForgeDirection.DOWN)
+                || BlockParaChest.isOcelotBlockingChest(par1World, par2, par3, par4)) {
             return null;
         }
-        if (par1World.isSideSolid(par2, par3 + 1, par4, ForgeDirection.DOWN)) {
-            return null;
-        }
-        if (isOcelotBlockingChest(par1World, par2, par3, par4)) {
-            return null;
-        }
-        return (IInventory)object;
+        return (IInventory) object;
     }
 
-    public static boolean isOcelotBlockingChest(final World par0World, final int par1, final int par2, final int par3) {
-        for (final Object entity : par0World.getEntitiesWithinAABB(EntityOcelot.class, AxisAlignedBB.getBoundingBox(par1, par2 + 1, par3, par1 + 1, par2 + 2, par3 + 1))) {
-            if (entity instanceof EntityOcelot && ((EntityOcelot)entity).isSitting()) {
-                return true;
+    public static boolean isOcelotBlockingChest(World par0World, int par1, int par2, int par3) {
+        final Iterator<?> iterator = par0World.getEntitiesWithinAABB(
+                EntityOcelot.class,
+                AxisAlignedBB.getBoundingBox(par1, par2 + 1, par3, par1 + 1, par2 + 2, par3 + 1)).iterator();
+        EntityOcelot entityocelot;
+
+        do {
+            if (!iterator.hasNext()) {
+                return false;
             }
-        }
-        return false;
+
+            entityocelot = (EntityOcelot) iterator.next();
+        } while (!entityocelot.isSitting());
+
+        return true;
     }
 
-    public TileEntity createNewTileEntity(final World par1World, final int meta) {
+    @Override
+    public TileEntity createNewTileEntity(World par1World, int meta) {
         return new TileEntityParaChest();
     }
 
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
         this.blockIcon = par1IconRegister.registerIcon("planks_oak");
     }
 
-    public String getShiftDescription(final int meta) {
+    @Override
+    public String getShiftDescription(int meta) {
         return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
 
-    public boolean showDescription(final int meta) {
+    @Override
+    public boolean showDescription(int meta) {
         return true;
     }
 }

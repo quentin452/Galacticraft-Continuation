@@ -1,26 +1,30 @@
 package micdoodle8.mods.galacticraft.planets;
 
-import cpw.mods.fml.common.event.*;
-import java.util.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.world.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
+import java.util.List;
 
-public interface IPlanetsModuleClient
-{
-    void preInit(final FMLPreInitializationEvent p0);
-    
-    void init(final FMLInitializationEvent p0);
-    
-    void postInit(final FMLPostInitializationEvent p0);
-    
-    void getGuiIDs(final List<Integer> p0);
-    
-    Object getGuiElement(final Side p0, final int p1, final EntityPlayer p2, final World p3, final int p4, final int p5, final int p6);
-    
-    int getBlockRenderID(final Block p0);
-    
-    void spawnParticle(final String p0, final Vector3 p1, final Vector3 p2, final Object... p3);
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.vector.Vector3;
+
+public interface IPlanetsModuleClient {
+
+    void preInit(FMLPreInitializationEvent event);
+
+    void init(FMLInitializationEvent event);
+
+    void postInit(FMLPostInitializationEvent event);
+
+    void getGuiIDs(List<Integer> idList);
+
+    Object getGuiElement(Side side, int ID, EntityPlayer player, World world, int x, int y, int z);
+
+    int getBlockRenderID(Block block);
+
+    void spawnParticle(String particleID, Vector3 position, Vector3 motion, Object... extraData);
 }

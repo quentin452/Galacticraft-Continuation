@@ -1,44 +1,76 @@
 package micdoodle8.mods.galacticraft.api.item;
 
-import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
-public class ElectricItemHelper
-{
-    public static float chargeItem(final ItemStack itemStack, final float joules) {
+/**
+ * Some helper functions for electric items.
+ *
+ * @author Calclavia
+ */
+public class ElectricItemHelper {
+
+    /**
+     * Recharges an electric item.
+     *
+     * @param joules - The joules being provided to the electric item
+     * @return The total amount of joules provided by the provider.
+     */
+    public static float chargeItem(ItemStack itemStack, float joules) {
         if (itemStack != null && itemStack.getItem() instanceof IItemElectric) {
-            return ((IItemElectric)itemStack.getItem()).recharge(itemStack, Math.min(((IItemElectric)itemStack.getItem()).getTransfer(itemStack), joules), true);
+            return ((IItemElectric) itemStack.getItem()).recharge(
+                    itemStack,
+                    Math.min(((IItemElectric) itemStack.getItem()).getTransfer(itemStack), joules),
+                    true);
         }
-        return 0.0f;
+
+        return 0;
     }
-    
-    public static float dischargeItem(final ItemStack itemStack, final float joules) {
+
+    /**
+     * Decharges an electric item.
+     *
+     * @param joules - The joules being withdrawn from the electric item
+     * @return The total amount of joules the provider received.
+     */
+    public static float dischargeItem(ItemStack itemStack, float joules) {
         if (itemStack != null && itemStack.getItem() instanceof IItemElectric) {
-            return ((IItemElectric)itemStack.getItem()).discharge(itemStack, Math.min(((IItemElectric)itemStack.getItem()).getMaxElectricityStored(itemStack), joules), true);
+            return ((IItemElectric) itemStack.getItem()).discharge(
+                    itemStack,
+                    Math.min(((IItemElectric) itemStack.getItem()).getMaxElectricityStored(itemStack), joules),
+                    true);
         }
-        return 0.0f;
+
+        return 0;
     }
-    
-    public static ItemStack getWithCharge(final ItemStack itemStack, final float joules) {
+
+    /**
+     * Returns an uncharged version of the electric item. Use this if you want the crafting recipe to use a charged
+     * version of the electric item instead of an empty version of the electric item
+     *
+     * @return An electrical ItemStack with a specific charge.
+     */
+    public static ItemStack getWithCharge(ItemStack itemStack, float joules) {
         if (itemStack != null && itemStack.getItem() instanceof IItemElectric) {
-            ((IItemElectric)itemStack.getItem()).setElectricity(itemStack, joules);
-            return itemStack;
+            ((IItemElectric) itemStack.getItem()).setElectricity(itemStack, joules);
         }
+
         return itemStack;
     }
-    
-    public static ItemStack getWithCharge(final Item item, final float joules) {
-        return getWithCharge(new ItemStack(item), joules);
+
+    public static ItemStack getWithCharge(Item item, float joules) {
+        return ElectricItemHelper.getWithCharge(new ItemStack(item), joules);
     }
-    
-    public static ItemStack getCloneWithCharge(final ItemStack itemStack, final float joules) {
-        return getWithCharge(itemStack.copy(), joules);
+
+    public static ItemStack getCloneWithCharge(ItemStack itemStack, float joules) {
+        return ElectricItemHelper.getWithCharge(itemStack.copy(), joules);
     }
-    
-    public static ItemStack getUncharged(final ItemStack itemStack) {
-        return getWithCharge(itemStack, 0.0f);
+
+    public static ItemStack getUncharged(ItemStack itemStack) {
+        return ElectricItemHelper.getWithCharge(itemStack, 0);
     }
-    
-    public static ItemStack getUncharged(final Item item) {
-        return getUncharged(new ItemStack(item));
+
+    public static ItemStack getUncharged(Item item) {
+        return ElectricItemHelper.getUncharged(new ItemStack(item));
     }
 }

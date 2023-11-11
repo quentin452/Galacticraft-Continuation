@@ -1,6 +1,12 @@
 package micdoodle8.mods.galacticraft.api.block;
 
-public interface IDetectableResource
-{
-    boolean isValueable(final int p0);
+/**
+ * Implement this interface to let Sensor Goggles see your block.
+ */
+public interface IDetectableResource {
+
+    /**
+     * @return array of metadata values that are considered valueable.
+     */
+    boolean isValueable(int metadata);
 }

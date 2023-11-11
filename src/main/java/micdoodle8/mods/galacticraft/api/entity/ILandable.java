@@ -1,6 +1,16 @@
 package micdoodle8.mods.galacticraft.api.entity;
 
-public interface ILandable extends IDockable
-{
-    void landEntity(final int p0, final int p1, final int p2);
+/**
+ * An entity which requires a hook into landing pad events should implement this interface
+ */
+public interface ILandable extends IDockable {
+
+    /**
+     * Called when the entity lands on a dock
+     *
+     * @param x coordinate of the dock on the x-axis
+     * @param y coordinate of the dock on the y-axis
+     * @param z coordinate of the dock on the z-axis
+     */
+    void landEntity(int x, int y, int z);
 }

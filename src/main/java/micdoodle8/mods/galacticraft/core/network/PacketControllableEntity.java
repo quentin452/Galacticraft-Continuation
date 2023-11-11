@@ -1,40 +1,44 @@
 package micdoodle8.mods.galacticraft.core.network;
 
-import io.netty.channel.*;
-import io.netty.buffer.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.entities.*;
+import net.minecraft.entity.player.EntityPlayer;
 
-public class PacketControllableEntity implements IPacket
-{
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import micdoodle8.mods.galacticraft.core.entities.IControllableEntity;
+
+public class PacketControllableEntity implements IPacket {
+
     private int keyPressed;
-    
-    public PacketControllableEntity() {
-    }
-    
-    public PacketControllableEntity(final int keyPressed) {
+
+    public PacketControllableEntity() {}
+
+    public PacketControllableEntity(int keyPressed) {
         this.keyPressed = keyPressed;
     }
-    
-    public void encodeInto(final ChannelHandlerContext context, final ByteBuf buffer) {
+
+    @Override
+    public void encodeInto(ChannelHandlerContext context, ByteBuf buffer) {
         buffer.writeInt(this.keyPressed);
     }
-    
-    public void decodeInto(final ChannelHandlerContext context, final ByteBuf buffer) {
+
+    @Override
+    public void decodeInto(ChannelHandlerContext context, ByteBuf buffer) {
         this.keyPressed = buffer.readInt();
     }
-    
-    public void handleClientSide(final EntityPlayer player) {
+
+    @Override
+    public void handleClientSide(EntityPlayer player) {
         this.handleKeyPress(player);
     }
-    
-    public void handleServerSide(final EntityPlayer player) {
+
+    @Override
+    public void handleServerSide(EntityPlayer player) {
         this.handleKeyPress(player);
     }
-    
-    private void handleKeyPress(final EntityPlayer player) {
-        if (player.ridingEntity != null && player.ridingEntity instanceof IControllableEntity) {
-            ((IControllableEntity)player.ridingEntity).pressKey(this.keyPressed);
+
+    private void handleKeyPress(EntityPlayer player) {
+        if (player.ridingEntity instanceof IControllableEntity) {
+            ((IControllableEntity) player.ridingEntity).pressKey(this.keyPressed);
         }
     }
 }

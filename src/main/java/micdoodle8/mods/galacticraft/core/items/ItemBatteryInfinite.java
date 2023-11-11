@@ -1,67 +1,84 @@
 package micdoodle8.mods.galacticraft.core.items;
 
-import micdoodle8.mods.galacticraft.core.energy.item.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.creativetab.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraft.item.*;
+import java.util.List;
 
-public class ItemBatteryInfinite extends ItemElectricBase
-{
-    public ItemBatteryInfinite(final String assetName) {
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class ItemBatteryInfinite extends ItemElectricBase {
+
+    public ItemBatteryInfinite(String assetName) {
         this.setUnlocalizedName(assetName);
         this.setTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
     }
-    
+
+    @Override
     protected void setMaxTransfer() {
-        this.transferMax = 1000.0f;
+        this.transferMax = 1000;
     }
-    
-    public int getTierGC(final ItemStack itemStack) {
+
+    @Override
+    public int getTierGC(ItemStack itemStack) {
         return 2;
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTab() {
         return GalacticraftCore.galacticraftItemsTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
-    public void addInformation(final ItemStack par1ItemStack, final EntityPlayer par2EntityPlayer, final List par3List, final boolean par4) {
-        par3List.add("�2" + GCCoreUtil.translate("gui.infiniteBattery.desc"));
+
+    @Override
+    public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List<String> par3List,
+            boolean par4) {
+        par3List.add("\u00a72" + GCCoreUtil.translate("gui.infiniteBattery.desc"));
     }
-    
-    public float getElectricityStored(final ItemStack itemStack) {
+
+    @Override
+    public float getElectricityStored(ItemStack itemStack) {
         return this.getMaxElectricityStored(itemStack);
     }
-    
-    public void setElectricity(final ItemStack itemStack, final float joules) {
-    }
-    
-    public float getMaxElectricityStored(final ItemStack itemStack) {
+
+    @Override
+    public void setElectricity(ItemStack itemStack, float joules) {}
+
+    @Override
+    public float getMaxElectricityStored(ItemStack itemStack) {
         return Float.POSITIVE_INFINITY;
     }
-    
-    public float getTransfer(final ItemStack itemStack) {
-        return 0.0f;
+
+    @Override
+    public float getTransfer(ItemStack itemStack) {
+        return 0.0F;
     }
-    
-    public float recharge(final ItemStack theItem, final float energy, final boolean doReceive) {
-        return 0.0f;
+
+    @Override
+    public float recharge(ItemStack theItem, float energy, boolean doReceive) {
+        return 0F;
     }
-    
-    public float discharge(final ItemStack theItem, final float energy, final boolean doTransfer) {
+
+    @Override
+    public float discharge(ItemStack theItem, float energy, boolean doTransfer) {
         return energy;
     }
-    
-    public void getSubItems(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
+
+    @Override
+    public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
         par3List.add(new ItemStack(par1, 1, 0));
     }
 }

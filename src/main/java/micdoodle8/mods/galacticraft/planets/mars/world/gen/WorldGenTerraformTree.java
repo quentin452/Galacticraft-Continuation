@@ -1,154 +1,206 @@
 package micdoodle8.mods.galacticraft.planets.mars.world.gen;
 
-import net.minecraft.world.gen.feature.*;
-import net.minecraft.item.*;
-import java.util.*;
-import net.minecraft.init.*;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.*;
-import net.minecraft.world.*;
-import net.minecraft.block.*;
-import net.minecraft.util.*;
+import java.util.Random;
 
-public class WorldGenTerraformTree extends WorldGenerator
-{
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.WorldGenerator;
+
+import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
+
+public class WorldGenTerraformTree extends WorldGenerator {
+
     private final int minTreeHeight;
     private final boolean vinesGrow;
     private final int metaWood;
     private final int metaLeaves;
-    
-    public WorldGenTerraformTree(final boolean par1, final ItemStack sapling) {
+
+    public WorldGenTerraformTree(boolean par1, ItemStack sapling) {
         this(par1, 4, 0, 0, false);
     }
-    
-    public WorldGenTerraformTree(final boolean par1, final int par2, final int par3, final int par4, final boolean vines) {
+
+    public WorldGenTerraformTree(boolean par1, int par2, int par3, int par4, boolean vines) {
         super(par1);
         this.minTreeHeight = par2;
         this.metaWood = par3;
         this.metaLeaves = par4;
         this.vinesGrow = vines;
     }
-    
-    public boolean generate(final World par1World, final Random par2Random, final int x, final int y, final int z) {
+
+    @Override
+    public boolean generate(World par1World, Random par2Random, int x, int y, int z) {
         final int l = par2Random.nextInt(3) + this.minTreeHeight;
         boolean flag = true;
+
         if (y < 1 || y + l + 1 > 256) {
             return false;
         }
-        for (int i1 = y; i1 <= y + 1 + l; ++i1) {
-            byte b0 = 1;
+        int i1;
+        byte b0;
+        int j1;
+        int k1;
+        int k2;
+
+        for (i1 = y; i1 <= y + 1 + l; ++i1) {
+            b0 = 1;
+
             if (i1 == y) {
                 b0 = 0;
             }
+
             if (i1 >= y + 1 + l - 2) {
                 b0 = 2;
             }
+
             b0 += 5;
-            for (int l2 = x - b0; l2 <= x + b0 && flag; ++l2) {
-                for (int j1 = z - b0; j1 <= z + b0 && flag; ++j1) {
+
+            for (int l1 = x - b0; l1 <= x + b0 && flag; ++l1) {
+                for (j1 = z - b0; j1 <= z + b0 && flag; ++j1) {
                     if (i1 >= 0 && i1 < 256) {
-                        final Block k1b = par1World.getBlock(l2, i1, j1);
-                        final int k2 = par1World.getBlockMetadata(l2, i1, j1);
-                        final boolean isAir = par1World.isAirBlock(l2, i1, j1);
-                        if (!isAir && k1b != Blocks.grass && k1b != Blocks.water && k1b != Blocks.flowing_water && k1b != MarsBlocks.marsBlock && k2 != 5) {
+                        final Block k1b = par1World.getBlock(l1, i1, j1);
+                        k2 = par1World.getBlockMetadata(l1, i1, j1);
+
+                        final boolean isAir = par1World.isAirBlock(l1, i1, j1);
+
+                        if (!isAir && k1b != Blocks.grass
+                                && k1b != Blocks.water
+                                && k1b != Blocks.flowing_water
+                                && k1b != MarsBlocks.marsBlock
+                                && k2 != 5) {
                             flag = false;
                         }
-                    }
-                    else {
+                    } else {
                         flag = false;
                     }
                 }
             }
         }
-        if (!flag) {
+
+        if (!flag || y >= 256 - l - 1) {
             return false;
         }
-        if (y < 256 - l - 1) {
-            final byte b0 = 3;
-            final byte b2 = 0;
-            for (int j1 = y - b0 + l; j1 <= y + l; ++j1) {
-                final int k3 = j1 - (y + l);
-                for (int i2 = b2 + 1 - k3 / 2, j2 = x - i2; j2 <= x + i2; ++j2) {
-                    final int k2 = j2 - x;
-                    for (int l3 = z - i2; l3 <= z + i2; ++l3) {
-                        final int i3 = l3 - z;
-                        if (Math.abs(k2) != i2 || Math.abs(i3) != i2 || (par2Random.nextInt(2) != 0 && k3 != 0)) {
-                            final Block block = par1World.getBlock(j2, j1, l3);
-                            if (block == null || block.canBeReplacedByLeaves((IBlockAccess)par1World, j2, j1, l3)) {
-                                this.setBlockAndNotifyAdequately(par1World, j2, j1, l3, (Block)Blocks.leaves, this.metaLeaves);
-                            }
+        b0 = 3;
+        final byte b1 = 0;
+        int i2;
+        int j2;
+
+        for (j1 = y - b0 + l; j1 <= y + l; ++j1) {
+            k1 = j1 - (y + l);
+            i2 = b1 + 1 - k1 / 2;
+
+            for (j2 = x - i2; j2 <= x + i2; ++j2) {
+                k2 = j2 - x;
+
+                for (int l2 = z - i2; l2 <= z + i2; ++l2) {
+                    final int i3 = l2 - z;
+
+                    if (Math.abs(k2) != i2 || Math.abs(i3) != i2 || par2Random.nextInt(2) != 0 && k1 != 0) {
+                        final Block block = par1World.getBlock(j2, j1, l2);
+
+                        if (block == null || block.canBeReplacedByLeaves(par1World, j2, j1, l2)) {
+                            this.setBlockAndNotifyAdequately(par1World, j2, j1, l2, Blocks.leaves, this.metaLeaves);
                         }
                     }
                 }
             }
-            for (int j1 = 0; j1 < l; ++j1) {
-                final Block block2 = par1World.getBlock(x, y + j1, z);
-                if (block2 != null) {
-                    if (block2.isAir((IBlockAccess)par1World, x, y + j1, z) || block2.isLeaves((IBlockAccess)par1World, x, y + j1, z)) {
-                        this.setBlockAndNotifyAdequately(par1World, x, y + j1, z, Blocks.log, this.metaWood);
-                        if (this.vinesGrow && j1 > 0) {
-                            if (par2Random.nextInt(3) > 0 && par1World.isAirBlock(x - 1, y + j1, z)) {
-                                this.setBlockAndNotifyAdequately(par1World, x - 1, y + j1, z, Blocks.vine, 8);
-                            }
-                            if (par2Random.nextInt(3) > 0 && par1World.isAirBlock(x + 1, y + j1, z)) {
-                                this.setBlockAndNotifyAdequately(par1World, x + 1, y + j1, z, Blocks.vine, 2);
-                            }
-                            if (par2Random.nextInt(3) > 0 && par1World.isAirBlock(x, y + j1, z - 1)) {
-                                this.setBlockAndNotifyAdequately(par1World, x, y + j1, z - 1, Blocks.vine, 1);
-                            }
-                            if (par2Random.nextInt(3) > 0 && par1World.isAirBlock(x, y + j1, z + 1)) {
-                                this.setBlockAndNotifyAdequately(par1World, x, y + j1, z + 1, Blocks.vine, 4);
-                            }
-                        }
-                    }
-                }
-            }
-            if (this.vinesGrow) {
-                for (int j1 = y - 3 + l; j1 <= y + l; ++j1) {
-                    final int k3 = j1 - (y + l);
-                    for (int i2 = 2 - k3 / 2, j2 = x - i2; j2 <= x + i2; ++j2) {
-                        for (int k2 = z - i2; k2 <= z + i2; ++k2) {
-                            final Block block2 = par1World.getBlock(j2, j1, k2);
-                            if (block2 != null && block2.isLeaves((IBlockAccess)par1World, j2, j1, k2)) {
-                                if (par2Random.nextInt(4) == 0 && par1World.isAirBlock(j2 - 1, j1, k2)) {
-                                    this.growVines(par1World, j2 - 1, j1, k2, 8);
-                                }
-                                if (par2Random.nextInt(4) == 0 && par1World.isAirBlock(j2 + 1, j1, k2)) {
-                                    this.growVines(par1World, j2 + 1, j1, k2, 2);
-                                }
-                                if (par2Random.nextInt(4) == 0 && par1World.isAirBlock(j2, j1, k2 - 1)) {
-                                    this.growVines(par1World, j2, j1, k2 - 1, 1);
-                                }
-                                if (par2Random.nextInt(4) == 0 && par1World.isAirBlock(j2, j1, k2 + 1)) {
-                                    this.growVines(par1World, j2, j1, k2 + 1, 4);
-                                }
-                            }
-                        }
-                    }
-                }
-                if (par2Random.nextInt(5) == 0 && l > 5) {
-                    for (int j1 = 0; j1 < 2; ++j1) {
-                        for (int k3 = 0; k3 < 4; ++k3) {
-                            if (par2Random.nextInt(4 - j1) == 0) {
-                                final int i2 = par2Random.nextInt(3);
-                                this.setBlockAndNotifyAdequately(par1World, x + Direction.offsetX[Direction.rotateOpposite[k3]], y + l - 5 + j1, z + Direction.offsetZ[Direction.rotateOpposite[k3]], Blocks.cocoa, i2 << 2 | k3);
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
         }
-        return false;
+
+        for (j1 = 0; j1 < l; ++j1) {
+            final Block block = par1World.getBlock(x, y + j1, z);
+            if (block == null) {
+                continue;
+            }
+
+            if (block.isAir(par1World, x, y + j1, z) || block.isLeaves(par1World, x, y + j1, z)) {
+                this.setBlockAndNotifyAdequately(par1World, x, y + j1, z, Blocks.log, this.metaWood);
+
+                if (this.vinesGrow && j1 > 0) {
+                    if (par2Random.nextInt(3) > 0 && par1World.isAirBlock(x - 1, y + j1, z)) {
+                        this.setBlockAndNotifyAdequately(par1World, x - 1, y + j1, z, Blocks.vine, 8);
+                    }
+
+                    if (par2Random.nextInt(3) > 0 && par1World.isAirBlock(x + 1, y + j1, z)) {
+                        this.setBlockAndNotifyAdequately(par1World, x + 1, y + j1, z, Blocks.vine, 2);
+                    }
+
+                    if (par2Random.nextInt(3) > 0 && par1World.isAirBlock(x, y + j1, z - 1)) {
+                        this.setBlockAndNotifyAdequately(par1World, x, y + j1, z - 1, Blocks.vine, 1);
+                    }
+
+                    if (par2Random.nextInt(3) > 0 && par1World.isAirBlock(x, y + j1, z + 1)) {
+                        this.setBlockAndNotifyAdequately(par1World, x, y + j1, z + 1, Blocks.vine, 4);
+                    }
+                }
+            }
+        }
+
+        if (this.vinesGrow) {
+            for (j1 = y - 3 + l; j1 <= y + l; ++j1) {
+                k1 = j1 - (y + l);
+                i2 = 2 - k1 / 2;
+
+                for (j2 = x - i2; j2 <= x + i2; ++j2) {
+                    for (k2 = z - i2; k2 <= z + i2; ++k2) {
+                        final Block block = par1World.getBlock(j2, j1, k2);
+                        if (block != null && block.isLeaves(par1World, j2, j1, k2)) {
+                            if (par2Random.nextInt(4) == 0 && par1World.isAirBlock(j2 - 1, j1, k2)) {
+                                this.growVines(par1World, j2 - 1, j1, k2, 8);
+                            }
+
+                            if (par2Random.nextInt(4) == 0 && par1World.isAirBlock(j2 + 1, j1, k2)) {
+                                this.growVines(par1World, j2 + 1, j1, k2, 2);
+                            }
+
+                            if (par2Random.nextInt(4) == 0 && par1World.isAirBlock(j2, j1, k2 - 1)) {
+                                this.growVines(par1World, j2, j1, k2 - 1, 1);
+                            }
+
+                            if (par2Random.nextInt(4) == 0 && par1World.isAirBlock(j2, j1, k2 + 1)) {
+                                this.growVines(par1World, j2, j1, k2 + 1, 4);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (par2Random.nextInt(5) == 0 && l > 5) {
+                for (j1 = 0; j1 < 2; ++j1) {
+                    for (k1 = 0; k1 < 4; ++k1) {
+                        if (par2Random.nextInt(4 - j1) == 0) {
+                            i2 = par2Random.nextInt(3);
+                            this.setBlockAndNotifyAdequately(
+                                    par1World,
+                                    x + Direction.offsetX[Direction.rotateOpposite[k1]],
+                                    y + l - 5 + j1,
+                                    z + Direction.offsetZ[Direction.rotateOpposite[k1]],
+                                    Blocks.cocoa,
+                                    i2 << 2 | k1);
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
     }
-    
-    private void growVines(final World par1World, final int x, int y, final int z, final int meta) {
+
+    /**
+     * Grows vines downward from the given block for a given length. Args: World, x, starty, z, vine-length
+     */
+    private void growVines(World par1World, int x, int y, int z, int meta) {
         this.setBlockAndNotifyAdequately(par1World, x, y, z, Blocks.vine, meta);
         int i1 = 4;
+
         while (true) {
             --y;
+
             if (!par1World.isAirBlock(x, y, z) || i1 <= 0) {
-                break;
+                return;
             }
+
             this.setBlockAndNotifyAdequately(par1World, x, y, z, Blocks.vine, meta);
             --i1;
         }

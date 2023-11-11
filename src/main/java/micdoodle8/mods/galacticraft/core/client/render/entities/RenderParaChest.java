@@ -1,48 +1,55 @@
 package micdoodle8.mods.galacticraft.core.client.render.entities;
 
-import net.minecraft.client.renderer.entity.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.client.model.*;
-import net.minecraft.entity.*;
-import micdoodle8.mods.galacticraft.core.entities.*;
-import org.lwjgl.opengl.*;
-import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.client.model.ModelParaChest;
+import micdoodle8.mods.galacticraft.core.entities.EntityParachest;
 
 @SideOnly(Side.CLIENT)
-public class RenderParaChest extends Render
-{
-    private static final ResourceLocation parachestTexture;
+public class RenderParaChest extends Render {
+
+    private static final ResourceLocation parachestTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/model/parachest.png");
+
     private final ModelParaChest chestModel;
-    
+
     public RenderParaChest() {
-        this.shadowSize = 1.0f;
+        this.shadowSize = 1F;
         this.chestModel = new ModelParaChest();
     }
-    
-    protected ResourceLocation func_110779_a(final Entity par1EntityArrow) {
+
+    protected ResourceLocation func_110779_a(Entity par1EntityArrow) {
         return RenderParaChest.parachestTexture;
     }
-    
-    protected ResourceLocation getEntityTexture(final Entity par1Entity) {
+
+    @Override
+    protected ResourceLocation getEntityTexture(Entity par1Entity) {
         return this.func_110779_a(par1Entity);
     }
-    
-    public void doRenderParaChest(final EntityParachest entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
+
+    public void doRenderParaChest(EntityParachest entity, double par2, double par4, double par6, float par8,
+            float par9) {
         GL11.glPushMatrix();
-        GL11.glTranslatef((float)par2 - 0.5f, (float)par4, (float)par6);
-        this.bindEntityTexture((Entity)entity);
+        GL11.glTranslatef((float) par2 - 0.5F, (float) par4, (float) par6);
+
+        this.bindEntityTexture(entity);
+
         if (!entity.isDead) {
             this.chestModel.renderAll();
         }
         GL11.glPopMatrix();
     }
-    
-    public void doRender(final Entity par1Entity, final double par2, final double par4, final double par6, final float par8, final float par9) {
-        this.doRenderParaChest((EntityParachest)par1Entity, par2, par4, par6, par8, par9);
-    }
-    
-    static {
-        parachestTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/model/parachest.png");
+
+    @Override
+    public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9) {
+        this.doRenderParaChest((EntityParachest) par1Entity, par2, par4, par6, par8, par9);
     }
 }

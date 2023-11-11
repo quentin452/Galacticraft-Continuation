@@ -1,25 +1,29 @@
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
-import tconstruct.client.tabs.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.*;
-import micdoodle8.mods.galacticraft.core.network.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.client.*;
-import net.minecraft.client.entity.*;
+import net.minecraft.item.ItemStack;
 
-public class InventoryTabGalacticraft extends AbstractTab
-{
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import tconstruct.client.tabs.AbstractTab;
+
+public class InventoryTabGalacticraft extends AbstractTab {
+
     public InventoryTabGalacticraft() {
         super(0, 0, 0, new ItemStack(GCItems.oxMask));
     }
-    
+
+    @Override
     public void onTabClicked() {
-        GalacticraftCore.packetPipeline.sendToServer(new PacketSimple(PacketSimple.EnumSimplePacket.S_OPEN_EXTENDED_INVENTORY, new Object[0]));
-        ClientProxyCore.playerClientHandler.onBuild(0, (EntityPlayerSP)FMLClientHandler.instance().getClientPlayerEntity());
+        GalacticraftCore.packetPipeline
+                .sendToServer(new PacketSimple(EnumSimplePacket.S_OPEN_EXTENDED_INVENTORY, new Object[] {}));
+        ClientProxyCore.playerClientHandler.onBuild(0, FMLClientHandler.instance().getClientPlayerEntity());
     }
-    
+
+    @Override
     public boolean shouldAddToList() {
         return true;
     }

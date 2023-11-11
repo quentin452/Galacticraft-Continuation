@@ -1,58 +1,90 @@
 package micdoodle8.mods.galacticraft.core.util;
 
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.api.*;
-import micdoodle8.mods.galacticraft.api.recipe.*;
-import net.minecraft.inventory.*;
-import micdoodle8.mods.galacticraft.core.inventory.*;
-import net.minecraft.item.crafting.*;
-import net.minecraftforge.oredict.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.core.recipe.*;
-import ic2.api.item.*;
+import java.util.HashMap;
 
-public class RecipeUtil
-{
-    public static ItemStack findMatchingBuggy(final InventoryBuggyBench benchStacks) {
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
+
+import cpw.mods.fml.common.registry.GameRegistry;
+import ic2.api.item.IC2Items;
+import micdoodle8.mods.galacticraft.api.GalacticraftRegistry;
+import micdoodle8.mods.galacticraft.api.recipe.INasaWorkbenchRecipe;
+import micdoodle8.mods.galacticraft.core.inventory.InventoryBuggyBench;
+import micdoodle8.mods.galacticraft.core.inventory.InventoryRocketBench;
+import micdoodle8.mods.galacticraft.core.recipe.NasaWorkbenchRecipe;
+
+public class RecipeUtil {
+
+    public static ItemStack findMatchingBuggy(InventoryBuggyBench benchStacks) {
         for (final INasaWorkbenchRecipe recipe : GalacticraftRegistry.getBuggyBenchRecipes()) {
-            if (recipe.matches((IInventory)benchStacks)) {
+            if (recipe.matches(benchStacks)) {
                 return recipe.getRecipeOutput();
             }
         }
+
         return null;
     }
-    
-    public static ItemStack findMatchingSpaceshipRecipe(final InventoryRocketBench inventoryRocketBench) {
+
+    public static ItemStack findMatchingSpaceshipRecipe(InventoryRocketBench inventoryRocketBench) {
         for (final INasaWorkbenchRecipe recipe : GalacticraftRegistry.getRocketT1Recipes()) {
-            if (recipe.matches((IInventory)inventoryRocketBench)) {
+            if (recipe.matches(inventoryRocketBench)) {
                 return recipe.getRecipeOutput();
             }
         }
+
         return null;
     }
-    
-    public static void addRecipe(final ItemStack result, final Object[] obj) {
+
+    public static void addRecipe(ItemStack result, Object[] obj) {
         CraftingManager.getInstance().getRecipeList().add(new ShapedOreRecipe(result, obj));
     }
-    
-    public static void addBlockRecipe(final ItemStack result, final String oreDictIngot, final ItemStack gcIngot) {
+
+    public static void addBlockRecipe(ItemStack result, String oreDictIngot, ItemStack gcIngot) {
         if (OreDictionary.getOres(oreDictIngot).size() > 1) {
-            CraftingManager.getInstance().getRecipeList().add(new ShapelessOreRecipe(result, new Object[] { gcIngot, oreDictIngot, oreDictIngot, oreDictIngot, oreDictIngot, oreDictIngot, oreDictIngot, oreDictIngot, oreDictIngot }));
+            CraftingManager.getInstance().getRecipeList().add(
+                    new ShapelessOreRecipe(
+                            result,
+                            gcIngot,
+                            oreDictIngot,
+                            oreDictIngot,
+                            oreDictIngot,
+                            oreDictIngot,
+                            oreDictIngot,
+                            oreDictIngot,
+                            oreDictIngot,
+                            oreDictIngot));
+        } else {
+            RecipeUtil.addRecipe(result, new Object[] { "XXX", "XXX", "XXX", 'X', gcIngot });
         }
-        else {
-            addRecipe(result, new Object[] { "XXX", "XXX", "XXX", 'X', gcIngot });
-        }
     }
-    
-    public static void addRocketBenchRecipe(final ItemStack result, final HashMap<Integer, ItemStack> input) {
-        GalacticraftRegistry.addT1RocketRecipe((INasaWorkbenchRecipe)new NasaWorkbenchRecipe(result, (HashMap)input));
+
+    public static void addRocketBenchRecipe(ItemStack result, HashMap<Integer, ItemStack> input) {
+        GalacticraftRegistry.addT1RocketRecipe(new NasaWorkbenchRecipe(result, input));
     }
-    
-    public static void addBuggyBenchRecipe(final ItemStack result, final HashMap<Integer, ItemStack> input) {
-        GalacticraftRegistry.addMoonBuggyRecipe((INasaWorkbenchRecipe)new NasaWorkbenchRecipe(result, (HashMap)input));
+
+    public static void addBuggyBenchRecipe(ItemStack result, HashMap<Integer, ItemStack> input) {
+        GalacticraftRegistry.addMoonBuggyRecipe(new NasaWorkbenchRecipe(result, input));
     }
-    
-    public static ItemStack getIndustrialCraftItem(final String indentifier) {
+
+    public static ItemStack getIndustrialCraftItem(String indentifier) {
         return IC2Items.getItem(indentifier);
+    }
+
+    public static Block getChestBlock() {
+        Block block = GameRegistry.findBlock("IronChest", "BlockIronChest");
+        if (block == null) {
+            block = Blocks.chest;
+        }
+        return block;
+    }
+
+    public static ItemStack getChestItemStack(int size, int meta) {
+        final Block block = getChestBlock();
+        return new ItemStack(block, size, meta);
     }
 }

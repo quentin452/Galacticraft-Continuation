@@ -1,10 +1,12 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import micdoodle8.mods.galacticraft.api.prefab.world.gen.*;
-import net.minecraft.world.biome.*;
+import net.minecraft.world.biome.BiomeGenBase;
 
-public class WorldChunkManagerOrbit extends WorldChunkManagerSpace
-{
+import micdoodle8.mods.galacticraft.api.prefab.world.gen.WorldChunkManagerSpace;
+
+public class WorldChunkManagerOrbit extends WorldChunkManagerSpace {
+
+    @Override
     public BiomeGenBase getBiome() {
         return BiomeGenBaseOrbit.space;
     }

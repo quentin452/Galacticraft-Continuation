@@ -1,118 +1,132 @@
 package micdoodle8.mods.galacticraft.core.client.gui.screen;
 
-import net.minecraft.client.renderer.texture.*;
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.client.*;
-import micdoodle8.mods.galacticraft.api.client.*;
-import org.lwjgl.opengl.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import micdoodle8.mods.galacticraft.core.client.render.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.network.*;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.util.ResourceLocation;
 
-public class GameScreenBasic implements IGameScreen
-{
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
+import micdoodle8.mods.galacticraft.api.client.IGameScreen;
+import micdoodle8.mods.galacticraft.api.client.IScreenManager;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.client.render.RenderPlanet;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+
+public class GameScreenBasic implements IGameScreen {
+
     private TextureManager renderEngine;
+
     private float frameA;
     private float frameBx;
     private float frameBy;
-    private float textureAx;
-    private float textureAy;
-    private float textureBx;
-    private float textureBy;
-    
+    private float textureAx = 0F;
+    private float textureAy = 0F;
+    private float textureBx = 1.0F;
+    private float textureBy = 1.0F;
+
     public GameScreenBasic() {
-        this.textureAx = 0.0f;
-        this.textureAy = 0.0f;
-        this.textureBx = 1.0f;
-        this.textureBy = 1.0f;
+        // This can be called from either server or client, so don't include
+        // client-side only code on the server.
         if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
             this.renderEngine = FMLClientHandler.instance().getClient().renderEngine;
         }
     }
-    
-    public void setFrameSize(final float frameSize) {
+
+    @Override
+    public void setFrameSize(float frameSize) {
         this.frameA = frameSize;
     }
-    
-    public void render(final int type, final float ticks, final float scaleX, final float scaleY, final IScreenManager scr) {
+
+    @Override
+    public void render(int type, float ticks, float scaleX, float scaleY, IScreenManager scr) {
         this.frameBx = scaleX - this.frameA;
         this.frameBy = scaleY - this.frameA;
+
         if (scaleX == scaleY) {
-            this.textureAx = 0.0f;
-            this.textureAy = 0.0f;
-            this.textureBx = 1.0f;
-            this.textureBy = 1.0f;
+            this.textureAx = 0F;
+            this.textureAy = 0F;
+            this.textureBx = 1.0F;
+            this.textureBy = 1.0F;
+        } else if (scaleX < scaleY) {
+            this.textureAx = (1.0F - scaleX / scaleY) / 2;
+            this.textureAy = 0F;
+            this.textureBx = 1.0F - this.textureAx;
+            this.textureBy = 1.0F;
+        } else if (scaleY < scaleX) {
+            this.textureAx = 0F;
+            this.textureAy = (1.0F - scaleY / scaleX) / 2;
+            this.textureBx = 1.0F;
+            this.textureBy = 1.0F - this.textureAy;
         }
-        else if (scaleX < scaleY) {
-            this.textureAx = (1.0f - scaleX / scaleY) / 2.0f;
-            this.textureAy = 0.0f;
-            this.textureBx = 1.0f - this.textureAx;
-            this.textureBy = 1.0f;
-        }
-        else if (scaleY < scaleX) {
-            this.textureAx = 0.0f;
-            this.textureAy = (1.0f - scaleY / scaleX) / 2.0f;
-            this.textureBx = 1.0f;
-            this.textureBy = 1.0f - this.textureAy;
-        }
+
         switch (type) {
-            case 0: {
-                this.drawBlackBackground(0.09f);
+            case 0:
+                this.drawBlackBackground(0.09F);
+                // ClientProxyCore.overworldTextureLocal = null;
                 break;
-            }
-            case 1: {
-                if (scr instanceof DrawGameScreen && ((DrawGameScreen)scr).mapDone) {
-                    GL11.glBindTexture(3553, DrawGameScreen.reusableMap.getGlTextureId());
+            case 1:
+                if (scr instanceof DrawGameScreen && ((DrawGameScreen) scr).mapDone) {
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, DrawGameScreen.reusableMap.getGlTextureId());
                     this.draw2DTexture();
-                    break;
-                }
-                if (ClientProxyCore.overworldTexturesValid) {
+                } else if (ClientProxyCore.overworldTexturesValid) {
                     GL11.glPushMatrix();
-                    final float centreX = scaleX / 2.0f;
-                    final float centreY = scaleY / 2.0f;
-                    GL11.glTranslatef(centreX, centreY, 0.0f);
-                    RenderPlanet.renderPlanet(ClientProxyCore.overworldTextureWide.getGlTextureId(), Math.min(scaleX, scaleY) - 0.2f, ticks, 45.0f);
+                    final float centreX = scaleX / 2;
+                    final float centreY = scaleY / 2;
+                    GL11.glTranslatef(centreX, centreY, 0F);
+                    RenderPlanet.renderPlanet(
+                            ClientProxyCore.overworldTextureWide.getGlTextureId(),
+                            Math.min(scaleX, scaleY) - 0.2F,
+                            ticks,
+                            45F);
                     GL11.glPopMatrix();
-                    break;
+                } else {
+                    this.renderEngine.bindTexture(
+                            new ResourceLocation(
+                                    GalacticraftCore.ASSET_PREFIX,
+                                    "textures/gui/celestialbodies/earth.png"));
+                    if (!ClientProxyCore.overworldTextureRequestSent) {
+                        GalacticraftCore.packetPipeline.sendToServer(
+                                new PacketSimple(
+                                        PacketSimple.EnumSimplePacket.S_REQUEST_OVERWORLD_IMAGE,
+                                        new Object[] {}));
+                        ClientProxyCore.overworldTextureRequestSent = true;
+                    }
+                    this.draw2DTexture();
                 }
-                this.renderEngine.bindTexture(new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/gui/celestialbodies/earth.png"));
-                if (!ClientProxyCore.overworldTextureRequestSent) {
-                    GalacticraftCore.packetPipeline.sendToServer(new PacketSimple(PacketSimple.EnumSimplePacket.S_REQUEST_OVERWORLD_IMAGE, new Object[0]));
-                    ClientProxyCore.overworldTextureRequestSent = true;
-                }
-                this.draw2DTexture();
                 break;
-            }
         }
     }
-    
+
     private void draw2DTexture() {
         final Tessellator tess = Tessellator.instance;
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         tess.setColorRGBA(255, 255, 255, 255);
         tess.startDrawingQuads();
-        tess.addVertexWithUV((double)this.frameA, (double)this.frameBy, 0.0, (double)this.textureAx, (double)this.textureBy);
-        tess.addVertexWithUV((double)this.frameBx, (double)this.frameBy, 0.0, (double)this.textureBx, (double)this.textureBy);
-        tess.addVertexWithUV((double)this.frameBx, (double)this.frameA, 0.0, (double)this.textureBx, (double)this.textureAy);
-        tess.addVertexWithUV((double)this.frameA, (double)this.frameA, 0.0, (double)this.textureAx, (double)this.textureAy);
+
+        tess.addVertexWithUV(this.frameA, this.frameBy, 0F, this.textureAx, this.textureBy);
+        tess.addVertexWithUV(this.frameBx, this.frameBy, 0F, this.textureBx, this.textureBy);
+        tess.addVertexWithUV(this.frameBx, this.frameA, 0F, this.textureBx, this.textureAy);
+        tess.addVertexWithUV(this.frameA, this.frameA, 0F, this.textureAx, this.textureAy);
         tess.draw();
     }
-    
-    private void drawBlackBackground(final float greyLevel) {
-        GL11.glBlendFunc(770, 771);
-        GL11.glDisable(3553);
+
+    private void drawBlackBackground(float greyLevel) {
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
         final Tessellator tess = Tessellator.instance;
-        GL11.glColor4f(greyLevel, greyLevel, greyLevel, 1.0f);
+        GL11.glColor4f(greyLevel, greyLevel, greyLevel, 1.0F);
         tess.startDrawingQuads();
-        tess.addVertex((double)this.frameA, (double)this.frameBy, 0.004999999888241291);
-        tess.addVertex((double)this.frameBx, (double)this.frameBy, 0.004999999888241291);
-        tess.addVertex((double)this.frameBx, (double)this.frameA, 0.004999999888241291);
-        tess.addVertex((double)this.frameA, (double)this.frameA, 0.004999999888241291);
+
+        tess.addVertex(this.frameA, this.frameBy, 0.005F);
+        tess.addVertex(this.frameBx, this.frameBy, 0.005F);
+        tess.addVertex(this.frameBx, this.frameA, 0.005F);
+        tess.addVertex(this.frameA, this.frameA, 0.005F);
         tess.draw();
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glEnable(3553);
+
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 }

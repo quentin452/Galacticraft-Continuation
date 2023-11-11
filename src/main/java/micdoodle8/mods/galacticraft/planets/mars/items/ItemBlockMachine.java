@@ -1,71 +1,90 @@
 package micdoodle8.mods.galacticraft.planets.mars.items;
 
-import micdoodle8.mods.galacticraft.core.items.*;
-import micdoodle8.mods.galacticraft.api.item.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.planets.mars.blocks.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemStack;
 
-public class ItemBlockMachine extends ItemBlockDesc implements IHoldableItem
-{
-    public ItemBlockMachine(final Block block) {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMars;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.BlockMachineMarsT2;
+import micdoodle8.mods.galacticraft.planets.mars.blocks.MarsBlocks;
+
+public class ItemBlockMachine extends ItemBlockDesc implements IHoldableItem {
+
+    public ItemBlockMachine(Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
-    
-    public int getMetadata(final int damage) {
+
+    @Override
+    public int getMetadata(int damage) {
         return damage;
     }
-    
-    public String getUnlocalizedName(final ItemStack itemstack) {
+
+    @Override
+    public String getUnlocalizedName(ItemStack itemstack) {
         int index = 0;
-        final int typenum = itemstack.getItemDamage() & 0xC;
+        final int typenum = itemstack.getItemDamage() & 12;
+
         if (this.field_150939_a == MarsBlocks.machine) {
-            if (typenum == 8) {
+            if (typenum == BlockMachineMars.LAUNCH_CONTROLLER_METADATA) {
                 index = 2;
-            }
-            else if (typenum == 4) {
+            } else if (typenum == BlockMachineMars.CRYOGENIC_CHAMBER_METADATA) {
                 index = 1;
             }
+        } else if (this.field_150939_a == MarsBlocks.machineT2) {
+            switch (typenum) {
+                case BlockMachineMarsT2.GAS_LIQUEFIER:
+                    return "tile.marsMachine.4";
+                case BlockMachineMarsT2.METHANE_SYNTHESIZER:
+                    return "tile.marsMachine.5";
+                case BlockMachineMarsT2.ELECTROLYZER:
+                    return "tile.marsMachine.6";
+                default:
+                    break;
+            }
         }
-        else if (this.field_150939_a == MarsBlocks.machineT2) {
-            if (typenum == 0) {
-                return "tile.marsMachine.4";
-            }
-            if (typenum == 4) {
-                return "tile.marsMachine.5";
-            }
-            if (typenum == 8) {
-                return "tile.marsMachine.6";
-            }
-        }
+
         return this.field_150939_a.getUnlocalizedName() + "." + index;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public EnumRarity getRarity(final ItemStack par1ItemStack) {
+    public EnumRarity getRarity(ItemStack par1ItemStack) {
         return ClientProxyCore.galacticraftItem;
     }
-    
+
+    @Override
     public String getUnlocalizedName() {
         return this.field_150939_a.getUnlocalizedName() + ".0";
     }
-    
-    public boolean shouldHoldLeftHandUp(final EntityPlayer player) {
+
+    @Override
+    public boolean shouldHoldLeftHandUp(EntityPlayer player) {
         final ItemStack currentStack = player.getCurrentEquippedItem();
-        return currentStack != null && this.field_150939_a == MarsBlocks.machine && currentStack.getItemDamage() >= 4 && currentStack.getItemDamage() < 8;
+
+        return currentStack != null && this.field_150939_a == MarsBlocks.machine
+                && currentStack.getItemDamage() >= BlockMachineMars.CRYOGENIC_CHAMBER_METADATA
+                && currentStack.getItemDamage() < BlockMachineMars.LAUNCH_CONTROLLER_METADATA;
     }
-    
-    public boolean shouldHoldRightHandUp(final EntityPlayer player) {
+
+    @Override
+    public boolean shouldHoldRightHandUp(EntityPlayer player) {
         final ItemStack currentStack = player.getCurrentEquippedItem();
-        return currentStack != null && this.field_150939_a == MarsBlocks.machine && currentStack.getItemDamage() >= 4 && currentStack.getItemDamage() < 8;
+
+        return currentStack != null && this.field_150939_a == MarsBlocks.machine
+                && currentStack.getItemDamage() >= BlockMachineMars.CRYOGENIC_CHAMBER_METADATA
+                && currentStack.getItemDamage() < BlockMachineMars.LAUNCH_CONTROLLER_METADATA;
     }
-    
-    public boolean shouldCrouch(final EntityPlayer player) {
+
+    @Override
+    public boolean shouldCrouch(EntityPlayer player) {
         return false;
     }
 }

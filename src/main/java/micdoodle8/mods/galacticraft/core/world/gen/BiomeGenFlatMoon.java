@@ -1,18 +1,22 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
-import net.minecraft.world.biome.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import net.minecraftforge.common.*;
+import net.minecraftforge.common.BiomeDictionary;
 
-public class BiomeGenFlatMoon extends BiomeGenBaseMoon
-{
-    public BiomeGenFlatMoon(final int par1) {
+import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
+
+public class BiomeGenFlatMoon extends BiomeGenBaseMoon {
+
+    public BiomeGenFlatMoon(int par1) {
         super(par1);
         this.setBiomeName("moonFlat");
         this.setColor(11111111);
-        this.setHeight(new BiomeGenBase.Height(1.5f, 0.4f));
+        this.setHeight(new Height(1.5F, 0.4F));
         if (!ConfigManagerCore.disableBiomeTypeRegistrations) {
-            BiomeDictionary.registerBiomeType((BiomeGenBase)this, new BiomeDictionary.Type[] { BiomeDictionary.Type.COLD, BiomeDictionary.Type.DRY, BiomeDictionary.Type.DEAD });
+            BiomeDictionary.registerBiomeType(
+                    this,
+                    BiomeDictionary.Type.COLD,
+                    BiomeDictionary.Type.DRY,
+                    BiomeDictionary.Type.DEAD);
         }
     }
 }

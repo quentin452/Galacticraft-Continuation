@@ -1,19 +1,24 @@
 package micdoodle8.mods.galacticraft.api.prefab.world.gen;
 
-import java.util.*;
-import net.minecraft.world.*;
-import net.minecraftforge.common.*;
-import micdoodle8.mods.galacticraft.api.event.wgen.*;
-import cpw.mods.fml.common.eventhandler.*;
-import net.minecraft.world.gen.feature.*;
+import java.util.Random;
 
-public abstract class BiomeDecoratorSpace
-{
+import net.minecraft.world.World;
+import net.minecraft.world.gen.feature.WorldGenerator;
+import net.minecraftforge.common.MinecraftForge;
+
+import micdoodle8.mods.galacticraft.api.event.wgen.GCCoreEventPopulate;
+
+/**
+ * Do not include this prefab class in your released mod download.
+ */
+public abstract class BiomeDecoratorSpace {
+
     protected Random rand;
+
     protected int chunkX;
     protected int chunkZ;
-    
-    public void decorate(final World world, final Random random, final int chunkX, final int chunkZ) {
+
+    public void decorate(World world, Random random, int chunkX, int chunkZ) {
         if (this.getCurrentWorld() != null) {
             throw new RuntimeException("Already decorating!!");
         }
@@ -21,18 +26,18 @@ public abstract class BiomeDecoratorSpace
         this.rand = random;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        MinecraftForge.EVENT_BUS.post((Event)new GCCoreEventPopulate.Pre(world, this.rand, this.chunkX, this.chunkZ));
+        MinecraftForge.EVENT_BUS.post(new GCCoreEventPopulate.Pre(world, this.rand, this.chunkX, this.chunkZ));
         this.decorate();
-        MinecraftForge.EVENT_BUS.post((Event)new GCCoreEventPopulate.Post(world, this.rand, this.chunkX, this.chunkZ));
+        MinecraftForge.EVENT_BUS.post(new GCCoreEventPopulate.Post(world, this.rand, this.chunkX, this.chunkZ));
         this.setCurrentWorld(null);
         this.rand = null;
     }
-    
-    protected abstract void setCurrentWorld(final World p0);
-    
+
+    protected abstract void setCurrentWorld(World world);
+
     protected abstract World getCurrentWorld();
-    
-    protected void generateOre(final int amountPerChunk, final WorldGenerator worldGenerator, final int minY, final int maxY) {
+
+    protected void generateOre(int amountPerChunk, WorldGenerator worldGenerator, int minY, int maxY) {
         final World currentWorld = this.getCurrentWorld();
         for (int var5 = 0; var5 < amountPerChunk; ++var5) {
             final int var6 = this.chunkX + this.rand.nextInt(16);
@@ -41,6 +46,6 @@ public abstract class BiomeDecoratorSpace
             worldGenerator.generate(currentWorld, this.rand, var6, var7, var8);
         }
     }
-    
+
     protected abstract void decorate();
 }

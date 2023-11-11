@@ -1,37 +1,37 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
-import net.minecraftforge.client.*;
-import net.minecraft.item.*;
-import org.lwjgl.opengl.*;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.IItemRenderer;
 
-public class ItemRendererUnlitTorch implements IItemRenderer
-{
-    public boolean handleRenderType(final ItemStack item, final IItemRenderer.ItemRenderType type) {
+import org.lwjgl.opengl.GL11;
+
+public class ItemRendererUnlitTorch implements IItemRenderer {
+
+    @Override
+    public boolean handleRenderType(ItemStack item, ItemRenderType type) {
         return false;
     }
-    
-    public boolean shouldUseRenderHelper(final IItemRenderer.ItemRenderType type, final ItemStack item, final IItemRenderer.ItemRendererHelper helper) {
-        switch (helper) {
-            case INVENTORY_BLOCK: {
-                return true;
-            }
-            default: {
-                return false;
-            }
-        }
+
+    @Override
+    public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
+        return switch (helper) {
+            case INVENTORY_BLOCK -> true;
+            default -> false;
+        };
     }
-    
-    public void renderItem(final IItemRenderer.ItemRenderType type, final ItemStack item, final Object... data) {
+
+    @Override
+    public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         switch (type) {
-            case INVENTORY: {
+            case INVENTORY:
                 this.renderTorchInInv();
-                break;
-            }
+            default:
         }
     }
-    
+
     public void renderTorchInInv() {
         GL11.glPushMatrix();
+
         GL11.glPopMatrix();
     }
 }

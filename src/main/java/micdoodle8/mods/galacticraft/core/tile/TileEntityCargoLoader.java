@@ -1,199 +1,250 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import micdoodle8.mods.galacticraft.core.energy.tile.*;
-import net.minecraft.inventory.*;
-import micdoodle8.mods.galacticraft.api.tile.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.miccore.*;
-import cpw.mods.fml.relauncher.*;
-import micdoodle8.mods.galacticraft.api.entity.*;
-import net.minecraftforge.common.util.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.nbt.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import micdoodle8.mods.galacticraft.core.energy.item.*;
-import net.minecraft.world.*;
+import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 
-public class TileEntityCargoLoader extends TileBaseElectricBlockWithInventory implements ISidedInventory, ILandingPadAttachable
-{
-    private ItemStack[] containingItems;
+import cpw.mods.fml.relauncher.Side;
+import micdoodle8.mods.galacticraft.api.entity.ICargoEntity;
+import micdoodle8.mods.galacticraft.api.entity.ICargoEntity.EnumCargoLoadingState;
+import micdoodle8.mods.galacticraft.api.entity.ICargoEntity.RemovalResult;
+import micdoodle8.mods.galacticraft.api.tile.ILandingPadAttachable;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.energy.item.ItemElectricBase;
+import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseElectricBlockWithInventory;
+import micdoodle8.mods.galacticraft.core.util.Annotations.NetworkedField;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class TileEntityCargoLoader extends TileBaseElectricBlockWithInventory
+        implements ISidedInventory, ILandingPadAttachable {
+
+    private ItemStack[] containingItems = new ItemStack[15];
     public boolean outOfItems;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public boolean targetFull;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public boolean targetNoInventory;
-    @Annotations.NetworkedField(targetSide = Side.CLIENT)
+
+    @NetworkedField(targetSide = Side.CLIENT)
     public boolean noTarget;
+
     public ICargoEntity attachedFuelable;
-    
+
     public TileEntityCargoLoader() {
-        this.containingItems = new ItemStack[15];
-        this.storage.setMaxExtract(45.0f);
+        this.storage.setMaxExtract(45);
     }
-    
+
+    @Override
     public void updateEntity() {
         super.updateEntity();
+
         if (!this.worldObj.isRemote) {
             if (this.ticks % 100 == 0) {
                 this.checkForCargoEntity();
             }
+
             if (this.attachedFuelable != null) {
                 this.noTarget = false;
                 final ItemStack stack = this.removeCargo(false).resultStack;
+
                 if (stack != null) {
                     this.outOfItems = false;
-                    final ICargoEntity.EnumCargoLoadingState state = this.attachedFuelable.addCargo(stack, false);
-                    this.targetFull = (state == ICargoEntity.EnumCargoLoadingState.FULL);
-                    this.targetNoInventory = (state == ICargoEntity.EnumCargoLoadingState.NOINVENTORY);
-                    this.noTarget = (state == ICargoEntity.EnumCargoLoadingState.NOTARGET);
-                    if (this.ticks % 15 == 0 && state == ICargoEntity.EnumCargoLoadingState.SUCCESS && !this.disabled && this.hasEnoughEnergyToRun) {
+
+                    final EnumCargoLoadingState state = this.attachedFuelable.addCargo(stack, false);
+
+                    this.targetFull = state == EnumCargoLoadingState.FULL;
+                    this.targetNoInventory = state == EnumCargoLoadingState.NOINVENTORY;
+                    this.noTarget = state == EnumCargoLoadingState.NOTARGET;
+
+                    if (this.ticks % 15 == 0 && state == EnumCargoLoadingState.SUCCESS
+                            && !this.disabled
+                            && this.hasEnoughEnergyToRun) {
                         this.attachedFuelable.addCargo(this.removeCargo(true).resultStack, true);
                     }
-                }
-                else {
+                } else {
                     this.outOfItems = true;
                 }
-            }
-            else {
+            } else {
                 this.noTarget = true;
             }
         }
     }
-    
+
     public void checkForCargoEntity() {
         boolean foundFuelable = false;
+
         for (final ForgeDirection dir : ForgeDirection.values()) {
             if (dir != ForgeDirection.UNKNOWN) {
-                final TileEntity pad = new BlockVec3((TileEntity)this).getTileEntityOnSide(this.worldObj, dir);
-                if (pad != null && pad instanceof TileEntityMulti) {
-                    final TileEntity mainTile = ((TileEntityMulti)pad).getMainBlockTile();
+                final TileEntity pad = new BlockVec3(this).getTileEntityOnSide(this.worldObj, dir);
+
+                if (pad instanceof TileEntityMulti) {
+                    final TileEntity mainTile = ((TileEntityMulti) pad).getMainBlockTile();
+
                     if (mainTile instanceof ICargoEntity) {
-                        this.attachedFuelable = (ICargoEntity)mainTile;
+                        this.attachedFuelable = (ICargoEntity) mainTile;
                         foundFuelable = true;
                         break;
                     }
-                }
-                else if (pad != null && pad instanceof ICargoEntity) {
-                    this.attachedFuelable = (ICargoEntity)pad;
+                } else if (pad instanceof ICargoEntity) {
+                    this.attachedFuelable = (ICargoEntity) pad;
                     foundFuelable = true;
                     break;
                 }
             }
         }
+
         if (!foundFuelable) {
             this.attachedFuelable = null;
         }
     }
-    
-    public void readFromNBT(final NBTTagCompound par1NBTTagCompound) {
+
+    @Override
+    public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
         super.readFromNBT(par1NBTTagCompound);
         this.containingItems = this.readStandardItemsFromNBT(par1NBTTagCompound);
     }
-    
-    public void writeToNBT(final NBTTagCompound par1NBTTagCompound) {
+
+    @Override
+    public void writeToNBT(NBTTagCompound par1NBTTagCompound) {
         super.writeToNBT(par1NBTTagCompound);
         this.writeStandardItemsToNBT(par1NBTTagCompound);
     }
-    
+
+    @Override
     protected ItemStack[] getContainingItems() {
         return this.containingItems;
     }
-    
+
+    @Override
     public boolean hasCustomInventoryName() {
         return true;
     }
-    
+
+    @Override
     public String getInventoryName() {
         return GCCoreUtil.translate("container.cargoloader.name");
     }
-    
-    public int[] getAccessibleSlotsFromSide(final int side) {
-        return (side != this.getBlockMetadata() + 2) ? new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 } : new int[0];
+
+    // ISidedInventory Implementation:
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(int side) {
+        return side != this.getBlockMetadata() + 2 ? new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
+                : new int[] {};
     }
-    
-    public boolean canInsertItem(final int slotID, final ItemStack itemstack, final int side) {
-        return side != this.getBlockMetadata() + 2 && (slotID != 0 || ItemElectricBase.isElectricItem(itemstack.getItem()));
-    }
-    
-    public boolean canExtractItem(final int slotID, final ItemStack itemstack, final int side) {
+
+    @Override
+    public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
+        if (side != this.getBlockMetadata() + 2) {
+            if (slotID == 0) {
+                return ItemElectricBase.isElectricItem(itemstack.getItem());
+            }
+            return true;
+        }
+
         return false;
     }
-    
-    public boolean isItemValidForSlot(final int slotID, final ItemStack itemstack) {
-        return slotID != 0 || ItemElectricBase.isElectricItem(itemstack.getItem());
+
+    @Override
+    public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
+        return false;
     }
-    
+
+    @Override
+    public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
+        if (slotID == 0) {
+            return ItemElectricBase.isElectricItem(itemstack.getItem());
+        }
+        return true;
+    }
+
+    @Override
     public boolean shouldUseEnergy() {
         return !this.getDisabled(0);
     }
-    
-    public ICargoEntity.EnumCargoLoadingState addCargo(final ItemStack stack, final boolean doAdd) {
+
+    public EnumCargoLoadingState addCargo(ItemStack stack, boolean doAdd) {
         int count = 1;
-        count = 1;
-        while (count < this.containingItems.length) {
+
+        for (count = 1; count < this.containingItems.length; count++) {
             final ItemStack stackAt = this.containingItems[count];
-            if (stackAt != null && stackAt.getItem() == stack.getItem() && stackAt.getItemDamage() == stack.getItemDamage() && stackAt.stackSize < stackAt.getMaxStackSize()) {
+
+            if (stackAt != null && stackAt.getItem() == stack.getItem()
+                    && stackAt.getItemDamage() == stack.getItemDamage()
+                    && stackAt.stackSize < stackAt.getMaxStackSize()) {
                 if (stackAt.stackSize + stack.stackSize <= stackAt.getMaxStackSize()) {
                     if (doAdd) {
-                        final ItemStack itemStack = this.containingItems[count];
-                        itemStack.stackSize += stack.stackSize;
+                        this.containingItems[count].stackSize += stack.stackSize;
                         this.markDirty();
                     }
-                    return ICargoEntity.EnumCargoLoadingState.SUCCESS;
+
+                    return EnumCargoLoadingState.SUCCESS;
                 }
+                // Part of the stack can fill this slot but there will be some left over
                 final int origSize = stackAt.stackSize;
                 final int surplus = origSize + stack.stackSize - stackAt.getMaxStackSize();
+
                 if (doAdd) {
                     this.containingItems[count].stackSize = stackAt.getMaxStackSize();
                     this.markDirty();
                 }
+
                 stack.stackSize = surplus;
-                if (this.addCargo(stack, doAdd) == ICargoEntity.EnumCargoLoadingState.SUCCESS) {
-                    return ICargoEntity.EnumCargoLoadingState.SUCCESS;
+                if (this.addCargo(stack, doAdd) == EnumCargoLoadingState.SUCCESS) {
+                    return EnumCargoLoadingState.SUCCESS;
                 }
+
                 this.containingItems[count].stackSize = origSize;
-                return ICargoEntity.EnumCargoLoadingState.FULL;
-            }
-            else {
-                ++count;
+                return EnumCargoLoadingState.FULL;
             }
         }
-        for (count = 1; count < this.containingItems.length; ++count) {
+
+        for (count = 1; count < this.containingItems.length; count++) {
             final ItemStack stackAt = this.containingItems[count];
+
             if (stackAt == null) {
                 if (doAdd) {
                     this.containingItems[count] = stack;
                     this.markDirty();
                 }
-                return ICargoEntity.EnumCargoLoadingState.SUCCESS;
+
+                return EnumCargoLoadingState.SUCCESS;
             }
         }
-        return ICargoEntity.EnumCargoLoadingState.FULL;
+
+        return EnumCargoLoadingState.FULL;
     }
-    
-    public ICargoEntity.RemovalResult removeCargo(final boolean doRemove) {
-        for (int i = 1; i < this.containingItems.length; ++i) {
+
+    public RemovalResult removeCargo(boolean doRemove) {
+        for (int i = 1; i < this.containingItems.length; i++) {
             final ItemStack stackAt = this.containingItems[i];
+
             if (stackAt != null) {
                 final ItemStack resultStack = stackAt.copy();
                 resultStack.stackSize = 1;
-                if (doRemove) {
-                    final ItemStack itemStack = stackAt;
-                    if (--itemStack.stackSize <= 0) {
-                        this.containingItems[i] = null;
-                    }
+
+                if (doRemove && --stackAt.stackSize <= 0) {
+                    this.containingItems[i] = null;
                 }
+
                 if (doRemove) {
                     this.markDirty();
                 }
-                return new ICargoEntity.RemovalResult(ICargoEntity.EnumCargoLoadingState.SUCCESS, resultStack);
+
+                return new RemovalResult(EnumCargoLoadingState.SUCCESS, resultStack);
             }
         }
-        return new ICargoEntity.RemovalResult(ICargoEntity.EnumCargoLoadingState.EMPTY, (ItemStack)null);
+
+        return new RemovalResult(EnumCargoLoadingState.EMPTY, null);
     }
-    
-    public boolean canAttachToLandingPad(final IBlockAccess world, final int x, final int y, final int z) {
+
+    @Override
+    public boolean canAttachToLandingPad(IBlockAccess world, int x, int y, int z) {
         return true;
     }
 }

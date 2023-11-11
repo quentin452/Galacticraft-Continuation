@@ -1,30 +1,38 @@
 package micdoodle8.mods.galacticraft.api.inventory;
 
-import java.lang.reflect.*;
-import net.minecraft.entity.player.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
-public class AccessInventoryGC
-{
+import net.minecraft.entity.player.EntityPlayerMP;
+
+/**
+ * A static method for other mods to access the Galacticraft extended inventory.
+ * <p>
+ * Call: AccessInventoryGC.getGCInventoryForPlayer(player)
+ */
+public class AccessInventoryGC {
+
     private static Class<?> playerStatsClass;
     private static Method getMethod;
     private static Field extendedInventoryField;
-    
-    public static IInventoryGC getGCInventoryForPlayer(final EntityPlayerMP player) {
+
+    public static IInventoryGC getGCInventoryForPlayer(EntityPlayerMP player) {
         try {
-            if (AccessInventoryGC.playerStatsClass == null || AccessInventoryGC.getMethod == null || AccessInventoryGC.extendedInventoryField == null) {
-                AccessInventoryGC.playerStatsClass = Class.forName("micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats");
-                AccessInventoryGC.getMethod = AccessInventoryGC.playerStatsClass.getMethod("get", EntityPlayerMP.class);
-                AccessInventoryGC.extendedInventoryField = AccessInventoryGC.playerStatsClass.getField("extendedInventory");
+            if (playerStatsClass == null || getMethod == null || extendedInventoryField == null) {
+                playerStatsClass = Class.forName("micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStats");
+                getMethod = playerStatsClass.getMethod("get", EntityPlayerMP.class);
+                extendedInventoryField = playerStatsClass.getField("extendedInventory");
             }
-            final Object stats = AccessInventoryGC.getMethod.invoke(null, player);
+
+            final Object stats = getMethod.invoke(null, player);
             if (stats == null) {
                 return null;
             }
-            return (IInventoryGC)AccessInventoryGC.extendedInventoryField.get(stats);
-        }
-        catch (Exception e) {
+            return (IInventoryGC) extendedInventoryField.get(stats);
+        } catch (final Exception e) {
             e.printStackTrace();
-            return null;
         }
+
+        return null;
     }
 }

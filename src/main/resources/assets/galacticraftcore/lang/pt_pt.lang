@@ -426,7 +426,7 @@ gui.telemetryFailWearingIt.message=Vou precisar de tirar meu Módulo de Frequên
 
 gui.rocketType.0=Espaço de Armazenagem: 18
 gui.rocketType.1=Espaço de Armazenagem: 36
-gui.rocketType.2=Espaço de Armazenagem: 56
+gui.rocketType.2=Espaço de Armazenagem: 54
 gui.rocketType.3=Pré-abastecido
 
 gui.spacestation.typeCommand=Digite
@@ -446,6 +446,7 @@ gui.receiver.cannotAttach=Não dá para instalar um Receptor aqui!
 gui.warning.invalidThermal=Proteção Térmica Inválida
 
 gui.tank.oxygenRemaining=Oxigénio restante
+gui.tank.infinite=INFINITO
 gui.buggy.storageSpace=Espaço de Armazenagem
 gui.frequencyModule.desc.0=Capaz de receber ondas sonoras
 gui.frequencyModule.desc.1=fracas e sinais distantes

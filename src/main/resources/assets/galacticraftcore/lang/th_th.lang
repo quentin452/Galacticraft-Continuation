@@ -426,7 +426,7 @@ gui.telemetryFailWearingIt.message=ฉันต้องการเอาโม
 
 gui.rocketType.0=พื้นที่เก็บของ: 18
 gui.rocketType.1=พื้นที่เก็บของ: 36
-gui.rocketType.2=พื้นที่เก็บของ: 56
+gui.rocketType.2=พื้นที่เก็บของ: 54
 gui.rocketType.3=เชื้อเพลิงเต็ม
 
 gui.spacestation.typeCommand=ชนิด
@@ -446,6 +446,7 @@ gui.receiver.cannotAttach=ไม่สามารถวางเครื่อ
 gui.warning.invalidThermal=อันตราย ไม่พบเกราะป้องกันอุณหภูมิ!
 
 gui.tank.oxygenRemaining=ออกซิเจนที่เหลือ
+gui.tank.infinite=อนันต์
 gui.buggy.storageSpace=พื้นที่เก็บของ
 gui.frequencyModule.desc.0=สามารถรับเสียง คลื่น
 gui.frequencyModule.desc.1=และสัญญาณทางไกลได้

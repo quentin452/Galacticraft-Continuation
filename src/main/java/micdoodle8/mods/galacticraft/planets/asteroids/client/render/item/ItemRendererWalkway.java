@@ -1,123 +1,127 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.client.render.item;
 
-import net.minecraftforge.client.*;
-import net.minecraft.util.*;
-import net.minecraftforge.client.model.*;
-import net.minecraft.client.renderer.*;
-import org.lwjgl.opengl.*;
-import cpw.mods.fml.client.*;
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.*;
-import net.minecraft.item.*;
-import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.model.AdvancedModelLoader;
+import net.minecraftforge.client.model.IModelCustom;
 
-public class ItemRendererWalkway implements IItemRenderer
-{
-    private static final ResourceLocation textureMain;
-    private static final ResourceLocation textureWire;
-    private static final ResourceLocation texturePipe;
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
+
+public class ItemRendererWalkway implements IItemRenderer {
+
+    private static final ResourceLocation textureMain = new ResourceLocation(
+            AsteroidsModule.ASSET_PREFIX,
+            "textures/blocks/walkway.png");
+    private static final ResourceLocation textureWire = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/blocks/aluminumWire.png");
+    private static final ResourceLocation texturePipe = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/blocks/pipe_oxygen_white.png");
     public static IModelCustom modelWalkway;
-    
+
     public ItemRendererWalkway() {
-        ItemRendererWalkway.modelWalkway = AdvancedModelLoader.loadModel(new ResourceLocation("galacticraftasteroids", "models/walkway.obj"));
+        modelWalkway = AdvancedModelLoader
+                .loadModel(new ResourceLocation(AsteroidsModule.ASSET_PREFIX, "models/walkway.obj"));
     }
-    
-    private void renderWalkway(final IItemRenderer.ItemRenderType type, final RenderBlocks render, final ItemStack item, final float translateX, final float translateY, final float translateZ) {
+
+    private void renderWalkway(ItemRenderType type, ItemStack item) {
         GL11.glPushMatrix();
         this.transform(type);
-        GL11.glColor3f(1.0f, 1.0f, 1.0f);
-        FMLClientHandler.instance().getClient().renderEngine.bindTexture(ItemRendererWalkway.textureMain);
-        ItemRendererWalkway.modelWalkway.renderPart("Walkway");
+
+        GL11.glColor3f(1.0F, 1.0F, 1.0F);
+
+        FMLClientHandler.instance().getClient().renderEngine.bindTexture(textureMain);
+        modelWalkway.renderPart("Walkway");
+
         if (item.getItem() == Item.getItemFromBlock(AsteroidBlocks.blockWalkway)) {
-            ItemRendererWalkway.modelWalkway.renderPart("WalkwayBase");
+            modelWalkway.renderPart("WalkwayBase");
+        } else if (item.getItem() == Item.getItemFromBlock(AsteroidBlocks.blockWalkwayWire)) {
+            FMLClientHandler.instance().getClient().renderEngine.bindTexture(textureWire);
+            modelWalkway.renderPart("Wire");
+        } else if (item.getItem() == Item.getItemFromBlock(AsteroidBlocks.blockWalkwayOxygenPipe)) {
+            FMLClientHandler.instance().getClient().renderEngine.bindTexture(texturePipe);
+            modelWalkway.renderPart("Pipe");
         }
-        else if (item.getItem() == Item.getItemFromBlock(AsteroidBlocks.blockWalkwayWire)) {
-            FMLClientHandler.instance().getClient().renderEngine.bindTexture(ItemRendererWalkway.textureWire);
-            ItemRendererWalkway.modelWalkway.renderPart("Wire");
-        }
-        else if (item.getItem() == Item.getItemFromBlock(AsteroidBlocks.blockWalkwayOxygenPipe)) {
-            FMLClientHandler.instance().getClient().renderEngine.bindTexture(ItemRendererWalkway.texturePipe);
-            ItemRendererWalkway.modelWalkway.renderPart("Pipe");
-        }
+
         GL11.glPopMatrix();
     }
-    
-    public void transform(final IItemRenderer.ItemRenderType type) {
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED) {
-            GL11.glTranslatef(0.6f, 0.2f, 0.6f);
-            GL11.glRotatef(185.0f, 1.0f, 0.0f, 0.0f);
-            GL11.glRotatef(40.0f, 0.0f, 1.0f, 0.0f);
-            GL11.glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
-            GL11.glScalef(2.0f, 2.0f, 2.0f);
+
+    public void transform(ItemRenderType type) {
+        if (type == ItemRenderType.EQUIPPED) {
+            GL11.glTranslatef(0.6F, 0.2F, 0.6F);
+            GL11.glRotatef(185, 1, 0, 0);
+            GL11.glRotatef(40, 0, 1, 0);
+            GL11.glRotatef(0, 0, 0, 1);
+            GL11.glScalef(2.0F, 2.0F, 2.0F);
         }
-        if (type == IItemRenderer.ItemRenderType.EQUIPPED_FIRST_PERSON) {
-            GL11.glTranslatef(-0.1f, 0.5f, 0.6f);
-            GL11.glScalef(1.6f, 1.6f, 1.6f);
-            GL11.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
+
+        if (type == ItemRenderType.EQUIPPED_FIRST_PERSON) {
+            GL11.glTranslatef(-0.1F, 0.5F, 0.6F);
+            GL11.glScalef(1.6F, 1.6F, 1.6F);
+            GL11.glRotatef(180, 0, 0, 1);
         }
-        GL11.glScalef(-0.2f, -0.2f, 0.2f);
-        if (type == IItemRenderer.ItemRenderType.INVENTORY || type == IItemRenderer.ItemRenderType.ENTITY) {
-            if (type == IItemRenderer.ItemRenderType.INVENTORY) {
-                GL11.glTranslatef(0.0f, 4.0f, 0.1f);
-                GL11.glScalef(2.1f, 2.1f, 2.1f);
-                GL11.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
-                GL11.glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+
+        GL11.glScalef(-0.2F, -0.2F, 0.2F);
+
+        if (type == ItemRenderType.INVENTORY || type == ItemRenderType.ENTITY) {
+            if (type == ItemRenderType.INVENTORY) {
+                GL11.glTranslatef(0.0F, 4.0F, 0.1F);
+                GL11.glScalef(2.1F, 2.1F, 2.1F);
+                GL11.glRotatef(180, 0, 0, 1);
+                GL11.glRotatef(-90, 0, 1, 0);
+            } else {
+                GL11.glRotatef(180, 0, 0, 1);
+                GL11.glScalef(1.8F, 1.8F, 1.8F);
             }
-            else {
-                GL11.glRotatef(180.0f, 0.0f, 0.0f, 1.0f);
-                GL11.glScalef(1.8f, 1.8f, 1.8f);
-            }
-            GL11.glScalef(1.3f, 1.3f, 1.3f);
-        }
-    }
-    
-    public boolean handleRenderType(final ItemStack item, final IItemRenderer.ItemRenderType type) {
-        switch (type) {
-            case ENTITY: {
-                return true;
-            }
-            case EQUIPPED: {
-                return true;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                return true;
-            }
-            case INVENTORY: {
-                return true;
-            }
-            default: {
-                return false;
-            }
+
+            GL11.glScalef(1.3F, 1.3F, 1.3F);
         }
     }
-    
-    public boolean shouldUseRenderHelper(final IItemRenderer.ItemRenderType type, final ItemStack item, final IItemRenderer.ItemRendererHelper helper) {
+
+    /**
+     * IItemRenderer implementation *
+     */
+    @Override
+    public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+        return switch (type) {
+            case ENTITY -> true;
+            case EQUIPPED -> true;
+            case EQUIPPED_FIRST_PERSON -> true;
+            case INVENTORY -> true;
+            default -> false;
+        };
+    }
+
+    @Override
+    public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
         return true;
     }
-    
-    public void renderItem(final IItemRenderer.ItemRenderType type, final ItemStack item, final Object... data) {
+
+    @Override
+    public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
         switch (type) {
-            case EQUIPPED: {
-                this.renderWalkway(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED:
+                this.renderWalkway(type, item);
                 break;
-            }
-            case EQUIPPED_FIRST_PERSON: {
-                this.renderWalkway(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case EQUIPPED_FIRST_PERSON:
+                this.renderWalkway(type, item);
                 break;
-            }
-            case INVENTORY: {
-                this.renderWalkway(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case INVENTORY:
+                this.renderWalkway(type, item);
                 break;
-            }
-            case ENTITY: {
-                this.renderWalkway(type, (RenderBlocks)data[0], item, -0.5f, -0.5f, -0.5f);
+            case ENTITY:
+                this.renderWalkway(type, item);
                 break;
-            }
+            default:
+                break;
         }
-    }
-    
-    static {
-        textureMain = new ResourceLocation("galacticraftasteroids", "textures/blocks/walkway.png");
-        textureWire = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/blocks/aluminumWire.png");
-        texturePipe = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/blocks/pipe_oxygen_white.png");
     }
 }

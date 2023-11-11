@@ -1,214 +1,230 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.api.block.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.block.material.*;
-import net.minecraft.client.renderer.texture.*;
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.entity.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.init.*;
-import net.minecraft.item.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraftforge.common.util.*;
-import net.minecraftforge.common.*;
-import net.minecraft.block.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.core.wrappers.*;
-import micdoodle8.mods.galacticraft.core.tick.*;
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-public class BlockBasicMoon extends BlockAdvancedTile implements IDetectableResource, IPlantableBlock, ITerraformableBlock
-{
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFlower;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.block.IDetectableResource;
+import micdoodle8.mods.galacticraft.api.block.IPlantableBlock;
+import micdoodle8.mods.galacticraft.api.block.ITerraformableBlock;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3Dim;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.GCItems;
+import micdoodle8.mods.galacticraft.core.tick.TickHandlerServer;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityDungeonSpawner;
+import micdoodle8.mods.galacticraft.core.wrappers.Footprint;
+
+public class BlockBasicMoon extends BlockAdvancedTile
+        implements IDetectableResource, IPlantableBlock, ITerraformableBlock {
+
+    // CopperMoon: 0, TinMoon: 1, CheeseStone: 2
+    // Moon dirt: 3; Moon rock: 4; Moon topsoil: 5-13 (6-13 have GC2 footprints);
+    // Moon dungeon brick: 14; Moon boss
+    // spawner: 15;
     @SideOnly(Side.CLIENT)
     private IIcon[] moonBlockIcons;
-    
+
     public BlockBasicMoon() {
         super(Material.rock);
-        this.blockHardness = 1.5f;
-        this.blockResistance = 2.5f;
+        this.blockHardness = 1.5F;
+        this.blockResistance = 2.5F;
         this.setBlockName("moonBlock");
     }
-    
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
         if (world.getBlockMetadata(x, y, z) == 15) {
-            return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x, (double)y, (double)z);
+            return AxisAlignedBB.getBoundingBox(x, y, z, x, y, z);
         }
+
         return super.getCollisionBoundingBoxFromPool(world, x, y, z);
     }
-    
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int x, final int y, final int z) {
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
         if (world.getBlockMetadata(x, y, z) == 15) {
-            return AxisAlignedBB.getBoundingBox((double)x, (double)y, (double)z, (double)x, (double)y, (double)z);
+            return AxisAlignedBB.getBoundingBox(x, y, z, x, y, z);
         }
+
         return super.getSelectedBoundingBoxFromPool(world, x, y, z);
     }
-    
-    public boolean isNormalCube(final IBlockAccess world, final int x, final int y, final int z) {
-        return world.getBlockMetadata(x, y, z) != 15 && super.isNormalCube(world, x, y, z);
+
+    @Override
+    public boolean isNormalCube(IBlockAccess world, int x, int y, int z) {
+        if (world.getBlockMetadata(x, y, z) == 15) {
+            return false;
+        }
+        return super.isNormalCube(world, x, y, z);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
-        (this.moonBlockIcons = new IIcon[17])[0] = par1IconRegister.registerIcon("galacticraftmoon:top");
-        this.moonBlockIcons[1] = par1IconRegister.registerIcon("galacticraftmoon:brick");
-        this.moonBlockIcons[2] = par1IconRegister.registerIcon("galacticraftmoon:middle");
-        this.moonBlockIcons[3] = par1IconRegister.registerIcon("galacticraftmoon:top_side");
-        this.moonBlockIcons[4] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_1");
-        this.moonBlockIcons[5] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_2");
-        this.moonBlockIcons[6] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_3");
-        this.moonBlockIcons[7] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_4");
-        this.moonBlockIcons[8] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_5");
-        this.moonBlockIcons[9] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_6");
-        this.moonBlockIcons[10] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_7");
-        this.moonBlockIcons[11] = par1IconRegister.registerIcon("galacticraftmoon:grass_step_8");
-        this.moonBlockIcons[12] = par1IconRegister.registerIcon("galacticraftmoon:moonore_copper");
-        this.moonBlockIcons[13] = par1IconRegister.registerIcon("galacticraftmoon:moonore_tin");
-        this.moonBlockIcons[14] = par1IconRegister.registerIcon("galacticraftmoon:moonore_cheese");
-        this.moonBlockIcons[15] = par1IconRegister.registerIcon("galacticraftmoon:bottom");
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
+        this.moonBlockIcons = new IIcon[17];
+        this.moonBlockIcons[0] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "top");
+        this.moonBlockIcons[1] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "brick");
+        this.moonBlockIcons[2] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "middle");
+        this.moonBlockIcons[3] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "top_side");
+        this.moonBlockIcons[4] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_1");
+        this.moonBlockIcons[5] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_2");
+        this.moonBlockIcons[6] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_3");
+        this.moonBlockIcons[7] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_4");
+        this.moonBlockIcons[8] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_5");
+        this.moonBlockIcons[9] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_6");
+        this.moonBlockIcons[10] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_7");
+        this.moonBlockIcons[11] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "grass_step_8");
+        this.moonBlockIcons[12] = par1IconRegister
+                .registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "moonore_copper");
+        this.moonBlockIcons[13] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "moonore_tin");
+        this.moonBlockIcons[14] = par1IconRegister
+                .registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "moonore_cheese");
+        this.moonBlockIcons[15] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX_MOON + "bottom");
         this.moonBlockIcons[16] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "blank");
     }
-    
+
     @SideOnly(Side.CLIENT)
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
-    public float getExplosionResistance(final Entity par1Entity, final World world, final int x, final int y, final int z, final double explosionX, final double explosionY, final double explosionZ) {
+
+    @Override
+    public float getExplosionResistance(Entity par1Entity, World world, int x, int y, int z, double explosionX,
+            double explosionY, double explosionZ) {
         final int metadata = world.getBlockMetadata(x, y, z);
-        if (metadata == 15) {
-            return 10000.0f;
+
+        switch (metadata) {
+            case 15:
+                return 10000.0F;
+            case 14:
+                return 40.0F;
+            case 4:
+                return 6.0F;
+            default:
+                if (metadata < 3) {
+                    return 3.0F;
+                }
+                break;
         }
-        if (metadata == 14) {
-            return 40.0f;
-        }
-        if (metadata == 4) {
-            return 6.0f;
-        }
-        if (metadata < 3) {
-            return 3.0f;
-        }
-        return this.blockResistance / 5.0f;
+
+        return this.blockResistance / 5.0F;
     }
-    
-    public float getBlockHardness(final World par1World, final int par2, final int par3, final int par4) {
+
+    @Override
+    public float getBlockHardness(World par1World, int par2, int par3, int par4) {
         final int meta = par1World.getBlockMetadata(par2, par3, par4);
-        if (meta == 3 || (meta >= 5 && meta <= 13)) {
-            return 0.5f;
+
+        if (meta == 3 || meta >= 5 && meta <= 13) {
+            return 0.5F;
         }
+
         if (meta == 14) {
-            return 4.0f;
+            return 4.0F;
         }
+
         if (meta > 13) {
-            return -1.0f;
+            return -1F;
         }
+
         if (meta < 2) {
-            return 5.0f;
+            return 5.0F;
         }
+
         if (meta == 2) {
-            return 3.0f;
+            return 3.0F;
         }
+
         return this.blockHardness;
     }
-    
-    public boolean canHarvestBlock(final EntityPlayer player, final int meta) {
-        return meta == 3 || (meta >= 5 && meta <= 13) || super.canHarvestBlock(player, meta);
+
+    @Override
+    public boolean canHarvestBlock(EntityPlayer player, int meta) {
+        if (meta == 3 || meta >= 5 && meta <= 13) {
+            return true;
+        }
+
+        return super.canHarvestBlock(player, meta);
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(final int side, final int meta) {
-        if (meta >= 5 && meta <= 13) {
-            if (side == 1) {
-                switch (meta - 5) {
-                    case 0: {
-                        return this.moonBlockIcons[0];
-                    }
-                    case 1: {
-                        return this.moonBlockIcons[4];
-                    }
-                    case 2: {
-                        return this.moonBlockIcons[5];
-                    }
-                    case 3: {
-                        return this.moonBlockIcons[6];
-                    }
-                    case 4: {
-                        return this.moonBlockIcons[7];
-                    }
-                    case 5: {
-                        return this.moonBlockIcons[8];
-                    }
-                    case 6: {
-                        return this.moonBlockIcons[9];
-                    }
-                    case 7: {
-                        return this.moonBlockIcons[10];
-                    }
-                    case 8: {
-                        return this.moonBlockIcons[11];
-                    }
-                    default: {
-                        return null;
-                    }
-                }
-            }
-            else {
-                if (side == 0) {
-                    return this.moonBlockIcons[2];
-                }
-                return this.moonBlockIcons[3];
-            }
+    @Override
+    public IIcon getIcon(int side, int meta) {
+        if ((meta < 5) || (meta > 13)) {
+            return switch (meta) {
+                case 0 -> this.moonBlockIcons[12];
+                case 1 -> this.moonBlockIcons[13];
+                case 2 -> this.moonBlockIcons[14];
+                case 3 -> this.moonBlockIcons[2];
+                case 4 -> this.moonBlockIcons[15];
+                case 14 -> this.moonBlockIcons[1];
+                case 15 -> this.moonBlockIcons[16];
+                default -> this.moonBlockIcons[16];
+            };
         }
-        else {
-            switch (meta) {
-                case 0: {
-                    return this.moonBlockIcons[12];
-                }
-                case 1: {
-                    return this.moonBlockIcons[13];
-                }
-                case 2: {
-                    return this.moonBlockIcons[14];
-                }
-                case 3: {
-                    return this.moonBlockIcons[2];
-                }
-                case 4: {
-                    return this.moonBlockIcons[15];
-                }
-                case 14: {
-                    return this.moonBlockIcons[1];
-                }
-                case 15: {
-                    return this.moonBlockIcons[16];
-                }
-                default: {
-                    return this.moonBlockIcons[16];
-                }
+        if (side == 1) {
+            switch (meta - 5) {
+                case 0:
+                    return this.moonBlockIcons[0];
+                case 1:
+                    return this.moonBlockIcons[4];
+                case 2:
+                    return this.moonBlockIcons[5];
+                case 3:
+                    return this.moonBlockIcons[6];
+                case 4:
+                    return this.moonBlockIcons[7];
+                case 5:
+                    return this.moonBlockIcons[8];
+                case 6:
+                    return this.moonBlockIcons[9];
+                case 7:
+                    return this.moonBlockIcons[10];
+                case 8:
+                    return this.moonBlockIcons[11];
             }
+        } else if (side == 0) {
+            return this.moonBlockIcons[2];
+        } else {
+            return this.moonBlockIcons[3];
         }
+
+        return null;
     }
-    
-    public Item getItemDropped(final int meta, final Random random, final int par3) {
-        switch (meta) {
-            case 2: {
-                return GCItems.cheeseCurd;
-            }
-            case 15: {
-                return Item.getItemFromBlock(Blocks.air);
-            }
-            default: {
-                return Item.getItemFromBlock((Block)this);
-            }
-        }
+
+    @Override
+    public Item getItemDropped(int meta, Random random, int par3) {
+        return switch (meta) {
+            case 2 -> GCItems.cheeseCurd;
+            case 15 -> Item.getItemFromBlock(Blocks.air);
+            default -> Item.getItemFromBlock(this);
+        };
     }
-    
-    public int damageDropped(final int meta) {
+
+    @Override
+    public int damageDropped(int meta) {
         if (meta >= 5 && meta <= 13) {
             return 5;
         }
@@ -217,124 +233,150 @@ public class BlockBasicMoon extends BlockAdvancedTile implements IDetectableReso
         }
         return meta;
     }
-    
-    public int getDamageValue(final World p_149643_1_, final int p_149643_2_, final int p_149643_3_, final int p_149643_4_) {
-        return p_149643_1_.getBlockMetadata(p_149643_2_, p_149643_3_, p_149643_4_);
+
+    @Override
+    public int getDamageValue(World worldIn, int x, int y, int z) {
+        return worldIn.getBlockMetadata(x, y, z);
     }
-    
-    public int quantityDropped(final int meta, final int fortune, final Random random) {
+
+    @Override
+    public int quantityDropped(int meta, int fortune, Random random) {
         switch (meta) {
-            case 2: {
+            case 2:
                 if (fortune >= 1) {
-                    return (random.nextFloat() < fortune * 0.29f - 0.25f) ? 2 : 1;
+                    return random.nextFloat() < fortune * 0.29F - 0.25F ? 2 : 1;
                 }
                 return 1;
-            }
-            case 15: {
+            case 15:
                 return 0;
-            }
-            default: {
+            default:
                 return 1;
-            }
         }
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(final Item par1, final CreativeTabs par2CreativeTabs, final List par3List) {
-        for (int var4 = 0; var4 < 6; ++var4) {
+    @Override
+    public void getSubBlocks(Item par1, CreativeTabs par2CreativeTabs, List<ItemStack> par3List) {
+        int var4;
+
+        for (var4 = 0; var4 < 6; ++var4) {
             par3List.add(new ItemStack(par1, 1, var4));
         }
-        for (int var4 = 14; var4 < 15; ++var4) {
+
+        for (var4 = 14; var4 < 15; var4++) {
             par3List.add(new ItemStack(par1, 1, var4));
         }
     }
-    
-    public TileEntity createTileEntity(final World world, final int metadata) {
+
+    @Override
+    public TileEntity createTileEntity(World world, int metadata) {
         if (metadata == 15) {
             return new TileEntityDungeonSpawner();
         }
+
         return null;
     }
-    
-    public boolean hasTileEntity(final int metadata) {
+
+    @Override
+    public boolean hasTileEntity(int metadata) {
         return metadata == 15;
     }
-    
-    public boolean isValueable(final int metadata) {
-        switch (metadata) {
-            case 0: {
-                return true;
-            }
-            case 1: {
-                return true;
-            }
-            case 2: {
-                return true;
-            }
-            default: {
-                return false;
-            }
-        }
+
+    @Override
+    public boolean isValueable(int metadata) {
+        return switch (metadata) {
+            case 0 -> true;
+            case 1 -> true;
+            case 2 -> true;
+            default -> false;
+        };
     }
-    
-    public boolean canSustainPlant(final IBlockAccess world, final int x, final int y, final int z, final ForgeDirection direction, final IPlantable plantable) {
+
+    @Override
+    public boolean canSustainPlant(IBlockAccess world, int x, int y, int z, ForgeDirection direction,
+            IPlantable plantable) {
         final int metadata = world.getBlockMetadata(x, y, z);
+
         if (metadata < 5 && metadata > 13) {
             return false;
         }
+
         plantable.getPlant(world, x, y + 1, z);
+
         return plantable instanceof BlockFlower;
     }
-    
+
+    @Override
     public int requiredLiquidBlocksNearby() {
         return 4;
     }
-    
-    public boolean isPlantable(final int metadata) {
+
+    @Override
+    public boolean isPlantable(int metadata) {
         return metadata >= 5 && metadata <= 13;
     }
-    
-    public boolean isTerraformable(final World world, final int x, final int y, final int z) {
+
+    @Override
+    public boolean isTerraformable(World world, int x, int y, int z) {
         final int meta = world.getBlockMetadata(x, y, z);
-        return meta >= 5 && meta <= 13 && !world.getBlock(x, y + 1, z).isOpaqueCube();
+
+        if (meta >= 5 && meta <= 13) {
+            return !world.getBlock(x, y + 1, z).isOpaqueCube();
+        }
+
+        return false;
     }
-    
-    public ItemStack getPickBlock(final MovingObjectPosition target, final World world, final int x, final int y, final int z) {
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         final int metadata = world.getBlockMetadata(x, y, z);
         if (metadata == 2) {
-            return new ItemStack(Item.getItemFromBlock((Block)this), 1, metadata);
+            return new ItemStack(Item.getItemFromBlock(this), 1, metadata);
         }
         if (metadata == 15) {
             return null;
         }
+
         return super.getPickBlock(target, world, x, y, z);
     }
-    
-    public void breakBlock(final World world, final int x, final int y, final int z, final Block block, final int par6) {
+
+    @Override
+    public void breakBlock(World world, int x, int y, int z, Block block, int par6) {
         super.breakBlock(world, x, y, z, block, par6);
+
         if (!world.isRemote && block == this && par6 == 5) {
-            final Map<Long, List<Footprint>> footprintChunkMap = TickHandlerServer.serverFootprintMap.get(world.provider.dimensionId);
+            final Map<Long, List<Footprint>> footprintChunkMap = TickHandlerServer.serverFootprintMap
+                    .get(world.provider.dimensionId);
+
             if (footprintChunkMap != null) {
                 final long chunkKey = ChunkCoordIntPair.chunkXZ2Int(x >> 4, z >> 4);
                 final List<Footprint> footprintList = footprintChunkMap.get(chunkKey);
+
                 if (footprintList != null && !footprintList.isEmpty()) {
-                    final List<Footprint> toRemove = new ArrayList<Footprint>();
+                    final List<Footprint> toRemove = new ArrayList<>();
+
                     for (final Footprint footprint : footprintList) {
-                        if (footprint.position.x > x && footprint.position.x < x + 1 && footprint.position.z > z && footprint.position.z < z + 1) {
+                        if (footprint.position.x > x && footprint.position.x < x + 1
+                                && footprint.position.z > z
+                                && footprint.position.z < z + 1) {
                             toRemove.add(footprint);
                         }
                     }
+
                     if (!toRemove.isEmpty()) {
                         footprintList.removeAll(toRemove);
                         footprintChunkMap.put(chunkKey, footprintList);
                     }
                 }
             }
+
             TickHandlerServer.footprintBlockChanges.add(new BlockVec3Dim(x, y, z, world.provider.dimensionId));
         }
     }
-    
-    public boolean isReplaceableOreGen(final World world, final int x, final int y, final int z, final Block target) {
+
+    @Override
+    public boolean isReplaceableOreGen(World world, int x, int y, int z, Block target) {
         if (target != Blocks.stone) {
             return false;
         }

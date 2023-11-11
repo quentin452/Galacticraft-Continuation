@@ -1,138 +1,199 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import micdoodle8.mods.galacticraft.api.entity.*;
-import net.minecraft.util.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import net.minecraft.tileentity.*;
-import cpw.mods.fml.client.*;
-import net.minecraft.block.*;
-import net.minecraftforge.fluids.*;
-import net.minecraft.item.*;
-import java.util.*;
-import micdoodle8.mods.galacticraft.api.tile.*;
-import net.minecraft.world.*;
+import java.util.HashSet;
+import java.util.List;
 
-public class TileEntityBuggyFueler extends TileEntityMulti implements IMultiBlock, IFuelable, IFuelDock, ICargoEntity
-{
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fluids.FluidStack;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import micdoodle8.mods.galacticraft.api.entity.ICargoEntity;
+import micdoodle8.mods.galacticraft.api.entity.IDockable;
+import micdoodle8.mods.galacticraft.api.entity.IFuelable;
+import micdoodle8.mods.galacticraft.api.tile.IFuelDock;
+import micdoodle8.mods.galacticraft.api.tile.ILandingPadAttachable;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.blocks.BlockMulti;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+
+public class TileEntityBuggyFueler extends TileEntityMulti implements IMultiBlock, IFuelable, IFuelDock, ICargoEntity {
+
     private IDockable dockedEntity;
-    
+
+    @Override
     public void updateEntity() {
         super.updateEntity();
+
         if (!this.worldObj.isRemote) {
-            final List<?> list = (List<?>)this.worldObj.getEntitiesWithinAABB((Class)IFuelable.class, AxisAlignedBB.getBoundingBox(this.xCoord - 1.5, this.yCoord - 2.0, this.zCoord - 1.5, this.xCoord + 1.5, this.yCoord + 4.0, this.zCoord + 1.5));
+            final List<?> list = this.worldObj.getEntitiesWithinAABB(
+                    IFuelable.class,
+                    AxisAlignedBB.getBoundingBox(
+                            this.xCoord - 1.5D,
+                            this.yCoord - 2.0,
+                            this.zCoord - 1.5D,
+                            this.xCoord + 1.5D,
+                            this.yCoord + 4.0,
+                            this.zCoord + 1.5D));
+
             boolean changed = false;
+
             for (final Object o : list) {
-                if (o != null && o instanceof IDockable && !this.worldObj.isRemote) {
-                    final IDockable fuelable = (IDockable)o;
-                    if (!fuelable.isDockValid((IFuelDock)this)) {
-                        continue;
-                    }
-                    (this.dockedEntity = fuelable).setPad((IFuelDock)this);
+                if (o != null && o instanceof IDockable fuelable
+                        && !this.worldObj.isRemote
+                        && fuelable.isDockValid(this)) {
+                    this.dockedEntity = fuelable;
+
+                    this.dockedEntity.setPad(this);
+
                     changed = true;
                 }
             }
+
             if (!changed) {
                 if (this.dockedEntity != null) {
-                    this.dockedEntity.setPad((IFuelDock)null);
+                    this.dockedEntity.setPad(null);
                 }
+
                 this.dockedEntity = null;
             }
         }
     }
-    
+
+    @Override
     public boolean canUpdate() {
         return true;
     }
-    
-    public boolean onActivated(final EntityPlayer entityPlayer) {
+
+    @Override
+    public boolean onActivated(EntityPlayer entityPlayer) {
         return false;
     }
-    
-    public void onCreate(final BlockVec3 placedPosition) {
+
+    @Override
+    public void onCreate(BlockVec3 placedPosition) {
         this.mainBlockPosition = placedPosition;
         this.markDirty();
-        for (int x = -1; x < 2; ++x) {
-            for (int z = -1; z < 2; ++z) {
+
+        for (int x = -1; x < 2; x++) {
+            for (int z = -1; z < 2; z++) {
                 final BlockVec3 vecToAdd = new BlockVec3(placedPosition.x + x, placedPosition.y, placedPosition.z + z);
-                if (!vecToAdd.equals((Object)placedPosition)) {
-                    ((BlockMulti)GCBlocks.fakeBlock).makeFakeBlock(this.worldObj, vecToAdd, placedPosition, 6);
+
+                if (!vecToAdd.equals(placedPosition)) {
+                    ((BlockMulti) GCBlocks.fakeBlock).makeFakeBlock(this.worldObj, vecToAdd, placedPosition, 6);
                 }
             }
         }
     }
-    
-    public void onDestroy(final TileEntity callingBlock) {
-        final BlockVec3 thisBlock = new BlockVec3((TileEntity)this);
+
+    @Override
+    public void onDestroy(TileEntity callingBlock) {
+        final BlockVec3 thisBlock = new BlockVec3(this);
+
         this.worldObj.func_147480_a(thisBlock.x, thisBlock.y, thisBlock.z, true);
-        for (int x = -1; x < 2; ++x) {
-            for (int z = -1; z < 2; ++z) {
-                if (this.worldObj.isRemote && this.worldObj.rand.nextDouble() < 0.1) {
-                    FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(thisBlock.x + x, thisBlock.y, thisBlock.z + z, GCBlocks.landingPad, Block.getIdFromBlock(GCBlocks.landingPad) >> 12 & 0xFF);
+
+        for (int x = -1; x < 2; x++) {
+            for (int z = -1; z < 2; z++) {
+                if (this.worldObj.isRemote && this.worldObj.rand.nextDouble() < 0.1D) {
+                    FMLClientHandler.instance().getClient().effectRenderer.addBlockDestroyEffects(
+                            thisBlock.x + x,
+                            thisBlock.y,
+                            thisBlock.z + z,
+                            GCBlocks.landingPad,
+                            Block.getIdFromBlock(GCBlocks.landingPad) >> 12 & 255);
                 }
+
                 this.worldObj.func_147480_a(thisBlock.x + x, thisBlock.y, thisBlock.z + z, false);
             }
         }
+
         if (this.dockedEntity != null) {
             this.dockedEntity.onPadDestroyed();
             this.dockedEntity = null;
         }
     }
-    
-    public int addFuel(final FluidStack liquid, final boolean doFill) {
+
+    @Override
+    public int addFuel(FluidStack liquid, boolean doFill) {
         if (this.dockedEntity != null) {
             return this.dockedEntity.addFuel(liquid, doFill);
         }
+
         return 0;
     }
-    
-    public FluidStack removeFuel(final int amount) {
+
+    @Override
+    public FluidStack removeFuel(int amount) {
         if (this.dockedEntity != null) {
             return this.dockedEntity.removeFuel(amount);
         }
+
         return null;
     }
-    
-    public ICargoEntity.EnumCargoLoadingState addCargo(final ItemStack stack, final boolean doAdd) {
+
+    @Override
+    public EnumCargoLoadingState addCargo(ItemStack stack, boolean doAdd) {
         if (this.dockedEntity != null) {
             return this.dockedEntity.addCargo(stack, doAdd);
         }
-        return ICargoEntity.EnumCargoLoadingState.NOTARGET;
+
+        return EnumCargoLoadingState.NOTARGET;
     }
-    
-    public ICargoEntity.RemovalResult removeCargo(final boolean doRemove) {
+
+    @Override
+    public RemovalResult removeCargo(boolean doRemove) {
         if (this.dockedEntity != null) {
             return this.dockedEntity.removeCargo(doRemove);
         }
-        return new ICargoEntity.RemovalResult(ICargoEntity.EnumCargoLoadingState.NOTARGET, (ItemStack)null);
+
+        return new RemovalResult(EnumCargoLoadingState.NOTARGET, null);
     }
-    
+
+    @Override
     public HashSet<ILandingPadAttachable> getConnectedTiles() {
-        final HashSet<ILandingPadAttachable> connectedTiles = new HashSet<ILandingPadAttachable>();
-        for (int x = -2; x < 3; ++x) {
-            for (int z = -2; z < 3; ++z) {
-                if ((x == -2 || x == 2 || z == -2 || z == 2) && Math.abs(x) != Math.abs(z)) {
-                    final TileEntity tile = this.worldObj.getTileEntity(this.xCoord + x, this.yCoord, this.zCoord + z);
-                    if (tile != null && tile instanceof ILandingPadAttachable && ((ILandingPadAttachable)tile).canAttachToLandingPad((IBlockAccess)this.worldObj, this.xCoord, this.yCoord, this.zCoord)) {
-                        connectedTiles.add((ILandingPadAttachable)tile);
+        final HashSet<ILandingPadAttachable> connectedTiles = new HashSet<>();
+
+        for (int x = -2; x < 3; x++) {
+            for (int z = -2; z < 3; z++) {
+                if (x == -2 || x == 2 || z == -2 || z == 2) {
+                    if (Math.abs(x) != Math.abs(z)) {
+                        final TileEntity tile = this.worldObj
+                                .getTileEntity(this.xCoord + x, this.yCoord, this.zCoord + z);
+
+                        if (tile instanceof ILandingPadAttachable && ((ILandingPadAttachable) tile)
+                                .canAttachToLandingPad(this.worldObj, this.xCoord, this.yCoord, this.zCoord)) {
+                            connectedTiles.add((ILandingPadAttachable) tile);
+                        }
                     }
                 }
             }
         }
+
         return connectedTiles;
     }
-    
-    public boolean isBlockAttachable(final IBlockAccess world, final int x, final int y, final int z) {
+
+    @Override
+    public boolean isBlockAttachable(IBlockAccess world, int x, int y, int z) {
         final TileEntity tile = world.getTileEntity(x, y, z);
-        return tile != null && tile instanceof ILandingPadAttachable && ((ILandingPadAttachable)tile).canAttachToLandingPad(world, this.xCoord, this.yCoord, this.zCoord);
+
+        if (tile instanceof ILandingPadAttachable) {
+            return ((ILandingPadAttachable) tile).canAttachToLandingPad(world, this.xCoord, this.yCoord, this.zCoord);
+        }
+
+        return false;
     }
-    
+
+    @Override
     public IDockable getDockedEntity() {
         return this.dockedEntity;
     }
-    
-    public void dockEntity(final IDockable entity) {
+
+    @Override
+    public void dockEntity(IDockable entity) {
         this.dockedEntity = entity;
     }
 }

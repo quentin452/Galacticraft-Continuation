@@ -1,97 +1,140 @@
 package micdoodle8.mods.galacticraft.core.client.gui.overlay;
 
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.client.*;
-import net.minecraft.item.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.client.gui.*;
-import net.minecraft.util.*;
-import org.lwjgl.opengl.*;
-import cpw.mods.fml.client.*;
-import net.minecraft.client.renderer.*;
-import micdoodle8.mods.galacticraft.core.proxy.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import micdoodle8.mods.galacticraft.core.entities.player.*;
-import micdoodle8.mods.galacticraft.core.util.*;
-import java.util.*;
-import net.minecraft.client.entity.*;
-import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.entities.player.GCPlayerStatsClient;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.util.ClientUtil;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+import micdoodle8.mods.galacticraft.core.util.PlayerUtil;
 
 @SideOnly(Side.CLIENT)
-public class OverlaySensorGlasses extends Overlay
-{
-    private static final ResourceLocation hudTexture;
-    private static final ResourceLocation indicatorTexture;
-    private static Minecraft minecraft;
-    private static int zoom;
-    
-    public static void renderSensorGlassesMain(final ItemStack stack, final EntityPlayer player, final ScaledResolution resolution, final float partialTicks, final boolean hasScreen, final int mouseX, final int mouseY) {
-        ++OverlaySensorGlasses.zoom;
-        final float f = MathHelper.sin(OverlaySensorGlasses.zoom / 80.0f) * 0.1f + 0.1f;
-        final ScaledResolution scaledresolution = ClientUtil.getScaledRes(OverlaySensorGlasses.minecraft, OverlaySensorGlasses.minecraft.displayWidth, OverlaySensorGlasses.minecraft.displayHeight);
+public class OverlaySensorGlasses extends Overlay {
+
+    private static final ResourceLocation hudTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/gui/hud.png");
+    private static final ResourceLocation indicatorTexture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/gui/indicator.png");
+
+    private static final Minecraft minecraft = FMLClientHandler.instance().getClient();
+
+    private static int zoom = 0;
+
+    /**
+     * Render the GUI that displays sensor glasses
+     */
+    public static void renderSensorGlassesMain(ItemStack stack, EntityPlayer player, ScaledResolution resolution,
+            float partialTicks, boolean hasScreen, int mouseX, int mouseY) {
+        OverlaySensorGlasses.zoom++;
+
+        final float f = MathHelper.sin(OverlaySensorGlasses.zoom / 80.0F) * 0.1F + 0.1F;
+
+        final ScaledResolution scaledresolution = ClientUtil.getScaledRes(
+                OverlaySensorGlasses.minecraft,
+                OverlaySensorGlasses.minecraft.displayWidth,
+                OverlaySensorGlasses.minecraft.displayHeight);
         final int i = scaledresolution.getScaledWidth();
         final int k = scaledresolution.getScaledHeight();
         OverlaySensorGlasses.minecraft.entityRenderer.setupOverlayRendering();
-        GL11.glEnable(3042);
-        GL11.glDisable(2929);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDepthMask(false);
-        GL11.glBlendFunc(770, 771);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glDisable(3008);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
         FMLClientHandler.instance().getClient().renderEngine.bindTexture(OverlaySensorGlasses.hudTexture);
         final Tessellator tessellator = Tessellator.instance;
+
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(i / 2 - 2 * k - f * 80.0f), (double)(k + f * 40.0f), -90.0, 0.0, 1.0);
-        tessellator.addVertexWithUV((double)(i / 2 + 2 * k + f * 80.0f), (double)(k + f * 40.0f), -90.0, 1.0, 1.0);
-        tessellator.addVertexWithUV((double)(i / 2 + 2 * k + f * 80.0f), 0.0 - f * 40.0f, -90.0, 1.0, 0.0);
-        tessellator.addVertexWithUV((double)(i / 2 - 2 * k - f * 80.0f), 0.0 - f * 40.0f, -90.0, 0.0, 0.0);
+        tessellator.addVertexWithUV(i / 2 - 2 * k - f * 80, k + f * 40, -90D, 0.0D, 1.0D);
+        tessellator.addVertexWithUV(i / 2 + 2 * k + f * 80, k + f * 40, -90D, 1.0D, 1.0D);
+        tessellator.addVertexWithUV(i / 2 + 2 * k + f * 80, 0.0D - f * 40, -90D, 1.0D, 0.0D);
+        tessellator.addVertexWithUV(i / 2 - 2 * k - f * 80, 0.0D - f * 40, -90D, 0.0D, 0.0D);
         tessellator.draw();
+
         GL11.glDepthMask(true);
-        GL11.glEnable(2929);
-        GL11.glEnable(3008);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
-    
-    public static void renderSensorGlassesValueableBlocks(final ItemStack stack, final EntityPlayer player, final ScaledResolution resolution, final float partialTicks, final boolean hasScreen, final int mouseX, final int mouseY) {
-        for (final BlockVec3 coords : ClientProxyCore.valueableBlocks) {
-            final double var52 = ClientProxyCore.playerPosX - coords.x - 0.5;
-            final double var53 = ClientProxyCore.playerPosY - coords.y - 0.5;
-            final double var54 = ClientProxyCore.playerPosZ - coords.z - 0.5;
-            final float var55 = (float)Math.toDegrees(Math.atan2(var52, var54));
-            final double var56 = Math.sqrt(var52 * var52 + var53 * var53 + var54 * var54) * 0.5;
-            final double var57 = Math.sqrt(var52 * var52 + var54 * var54) * 0.5;
-            final ScaledResolution var58 = ClientUtil.getScaledRes(OverlaySensorGlasses.minecraft, OverlaySensorGlasses.minecraft.displayWidth, OverlaySensorGlasses.minecraft.displayHeight);
-            final int var59 = var58.getScaledWidth();
-            final int var60 = var58.getScaledHeight();
-            boolean var61 = false;
-            final EntityClientPlayerMP client = PlayerUtil.getPlayerBaseClientFromPlayer((EntityPlayer)OverlaySensorGlasses.minecraft.thePlayer, false);
+
+    public static void renderSensorGlassesValueableBlocks(ItemStack stack, EntityPlayer player,
+            ScaledResolution resolution, float partialTicks, boolean hasScreen, int mouseX, int mouseY) {
+        double var52;
+        double var58;
+        double var59;
+        double var20;
+        double var21;
+        float var60;
+
+        for (BlockVec3 coords : ClientProxyCore.valueableBlocks) {
+            var52 = ClientProxyCore.playerPosX - coords.x - 0.5D;
+            var58 = ClientProxyCore.playerPosY - coords.y - 0.5D;
+            var59 = ClientProxyCore.playerPosZ - coords.z - 0.5D;
+            var60 = (float) Math.toDegrees(Math.atan2(var52, var59));
+            var20 = Math.sqrt(var52 * var52 + var58 * var58 + var59 * var59) * 0.5D;
+            var21 = Math.sqrt(var52 * var52 + var59 * var59) * 0.5D;
+
+            final ScaledResolution var5 = ClientUtil.getScaledRes(
+                    OverlaySensorGlasses.minecraft,
+                    OverlaySensorGlasses.minecraft.displayWidth,
+                    OverlaySensorGlasses.minecraft.displayHeight);
+            final int var6 = var5.getScaledWidth();
+            final int var7 = var5.getScaledHeight();
+
+            boolean var2 = false;
+
+            final EntityClientPlayerMP client = PlayerUtil
+                    .getPlayerBaseClientFromPlayer(OverlaySensorGlasses.minecraft.thePlayer, false);
+
             if (client != null) {
-                final GCPlayerStatsClient stats = GCPlayerStatsClient.get((EntityPlayerSP)client);
-                var61 = stats.usingAdvancedGoggles;
+                final GCPlayerStatsClient stats = GCPlayerStatsClient.get(client);
+                var2 = stats.usingAdvancedGoggles;
             }
-            OverlaySensorGlasses.minecraft.fontRenderer.drawString(GCCoreUtil.translate("gui.sensor.advanced") + ": " + (var61 ? GCCoreUtil.translate("gui.sensor.advancedon") : GCCoreUtil.translate("gui.sensor.advancedoff")), var59 / 2 - 50, 4, 243855);
+
+            OverlaySensorGlasses.minecraft.fontRenderer.drawString(
+                    GCCoreUtil.translate("gui.sensor.advanced") + ": "
+                            + (var2 ? GCCoreUtil.translate("gui.sensor.advancedon")
+                                    : GCCoreUtil.translate("gui.sensor.advancedoff")),
+                    var6 / 2 - 50,
+                    4,
+                    0x03b88f);
+
             try {
                 GL11.glPushMatrix();
-                if (var56 >= 4.0) {
-                    continue;
+
+                if (var20 < 4.0D) {
+                    GL11.glColor4f(
+                            0.0F,
+                            255F / 255F,
+                            198F / 255F,
+                            (float) Math.min(1.0D, Math.max(0.2D, (var20 - 1.0D) * 0.1D)));
+                    FMLClientHandler.instance().getClient().renderEngine
+                            .bindTexture(OverlaySensorGlasses.indicatorTexture);
+                    GL11.glRotatef(-var60 - ClientProxyCore.playerRotationYaw + 180.0F, 0.0F, 0.0F, 1.0F);
+                    GL11.glTranslated(0.0D, var2 ? -var20 * 16 : -var21 * 16, 0.0D);
+                    GL11.glRotatef(-(-var60 - ClientProxyCore.playerRotationYaw + 180.0F), 0.0F, 0.0F, 1.0F);
+                    Overlay.drawCenteringRectangle(var6 / 2, var7 / 2, 1.0D, 8.0D, 8.0D);
                 }
-                GL11.glColor4f(0.0f, 1.0f, 0.7764706f, (float)Math.min(1.0, Math.max(0.2, (var56 - 1.0) * 0.1)));
-                FMLClientHandler.instance().getClient().renderEngine.bindTexture(OverlaySensorGlasses.indicatorTexture);
-                GL11.glRotatef(-var55 - ClientProxyCore.playerRotationYaw + 180.0f, 0.0f, 0.0f, 1.0f);
-                GL11.glTranslated(0.0, var61 ? (-var56 * 16.0) : (-var57 * 16.0), 0.0);
-                GL11.glRotatef(-(-var55 - ClientProxyCore.playerRotationYaw + 180.0f), 0.0f, 0.0f, 1.0f);
-                Overlay.drawCenteringRectangle((double)(var59 / 2), (double)(var60 / 2), 1.0, 8.0, 8.0);
-            }
-            finally {
+            } finally {
                 GL11.glPopMatrix();
             }
         }
-    }
-    
-    static {
-        hudTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/gui/hud.png");
-        indicatorTexture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/gui/indicator.png");
-        OverlaySensorGlasses.minecraft = FMLClientHandler.instance().getClient();
-        OverlaySensorGlasses.zoom = 0;
     }
 }

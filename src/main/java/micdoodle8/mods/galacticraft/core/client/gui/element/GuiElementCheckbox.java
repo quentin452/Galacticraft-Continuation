@@ -1,38 +1,44 @@
 package micdoodle8.mods.galacticraft.core.client.gui.element;
 
-import net.minecraft.client.gui.*;
-import net.minecraft.util.*;
-import net.minecraft.client.*;
-import org.lwjgl.opengl.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.entity.player.*;
-import micdoodle8.mods.galacticraft.core.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 
-public class GuiElementCheckbox extends GuiButton
-{
-    protected static final ResourceLocation texture;
+import org.lwjgl.opengl.GL11;
+
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+
+public class GuiElementCheckbox extends GuiButton {
+
+    protected static final ResourceLocation texture = new ResourceLocation(
+            GalacticraftCore.ASSET_PREFIX,
+            "textures/gui/gui.png");
     public Boolean isSelected;
-    private ICheckBoxCallback parentGui;
-    private int textColor;
-    private int texWidth;
-    private int texHeight;
-    private int texX;
-    private int texY;
-    private boolean shiftOnHover;
-    
-    public GuiElementCheckbox(final int id, final ICheckBoxCallback parentGui, final int x, final int y, final String text) {
+    private final ICheckBoxCallback parentGui;
+    private final int textColor;
+    private final int texWidth;
+    private final int texHeight;
+    private final int texX;
+    private final int texY;
+    private final boolean shiftOnHover;
+
+    public GuiElementCheckbox(int id, ICheckBoxCallback parentGui, int x, int y, String text) {
         this(id, parentGui, x, y, text, 4210752);
     }
-    
-    public GuiElementCheckbox(final int id, final ICheckBoxCallback parentGui, final int x, final int y, final String text, final int textColor) {
+
+    public GuiElementCheckbox(int id, ICheckBoxCallback parentGui, int x, int y, String text, int textColor) {
         this(id, parentGui, x, y, 13, 13, 20, 24, text, textColor);
     }
-    
-    private GuiElementCheckbox(final int id, final ICheckBoxCallback parentGui, final int x, final int y, final int width, final int height, final int texX, final int texY, final String text, final int textColor) {
+
+    private GuiElementCheckbox(int id, ICheckBoxCallback parentGui, int x, int y, int width, int height, int texX,
+            int texY, String text, int textColor) {
         this(id, parentGui, x, y, width, height, width, height, texX, texY, text, textColor, true);
     }
-    
-    public GuiElementCheckbox(final int id, final ICheckBoxCallback parentGui, final int x, final int y, final int width, final int height, final int texWidth, final int texHeight, final int texX, final int texY, final String text, final int textColor, final boolean shiftOnHover) {
+
+    public GuiElementCheckbox(int id, ICheckBoxCallback parentGui, int x, int y, int width, int height, int texWidth,
+            int texHeight, int texX, int texY, String text, int textColor, boolean shiftOnHover) {
         super(id, x, y, width, height, text);
         this.parentGui = parentGui;
         this.textColor = textColor;
@@ -42,57 +48,80 @@ public class GuiElementCheckbox extends GuiButton
         this.texX = texX;
         this.texY = texY;
     }
-    
-    public void drawButton(final Minecraft par1Minecraft, final int par2, final int par3) {
+
+    @Override
+    public void drawButton(Minecraft par1Minecraft, int par2, int par3) {
         if (this.isSelected == null) {
             this.isSelected = this.parentGui.getInitiallySelected(this);
         }
+
         if (this.visible) {
             par1Minecraft.getTextureManager().bindTexture(GuiElementCheckbox.texture);
-            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-            this.field_146123_n = (par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + this.width && par3 < this.yPosition + this.height);
-            this.drawTexturedModalRect(this.xPosition, this.yPosition, ((boolean)this.isSelected) ? (this.texX + this.texWidth) : this.texX, this.field_146123_n ? (this.shiftOnHover ? (this.texY + this.texHeight) : this.texY) : this.texY, this.width, this.height);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition
+                    && par2 < this.xPosition + this.width
+                    && par3 < this.yPosition + this.height;
+            this.drawTexturedModalRect(
+                    this.xPosition,
+                    this.yPosition,
+                    this.isSelected ? this.texX + this.texWidth : this.texX,
+                    this.field_146123_n ? this.shiftOnHover ? this.texY + this.texHeight : this.texY : this.texY,
+                    this.width,
+                    this.height);
             this.mouseDragged(par1Minecraft, par2, par3);
-            par1Minecraft.fontRenderer.drawString(this.displayString, this.xPosition + this.width + 3, this.yPosition + (this.height - 6) / 2, this.textColor, false);
+            par1Minecraft.fontRenderer.drawString(
+                    this.displayString,
+                    this.xPosition + this.width + 3,
+                    this.yPosition + (this.height - 6) / 2,
+                    this.textColor,
+                    false);
         }
     }
-    
-    public void drawTexturedModalRect(final int par1, final int par2, final int par3, final int par4, final int par5, final int par6) {
-        final float f = 0.00390625f;
-        final float f2 = 0.00390625f;
+
+    @Override
+    public void drawTexturedModalRect(int par1, int par2, int par3, int par4, int par5, int par6) {
+        final float f = 0.00390625F;
+        final float f1 = 0.00390625F;
         final Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(par1 + 0), (double)(par2 + par6), (double)this.zLevel, (double)((par3 + 0) * f), (double)((par4 + this.texHeight) * f2));
-        tessellator.addVertexWithUV((double)(par1 + par5), (double)(par2 + par6), (double)this.zLevel, (double)((par3 + this.texWidth) * f), (double)((par4 + this.texHeight) * f2));
-        tessellator.addVertexWithUV((double)(par1 + par5), (double)(par2 + 0), (double)this.zLevel, (double)((par3 + this.texWidth) * f), (double)((par4 + 0) * f2));
-        tessellator.addVertexWithUV((double)(par1 + 0), (double)(par2 + 0), (double)this.zLevel, (double)((par3 + 0) * f), (double)((par4 + 0) * f2));
+        tessellator.addVertexWithUV(par1 + 0, par2 + par6, this.zLevel, (par3 + 0) * f, (par4 + this.texHeight) * f1);
+        tessellator.addVertexWithUV(
+                par1 + par5,
+                par2 + par6,
+                this.zLevel,
+                (par3 + this.texWidth) * f,
+                (par4 + this.texHeight) * f1);
+        tessellator.addVertexWithUV(par1 + par5, par2 + 0, this.zLevel, (par3 + this.texWidth) * f, (par4 + 0) * f1);
+        tessellator.addVertexWithUV(par1 + 0, par2 + 0, this.zLevel, (par3 + 0) * f, (par4 + 0) * f1);
         tessellator.draw();
     }
-    
-    public boolean mousePressed(final Minecraft par1Minecraft, final int par2, final int par3) {
-        if (this.enabled && this.visible && par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + this.width && par3 < this.yPosition + this.height) {
-            if (this.parentGui.canPlayerEdit(this, (EntityPlayer)par1Minecraft.thePlayer)) {
+
+    @Override
+    public boolean mousePressed(Minecraft par1Minecraft, int par2, int par3) {
+        if (this.enabled && this.visible
+                && par2 >= this.xPosition
+                && par3 >= this.yPosition
+                && par2 < this.xPosition + this.width
+                && par3 < this.yPosition + this.height) {
+            if (this.parentGui.canPlayerEdit(this, par1Minecraft.thePlayer)) {
                 this.isSelected = !this.isSelected;
                 this.parentGui.onSelectionChanged(this, this.isSelected);
                 return true;
             }
             this.parentGui.onIntruderInteraction();
         }
+
         return false;
     }
-    
-    static {
-        texture = new ResourceLocation(GalacticraftCore.ASSET_PREFIX, "textures/gui/gui.png");
-    }
-    
-    public interface ICheckBoxCallback
-    {
-        void onSelectionChanged(final GuiElementCheckbox p0, final boolean p1);
-        
-        boolean canPlayerEdit(final GuiElementCheckbox p0, final EntityPlayer p1);
-        
-        boolean getInitiallySelected(final GuiElementCheckbox p0);
-        
+
+    public interface ICheckBoxCallback {
+
+        void onSelectionChanged(GuiElementCheckbox checkbox, boolean newSelected);
+
+        boolean canPlayerEdit(GuiElementCheckbox checkbox, EntityPlayer player);
+
+        boolean getInitiallySelected(GuiElementCheckbox checkbox);
+
         void onIntruderInteraction();
     }
 }

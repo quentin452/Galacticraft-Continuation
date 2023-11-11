@@ -1,156 +1,205 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.core.items.*;
-import net.minecraft.block.material.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.*;
-import micdoodle8.mods.galacticraft.core.tile.*;
-import net.minecraft.init.*;
-import net.minecraft.entity.item.*;
-import net.minecraft.entity.*;
-import net.minecraft.creativetab.*;
-import net.minecraft.world.*;
-import micdoodle8.mods.galacticraft.api.vector.*;
-import net.minecraftforge.common.util.*;
-import cpw.mods.fml.relauncher.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
-import net.minecraft.tileentity.*;
-import micdoodle8.mods.galacticraft.api.tile.*;
-import net.minecraft.client.renderer.texture.*;
-import net.minecraft.util.*;
-import micdoodle8.mods.galacticraft.api.transmission.*;
-import micdoodle8.mods.galacticraft.core.util.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
-public class BlockOxygenPipe extends BlockTransmitter implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc
-{
-    private IIcon[] pipeIcons;
-    
-    public BlockOxygenPipe(final String assetName) {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import micdoodle8.mods.galacticraft.api.tile.IColorable;
+import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.items.ItemBlockDesc;
+import micdoodle8.mods.galacticraft.core.tile.TileEntityOxygenPipe;
+import micdoodle8.mods.galacticraft.core.util.GCCoreUtil;
+
+public class BlockOxygenPipe extends BlockTransmitter implements ITileEntityProvider, ItemBlockDesc.IBlockShiftDesc {
+
+    private IIcon[] pipeIcons = new IIcon[16];
+
+    public BlockOxygenPipe(String assetName) {
         super(Material.glass);
-        this.pipeIcons = new IIcon[16];
-        this.setHardness(0.3f);
+        this.setHardness(0.3F);
         this.setStepSound(Block.soundTypeGlass);
         this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
         this.setBlockName(assetName);
     }
-    
-    public void breakBlock(final World par1World, final int par2, final int par3, final int par4, final Block par5, final int par6) {
-        final TileEntityOxygenPipe tile = (TileEntityOxygenPipe)par1World.getTileEntity(par2, par3, par4);
+
+    @Override
+    public void breakBlock(World par1World, int par2, int par3, int par4, Block par5, int par6) {
+        final TileEntityOxygenPipe tile = (TileEntityOxygenPipe) par1World.getTileEntity(par2, par3, par4);
+
         if (tile != null && tile.getColor() != 15) {
-            final float f = 0.7f;
-            final double d0 = par1World.rand.nextFloat() * 0.7f + 0.15000000596046448;
-            final double d2 = par1World.rand.nextFloat() * 0.7f + 0.06000000238418579 + 0.6;
-            final double d3 = par1World.rand.nextFloat() * 0.7f + 0.15000000596046448;
-            final EntityItem entityitem = new EntityItem(par1World, par2 + d0, par3 + d2, par4 + d3, new ItemStack(Items.dye, 1, (int)tile.getColor()));
+            final float f = 0.7F;
+            final double d0 = par1World.rand.nextFloat() * f + (1.0F - f) * 0.5D;
+            final double d1 = par1World.rand.nextFloat() * f + (1.0F - f) * 0.2D + 0.6D;
+            final double d2 = par1World.rand.nextFloat() * f + (1.0F - f) * 0.5D;
+            final EntityItem entityitem = new EntityItem(
+                    par1World,
+                    par2 + d0,
+                    par3 + d1,
+                    par4 + d2,
+                    new ItemStack(Items.dye, 1, tile.getColor()));
             entityitem.delayBeforeCanPickup = 10;
-            par1World.spawnEntityInWorld((Entity)entityitem);
+            par1World.spawnEntityInWorld(entityitem);
         }
+
         super.breakBlock(par1World, par2, par3, par4, par5, par6);
     }
-    
+
     @Override
-    public void onNeighborBlockChange(final World world, final int x, final int y, final int z, final Block block) {
+    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
         super.onNeighborBlockChange(world, x, y, z, block);
         world.func_147479_m(x, y, z);
     }
-    
+
+    @Override
     public CreativeTabs getCreativeTabToDisplayOn() {
         return GalacticraftCore.galacticraftBlocksTab;
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(final IBlockAccess par1IBlockAccess, final int x, final int y, final int z, final int par5) {
+    public IIcon getIcon(IBlockAccess par1IBlockAccess, int x, int y, int z, int par5) {
         final BlockVec3 thisVec = new BlockVec3(x, y, z).modifyPositionFromSide(ForgeDirection.getOrientation(par5));
         final Block blockAt = thisVec.getBlock(par1IBlockAccess);
-        final TileEntityOxygenPipe tileEntity = (TileEntityOxygenPipe)par1IBlockAccess.getTileEntity(x, y, z);
-        if (blockAt == GCBlocks.oxygenPipe && ((TileEntityOxygenPipe)thisVec.getTileEntity(par1IBlockAccess)).getColor() == tileEntity.getColor()) {
+
+        final TileEntityOxygenPipe tileEntity = (TileEntityOxygenPipe) par1IBlockAccess.getTileEntity(x, y, z);
+
+        if (blockAt == GCBlocks.oxygenPipe
+                && ((TileEntityOxygenPipe) thisVec.getTileEntity(par1IBlockAccess)).getColor()
+                        == tileEntity.getColor()) {
             return this.pipeIcons[15];
         }
+
         return this.pipeIcons[tileEntity.getColor()];
     }
-    
-    public boolean onBlockActivated(final World par1World, final int x, final int y, final int z, final EntityPlayer par5EntityPlayer, final int par6, final float par7, final float par8, final float par9) {
-        final TileEntityOxygenPipe tileEntity = (TileEntityOxygenPipe)par1World.getTileEntity(x, y, z);
+
+    @Override
+    public boolean onBlockActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int par6,
+            float par7, float par8, float par9) {
+        final TileEntityOxygenPipe tileEntity = (TileEntityOxygenPipe) par1World.getTileEntity(x, y, z);
+
         if (!par1World.isRemote) {
             final ItemStack stack = par5EntityPlayer.inventory.getCurrentItem();
+
             if (stack != null && stack.getItem() instanceof ItemDye) {
                 final int dyeColor = par5EntityPlayer.inventory.getCurrentItem().getItemDamageForDisplay();
+
                 final byte colorBefore = tileEntity.getColor();
-                tileEntity.setColor((byte)dyeColor);
-                if (colorBefore != (byte)dyeColor && !par5EntityPlayer.capabilities.isCreativeMode) {
-                    final ItemStack getCurrentItem = par5EntityPlayer.inventory.getCurrentItem();
-                    if (--getCurrentItem.stackSize == 0) {
-                        par5EntityPlayer.inventory.mainInventory[par5EntityPlayer.inventory.currentItem] = null;
-                    }
+
+                tileEntity.setColor((byte) dyeColor);
+
+                if (colorBefore != (byte) dyeColor && !par5EntityPlayer.capabilities.isCreativeMode
+                        && --par5EntityPlayer.inventory.getCurrentItem().stackSize == 0) {
+                    par5EntityPlayer.inventory.mainInventory[par5EntityPlayer.inventory.currentItem] = null;
                 }
-                if (colorBefore != (byte)dyeColor && colorBefore != 15) {
-                    final float f = 0.7f;
-                    final double d0 = par1World.rand.nextFloat() * 0.7f + 0.15000000596046448;
-                    final double d2 = par1World.rand.nextFloat() * 0.7f + 0.06000000238418579 + 0.6;
-                    final double d3 = par1World.rand.nextFloat() * 0.7f + 0.15000000596046448;
-                    final EntityItem entityitem = new EntityItem(par1World, x + d0, y + d2, z + d3, new ItemStack(Items.dye, 1, (int)colorBefore));
+
+                if (colorBefore != (byte) dyeColor && colorBefore != 15) {
+                    final float f = 0.7F;
+                    final double d0 = par1World.rand.nextFloat() * f + (1.0F - f) * 0.5D;
+                    final double d1 = par1World.rand.nextFloat() * f + (1.0F - f) * 0.2D + 0.6D;
+                    final double d2 = par1World.rand.nextFloat() * f + (1.0F - f) * 0.5D;
+                    final EntityItem entityitem = new EntityItem(
+                            par1World,
+                            x + d0,
+                            y + d1,
+                            z + d2,
+                            new ItemStack(Items.dye, 1, colorBefore));
                     entityitem.delayBeforeCanPickup = 10;
-                    par1World.spawnEntityInWorld((Entity)entityitem);
+                    par1World.spawnEntityInWorld(entityitem);
                 }
-                final BlockVec3 tileVec = new BlockVec3((TileEntity)tileEntity);
+
+                //
+                // GCCorePacketManager.sendPacketToClients(GCCorePacketManager.getPacket(GalacticraftCore.CHANNELENTITIES,
+                // tileEntity, tileEntity.getColor(), (byte) -1)); TODO Fix pipe color
+
+                final BlockVec3 tileVec = new BlockVec3(tileEntity);
                 for (final ForgeDirection dir : ForgeDirection.values()) {
                     final TileEntity tileAt = tileVec.getTileEntityOnSide(tileEntity.getWorldObj(), dir);
-                    if (tileAt != null && tileAt instanceof IColorable) {
-                        ((IColorable)tileAt).onAdjacentColorChanged(dir);
+
+                    if (tileAt instanceof IColorable) {
+                        ((IColorable) tileAt).onAdjacentColorChanged(dir);
                     }
                 }
+
                 return true;
             }
         }
+
         return false;
     }
-    
+
+    @Override
     public int getRenderType() {
-        return GalacticraftCore.proxy.getBlockRender((Block)this);
+        return GalacticraftCore.proxy.getBlockRender(this);
     }
-    
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(final IIconRegister par1IconRegister) {
+    public void registerBlockIcons(IIconRegister par1IconRegister) {
         this.pipeIcons = new IIcon[16];
-        for (int count = 0; count < ItemDye.field_150923_a.length; ++count) {
-            this.pipeIcons[count] = par1IconRegister.registerIcon(GalacticraftCore.TEXTURE_PREFIX + "pipe_oxygen_" + ItemDye.field_150923_a[count]);
+
+        for (int count = 0; count < ItemDye.field_150923_a.length; count++) {
+            this.pipeIcons[count] = par1IconRegister
+                    .registerIcon(GalacticraftCore.TEXTURE_PREFIX + "pipe_oxygen_" + ItemDye.field_150923_a[count]);
         }
+
         this.blockIcon = this.pipeIcons[15];
     }
-    
-    public boolean shouldSideBeRendered(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4, final int par5) {
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockAccess par1IBlockAccess, int par2, int par3, int par4, int par5) {
         return true;
     }
-    
+
+    @Override
     public boolean isOpaqueCube() {
         return false;
     }
-    
+
+    @Override
     public boolean renderAsNormalBlock() {
         return false;
     }
-    
-    public TileEntity createNewTileEntity(final World world, final int meta) {
+
+    @Override
+    public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityOxygenPipe();
     }
-    
+
     @SideOnly(Side.CLIENT)
     @Override
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(final World world, final int i, final int j, final int k) {
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int i, int j, int k) {
         return this.getCollisionBoundingBoxFromPool(world, i, j, k);
     }
-    
+
     @Override
     public NetworkType getNetworkType() {
         return NetworkType.OXYGEN;
     }
-    
-    public String getShiftDescription(final int meta) {
+
+    @Override
+    public String getShiftDescription(int meta) {
         return GCCoreUtil.translate(this.getUnlocalizedName() + ".description");
     }
-    
-    public boolean showDescription(final int meta) {
+
+    @Override
+    public boolean showDescription(int meta) {
         return true;
     }
 }

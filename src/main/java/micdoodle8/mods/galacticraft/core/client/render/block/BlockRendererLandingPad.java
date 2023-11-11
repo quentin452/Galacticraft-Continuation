@@ -1,173 +1,226 @@
 package micdoodle8.mods.galacticraft.core.client.render.block;
 
-import cpw.mods.fml.client.registry.*;
-import net.minecraft.world.*;
-import org.lwjgl.opengl.*;
-import micdoodle8.mods.galacticraft.api.tile.*;
-import net.minecraft.init.*;
-import net.minecraft.client.renderer.*;
-import net.minecraft.block.*;
-import micdoodle8.mods.galacticraft.core.blocks.*;
-import net.minecraft.util.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockHopper;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 
-public class BlockRendererLandingPad implements ISimpleBlockRenderingHandler
-{
+import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import micdoodle8.mods.galacticraft.api.tile.IFuelDock;
+
+public class BlockRendererLandingPad implements ISimpleBlockRenderingHandler {
+
     final int renderID;
-    
-    public BlockRendererLandingPad(final int var1) {
+
+    public BlockRendererLandingPad(int var1) {
         this.renderID = var1;
     }
-    
-    public boolean renderWorldBlock(final IBlockAccess var1, final int var2, final int var3, final int var4, final Block var5, final int var6, final RenderBlocks var7) {
+
+    @Override
+    public boolean renderWorldBlock(IBlockAccess var1, int var2, int var3, int var4, Block var5, int var6,
+            RenderBlocks var7) {
         this.renderBlockLandingPad(var7, var5, var1, var2, var3, var4);
         return true;
     }
-    
-    public boolean shouldRender3DInInventory(final int modelId) {
+
+    @Override
+    public boolean shouldRender3DInInventory(int modelId) {
         return true;
     }
-    
+
+    @Override
     public int getRenderId() {
         return this.renderID;
     }
-    
-    public static void renderInvNormalBlock(final RenderBlocks var0, final Block var1, final int var2) {
+
+    public static void renderInvNormalBlock(RenderBlocks var0, Block var1, int var2) {
         final Tessellator var3 = Tessellator.instance;
-        GL11.glTranslatef(-0.5f, -0.5f, -0.5f);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        var0.setRenderBounds(0.15000000596046448, 0.15000000596046448, 0.15000000596046448, 0.8500000238418579, 0.8500000238418579, 0.8500000238418579);
+        GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        var0.setRenderBounds(0.15F, 0.15F, 0.15F, 0.85F, 0.85F, 0.85F);
         var3.startDrawingQuads();
-        var3.setNormal(0.0f, -0.8f, 0.0f);
-        var0.renderFaceYNeg(var1, 0.0, 0.0, 0.0, var1.getIcon(0, var2));
+        var3.setNormal(0.0F, -0.8F, 0.0F);
+        var0.renderFaceYNeg(var1, 0.0D, 0.0D, 0.0D, var1.getIcon(0, var2));
         var3.draw();
         var3.startDrawingQuads();
-        var3.setNormal(0.0f, 0.8f, 0.0f);
-        var0.renderFaceYPos(var1, 0.0, 0.0, 0.0, var1.getIcon(1, var2));
+        var3.setNormal(0.0F, 0.8F, 0.0F);
+        var0.renderFaceYPos(var1, 0.0D, 0.0D, 0.0D, var1.getIcon(1, var2));
         var3.draw();
         var3.startDrawingQuads();
-        var3.setNormal(0.0f, 0.0f, -0.8f);
-        var0.renderFaceXPos(var1, 0.0, 0.0, 0.0, var1.getIcon(2, var2));
+        var3.setNormal(0.0F, 0.0F, -0.8F);
+        var0.renderFaceXPos(var1, 0.0D, 0.0D, 0.0D, var1.getIcon(2, var2));
         var3.draw();
         var3.startDrawingQuads();
-        var3.setNormal(0.0f, 0.0f, 0.8f);
-        var0.renderFaceXNeg(var1, 0.0, 0.0, 0.0, var1.getIcon(3, var2));
+        var3.setNormal(0.0F, 0.0F, 0.8F);
+        var0.renderFaceXNeg(var1, 0.0D, 0.0D, 0.0D, var1.getIcon(3, var2));
         var3.draw();
         var3.startDrawingQuads();
-        var3.setNormal(-0.8f, 0.0f, 0.0f);
-        var0.renderFaceZNeg(var1, 0.0, 0.0, 0.0, var1.getIcon(4, var2));
+        var3.setNormal(-0.8F, 0.0F, 0.0F);
+        var0.renderFaceZNeg(var1, 0.0D, 0.0D, 0.0D, var1.getIcon(4, var2));
         var3.draw();
         var3.startDrawingQuads();
-        var3.setNormal(0.8f, 0.0f, 0.0f);
-        var0.renderFaceZPos(var1, 0.0, 0.0, 0.0, var1.getIcon(5, var2));
+        var3.setNormal(0.8F, 0.0F, 0.0F);
+        var0.renderFaceZPos(var1, 0.0D, 0.0D, 0.0D, var1.getIcon(5, var2));
         var3.draw();
     }
-    
-    public void renderInventoryBlock(final Block block, final int metadata, final int modelID, final RenderBlocks renderer) {
-        renderInvNormalBlock(renderer, block, metadata);
+
+    @Override
+    public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {
+        BlockRendererLandingPad.renderInvNormalBlock(renderer, block, metadata);
     }
-    
-    public void renderBlockLandingPad(final RenderBlocks renderBlocks, final Block par1Block, final IBlockAccess var1, final int par2, final int par3, final int par4) {
-        renderBlocks.setRenderBounds(-1.0, 0.0, -1.0, 2.0, 0.20000000298023224, 2.0);
+
+    public void renderBlockLandingPad(RenderBlocks renderBlocks, Block par1Block, IBlockAccess var1, int par2, int par3,
+            int par4) {
+        renderBlocks.setRenderBounds(-1F, 0F, -1F, 2F, 0.2F, 2F);
         renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
+
         if (var1.getBlockMetadata(par2, par3, par4) == 0) {
-            renderBlocks.setRenderBounds(-0.5, 0.20000000298023224, -0.5, 1.5, 0.30000001192092896, 1.5);
+            renderBlocks.setRenderBounds(-0.5F, 0.2F, -0.5F, 1.5F, 0.3F, 1.5F);
             renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
-            renderBlocks.setRenderBounds(0.0, 0.30000001192092896, 0.0, 1.0, 0.4000000059604645, 1.0);
+            renderBlocks.setRenderBounds(0F, 0.3F, 0F, 1F, 0.4F, 1F);
             renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
         }
-        final IFuelDock landingPad = (IFuelDock)var1.getTileEntity(par2, par3, par4);
+
+        final IFuelDock landingPad = (IFuelDock) var1.getTileEntity(par2, par3, par4);
+
         if (landingPad != null) {
+            // +X left
             if (landingPad.isBlockAttachable(var1, par2 + 2, par3, par4 - 1)) {
-                renderBlocks.setRenderBounds(1.5, 0.20000000298023224, -0.8999999761581421, 2.0, 0.9010000228881836, -0.10000000149011612);
+                renderBlocks.setRenderBounds(1.5F, 0.2F, -0.9F, 2F, 0.901F, -0.1F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // +X middle
             if (landingPad.isBlockAttachable(var1, par2 + 2, par3, par4)) {
-                renderBlocks.setRenderBounds(1.5, 0.20000000298023224, 0.10000000149011612, 2.0, 0.8999999761581421, 0.8999999761581421);
+                renderBlocks.setRenderBounds(1.5F, 0.2F, 0.1F, 2F, 0.9F, 0.9F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // +X right
             if (landingPad.isBlockAttachable(var1, par2 + 2, par3, par4 + 1)) {
-                renderBlocks.setRenderBounds(1.5, 0.20000000298023224, 1.100000023841858, 2.0, 0.8999999761581421, 1.899999976158142);
+                renderBlocks.setRenderBounds(1.5F, 0.2F, 1.1F, 2F, 0.9F, 1.9F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // +Z left
             if (landingPad.isBlockAttachable(var1, par2 + 1, par3, par4 + 2)) {
-                renderBlocks.setRenderBounds(1.100000023841858, 0.20000000298023224, 1.5, 1.899999976158142, 0.9010000228881836, 2.0);
+                renderBlocks.setRenderBounds(1.1F, 0.2F, 1.5F, 1.9F, 0.901F, 2F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // +Z left
             if (landingPad.isBlockAttachable(var1, par2, par3, par4 + 2)) {
-                renderBlocks.setRenderBounds(0.10000000149011612, 0.20000000298023224, 1.5, 0.8999999761581421, 0.9010000228881836, 2.0);
+                renderBlocks.setRenderBounds(0.1F, 0.2F, 1.5F, 0.9F, 0.901F, 2F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // +Z right
             if (landingPad.isBlockAttachable(var1, par2 - 1, par3, par4 + 2)) {
-                renderBlocks.setRenderBounds(-0.8999999761581421, 0.20000000298023224, 1.5, -0.10000000149011612, 0.8999999761581421, 2.0);
+                renderBlocks.setRenderBounds(-0.9F, 0.2F, 1.5F, -0.1F, 0.9F, 2F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // -X left
             if (landingPad.isBlockAttachable(var1, par2 - 2, par3, par4 + 1)) {
-                renderBlocks.setRenderBounds(-1.0, 0.20000000298023224, 1.100000023841858, -0.5, 0.9010000228881836, 1.899999976158142);
+                renderBlocks.setRenderBounds(-1.0F, 0.2F, 1.1F, -0.5F, 0.901F, 1.9F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // -X middle
             if (landingPad.isBlockAttachable(var1, par2 - 2, par3, par4)) {
-                renderBlocks.setRenderBounds(-1.0, 0.20000000298023224, 0.10000000149011612, -0.5, 0.8999999761581421, 0.8999999761581421);
+                renderBlocks.setRenderBounds(-1.0F, 0.2F, 0.1F, -0.5F, 0.9F, 0.9F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // -X right
             if (landingPad.isBlockAttachable(var1, par2 - 2, par3, par4 - 1)) {
-                renderBlocks.setRenderBounds(-1.0, 0.20000000298023224, -0.8999999761581421, -0.5, 0.8999999761581421, -0.10000000149011612);
+                renderBlocks.setRenderBounds(-1.0F, 0.2F, -0.9F, -0.5F, 0.9F, -0.1F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // -Z right
             if (landingPad.isBlockAttachable(var1, par2 + 1, par3, par4 - 2)) {
-                renderBlocks.setRenderBounds(1.100000023841858, 0.20000000298023224, -1.0, 1.899999976158142, 0.8999999761581421, -0.5);
+                renderBlocks.setRenderBounds(1.1F, 0.2F, -1.0F, 1.9F, 0.9F, -0.5F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // -Z middle
             if (landingPad.isBlockAttachable(var1, par2, par3, par4 - 2)) {
-                renderBlocks.setRenderBounds(0.10000000149011612, 0.20000000298023224, -1.0, 0.8999999761581421, 0.8999999761581421, -0.5);
+                renderBlocks.setRenderBounds(0.1F, 0.2F, -1.0F, 0.9F, 0.9F, -0.5F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
+
+            // -Z left
             if (landingPad.isBlockAttachable(var1, par2 - 1, par3, par4 - 2)) {
-                renderBlocks.setRenderBounds(-0.8999999761581421, 0.20000000298023224, -1.0, -0.10000000149011612, 0.9010000228881836, -0.5);
+                renderBlocks.setRenderBounds(-0.9F, 0.2F, -1.0F, -0.1F, 0.901F, -0.5F);
                 renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
             }
         }
+
         if (var1.getBlockMetadata(par2, par3, par4) == 2) {
             final Tessellator tessellator = Tessellator.instance;
             tessellator.setBrightness(Blocks.hopper.getMixedBrightnessForBlock(var1, par2, par3, par4));
-            final float f1 = 1.0f;
+            final float f1 = 1.0F;
             final int j1 = Blocks.hopper.colorMultiplier(var1, par2, par3, par4);
-            float f2 = (j1 >> 16 & 0xFF) / 255.0f;
-            float f3 = (j1 >> 8 & 0xFF) / 255.0f;
-            float f4 = (j1 & 0xFF) / 255.0f;
+            float f = (j1 >> 16 & 255) / 255.0F;
+            float f2 = (j1 >> 8 & 255) / 255.0F;
+            float f3 = (j1 & 255) / 255.0F;
+
             if (EntityRenderer.anaglyphEnable) {
-                final float f5 = (f2 * 30.0f + f3 * 59.0f + f4 * 11.0f) / 100.0f;
-                final float f6 = (f2 * 30.0f + f3 * 70.0f) / 100.0f;
-                final float f7 = (f2 * 30.0f + f4 * 70.0f) / 100.0f;
+                final float f4 = (f * 30.0F + f2 * 59.0F + f3 * 11.0F) / 100.0F;
+                final float f5 = (f * 30.0F + f2 * 70.0F) / 100.0F;
+                final float f6 = (f * 30.0F + f3 * 70.0F) / 100.0F;
+                f = f4;
                 f2 = f5;
                 f3 = f6;
-                f4 = f7;
             }
-            tessellator.setColorOpaque_F(f1 * f2, f1 * f3, f1 * f4);
+
+            tessellator.setColorOpaque_F(f1 * f, f1 * f2, f1 * f3);
+
             renderBlocks.clearOverrideBlockTexture();
+
             final IIcon icon = BlockHopper.getHopperIcon("hopper");
             BlockHopper.getHopperIcon("hopper_inside");
-            f2 = 0.125f;
-            final double d0 = 0.625;
+
+            f = 0.125F;
+            final double d0 = 0.625D;
+
             renderBlocks.setOverrideBlockTexture(icon);
-            renderBlocks.setRenderBounds(0.0, d0, 0.0, 1.0, 0.9, 1.0);
-            renderBlocks.renderStandardBlock((Block)Blocks.hopper, par2, par3, par4);
-            renderBlocks.setOverrideBlockTexture(((BlockLandingPadFull)par1Block).getIcon(0, 0));
-            renderBlocks.setRenderBounds(-0.1, 0.0, -0.1, 0.0, 1.0, 0.0);
-            renderBlocks.renderStandardBlock((Block)Blocks.hopper, par2, par3, par4);
-            renderBlocks.setRenderBounds(-0.1, 0.0, 1.0, 0.0, 1.0, 1.1);
-            renderBlocks.renderStandardBlock((Block)Blocks.hopper, par2, par3, par4);
-            renderBlocks.setRenderBounds(1.0, 0.0, -0.1, 1.1, 1.0, 0.0);
-            renderBlocks.renderStandardBlock((Block)Blocks.hopper, par2, par3, par4);
-            renderBlocks.setRenderBounds(1.0, 0.0, 1.0, 1.1, 1.0, 1.1);
-            renderBlocks.renderStandardBlock((Block)Blocks.hopper, par2, par3, par4);
-            renderBlocks.setRenderBounds(0.0, 0.9, 0.0, 1.0, 1.0, 1.0);
+
+            renderBlocks.setRenderBounds(0.0D, d0, 0.0D, 1.0D, 0.9D, 1.0D);
+            renderBlocks.renderStandardBlock(Blocks.hopper, par2, par3, par4);
+
+            renderBlocks.setOverrideBlockTexture(par1Block.getIcon(0, 0));
+
+            renderBlocks.setRenderBounds(-0.1D, 0.0D, -0.1D, 0.0D, 1.0D, 0.0D);
+            renderBlocks.renderStandardBlock(Blocks.hopper, par2, par3, par4);
+
+            renderBlocks.setRenderBounds(-0.1D, 0.0D, 1.0D, 0.0D, 1.0D, 1.1D);
+            renderBlocks.renderStandardBlock(Blocks.hopper, par2, par3, par4);
+
+            renderBlocks.setRenderBounds(1.0D, 0.0D, -0.1D, 1.1D, 1.0D, 0.0D);
+            renderBlocks.renderStandardBlock(Blocks.hopper, par2, par3, par4);
+
+            renderBlocks.setRenderBounds(1.0D, 0.0D, 1.0D, 1.1D, 1.0D, 1.1D);
+            renderBlocks.renderStandardBlock(Blocks.hopper, par2, par3, par4);
+
+            renderBlocks.setRenderBounds(0.0D, 0.9D, 0.0D, 1.0D, 1.0D, 1.0D);
             renderBlocks.renderStandardBlock(par1Block, par2, par3, par4);
+
             renderBlocks.setOverrideBlockTexture(icon);
-            final double d2 = 0.1;
-            final double d3 = 0.1;
-            renderBlocks.setRenderBounds(d2, d3, d2, 1.0 - d2, d0 - 0.002, 1.0 - d2);
-            renderBlocks.renderStandardBlock((Block)Blocks.hopper, par2, par3, par4);
+
+            final double d1 = 0.1D;
+            final double d2 = 0.1D;
+            renderBlocks.setRenderBounds(d1, d2, d1, 1.0D - d1, d0 - 0.002D, 1.0D - d1);
+            renderBlocks.renderStandardBlock(Blocks.hopper, par2, par3, par4);
         }
+
         renderBlocks.clearOverrideBlockTexture();
         par1Block.setBlockBoundsForItemRender();
         renderBlocks.uvRotateTop = 0;

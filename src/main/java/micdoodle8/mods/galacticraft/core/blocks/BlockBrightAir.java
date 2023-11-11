@@ -1,48 +1,59 @@
 package micdoodle8.mods.galacticraft.core.blocks;
 
-import micdoodle8.mods.galacticraft.core.*;
-import net.minecraft.block.*;
-import java.util.*;
-import net.minecraft.item.*;
-import net.minecraft.init.*;
-import net.minecraft.world.*;
+import java.util.Random;
 
-public class BlockBrightAir extends BlockAir
-{
-    public BlockBrightAir(final String assetName) {
-        this.setResistance(1000.0f);
-        this.setHardness(0.0f);
+import net.minecraft.block.BlockAir;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+
+public class BlockBrightAir extends BlockAir {
+
+    public BlockBrightAir(String assetName) {
+        this.setResistance(1000.0F);
+        this.setHardness(0.0F);
         this.setBlockTextureName(GalacticraftCore.TEXTURE_PREFIX + assetName);
         this.setBlockName(assetName);
-        this.setStepSound(new Block.SoundType("sand", 0.0f, 1.0f));
-        this.setLightLevel(1.0f);
+        this.setStepSound(new SoundType("sand", 0.0F, 1.0F));
+        this.setLightLevel(1.0F);
     }
-    
-    public boolean canReplace(final World world, final int x, final int y, final int z, final int side, final ItemStack stack) {
+
+    @Override
+    public boolean canReplace(World world, int x, int y, int z, int side, ItemStack stack) {
         return true;
     }
-    
-    public boolean canPlaceBlockAt(final World var1, final int var2, final int var3, final int var4) {
+
+    @Override
+    public boolean canPlaceBlockAt(World var1, int var2, int var3, int var4) {
         return true;
     }
-    
+
+    @Override
     public int getRenderBlockPass() {
         return 1;
     }
-    
+
+    @Override
     public int getMobilityFlag() {
         return 1;
     }
-    
-    public Item getItemDropped(final int var1, final Random var2, final int var3) {
+
+    @Override
+    public Item getItemDropped(int var1, Random var2, int var3) {
         return Item.getItemFromBlock(Blocks.air);
     }
-    
-    public boolean shouldSideBeRendered(final IBlockAccess par1IBlockAccess, final int par2, final int par3, final int par4, final int par5) {
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockAccess par1IBlockAccess, int par2, int par3, int par4, int par5) {
         return false;
     }
-    
-    public int getLightValue(final IBlockAccess world, final int x, final int y, final int z) {
+
+    @Override
+    public int getLightValue(IBlockAccess world, int x, int y, int z) {
         return 15 - world.getBlockMetadata(x, y, z);
     }
 }
