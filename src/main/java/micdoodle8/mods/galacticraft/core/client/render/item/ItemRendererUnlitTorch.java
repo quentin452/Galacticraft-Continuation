@@ -5,6 +5,8 @@ import net.minecraftforge.client.IItemRenderer;
 
 import org.lwjgl.opengl.GL11;
 
+import java.util.Objects;
+
 public class ItemRendererUnlitTorch implements IItemRenderer {
 
     @Override
@@ -14,18 +16,13 @@ public class ItemRendererUnlitTorch implements IItemRenderer {
 
     @Override
     public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
-        return switch (helper) {
-            case INVENTORY_BLOCK -> true;
-            default -> false;
-        };
+        return Objects.requireNonNull(helper) == ItemRendererHelper.INVENTORY_BLOCK;
     }
 
     @Override
     public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
-        switch (type) {
-            case INVENTORY:
-                this.renderTorchInInv();
-            default:
+        if (Objects.requireNonNull(type) == ItemRenderType.INVENTORY) {
+            this.renderTorchInInv();
         }
     }
 

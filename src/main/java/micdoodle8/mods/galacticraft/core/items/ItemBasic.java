@@ -109,23 +109,33 @@ public class ItemBasic extends Item {
     }
 
     public int getHealAmount(ItemStack par1ItemStack) {
-        return switch (par1ItemStack.getItemDamage()) {
-            case 15 -> 8;
-            case 16 -> 8;
-            case 17 -> 4;
-            case 18 -> 2;
-            default -> 0;
-        };
+        int damage = par1ItemStack.getItemDamage();
+        switch (damage) {
+            case 15:
+            case 16:
+                return 8;
+            case 17:
+                return 4;
+            case 18:
+                return 2;
+            default:
+                return 0;
+        }
     }
 
     public float getSaturationModifier(ItemStack par1ItemStack) {
-        return switch (par1ItemStack.getItemDamage()) {
-            case 15 -> 0.3F;
-            case 16 -> 0.6F;
-            case 17 -> 0.3F;
-            case 18 -> 0.3F;
-            default -> 0.0F;
-        };
+        int damage = par1ItemStack.getItemDamage();
+        switch (damage) {
+            case 15:
+                return 0.3F;
+            case 16:
+                return 0.6F;
+            case 17:
+            case 18:
+                return 0.3F;
+            default:
+                return 0.0F;
+        }
     }
 
     @Override

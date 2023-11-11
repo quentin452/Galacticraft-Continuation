@@ -70,33 +70,37 @@ public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShi
     public void randomDisplayTick(World par1World, int x, int y, int z, Random par5Random) {
         final TileEntity tile = par1World.getTileEntity(x, y, z);
 
-        if (tile instanceof TileEntityCoalGenerator tileEntity && tileEntity.heatGJperTick > 0) {
-            final int metadata = par1World.getBlockMetadata(x, y, z);
-            final float var7 = x + 0.5F;
-            final float var8 = y + 0.0F + par5Random.nextFloat() * 6.0F / 16.0F;
-            final float var9 = z + 0.5F;
-            final float var10 = 0.52F;
-            final float var11 = par5Random.nextFloat() * 0.6F - 0.3F;
+        if (tile instanceof TileEntityCoalGenerator) {
+            TileEntityCoalGenerator tileEntity = (TileEntityCoalGenerator) tile;
 
-            switch (metadata) {
-                case 0:
-                    par1World.spawnParticle("smoke", var7 - var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
-                    par1World.spawnParticle("flame", var7 - var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
-                    break;
-                case 1:
-                    par1World.spawnParticle("smoke", var7 + var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
-                    par1World.spawnParticle("flame", var7 + var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
-                    break;
-                case 2:
-                    par1World.spawnParticle("smoke", var7 + var11, var8, var9 + var10, 0.0D, 0.0D, 0.0D);
-                    par1World.spawnParticle("flame", var7 + var11, var8, var9 + var10, 0.0D, 0.0D, 0.0D);
-                    break;
-                case 3:
-                    par1World.spawnParticle("smoke", var7 + var11, var8, var9 - var10, 0.0D, 0.0D, 0.0D);
-                    par1World.spawnParticle("flame", var7 + var11, var8, var9 - var10, 0.0D, 0.0D, 0.0D);
-                    break;
-                default:
-                    break;
+            if (tileEntity.heatGJperTick > 0) {
+                final int metadata = par1World.getBlockMetadata(x, y, z);
+                final float var7 = x + 0.5F;
+                final float var8 = y + 0.0F + par5Random.nextFloat() * 6.0F / 16.0F;
+                final float var9 = z + 0.5F;
+                final float var10 = 0.52F;
+                final float var11 = par5Random.nextFloat() * 0.6F - 0.3F;
+
+                switch (metadata) {
+                    case 0:
+                        par1World.spawnParticle("smoke", var7 - var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
+                        par1World.spawnParticle("flame", var7 - var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
+                        break;
+                    case 1:
+                        par1World.spawnParticle("smoke", var7 + var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
+                        par1World.spawnParticle("flame", var7 + var10, var8, var9 + var11, 0.0D, 0.0D, 0.0D);
+                        break;
+                    case 2:
+                        par1World.spawnParticle("smoke", var7 + var11, var8, var9 + var10, 0.0D, 0.0D, 0.0D);
+                        par1World.spawnParticle("flame", var7 + var11, var8, var9 + var10, 0.0D, 0.0D, 0.0D);
+                        break;
+                    case 3:
+                        par1World.spawnParticle("smoke", var7 + var11, var8, var9 - var10, 0.0D, 0.0D, 0.0D);
+                        par1World.spawnParticle("flame", var7 + var11, var8, var9 - var10, 0.0D, 0.0D, 0.0D);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -220,12 +224,16 @@ public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShi
     @Override
     public TileEntity createTileEntity(World world, int metadata) {
         metadata &= 12;
-        return switch (metadata) {
-            case BlockMachine.COMPRESSOR_METADATA -> new TileEntityIngotCompressor();
-            case 4 -> new TileEntityEnergyStorageModule();
-            case 8 -> new TileEntityElectricFurnace();
-            default -> new TileEntityCoalGenerator();
-        };
+        switch (metadata) {
+            case BlockMachine.COMPRESSOR_METADATA:
+                return new TileEntityIngotCompressor();
+            case 4:
+                return new TileEntityEnergyStorageModule();
+            case 8:
+                return new TileEntityElectricFurnace();
+            default:
+                return new TileEntityCoalGenerator();
+        }
     }
 
     public ItemStack getCompressor() {

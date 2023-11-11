@@ -19,44 +19,49 @@ public abstract class StructureComponentMoon extends StructureComponent {
     }
 
     public static StructureBoundingBox getComponentToAddBoundingBox(int var0, int var1, int var2, int var3, int var4,
-            int var5, int var6, int var7, int var8, int var9) {
-        return switch (var9) {
-            case 0 -> new StructureBoundingBox(
+                                                                    int var5, int var6, int var7, int var8, int var9) {
+        switch (var9) {
+            case 0:
+                return new StructureBoundingBox(
                     var0 + var3,
                     var1 + var4,
                     var2 + var5,
                     var0 + var6 + var3,
                     var1 + var7 + var4,
                     var2 + var8 + var5);
-            case 1 -> new StructureBoundingBox(
+            case 1:
+                return new StructureBoundingBox(
                     var0 - var8 + var5,
                     var1 + var4,
                     var2 + var3,
                     var0 + var5,
                     var1 + var7 + var4,
                     var2 + var6 + var3);
-            case 2 -> new StructureBoundingBox(
+            case 2:
+                return new StructureBoundingBox(
                     var0 - var6 - var3,
                     var1 + var4,
                     var2 - var8 - var5,
                     var0 - var3,
                     var1 + var7 + var4,
                     var2 - var5);
-            case 3 -> new StructureBoundingBox(
+            case 3:
+                return new StructureBoundingBox(
                     var0 + var5,
                     var1 + var4,
                     var2 - var6,
                     var0 + var8 + var5,
                     var1 + var7 + var4,
                     var2 + var3);
-            default -> new StructureBoundingBox(
+            default:
+                return new StructureBoundingBox(
                     var0 + var3,
                     var1 + var4,
                     var2 + var5,
                     var0 + var6 + var3,
                     var1 + var7 + var4,
                     var2 + var8 + var5);
-        };
+        }
     }
 
     protected TileEntityMobSpawner placeSpawnerAtCurrentPosition(World var1, Random var2, int var3, int var4, int var5,
@@ -102,13 +107,18 @@ public abstract class StructureComponentMoon extends StructureComponent {
 
     @Override
     protected int getXWithOffset(int var1, int var2) {
-        return switch (this.getCoordBaseMode()) {
-            case 0 -> this.boundingBox.minX + var1;
-            case 1 -> this.boundingBox.maxX - var2;
-            case 2 -> this.boundingBox.maxX - var1;
-            case 3 -> this.boundingBox.minX + var2;
-            default -> var1;
-        };
+        switch (this.getCoordBaseMode()) {
+            case 0:
+                return this.boundingBox.minX + var1;
+            case 1:
+                return this.boundingBox.maxX - var2;
+            case 2:
+                return this.boundingBox.maxX - var1;
+            case 3:
+                return this.boundingBox.minX + var2;
+            default:
+                return var1;
+        }
     }
 
     @Override
@@ -118,41 +128,55 @@ public abstract class StructureComponentMoon extends StructureComponent {
 
     @Override
     protected int getZWithOffset(int var1, int var2) {
-        return switch (this.getCoordBaseMode()) {
-            case 0 -> this.boundingBox.minZ + var2;
-            case 1 -> this.boundingBox.minZ + var1;
-            case 2 -> this.boundingBox.maxZ - var2;
-            case 3 -> this.boundingBox.maxZ - var1;
-            default -> var2;
-        };
+        switch (this.getCoordBaseMode()) {
+            case 0:
+                return this.boundingBox.minZ + var2;
+            case 1:
+                return this.boundingBox.minZ + var1;
+            case 2:
+                return this.boundingBox.maxZ - var2;
+            case 3:
+                return this.boundingBox.maxZ - var1;
+            default:
+                return var2;
+        }
     }
 
     protected int getXWithOffsetAsIfRotated(int var1, int var2, int var3) {
         if (this.coordBaseMode < 0) {
             return var1;
         }
-        return switch ((this.coordBaseMode + var3) % 4) {
-            case 0 -> this.boundingBox.minX + var1;
-            case 1 -> this.boundingBox.maxX - var2;
-            case 2 -> this.boundingBox.maxX - var1;
-            case 3 -> this.boundingBox.minX + var2;
-            default -> var1;
-        };
+        switch ((this.coordBaseMode + var3) % 4) {
+            case 0:
+                return this.boundingBox.minX + var1;
+            case 1:
+                return this.boundingBox.maxX - var2;
+            case 2:
+                return this.boundingBox.maxX - var1;
+            case 3:
+                return this.boundingBox.minX + var2;
+            default:
+                return var1;
+        }
     }
 
     protected int getZWithOffsetAsIfRotated(int var1, int var2, int var3) {
         if (this.coordBaseMode < 0) {
             return var1;
         }
-        return switch ((this.coordBaseMode + var3) % 4) {
-            case 0 -> this.boundingBox.minZ + var2;
-            case 1 -> this.boundingBox.minZ + var1;
-            case 2 -> this.boundingBox.maxZ - var2;
-            case 3 -> this.boundingBox.maxZ - var1;
-            default -> var2;
-        };
+        switch ((this.coordBaseMode + var3) % 4) {
+            case 0:
+                return this.boundingBox.minZ + var2;
+            case 1:
+                return this.boundingBox.minZ + var1;
+            case 2:
+                return this.boundingBox.maxZ - var2;
+            case 3:
+                return this.boundingBox.maxZ - var1;
+            default:
+                return var2;
+        }
     }
-
     public int getCoordBaseMode() {
         return this.coordBaseMode;
     }
@@ -203,23 +227,33 @@ public abstract class StructureComponentMoon extends StructureComponent {
     }
 
     protected int getStairMeta(int var1) {
-        return switch ((this.getCoordBaseMode() + var1) % 4) {
-            case 0 -> 0;
-            case 1 -> 2;
-            case 2 -> 1;
-            case 3 -> 3;
-            default -> -1;
-        };
+        switch ((this.getCoordBaseMode() + var1) % 4) {
+            case 0:
+                return 0;
+            case 1:
+                return 2;
+            case 2:
+                return 1;
+            case 3:
+                return 3;
+            default:
+                return -1;
+        }
     }
 
     protected int getLadderMeta(int var1) {
-        return switch ((this.getCoordBaseMode() + var1) % 4) {
-            case 0 -> 4;
-            case 1 -> 2;
-            case 2 -> 5;
-            case 3 -> 3;
-            default -> -1;
-        };
+        switch ((this.getCoordBaseMode() + var1) % 4) {
+            case 0:
+                return 4;
+            case 1:
+                return 2;
+            case 2:
+                return 5;
+            case 3:
+                return 3;
+            default:
+                return -1;
+        }
     }
 
     protected int getLadderMeta(int var1, int var2) {

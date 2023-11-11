@@ -53,9 +53,7 @@ public class BlockMachineFrame extends Block {
 
     @Override
     public Item getItemDropped(int meta, Random random, int par3) {
-        return switch (meta) {
-            default -> super.getItemDropped(meta, random, par3);
-        };
+        return super.getItemDropped(meta, random, par3);
     }
 
     @Override
@@ -65,9 +63,7 @@ public class BlockMachineFrame extends Block {
 
     @Override
     public int quantityDropped(int meta, int fortune, Random random) {
-        return switch (meta) {
-            default -> 1;
-        };
+        return 1;
     }
 
     @Override

@@ -157,7 +157,8 @@ public class PacketSimpleMars implements IPacket {
             case S_UPDATE_SLIMELING_DATA:
                 final Entity entity = player.worldObj.getEntityByID((Integer) this.data.get(0));
 
-                if (entity instanceof EntitySlimeling slimeling) {
+                if (entity instanceof EntitySlimeling) {
+                    EntitySlimeling slimeling = (EntitySlimeling) entity;
                     final int subType = (Integer) this.data.get(1);
 
                     switch (subType) {
@@ -183,7 +184,7 @@ public class PacketSimpleMars implements IPacket {
                             break;
                         case 3:
                             if (!slimeling.isInLove() && player == slimeling.getOwner()
-                                    && !slimeling.worldObj.isRemote) {
+                                && !slimeling.worldObj.isRemote) {
                                 slimeling.func_146082_f(playerBase);
                             }
                             break;
@@ -210,52 +211,58 @@ public class PacketSimpleMars implements IPacket {
 
                 if (c != null) {
                     final EventWakePlayer event = new EventWakePlayer(
-                            playerBase,
-                            c.posX,
-                            c.posY,
-                            c.posZ,
-                            true,
-                            true,
-                            false,
-                            true);
+                        playerBase,
+                        c.posX,
+                        c.posY,
+                        c.posZ,
+                        true,
+                        true,
+                        false,
+                        true);
                     MinecraftForge.EVENT_BUS.post(event);
                     playerBase.wakeUpPlayer(true, true, false);
                 }
                 break;
             case S_UPDATE_ADVANCED_GUI:
                 final TileEntity tile = player.worldObj.getTileEntity(
-                        (Integer) this.data.get(1),
-                        (Integer) this.data.get(2),
-                        (Integer) this.data.get(3));
+                    (Integer) this.data.get(1),
+                    (Integer) this.data.get(2),
+                    (Integer) this.data.get(3));
 
                 switch ((Integer) this.data.get(0)) {
                     case 0:
-                        if (tile instanceof TileEntityLaunchController launchController) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
                             launchController.setFrequency((Integer) this.data.get(4));
                         }
                         break;
                     case 1:
-                        if (tile instanceof TileEntityLaunchController launchController) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
                             launchController.setLaunchDropdownSelection((Integer) this.data.get(4));
                         }
                         break;
                     case 2:
-                        if (tile instanceof TileEntityLaunchController launchController) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
                             launchController.setDestinationFrequency((Integer) this.data.get(4));
                         }
                         break;
                     case 3:
-                        if (tile instanceof TileEntityLaunchController launchController) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
                             launchController.launchPadRemovalDisabled = (Integer) this.data.get(4) == 1;
                         }
                         break;
                     case 4:
-                        if (tile instanceof TileEntityLaunchController launchController) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
                             launchController.setLaunchSchedulingEnabled((Integer) this.data.get(4) == 1);
                         }
                         break;
                     case 5:
-                        if (tile instanceof TileEntityLaunchController launchController) {
+                        if (tile instanceof TileEntityLaunchController) {
+                            TileEntityLaunchController launchController = (TileEntityLaunchController) tile;
                             launchController.requiresClientUpdate = true;
                         }
                         break;
@@ -266,7 +273,8 @@ public class PacketSimpleMars implements IPacket {
             case S_UPDATE_CARGO_ROCKET_STATUS:
                 final Entity entity2 = player.worldObj.getEntityByID((Integer) this.data.get(0));
 
-                if (entity2 instanceof EntityCargoRocket rocket) {
+                if (entity2 instanceof EntityCargoRocket) {
+                    EntityCargoRocket rocket = (EntityCargoRocket) entity2;
                     rocket.statusValid = rocket.checkLaunchValidity();
                 }
                 break;

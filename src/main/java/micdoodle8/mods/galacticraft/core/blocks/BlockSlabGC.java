@@ -123,10 +123,16 @@ public class BlockSlabGC extends BlockSlab {
     @Override
     public float getBlockHardness(World world, int x, int y, int z) {
         final int meta = world.getBlockMetadata(x, y, z);
-        return switch (getTypeFromMeta(meta)) {
-            case 2, 3 -> 1.5F;
-            default -> 2.0F;
-        };
+        int type = getTypeFromMeta(meta);
+
+        float hardness;
+        if(type == 2 || type == 3) {
+            hardness = 1.5F;
+        } else {
+            hardness = 2.0F;
+        }
+
+        return hardness;
     }
 
     @Override

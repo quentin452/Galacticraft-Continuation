@@ -162,11 +162,13 @@ public class TileEntityOxygenDecompressor extends TileEntityOxygen implements II
     @Override
     public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
         if (this.isItemValidForSlot(slotID, itemstack)) {
-            return switch (slotID) {
-                case 0 -> itemstack.getItemDamage() < itemstack.getMaxDamage();
-                case 1 -> ItemElectricBase.isElectricItemCharged(itemstack);
-                default -> false;
-            };
+            if (slotID == 0) {
+                return itemstack.getItemDamage() < itemstack.getMaxDamage();
+            } else if (slotID == 1) {
+                return ItemElectricBase.isElectricItemCharged(itemstack);
+            } else {
+                return false;
+            }
         }
         return false;
     }
@@ -174,11 +176,13 @@ public class TileEntityOxygenDecompressor extends TileEntityOxygen implements II
     @Override
     public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
         if (this.isItemValidForSlot(slotID, itemstack)) {
-            return switch (slotID) {
-                case 0 -> itemstack.getItemDamage() == itemstack.getMaxDamage();
-                case 1 -> ItemElectricBase.isElectricItemEmpty(itemstack);
-                default -> false;
-            };
+            if (slotID == 0) {
+                return itemstack.getItemDamage() == itemstack.getMaxDamage();
+            } else if (slotID == 1) {
+                return ItemElectricBase.isElectricItemEmpty(itemstack);
+            } else {
+                return false;
+            }
         }
         return false;
     }

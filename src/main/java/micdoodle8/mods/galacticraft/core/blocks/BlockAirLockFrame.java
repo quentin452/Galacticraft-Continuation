@@ -103,13 +103,15 @@ public class BlockAirLockFrame extends BlockAdvancedTile implements ItemBlockDes
 
             final TileEntity tile = world.getTileEntity(par2, par3, par4);
 
-            if (!(tile instanceof TileEntityAirLockController controller)) {
-                return this.airLockIcons[6];
-            }
-            if (controller.active) {
-                return this.airLockIcons[6];
+            if (tile instanceof TileEntityAirLockController) {
+                TileEntityAirLockController controller = (TileEntityAirLockController) tile;
+                if (controller.active) {
+                    return this.airLockIcons[6];
+                } else {
+                    return this.airLockIcons[7];
+                }
             } else {
-                return this.airLockIcons[7];
+                return this.airLockIcons[6];
             }
         }
         for (final ForgeDirection orientation : ForgeDirection.values()) {

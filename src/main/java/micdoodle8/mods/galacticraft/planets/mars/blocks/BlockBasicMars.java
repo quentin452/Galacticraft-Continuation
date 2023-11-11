@@ -50,11 +50,13 @@ public class BlockBasicMars extends Block
 
     @Override
     public MapColor getMapColor(int meta) {
-        return switch (meta) {
-            case 7 -> MapColor.greenColor;
-            case 5 -> MapColor.dirtColor;
-            default -> MapColor.redColor;
-        };
+        if (meta == 7) {
+            return MapColor.greenColor;
+        } else if (meta == 5) {
+            return MapColor.dirtColor;
+        } else {
+            return MapColor.redColor;
+        }
     }
 
     public BlockBasicMars() {
@@ -241,13 +243,7 @@ public class BlockBasicMars extends Block
 
     @Override
     public boolean isValueable(int metadata) {
-        return switch (metadata) {
-            case 0 -> true;
-            case 1 -> true;
-            case 2 -> true;
-            case 3 -> true;
-            default -> false;
-        };
+        return metadata == 0 || metadata == 1 || metadata == 2 || metadata == 3;
     }
 
     @Override

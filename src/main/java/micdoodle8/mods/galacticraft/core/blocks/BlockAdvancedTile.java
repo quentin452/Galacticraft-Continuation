@@ -50,7 +50,8 @@ public abstract class BlockAdvancedTile extends BlockAdvanced implements ITileEn
     public void dropEntireInventory(World world, int x, int y, int z, Block par5, int par6) {
         final TileEntity tileEntity = world.getTileEntity(x, y, z);
 
-        if (tileEntity != null && tileEntity instanceof IInventory inventory) {
+        if (tileEntity != null && tileEntity instanceof IInventory) {
+            IInventory inventory = (IInventory) tileEntity;
             for (int var6 = 0; var6 < inventory.getSizeInventory(); ++var6) {
                 final ItemStack var7 = inventory.getStackInSlot(var6);
 
@@ -69,11 +70,11 @@ public abstract class BlockAdvancedTile extends BlockAdvanced implements ITileEn
 
                         var7.stackSize -= var11;
                         final EntityItem var12 = new EntityItem(
-                                world,
-                                x + var8,
-                                y + var9,
-                                z + var10,
-                                new ItemStack(var7.getItem(), var11, var7.getItemDamage()));
+                            world,
+                            x + var8,
+                            y + var9,
+                            z + var10,
+                            new ItemStack(var7.getItem(), var11, var7.getItemDamage()));
 
                         if (var7.hasTagCompound()) {
                             var12.getEntityItem().setTagCompound((NBTTagCompound) var7.getTagCompound().copy());

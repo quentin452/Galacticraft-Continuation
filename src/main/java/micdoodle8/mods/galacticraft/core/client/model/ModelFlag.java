@@ -37,7 +37,8 @@ public class ModelFlag extends ModelBase {
     public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
         super.render(entity, f, f1, f2, f3, f4, f5);
 
-        if (entity instanceof EntityFlag flag) {
+        if (entity instanceof EntityFlag) {
+            EntityFlag flag = (EntityFlag) entity;
             this.renderPole(flag, f5);
             this.renderFlag(flag, flag.ticksExisted);
         }

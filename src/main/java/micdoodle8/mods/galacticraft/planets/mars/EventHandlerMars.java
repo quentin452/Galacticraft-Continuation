@@ -43,27 +43,31 @@ public class EventHandlerMars {
 
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
-        if ("slimeling".equals(event.source.damageType) && event.source instanceof EntityDamageSource source
-                && source.getEntity() instanceof EntitySlimeling
-                && !source.getEntity().worldObj.isRemote) {
-            ((EntitySlimeling) source.getEntity()).kills++;
+        if ("slimeling".equals(event.source.damageType) && event.source instanceof EntityDamageSource
+            && event.source.getEntity() instanceof EntitySlimeling
+            && !event.source.getEntity().worldObj.isRemote) {
+            Entity entity = event.source.getEntity();
+            if (entity instanceof EntitySlimeling) {
+                ((EntitySlimeling) entity).kills++;
+            }
         }
     }
 
     @SubscribeEvent
     public void onLivingAttacked(LivingAttackEvent event) {
         if (!event.entity.isEntityInvulnerable() && !event.entity.worldObj.isRemote
-                && event.entityLiving.getHealth() <= 0.0F
-                && (!event.source.isFireDamage() || !event.entityLiving.isPotionActive(Potion.fireResistance))) {
-            final Entity entity = event.source.getEntity();
-
-            if (entity instanceof EntitySlimeling entitywolf && entitywolf.isTamed()) {
-                event.entityLiving.recentlyHit = 100;
-                event.entityLiving.attackingPlayer = null;
+            && event.entityLiving.getHealth() <= 0.0F
+            && (!event.source.isFireDamage() || !event.entityLiving.isPotionActive(Potion.fireResistance))) {
+            Entity entity = event.source.getEntity();
+            if (entity instanceof EntitySlimeling) {
+                EntitySlimeling entitySlimeling = (EntitySlimeling) entity;
+                if (entitySlimeling.isTamed()) {
+                    event.entityLiving.recentlyHit = 100;
+                    event.entityLiving.attackingPlayer = null;
+                }
             }
         }
     }
-
     @SubscribeEvent
     public void onPlayerWakeUp(EventWakePlayer event) {
         final ChunkCoordinates c = event.entityPlayer.playerLocation;
@@ -184,20 +188,19 @@ public class EventHandlerMars {
 
     @SubscribeEvent
     public void onLandingPadRemoved(EventLandingPadRemoval event) {
-        final TileEntity tile = event.world.getTileEntity(event.x, event.y, event.z);
+        TileEntity tile = event.world.getTileEntity(event.x, event.y, event.z);
 
-        if (tile instanceof IFuelDock dock) {
-            for (final ILandingPadAttachable connectedTile : dock.getConnectedTiles()) {
+        if (tile instanceof IFuelDock) {
+            IFuelDock dock = (IFuelDock) tile;
+            for (ILandingPadAttachable connectedTile : dock.getConnectedTiles()) {
                 if (connectedTile instanceof TileEntityLaunchController) {
-                    final TileEntityLaunchController launchController = (TileEntityLaunchController) event.world
-                            .getTileEntity(
-                                    ((TileEntityLaunchController) connectedTile).xCoord,
-                                    ((TileEntityLaunchController) connectedTile).yCoord,
-                                    ((TileEntityLaunchController) connectedTile).zCoord);
+                    TileEntityLaunchController launchController = (TileEntityLaunchController) event.world.getTileEntity(
+                        ((TileEntityLaunchController) connectedTile).xCoord,
+                        ((TileEntityLaunchController) connectedTile).yCoord,
+                        ((TileEntityLaunchController) connectedTile).zCoord);
                     if (launchController.getEnergyStoredGC() > 0.0F && launchController.launchPadRemovalDisabled
-                            && !launchController.getDisabled(0)) {
+                        && !launchController.getDisabled(0)) {
                         event.allow = false;
-                        return;
                     }
                     break;
                 }

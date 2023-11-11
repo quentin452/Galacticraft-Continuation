@@ -632,8 +632,8 @@ public class EntityAstroMiner extends Entity
     private void atBase() {
         final TileEntity tileEntity = this.posBase.getTileEntity(this.worldObj);
 
-        if (!(tileEntity instanceof TileEntityMinerBase minerBase) || tileEntity.isInvalid()
-                || !((TileEntityMinerBase) tileEntity).isMaster) {
+        if (!(tileEntity instanceof TileEntityMinerBase) || tileEntity.isInvalid()
+            || !((TileEntityMinerBase) tileEntity).isMaster) {
             this.freeze(FAIL_BASEDESTROYED);
             return;
         }
@@ -646,11 +646,12 @@ public class EntityAstroMiner extends Entity
 
         boolean somethingTransferred = true;
         if (this.ticksExisted % 5 == 0) {
-            somethingTransferred = this.emptyInventory(minerBase);
+            somethingTransferred = this.emptyInventory((TileEntityMinerBase) tileEntity);
         }
         this.inventoryDrops = 0;
 
         // Recharge
+        TileEntityMinerBase minerBase = (TileEntityMinerBase) tileEntity;
         if (minerBase.hasEnoughEnergyToRun && this.energyLevel < MAXENERGY) {
             this.energyLevel += 16;
             minerBase.storage.extractEnergyGC(minerBase.storage.getMaxExtract(), false);
@@ -664,8 +665,7 @@ public class EntityAstroMiner extends Entity
                 this.wayPoints.add(this.waypointBase.clone());
                 this.mineCount = 0;
             } else if (this.playerMP != null && (this.givenFailMessage & 64) == 0) {
-                this.playerMP
-                        .addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner6.fail")));
+                this.playerMP.addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.message.astroMiner6.fail")));
                 this.givenFailMessage += 64;
             }
         }

@@ -51,7 +51,8 @@ public class NetworkUtil {
                 buffer.writeShort((Short) dataValue);
             } else if (dataValue instanceof Long) {
                 buffer.writeLong((Long) dataValue);
-            } else if (dataValue instanceof EnergyStorage storage) {
+            } else if (dataValue instanceof EnergyStorage) {
+                EnergyStorage storage = (EnergyStorage) dataValue;
                 buffer.writeFloat(storage.getCapacityGC());
                 buffer.writeFloat(storage.getMaxReceive());
                 buffer.writeFloat(storage.getMaxExtract());
@@ -63,50 +64,55 @@ public class NetworkUtil {
             } else if (dataValue instanceof Entity) {
                 buffer.writeInt(((Entity) dataValue).getEntityId());
             } else if (dataValue instanceof Vector3) {
-                buffer.writeDouble(((Vector3) dataValue).x);
-                buffer.writeDouble(((Vector3) dataValue).y);
-                buffer.writeDouble(((Vector3) dataValue).z);
+                Vector3 vector = (Vector3) dataValue;
+                buffer.writeDouble(vector.x);
+                buffer.writeDouble(vector.y);
+                buffer.writeDouble(vector.z);
             } else if (dataValue instanceof BlockVec3) {
-                buffer.writeInt(((BlockVec3) dataValue).x);
-                buffer.writeInt(((BlockVec3) dataValue).y);
-                buffer.writeInt(((BlockVec3) dataValue).z);
+                BlockVec3 blockVec = (BlockVec3) dataValue;
+                buffer.writeInt(blockVec.x);
+                buffer.writeInt(blockVec.y);
+                buffer.writeInt(blockVec.z);
             } else if (dataValue instanceof byte[]) {
-                buffer.writeInt(((byte[]) dataValue).length);
-                for (int i = 0; i < ((byte[]) dataValue).length; i++) {
-                    buffer.writeByte(((byte[]) dataValue)[i]);
+                byte[] byteArray = (byte[]) dataValue;
+                buffer.writeInt(byteArray.length);
+                for (byte b : byteArray) {
+                    buffer.writeByte(b);
                 }
             } else if (dataValue instanceof UUID) {
-                buffer.writeLong(((UUID) dataValue).getLeastSignificantBits());
-                buffer.writeLong(((UUID) dataValue).getMostSignificantBits());
+                UUID uuid = (UUID) dataValue;
+                buffer.writeLong(uuid.getLeastSignificantBits());
+                buffer.writeLong(uuid.getMostSignificantBits());
             } else if (dataValue instanceof Collection) {
                 NetworkUtil.encodeData(buffer, (Collection<Object>) dataValue);
             } else if (dataValue instanceof FlagData) {
-                buffer.writeInt(((FlagData) dataValue).getWidth());
-                buffer.writeInt(((FlagData) dataValue).getHeight());
+                FlagData flagData = (FlagData) dataValue;
+                buffer.writeInt(flagData.getWidth());
+                buffer.writeInt(flagData.getHeight());
 
-                for (int i = 0; i < ((FlagData) dataValue).getWidth(); i++) {
-                    for (int j = 0; j < ((FlagData) dataValue).getHeight(); j++) {
-                        final Vector3 vec = ((FlagData) dataValue).getColorAt(i, j);
+                for (int i = 0; i < flagData.getWidth(); i++) {
+                    for (int j = 0; j < flagData.getHeight(); j++) {
+                        final Vector3 vec = flagData.getColorAt(i, j);
                         buffer.writeByte((byte) (vec.x * 256 - 128));
                         buffer.writeByte((byte) (vec.y * 256 - 128));
                         buffer.writeByte((byte) (vec.z * 256 - 128));
                     }
                 }
-            } else if (dataValue instanceof Integer[]array) {
+            } else if (dataValue instanceof Integer[]) {
+                Integer[] array = (Integer[]) dataValue;
                 buffer.writeInt(array.length);
-
                 for (final Integer element : array) {
                     buffer.writeInt(element);
                 }
-            } else if (dataValue instanceof String[]array) {
+            } else if (dataValue instanceof String[]) {
+                String[] array = (String[]) dataValue;
                 buffer.writeInt(array.length);
-
                 for (final String element : array) {
                     ByteBufUtils.writeUTF8String(buffer, element);
                 }
-            } else if (dataValue instanceof Footprint[]array) {
+            } else if (dataValue instanceof Footprint[]) {
+                Footprint[] array = (Footprint[]) dataValue;
                 buffer.writeInt(array.length);
-
                 for (final Footprint element : array) {
                     buffer.writeInt(element.dimension);
                     buffer.writeFloat((float) element.position.x);
@@ -367,23 +373,29 @@ public class NetworkUtil {
             return af == bf || Math.abs(af - bf) < 0.01F;
         } else if (a instanceof Double && b instanceof Double) {
             return DoubleMath.fuzzyEquals((Double) a, (Double) b, 0.01);
-        } else if (a instanceof Entity a2 && b instanceof Entity b2) {
-            return fuzzyEquals(a2.getEntityId(), b2.getEntityId());
-        } else if (a instanceof Vector3 a2 && b instanceof Vector3 b2) {
-            return fuzzyEquals(a2.x, b2.x) && fuzzyEquals(a2.y, b2.y) && fuzzyEquals(a2.z, b2.z);
-        } else if (a instanceof EnergyStorage a2 && b instanceof EnergyStorage b2) {
-            return fuzzyEquals(a2.getEnergyStoredGC(), b2.getEnergyStoredGC())
-                    && fuzzyEquals(a2.getCapacityGC(), b2.getCapacityGC())
-                    && fuzzyEquals(a2.getMaxReceive(), b2.getMaxReceive())
-                    && fuzzyEquals(a2.getMaxExtract(), b2.getMaxExtract());
-        } else if (a instanceof FluidTank a2 && b instanceof FluidTank b2) {
-            final FluidStack fluidA = a2.getFluid();
-            final FluidStack fluidB = b2.getFluid();
-            return fuzzyEquals(a2.getCapacity(), b2.getCapacity())
-                    && fuzzyEquals(
-                            fluidA != null ? FluidUtil.getFluidID(fluidA) : -1,
-                            fluidB != null ? FluidUtil.getFluidID(fluidB) : -1)
-                    && fuzzyEquals(a2.getFluidAmount(), b2.getFluidAmount());
+        } else if (a instanceof Entity && b instanceof Entity) {
+            return fuzzyEquals(((Entity) a).getEntityId(), ((Entity) b).getEntityId());
+        } else if (a instanceof Vector3 && b instanceof Vector3) {
+            Vector3 aVec = (Vector3) a;
+            Vector3 bVec = (Vector3) b;
+            return fuzzyEquals(aVec.x, bVec.x) && fuzzyEquals(aVec.y, bVec.y) && fuzzyEquals(aVec.z, bVec.z);
+        } else if (a instanceof EnergyStorage && b instanceof EnergyStorage) {
+            EnergyStorage aStorage = (EnergyStorage) a;
+            EnergyStorage bStorage = (EnergyStorage) b;
+            return fuzzyEquals(aStorage.getEnergyStoredGC(), bStorage.getEnergyStoredGC())
+                && fuzzyEquals(aStorage.getCapacityGC(), bStorage.getCapacityGC())
+                && fuzzyEquals(aStorage.getMaxReceive(), bStorage.getMaxReceive())
+                && fuzzyEquals(aStorage.getMaxExtract(), bStorage.getMaxExtract());
+        } else if (a instanceof FluidTank && b instanceof FluidTank) {
+            FluidTank aTank = (FluidTank) a;
+            FluidTank bTank = (FluidTank) b;
+            final FluidStack fluidA = aTank.getFluid();
+            final FluidStack fluidB = bTank.getFluid();
+            return fuzzyEquals(aTank.getCapacity(), bTank.getCapacity())
+                && fuzzyEquals(
+                fluidA != null ? FluidUtil.getFluidID(fluidA) : -1,
+                fluidB != null ? FluidUtil.getFluidID(fluidB) : -1)
+                && fuzzyEquals(aTank.getFluidAmount(), bTank.getFluidAmount());
         } else {
             return a.equals(b);
         }
@@ -391,15 +403,17 @@ public class NetworkUtil {
 
     public static Object cloneNetworkedObject(Object a) {
         // We only need to clone mutable objects
-        if (a instanceof EnergyStorage prevStorage) {
+        if (a instanceof EnergyStorage) {
+            EnergyStorage prevStorage = (EnergyStorage) a;
             final EnergyStorage storage = new EnergyStorage(
-                    prevStorage.getCapacityGC(),
-                    prevStorage.getMaxReceive(),
-                    prevStorage.getMaxExtract());
+                prevStorage.getCapacityGC(),
+                prevStorage.getMaxReceive(),
+                prevStorage.getMaxExtract());
             storage.setEnergyStored(prevStorage.getEnergyStoredGC());
             return storage;
         }
-        if (a instanceof FluidTank prevTank) {
+        if (a instanceof FluidTank) {
+            FluidTank prevTank = (FluidTank) a;
             FluidStack prevFluid = prevTank.getFluid();
             prevFluid = prevFluid == null ? null : prevFluid.copy();
             return new FluidTank(prevFluid, prevTank.getCapacity());

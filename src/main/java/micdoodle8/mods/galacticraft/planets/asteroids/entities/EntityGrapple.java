@@ -296,10 +296,10 @@ public class EntityGrapple extends Entity implements IProjectile {
                 movingobjectposition = new MovingObjectPosition(entity);
             }
 
-            if (movingobjectposition != null && movingobjectposition.entityHit != null
-                    && movingobjectposition.entityHit instanceof EntityPlayer entityplayer) {
+            if (movingobjectposition != null && movingobjectposition.entityHit instanceof EntityPlayer) {
+                EntityPlayer entityplayer = (EntityPlayer) movingobjectposition.entityHit;
                 if (entityplayer.capabilities.disableDamage
-                        || this.shootingEntity != null && !this.shootingEntity.canAttackPlayer(entityplayer)) {
+                    || (this.shootingEntity != null && !this.shootingEntity.canAttackPlayer(entityplayer))) {
                     movingobjectposition = null;
                 }
             }

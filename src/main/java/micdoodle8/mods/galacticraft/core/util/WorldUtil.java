@@ -118,14 +118,18 @@ public class WorldUtil {
             }
 
             final IGalacticraftWorldProvider customProvider = (IGalacticraftWorldProvider) entity.worldObj.provider;
-            if (entity instanceof EntityPlayer player && player.inventory != null) {
+            if (entity instanceof EntityPlayer && ((EntityPlayer) entity).inventory != null) {
+                EntityPlayer player = (EntityPlayer) entity;
                 int armorModLowGrav = 100;
                 int armorModHighGrav = 100;
+
                 for (int i = 0; i < 4; i++) {
                     final ItemStack armorPiece = player.getCurrentArmor(i);
+
                     if (armorPiece != null && armorPiece.getItem() instanceof IArmorGravity) {
-                        armorModLowGrav -= ((IArmorGravity) armorPiece.getItem()).gravityOverrideIfLow(player);
-                        armorModHighGrav -= ((IArmorGravity) armorPiece.getItem()).gravityOverrideIfHigh(player);
+                        IArmorGravity armorItem = (IArmorGravity) armorPiece.getItem();
+                        armorModLowGrav -= armorItem.gravityOverrideIfLow(player);
+                        armorModHighGrav -= armorItem.gravityOverrideIfHigh(player);
                     }
                 }
                 if (armorModLowGrav > 100) {
@@ -154,7 +158,9 @@ public class WorldUtil {
     }
 
     public static float getGravityFactor(Entity entity) {
-        if (entity.worldObj.provider instanceof IGalacticraftWorldProvider customProvider) {
+        if (entity.worldObj.provider instanceof IGalacticraftWorldProvider) {
+            IGalacticraftWorldProvider customProvider = (IGalacticraftWorldProvider) entity.worldObj.provider;
+
             float returnValue = MathHelper.sqrt_float(0.08F / (0.08F - customProvider.getGravity()));
             if (returnValue > 2.5F) {
                 returnValue = 2.5F;
@@ -162,18 +168,28 @@ public class WorldUtil {
             if (returnValue < 0.75F) {
                 returnValue = 0.75F;
             }
+
             return returnValue;
         }
+
         return 1F;
     }
 
     public static double getItemGravity(EntityItem e) {
-        if (e.worldObj.provider instanceof IGalacticraftWorldProvider customProvider) {
-            return Math.max(
-                    0.002D,
-                    0.03999999910593033D - (customProvider instanceof IOrbitDimension ? 0.05999999910593033D
-                            : customProvider.getGravity()) / 1.75D);
+        if (e.worldObj.provider instanceof IGalacticraftWorldProvider) {
+            IGalacticraftWorldProvider customProvider = (IGalacticraftWorldProvider) e.worldObj.provider;
+
+            double gravity = 0.03999999910593033D;
+
+            if (customProvider instanceof IOrbitDimension) {
+                gravity = Math.max(0.002D, gravity - 0.05999999910593033D / 1.75D);
+            } else {
+                gravity = Math.max(0.002D, gravity - customProvider.getGravity() / 1.75D);
+            }
+
+            return gravity;
         }
+
         return 0.03999999910593033D;
     }
 
@@ -363,6 +379,7 @@ public class WorldUtil {
 
     public static void initialiseDimensionNames() {
         final WorldProvider provider = WorldUtil.getProviderForDimensionServer(ConfigManagerCore.idDimensionOverworld);
+        assert provider != null;
         WorldUtil.dimNames.put(ConfigManagerCore.idDimensionOverworld, provider.getDimensionName());
     }
 
@@ -858,8 +875,9 @@ public class WorldUtil {
     }
 
     public static Entity cancelTeleportation(Entity entity) {
-        if (entity instanceof EntityPlayerMP player) {
-            final GCPlayerStats stats = GCPlayerStats.get(player);
+        if (entity instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) entity;
+            GCPlayerStats stats = GCPlayerStats.get(player);
             stats.usingPlanetSelectionGui = false;
         }
         return entity;
@@ -1209,7 +1227,8 @@ public class WorldUtil {
     }
 
     private static void removeEntityFromWorld(World var0, Entity var1, boolean directlyRemove) {
-        if (var1 instanceof EntityPlayer var2) {
+        if (var1 instanceof EntityPlayer) {
+            EntityPlayer var2 = (EntityPlayer) var1;
             var2.closeScreen();
             var0.playerEntities.remove(var2);
             var0.updateAllPlayersSleepingFlag();

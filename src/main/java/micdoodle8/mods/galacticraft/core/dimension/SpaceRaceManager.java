@@ -46,17 +46,17 @@ public class SpaceRaceManager {
         for (final SpaceRace race : SpaceRaceManager.spaceRaces) {
             boolean playerOnline = false;
 
-            for (final Object o : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
-                if (o instanceof EntityPlayer player
-                        && race.getPlayerNames().contains(player.getGameProfile().getName())) {
-                    final CelestialBody body = GalaxyRegistry
-                            .getCelestialBodyFromDimensionID(player.worldObj.provider.dimensionId);
+            for (final EntityPlayer o : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+                if (o != null && (race.getPlayerNames().contains(o.getGameProfile().getName()))) {
+                        final CelestialBody body = GalaxyRegistry
+                            .getCelestialBodyFromDimensionID(o.worldObj.provider.dimensionId);
 
-                    if ((body != null) && !race.getCelestialBodyStatusList().containsKey(body)) {
-                        race.setCelestialBodyReached(body);
-                    }
+                        if ((body != null) && !race.getCelestialBodyStatusList().containsKey(body)) {
+                            race.setCelestialBodyReached(body);
+                        }
 
-                    playerOnline = true;
+                        playerOnline = true;
+
                 }
             }
 
@@ -116,7 +116,7 @@ public class SpaceRaceManager {
             objList.add(spaceRace.getTeamName());
             objList.add(spaceRace.getFlagData());
             objList.add(spaceRace.getTeamColor());
-            objList.add(spaceRace.getPlayerNames().toArray(new String[spaceRace.getPlayerNames().size()]));
+            objList.add(spaceRace.getPlayerNames().toArray(new String[0]));
 
             if (toPlayer != null) {
                 GalacticraftCore.packetPipeline

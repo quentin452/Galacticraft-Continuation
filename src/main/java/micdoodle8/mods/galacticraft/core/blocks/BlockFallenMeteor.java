@@ -75,29 +75,33 @@ public class BlockFallenMeteor extends Block implements ITileEntityProvider, Ite
     public void onEntityCollidedWithBlock(World par1World, int par2, int par3, int par4, Entity par5Entity) {
         final TileEntity tile = par1World.getTileEntity(par2, par3, par4);
 
-        if (tile instanceof TileEntityFallenMeteor meteor) {
+        if (tile instanceof TileEntityFallenMeteor) {
+            TileEntityFallenMeteor meteor = (TileEntityFallenMeteor) tile;
+
             if (meteor.getHeatLevel() <= 0) {
                 return;
             }
 
-            if (par5Entity instanceof EntityLivingBase livingEntity) {
+            if (par5Entity instanceof EntityLivingBase) {
+                EntityLivingBase livingEntity = (EntityLivingBase) par5Entity;
+
                 par1World.playSoundEffect(
-                        par2 + 0.5F,
-                        par3 + 0.5F,
-                        par4 + 0.5F,
-                        "random.fizz",
-                        0.5F,
-                        2.6F + (par1World.rand.nextFloat() - par1World.rand.nextFloat()) * 0.8F);
+                    par2 + 0.5F,
+                    par3 + 0.5F,
+                    par4 + 0.5F,
+                    "random.fizz",
+                    0.5F,
+                    2.6F + (par1World.rand.nextFloat() - par1World.rand.nextFloat()) * 0.8F);
 
                 for (int var5 = 0; var5 < 8; ++var5) {
                     par1World.spawnParticle(
-                            "largesmoke",
-                            par2 + Math.random(),
-                            par3 + 0.2D + Math.random(),
-                            par4 + Math.random(),
-                            0.0D,
-                            0.0D,
-                            0.0D);
+                        "largesmoke",
+                        par2 + Math.random(),
+                        par3 + 0.2D + Math.random(),
+                        par4 + Math.random(),
+                        0.0D,
+                        0.0D,
+                        0.0D);
                 }
 
                 if (!livingEntity.isBurning()) {
@@ -108,7 +112,7 @@ public class BlockFallenMeteor extends Block implements ITileEntityProvider, Ite
                 double var7;
 
                 for (var7 = livingEntity.posZ - par4; var9 * var9 + var7 * var7
-                        < 1.0E-4D; var7 = (Math.random() - Math.random()) * 0.01D) {
+                    < 1.0E-4D; var7 = (Math.random() - Math.random()) * 0.01D) {
                     var9 = (Math.random() - Math.random()) * 0.01D;
                 }
 
@@ -165,7 +169,9 @@ public class BlockFallenMeteor extends Block implements ITileEntityProvider, Ite
     public int colorMultiplier(IBlockAccess par1IBlockAccess, int par2, int par3, int par4) {
         final TileEntity tile = par1IBlockAccess.getTileEntity(par2, par3, par4);
 
-        if (tile instanceof TileEntityFallenMeteor meteor) {
+        if (tile instanceof TileEntityFallenMeteor) {
+            TileEntityFallenMeteor meteor = (TileEntityFallenMeteor) tile;
+
             final Vector3 col = new Vector3(198, 108, 58);
             col.translate(200 - meteor.getScaledHeatLevel() * 200);
             col.x = Math.min(255, col.x);

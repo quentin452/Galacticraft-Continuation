@@ -150,7 +150,8 @@ public class ItemOilExtractor extends Item {
     private boolean isOilBlock(World world, int x, int y, int z, boolean doDrain) {
         final Block block = world.getBlock(x, y, z);
 
-        if (block instanceof IFluidBlock fluidBlockHit) {
+        if (block instanceof IFluidBlock) {
+            IFluidBlock fluidBlockHit = (IFluidBlock) block;
             boolean flag = false;
             if (block == GCBlocks.crudeOil) {
                 flag = true;

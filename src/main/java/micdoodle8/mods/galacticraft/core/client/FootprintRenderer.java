@@ -122,13 +122,7 @@ public class FootprintRenderer {
             footprintList = new ArrayList<>();
         }
 
-        final Iterator<Footprint> i = footprintList.iterator();
-        while (i.hasNext()) {
-            final Footprint print = i.next();
-            if (!print.owner.equals(FMLClientHandler.instance().getClient().thePlayer.getCommandSenderName())) {
-                i.remove();
-            }
-        }
+        footprintList.removeIf(print -> !print.owner.equals(FMLClientHandler.instance().getClient().thePlayer.getCommandSenderName()));
 
         footprintList.addAll(prints);
         this.footprints.put(chunkKey, footprintList);

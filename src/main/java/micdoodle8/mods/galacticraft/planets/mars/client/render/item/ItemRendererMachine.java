@@ -84,17 +84,26 @@ public class ItemRendererMachine implements IItemRenderer {
     @Override
     public boolean handleRenderType(ItemStack item, ItemRenderType type) {
         if (item.getItemDamage() < BlockMachineMars.CRYOGENIC_CHAMBER_METADATA
-                || item.getItemDamage() >= BlockMachineMars.LAUNCH_CONTROLLER_METADATA) {
+            || item.getItemDamage() >= BlockMachineMars.LAUNCH_CONTROLLER_METADATA) {
             return false;
         }
-        return switch (type) {
-            case ENTITY -> true;
-            case EQUIPPED -> true;
-            case EQUIPPED_FIRST_PERSON -> true;
-            case INVENTORY -> true;
-            default -> false;
-        };
+
+        boolean result;
+        switch (type) {
+            case ENTITY:
+            case EQUIPPED:
+            case EQUIPPED_FIRST_PERSON:
+            case INVENTORY:
+                result = true;
+                break;
+            default:
+                result = false;
+                break;
+        }
+
+        return result;
     }
+
 
     @Override
     public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {

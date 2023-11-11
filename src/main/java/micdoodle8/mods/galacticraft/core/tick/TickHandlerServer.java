@@ -476,14 +476,22 @@ public class TickHandlerServer {
                 final Object[] entityList = world.loadedEntityList.toArray();
 
                 for (final Object o : entityList) {
-                    if ((o instanceof Entity e && e.worldObj.provider instanceof IOrbitDimension dimension)
-                            && (e.posY <= dimension.getYCoordToTeleportToPlanet())) {
-                        int dim = 0;
-                        try {
-                            dim = WorldUtil.getProviderForNameServer(dimension.getPlanetToOrbit()).dimensionId;
-                        } catch (final Exception ex) {}
+                    if (o instanceof Entity) {
+                        Entity e = (Entity) o;
 
-                        WorldUtil.transferEntityToDimension(e, dim, world, false, null);
+                        if (e.worldObj.provider instanceof IOrbitDimension) {
+                            IOrbitDimension dimension = (IOrbitDimension) e.worldObj.provider;
+
+                            if (e.posY <= dimension.getYCoordToTeleportToPlanet()) {
+                                int dim = 0;
+                                try {
+                                    dim = WorldUtil.getProviderForNameServer(dimension.getPlanetToOrbit()).dimensionId;
+                                } catch (final Exception ex) {
+                                }
+
+                                WorldUtil.transferEntityToDimension(e, dim, world, false, null);
+                            }
+                        }
                     }
                 }
             }

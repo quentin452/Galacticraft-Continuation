@@ -15,7 +15,7 @@ import micdoodle8.mods.galacticraft.api.entity.IFuelable;
 /**
  * Handles which fluids can be used to fuel an {@link IFuelable} object. This is used by the Fuel Loader but you can use
  * this for other things too.
- * 
+ *
  * @since 3.0.70-GTNH
  * @author glowredman
  */
@@ -25,7 +25,7 @@ public class RocketFuels {
 
     /**
      * Allow a fluid to be used as fuel
-     * 
+     *
      * @param fluid must be either of type {@link String}, {@link Fluid} or {@link FluidStack}
      * @return {@code true} if the fuel map changed
      * @since 3.0.70-GTNH
@@ -37,7 +37,7 @@ public class RocketFuels {
 
     /**
      * Remove a fluid from the fuelable's allowed-list of fuels
-     * 
+     *
      * @param fluid must be either of type {@link String}, {@link Fluid} or {@link FluidStack}
      * @return {@code true} if the fuel map changed
      * @since 3.0.70-GTNH
@@ -49,7 +49,7 @@ public class RocketFuels {
 
     /**
      * Remove all fluids from the fuelable's allowed-list of fuels
-     * 
+     *
      * @return the values that were removed (possibly empty).
      * @since 3.0.70-GTNH
      * @author glowredman
@@ -60,7 +60,7 @@ public class RocketFuels {
 
     /**
      * Check if the given fuel can be used for this fuelable
-     * 
+     *
      * @param fluid must be either of type {@link String}, {@link Fluid} or {@link FluidStack}
      * @return {@code true} if it is usable
      * @since 3.0.70-GTNH
@@ -72,7 +72,7 @@ public class RocketFuels {
 
     /**
      * Check if the given fuel can be used for any fuelable
-     * 
+     *
      * @param fluid must be either of type {@link String}, {@link Fluid} or {@link FluidStack}
      * @return {@code true} if it is usable
      * @since 3.0.70-GTNH
@@ -83,16 +83,16 @@ public class RocketFuels {
     }
 
     private static String getFluidName(Object fluid) {
-        if (fluid instanceof String fluidName) {
-            return fluidName;
+        if (fluid instanceof String) {
+            return (String) fluid;
         }
-        if (fluid instanceof Fluid fluidObj) {
-            return fluidObj.getName();
+        if (fluid instanceof Fluid) {
+            return ((Fluid) fluid).getName();
         }
-        if (fluid instanceof FluidStack fluidStack) {
-            return fluidStack.getFluid().getName();
+        if (fluid instanceof FluidStack) {
+            return ((FluidStack) fluid).getFluid().getName();
         }
-        throw new IllegalArgumentException(fluid + " is not an instace of String, FLuid or FluidStack!");
+        throw new IllegalArgumentException(fluid + " is not an instance of String, Fluid, or FluidStack!");
     }
 
     private RocketFuels() {}

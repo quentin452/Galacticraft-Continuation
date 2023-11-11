@@ -104,12 +104,27 @@ public class RoomSpawnerMars extends DungeonRoom {
     }
 
     private static String getMob(Random rand) {
-        return switch (rand.nextInt(6)) {
-            case 0 -> "GalacticraftCore.EvolvedSpider";
-            case 1 -> "GalacticraftCore.EvolvedZombie";
-            case 2 -> "GalacticraftCore.EvolvedCreeper";
-            case 3 -> "GalacticraftCore.EvolvedSkeleton";
-            default -> "GalacticraftCore.EvolvedCreeper";
-        };
+        int randomValue = rand.nextInt(6);
+        String mob;
+
+        switch (randomValue) {
+            case 0:
+                mob = "GalacticraftCore.EvolvedSpider";
+                break;
+            case 1:
+                mob = "GalacticraftCore.EvolvedZombie";
+                break;
+            case 2:
+                mob = "GalacticraftCore.EvolvedCreeper";
+                break;
+            case 3:
+                mob = "GalacticraftCore.EvolvedSkeleton";
+                break;
+            default:
+                mob = "GalacticraftCore.EvolvedCreeper";
+                break;
+        }
+
+        return mob;
     }
 }

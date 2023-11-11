@@ -13,6 +13,8 @@ import org.lwjgl.opengl.GL12;
 import cpw.mods.fml.client.FMLClientHandler;
 import micdoodle8.mods.galacticraft.core.util.VersionUtil;
 
+import java.util.Objects;
+
 public class ItemRendererThermalArmor implements IItemRenderer {
 
     private void renderThermalArmor(ItemStack item) {
@@ -73,21 +75,23 @@ public class ItemRendererThermalArmor implements IItemRenderer {
      */
     @Override
     public boolean handleRenderType(ItemStack item, ItemRenderType type) {
-        return switch (type) {
-            case ENTITY -> false;
-            case EQUIPPED -> false;
-            case EQUIPPED_FIRST_PERSON -> false;
-            case INVENTORY -> true;
-            default -> false;
-        };
+        switch (type) {
+            case ENTITY:
+            case EQUIPPED:
+            case EQUIPPED_FIRST_PERSON:
+            case INVENTORY:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
     public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper) {
-        return switch (helper) {
-            case INVENTORY_BLOCK -> false;
-            default -> false;
-        };
+        if (Objects.requireNonNull(helper) == ItemRendererHelper.INVENTORY_BLOCK) {
+            return false;
+        }
+        return false;
     }
 
     @Override

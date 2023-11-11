@@ -20,8 +20,9 @@ public class GCInvSaveData extends WorldSavedData {
     @Override
     public void readFromNBT(NBTTagCompound filedata) {
         for (final Object obj : filedata.func_150296_c()) {
-            if (obj instanceof NBTTagList entry) {
-                final String name = entry.toString(); // TODO See if this is equivilent to 1.6's getName function
+            if (obj instanceof NBTTagList) {
+                NBTTagList entry = (NBTTagList) obj;
+                final String name = entry.toString(); // TODO See if this is equivalent to 1.6's getName function
                 final ItemStack[] saveinv = new ItemStack[6];
                 if (entry.tagCount() > 0) {
                     for (int j = 0; j < entry.tagCount(); j++) {

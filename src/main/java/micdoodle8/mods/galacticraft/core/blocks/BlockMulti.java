@@ -79,15 +79,21 @@ public class BlockMulti extends BlockContainer implements IPartialSealableBlock,
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int par1, int par2) {
-        return switch (par2) {
-            case 0 -> this.fakeIcons[2];
-            case 2 -> this.fakeIcons[0];
-            case 3 -> this.fakeIcons[1];
-            case 4 -> this.fakeIcons[2];
-            case 5 -> this.fakeIcons[3];
-            case 6 -> this.fakeIcons[4];
-            default -> this.fakeIcons[0];
-        };
+        if (par2 == 0) {
+            return this.fakeIcons[2];
+        } else if (par2 == 2) {
+            return this.fakeIcons[0];
+        } else if (par2 == 3) {
+            return this.fakeIcons[1];
+        } else if (par2 == 4) {
+            return this.fakeIcons[2];
+        } else if (par2 == 5) {
+            return this.fakeIcons[3];
+        } else if (par2 == 6) {
+            return this.fakeIcons[4];
+        } else {
+            return this.fakeIcons[0];
+        }
     }
 
     @Override

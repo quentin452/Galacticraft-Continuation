@@ -60,40 +60,79 @@ public class BlockBasic extends Block implements IDetectableResource {
 
     @Override
     public IIcon getIcon(int side, int meta) {
-        return switch (meta) {
-            case 3 -> switch (side) {
-                    case 0 -> this.iconBuffer[1];
-                    case 1 -> this.iconBuffer[0];
-                    default -> this.iconBuffer[2];
-                };
-            case 4 -> this.iconBuffer[3];
-            case 5 -> this.iconBuffer[4];
-            case 6 -> this.iconBuffer[5];
-            case 7 -> this.iconBuffer[6];
-            case 8 -> this.iconBuffer[7];
-            case 9 -> this.iconBuffer[8];
-            case 10 -> this.iconBuffer[9];
-            case 11 -> this.iconBuffer[10];
-            case 12 -> this.iconBuffer[11];
-            default -> meta < this.iconBuffer.length ? this.iconBuffer[meta] : this.iconBuffer[0];
-        };
-    }
+        IIcon result;
 
+        switch (meta) {
+            case 3:
+                switch (side) {
+                    case 0:
+                        result = this.iconBuffer[1];
+                        break;
+                    case 1:
+                        result = this.iconBuffer[0];
+                        break;
+                    default:
+                        result = this.iconBuffer[2];
+                        break;
+                }
+                break;
+            case 4:
+                result = this.iconBuffer[3];
+                break;
+            case 5:
+                result = this.iconBuffer[4];
+                break;
+            case 6:
+                result = this.iconBuffer[5];
+                break;
+            case 7:
+                result = this.iconBuffer[6];
+                break;
+            case 8:
+                result = this.iconBuffer[7];
+                break;
+            case 9:
+                result = this.iconBuffer[8];
+                break;
+            case 10:
+                result = this.iconBuffer[9];
+                break;
+            case 11:
+                result = this.iconBuffer[10];
+                break;
+            case 12:
+                result = this.iconBuffer[11];
+                break;
+            default:
+                result = meta < this.iconBuffer.length ? this.iconBuffer[meta] : this.iconBuffer[0];
+                break;
+        }
+
+        return result;
+    }
     @Override
     public Item getItemDropped(int meta, Random random, int par3) {
-        return switch (meta) {
-            case 8 -> GCItems.basicItem;
-            default -> Item.getItemFromBlock(this);
-        };
+        Item droppedItem;
+        switch (meta) {
+            case 8:
+                droppedItem = GCItems.basicItem;
+                break;
+            default:
+                droppedItem = Item.getItemFromBlock(this);
+                break;
+        }
+        return droppedItem;
     }
 
     @Override
     public int damageDropped(int meta) {
-        return switch (meta) {
-            case 8 -> 2;
-            default -> meta;
-        };
+        if (meta == 8) {
+            return 2;
+        } else {
+            return meta;
+        }
     }
+
 
     @Override
     public int getDamageValue(World worldIn, int x, int y, int z) {

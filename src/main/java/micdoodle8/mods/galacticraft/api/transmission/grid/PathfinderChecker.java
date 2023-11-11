@@ -33,10 +33,11 @@ public class PathfinderChecker extends Pathfinder {
                     final BlockVec3 position = currentNode.clone().modifyPositionFromSide(direction);
                     final TileEntity connectedBlock = position.getTileEntity(world);
 
-                    if (connectedBlock instanceof ITransmitter transmitter
-                            && !Arrays.asList(ignoreConnector).contains(transmitter)
-                            && transmitter.canConnect(direction.getOpposite(), networkType)) {
-                        neighbors.add(position);
+                    if (connectedBlock instanceof ITransmitter) {
+                        ITransmitter transmitter = (ITransmitter) connectedBlock;
+                        if (!Arrays.asList(ignoreConnector).contains(transmitter) && transmitter.canConnect(direction.getOpposite(), networkType)) {
+                            neighbors.add(position);
+                        }
                     }
                 }
 

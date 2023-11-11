@@ -193,7 +193,7 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
 
     @Override
     protected void updateAITick() {
-        this.dataWatcher.updateObject(18, Float.valueOf(this.getHealth()));
+        this.dataWatcher.updateObject(18, this.getHealth());
     }
 
     @Override
@@ -449,21 +449,22 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
     }
 
     public EntitySlimeling spawnBabyAnimal(EntityAgeable par1EntityAgeable) {
-        if (par1EntityAgeable instanceof EntitySlimeling otherSlimeling) {
+        if (par1EntityAgeable != null && par1EntityAgeable instanceof EntitySlimeling) {
+            EntitySlimeling otherSlimeling = (EntitySlimeling) par1EntityAgeable;
             final Vector3 colorParentA = new Vector3(this.getColorRed(), this.getColorGreen(), this.getColorBlue());
             final Vector3 colorParentB = new Vector3(
-                    otherSlimeling.getColorRed(),
-                    otherSlimeling.getColorGreen(),
-                    otherSlimeling.getColorBlue());
+                otherSlimeling.getColorRed(),
+                otherSlimeling.getColorGreen(),
+                otherSlimeling.getColorBlue());
             final Vector3 newColor = ColorUtil.addColorsRealistically(colorParentA, colorParentB);
             newColor.x = Math.max(Math.min(newColor.x, 1.0F), 0);
             newColor.y = Math.max(Math.min(newColor.y, 1.0F), 0);
             newColor.z = Math.max(Math.min(newColor.z, 1.0F), 0);
             final EntitySlimeling newSlimeling = new EntitySlimeling(
-                    this.worldObj,
-                    (float) newColor.x,
-                    (float) newColor.y,
-                    (float) newColor.z);
+                this.worldObj,
+                (float) newColor.x,
+                (float) newColor.y,
+                (float) newColor.z);
 
             String s = VersionUtil.getSlimelingOwner(this);
 
@@ -488,9 +489,11 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
 
     @Override
     public boolean canMateWith(EntityAnimal par1EntityAnimal) {
-        if (par1EntityAnimal == this || !this.isTamed() || !(par1EntityAnimal instanceof EntitySlimeling slimeling)) {
+        if (par1EntityAnimal == this || !this.isTamed() || !(par1EntityAnimal instanceof EntitySlimeling)) {
             return false;
         }
+
+        EntitySlimeling slimeling = (EntitySlimeling) par1EntityAnimal;
         return slimeling.isTamed() && !slimeling.isSitting() && this.isInLove() && slimeling.isInLove();
     }
 
@@ -499,9 +502,11 @@ public class EntitySlimeling extends EntityTameable implements IEntityBreathable
         if (par1EntityLivingBase instanceof EntityCreeper || par1EntityLivingBase instanceof EntityGhast) {
             return false;
         }
-        if (par1EntityLivingBase instanceof EntitySlimeling slimeling && slimeling.isTamed()
-                && slimeling.getOwner() == par2EntityLivingBase) {
-            return false;
+        if (par1EntityLivingBase instanceof EntitySlimeling) {
+            EntitySlimeling slimeling = (EntitySlimeling) par1EntityLivingBase;
+            if (slimeling.isTamed() && slimeling.getOwner() == par2EntityLivingBase) {
+                return false;
+            }
         }
 
         return (!(par1EntityLivingBase instanceof EntityPlayer) || !(par2EntityLivingBase instanceof EntityPlayer)

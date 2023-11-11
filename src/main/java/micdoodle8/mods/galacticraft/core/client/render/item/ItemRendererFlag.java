@@ -110,13 +110,10 @@ public class ItemRendererFlag implements IItemRenderer {
      */
     @Override
     public boolean handleRenderType(ItemStack item, ItemRenderType type) {
-        return switch (type) {
-            case ENTITY -> true;
-            case EQUIPPED -> true;
-            case EQUIPPED_FIRST_PERSON -> true;
-            case INVENTORY -> true;
-            default -> false;
-        };
+        return type == ItemRenderType.ENTITY ||
+            type == ItemRenderType.EQUIPPED ||
+            type == ItemRenderType.EQUIPPED_FIRST_PERSON ||
+            type == ItemRenderType.INVENTORY;
     }
 
     @Override

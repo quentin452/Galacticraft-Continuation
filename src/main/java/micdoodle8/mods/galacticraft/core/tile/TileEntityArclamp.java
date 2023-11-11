@@ -163,9 +163,10 @@ public class TileEntityArclamp extends TileEntity {
 
                 if (!moblist.isEmpty()) {
                     for (final Entity entry : moblist) {
-                        if (!(entry instanceof EntityCreature e)) {
+                        if (!(entry instanceof EntityCreature)) {
                             continue;
                         }
+                        EntityCreature e = (EntityCreature) entry;
                         final Vec3 vecNewTarget = RandomPositionGenerator
                                 .findRandomTargetBlockAwayFrom(e, 16, 7, this.thisPos);
                         if (vecNewTarget == null) {

@@ -76,10 +76,10 @@ public class PacketEntityUpdate implements IPacket {
     private void setEntityData(EntityPlayer player) {
         final Entity entity = player.worldObj.getEntityByID(this.entityID);
 
-        if (entity instanceof IEntityFullSync controllable
-                && (player.worldObj.isRemote || player.getUniqueID().equals(((IEntityFullSync) entity).getOwnerUUID())
-                        || ((IEntityFullSync) entity).getOwnerUUID() == null)) {
-            controllable.setPositionRotationAndMotion(
+        if (entity instanceof IEntityFullSync) {
+            IEntityFullSync controllable = (IEntityFullSync) entity;
+            if (player.worldObj.isRemote || player.getUniqueID().equals(controllable.getOwnerUUID()) || controllable.getOwnerUUID() == null) {
+                controllable.setPositionRotationAndMotion(
                     this.position.x,
                     this.position.y,
                     this.position.z,
@@ -89,6 +89,7 @@ public class PacketEntityUpdate implements IPacket {
                     this.motion.y,
                     this.motion.z,
                     this.onGround);
+            }
         }
     }
 

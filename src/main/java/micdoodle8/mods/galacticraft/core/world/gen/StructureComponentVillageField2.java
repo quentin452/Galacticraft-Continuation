@@ -56,11 +56,15 @@ public class StructureComponentVillageField2 extends StructureComponentVillage {
     }
 
     private Block getRandomCrop(Random par1Random) {
-        return switch (par1Random.nextInt(5)) {
-            case 0 -> Blocks.carrots;
-            case 1 -> Blocks.potatoes;
-            default -> Blocks.wheat;
-        };
+        int randomValue = par1Random.nextInt(5);
+        switch (randomValue) {
+            case 0:
+                return Blocks.carrots;
+            case 1:
+                return Blocks.potatoes;
+            default:
+                return Blocks.wheat;
+        }
     }
 
     public static StructureComponentVillageField2 func_74900_a(

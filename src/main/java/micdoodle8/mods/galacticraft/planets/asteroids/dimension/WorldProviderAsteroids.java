@@ -264,7 +264,7 @@ public class WorldProviderAsteroids extends WorldProviderSpace implements ISolar
             this.loadAsteroidSavedData();
         }
 
-        if (this.asteroids.size() == 0) {
+        if (this.asteroids.isEmpty()) {
             return null;
         }
 
@@ -301,7 +301,7 @@ public class WorldProviderAsteroids extends WorldProviderSpace implements ISolar
             this.loadAsteroidSavedData();
         }
 
-        if (this.asteroids.size() == 0) {
+        if (this.asteroids.isEmpty()) {
             return null;
         }
 
@@ -434,7 +434,8 @@ public class WorldProviderAsteroids extends WorldProviderSpace implements ISolar
                 return this.centre.x == vector.x && this.centre.y == vector.y && this.centre.z == vector.z;
             }
 
-            if (o instanceof BlockVec3 vector) {
+            if (o instanceof BlockVec3) {
+                BlockVec3 vector = (BlockVec3) o;
                 return this.centre.x == vector.x && this.centre.y == vector.y && this.centre.z == vector.z;
             }
 

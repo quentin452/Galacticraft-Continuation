@@ -41,18 +41,17 @@ public class ConnectionEvents {
     public void onPlayerLogin(PlayerLoggedInEvent event) {
         ChunkLoadingCallback.onPlayerLogin(event.player);
 
-        if (event.player instanceof EntityPlayerMP thePlayer) {
+        if (event.player instanceof EntityPlayerMP) {
+            EntityPlayerMP thePlayer = (EntityPlayerMP) event.player;
             final GCPlayerStats stats = GCPlayerStats.get(thePlayer);
             SpaceStationWorldData.checkAllStations(thePlayer, stats);
-            GalacticraftCore.packetPipeline
-                    .sendTo(
-                            new PacketSimple(
-                                    EnumSimplePacket.C_UPDATE_SPACESTATION_CLIENT_ID,
-                                    new Object[] {
-                                            WorldUtil.spaceStationDataToString(stats.spaceStationDimensionData) }),
-                            thePlayer);
-            final SpaceRace raceForPlayer = SpaceRaceManager
-                    .getSpaceRaceFromPlayer(thePlayer.getGameProfile().getName());
+            GalacticraftCore.packetPipeline.sendTo(
+                new PacketSimple(
+                    EnumSimplePacket.C_UPDATE_SPACESTATION_CLIENT_ID,
+                    new Object[] {
+                        WorldUtil.spaceStationDataToString(stats.spaceStationDimensionData) }),
+                thePlayer);
+            final SpaceRace raceForPlayer = SpaceRaceManager.getSpaceRaceFromPlayer(thePlayer.getGameProfile().getName());
             if (raceForPlayer != null) {
                 SpaceRaceManager.sendSpaceRaceData(thePlayer, raceForPlayer);
             }

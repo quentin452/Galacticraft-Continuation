@@ -99,20 +99,21 @@ public class ModelPlayerBaseGC extends ModelPlayerBase {
     private ModelRenderer createModelRenderer(ModelPlayer player, int texOffsetX, int texOffsetY, int type) {
         if (isSmartMovingLoaded) {
             try {
-                return switch (type) {
-                    case 0, 15 -> modelRotationGCSmartMovingInit.newInstance(
-                            player,
-                            texOffsetX,
-                            texOffsetY,
-                            SmartRender.getPlayerBase(this.modelPlayer).getHead(),
-                            type);
-                    default -> modelRotationGCSmartMovingInit.newInstance(
-                            player,
-                            texOffsetX,
-                            texOffsetY,
-                            SmartRender.getPlayerBase(this.modelPlayer).getBody(),
-                            type);
-                };
+                if (type == 0 || type == 15) {
+                    return modelRotationGCSmartMovingInit.newInstance(
+                        player,
+                        texOffsetX,
+                        texOffsetY,
+                        SmartRender.getPlayerBase(this.modelPlayer).getHead(),
+                        type);
+                } else {
+                    return modelRotationGCSmartMovingInit.newInstance(
+                        player,
+                        texOffsetX,
+                        texOffsetY,
+                        SmartRender.getPlayerBase(this.modelPlayer).getBody(),
+                        type);
+                }
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -338,9 +339,11 @@ public class ModelPlayerBaseGC extends ModelPlayerBase {
     public void afterSetRotationAngles(float par1, float par2, float par3, float par4, float par5, float par6,
             Entity par7Entity) {
         super.afterSetRotationAngles(par1, par2, par3, par4, par5, par6, par7Entity);
-        if (!(par7Entity instanceof EntityPlayer player)) {
+        if (!(par7Entity instanceof EntityPlayer)) {
             return; // Deal with RenderPlayerAPIEnhancer calling this for skeletons etc
         }
+
+        EntityPlayer player = (EntityPlayer) par7Entity;
 
         final ItemStack currentItemStack = player.inventory.getCurrentItem();
 
@@ -419,11 +422,12 @@ public class ModelPlayerBaseGC extends ModelPlayerBase {
                         player.posZ + 20));
 
         for (Entity entity : entitiesInAABB) {
-            if (entity instanceof EntityTieredRocket ship) {
+            if (entity instanceof EntityTieredRocket) {
+                EntityTieredRocket ship = (EntityTieredRocket) entity;
                 if (ship.riddenByEntity != null && !ship.riddenByEntity.equals(player)
-                        && (ship.getLaunched() || ship.timeUntilLaunch < 390)) {
+                    && (ship.getLaunched() || ship.timeUntilLaunch < 390)) {
                     this.modelPlayer.bipedRightArm.rotateAngleZ -= (float) (Math.PI / 8)
-                            + MathHelper.sin(par3 * 0.9F) * 0.2F;
+                        + MathHelper.sin(par3 * 0.9F) * 0.2F;
                     this.modelPlayer.bipedRightArm.rotateAngleX = (float) Math.PI;
                     break;
                 }
@@ -440,10 +444,11 @@ public class ModelPlayerBaseGC extends ModelPlayerBase {
         // Deal with RenderPlayerAPIEnhancer calling this for skeletons etc
         // Do not render GC equipment on top of armor - only on top of player - see
         // .init() method
-        if (ModelPlayerBaseGC.isSmartMovingLoaded || !(var1 instanceof EntityPlayer player)
-                || this.oxygenMask == null) {
+        if (ModelPlayerBaseGC.isSmartMovingLoaded || !(var1 instanceof EntityPlayer) || this.oxygenMask == null) {
             return;
         }
+
+        EntityPlayer player = (EntityPlayer) var1;
 
         final PlayerGearData gearData = ClientProxyCore.playerItemData.get(player.getCommandSenderName());
 

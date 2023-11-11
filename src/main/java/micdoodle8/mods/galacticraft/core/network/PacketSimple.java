@@ -779,7 +779,8 @@ public class PacketSimple extends Packet implements IPacket {
                         (Integer) this.data.get(0),
                         (Integer) this.data.get(1),
                         (Integer) this.data.get(2));
-                if (tile instanceof TileEntityScreen screenTile) {
+                if (tile instanceof TileEntityScreen) {
+                    TileEntityScreen screenTile = (TileEntityScreen) tile;
                     final int screenType = (Integer) this.data.get(3);
                     final int flags = (Integer) this.data.get(4);
                     screenTile.imageType = screenType;
@@ -895,10 +896,10 @@ public class PacketSimple extends Packet implements IPacket {
                     final Integer dim = provider.dimensionId;
                     GCLog.info("Found matching world (" + dim.toString() + ") for name: " + this.data.get(0));
 
-                    if (playerBase.worldObj instanceof WorldServer world) {
+                    if (playerBase.worldObj instanceof WorldServer) {
+                        WorldServer world = (WorldServer) playerBase.worldObj;
                         WorldUtil.transferEntityToDimension(playerBase, dim, world, (Boolean) this.data.get(1), null);
                     }
-
                     stats.teleportCooldown = 10;
                     GalacticraftCore.packetPipeline
                             .sendTo(new PacketSimple(EnumSimplePacket.C_CLOSE_GUI, new Object[] {}), playerBase);
@@ -909,17 +910,17 @@ public class PacketSimple extends Packet implements IPacket {
                 break;
             case S_IGNITE_ROCKET:
                 if (!player.worldObj.isRemote && !player.isDead
-                        && player.ridingEntity != null
-                        && !player.ridingEntity.isDead
-                        && player.ridingEntity instanceof EntityTieredRocket ship) {
-                    if (!ship.landing) {
+                    && player.ridingEntity != null
+                    && !player.ridingEntity.isDead
+                    && player.ridingEntity instanceof EntityTieredRocket) {
+                    EntityTieredRocket ship = (EntityTieredRocket) player.ridingEntity;
 
+                    if (!ship.landing) {
                         if (ship.hasValidFuel()) {
                             ship.igniteCheckingCooldown();
                             stats.launchAttempts = 0;
                         } else if (stats.chatCooldown == 0) {
-                            player.addChatMessage(
-                                    new ChatComponentText(GCCoreUtil.translate("gui.rocket.warning.nofuel")));
+                            player.addChatMessage(new ChatComponentText(GCCoreUtil.translate("gui.rocket.warning.nofuel")));
                             stats.chatCooldown = 250;
                         }
                     }
@@ -955,12 +956,14 @@ public class PacketSimple extends Packet implements IPacket {
                 }
                 break;
             case S_UPDATE_SHIP_YAW:
-                if (player.ridingEntity instanceof EntitySpaceshipBase ship && ship != null) {
+                if (player.ridingEntity instanceof EntitySpaceshipBase && player.ridingEntity != null) {
+                    EntitySpaceshipBase ship = (EntitySpaceshipBase) player.ridingEntity;
                     ship.rotationYaw = (Float) this.data.get(0);
                 }
                 break;
             case S_UPDATE_SHIP_PITCH:
-                if (player.ridingEntity instanceof EntitySpaceshipBase ship && ship != null) {
+                if (player.ridingEntity instanceof EntitySpaceshipBase && player.ridingEntity != null) {
+                    EntitySpaceshipBase ship = (EntitySpaceshipBase) player.ridingEntity;
                     ship.rotationPitch = (Float) this.data.get(0);
                 }
                 break;
@@ -977,13 +980,14 @@ public class PacketSimple extends Packet implements IPacket {
                 }
                 break;
             case S_UNLOCK_NEW_SCHEMATIC:
-                final Container container = player.openContainer;
+                Container container = player.openContainer;
 
-                if (container instanceof ContainerSchematic schematicContainer) {
+                if (container instanceof ContainerSchematic) {
+                    ContainerSchematic schematicContainer = (ContainerSchematic) container;
                     ItemStack stack = schematicContainer.craftMatrix.getStackInSlot(0);
 
                     if (stack != null) {
-                        final ISchematicPage page = SchematicRegistry.getMatchingRecipeForItemStack(stack);
+                        ISchematicPage page = SchematicRegistry.getMatchingRecipeForItemStack(stack);
 
                         if (page != null) {
                             SchematicRegistry.unlockNewPage(playerBase, stack);
@@ -996,10 +1000,10 @@ public class PacketSimple extends Packet implements IPacket {
                             schematicContainer.craftMatrix.markDirty();
 
                             GalacticraftCore.packetPipeline.sendTo(
-                                    new PacketSimple(
-                                            EnumSimplePacket.C_ADD_NEW_SCHEMATIC,
-                                            new Object[] { page.getPageID() }),
-                                    playerBase);
+                                new PacketSimple(
+                                    EnumSimplePacket.C_ADD_NEW_SCHEMATIC,
+                                    new Object[] { page.getPageID() }),
+                                playerBase);
                         }
                     }
                 }
@@ -1010,7 +1014,8 @@ public class PacketSimple extends Packet implements IPacket {
                         (Integer) this.data.get(1),
                         (Integer) this.data.get(2));
 
-                if (tileAt instanceof IDisableableMachine machine) {
+                if (tileAt instanceof IDisableableMachine) {
+                    IDisableableMachine machine = (IDisableableMachine) tileAt;
                     machine.setDisabled((Integer) this.data.get(3), !machine.getDisabled((Integer) this.data.get(3)));
                 }
                 break;
@@ -1042,38 +1047,45 @@ public class PacketSimple extends Packet implements IPacket {
 
                 switch ((Integer) this.data.get(0)) {
                     case 0:
-                        if (tile1 instanceof TileEntityAirLockController airlockController) {
+                        if (tile1 instanceof TileEntityAirLockController) {
+                            TileEntityAirLockController airlockController = (TileEntityAirLockController) tile1;
                             airlockController.redstoneActivation = (Integer) this.data.get(4) == 1;
                         }
                         break;
                     case 1:
-                        if (tile1 instanceof TileEntityAirLockController airlockController) {
+                        if (tile1 instanceof TileEntityAirLockController) {
+                            TileEntityAirLockController airlockController = (TileEntityAirLockController) tile1;
                             airlockController.playerDistanceActivation = (Integer) this.data.get(4) == 1;
                         }
                         break;
                     case 2:
-                        if (tile1 instanceof TileEntityAirLockController airlockController) {
+                        if (tile1 instanceof TileEntityAirLockController) {
+                            TileEntityAirLockController airlockController = (TileEntityAirLockController) tile1;
                             airlockController.playerDistanceSelection = (Integer) this.data.get(4);
                         }
                         break;
                     case 3:
-                        if (tile1 instanceof TileEntityAirLockController airlockController) {
+                        if (tile1 instanceof TileEntityAirLockController) {
+                            TileEntityAirLockController airlockController = (TileEntityAirLockController) tile1;
                             airlockController.playerNameMatches = (Integer) this.data.get(4) == 1;
                         }
                         break;
                     case 4:
-                        if (tile1 instanceof TileEntityAirLockController airlockController) {
+                        if (tile1 instanceof TileEntityAirLockController) {
+                            TileEntityAirLockController airlockController = (TileEntityAirLockController) tile1;
                             airlockController.invertSelection = (Integer) this.data.get(4) == 1;
                         }
                         break;
                     case 5:
-                        if (tile1 instanceof TileEntityAirLockController airlockController) {
+                        if (tile1 instanceof TileEntityAirLockController) {
+                            TileEntityAirLockController airlockController = (TileEntityAirLockController) tile1;
                             airlockController.lastHorizontalModeEnabled = airlockController.horizontalModeEnabled;
                             airlockController.horizontalModeEnabled = (Integer) this.data.get(4) == 1;
                         }
                         break;
                     case 6:
-                        if (tile1 instanceof IBubbleProvider distributor) {
+                        if (tile1 instanceof IBubbleProvider) {
+                            IBubbleProvider distributor = (IBubbleProvider) tile1;
                             distributor.setBubbleVisible((Integer) this.data.get(4) == 1);
                         }
                         break;
@@ -1087,23 +1099,21 @@ public class PacketSimple extends Packet implements IPacket {
                         (Integer) this.data.get(2),
                         (Integer) this.data.get(3));
 
-                switch ((Integer) this.data.get(0)) {
-                    case 0:
-                        if (tile2 instanceof TileEntityAirLockController airlockController) {
-                            airlockController.playerToOpenFor = (String) this.data.get(4);
-                        }
-                        break;
-                    default:
-                        break;
+                if ((Integer) this.data.get(0) == 0) {
+                    if (tile2 instanceof TileEntityAirLockController) {
+                        TileEntityAirLockController airlockController = (TileEntityAirLockController) tile2;
+                        airlockController.playerToOpenFor = (String) this.data.get(4);
+                    }
                 }
-                break;
+
             case S_UPDATE_SHIP_MOTION_Y:
                 final int entityID = (Integer) this.data.get(0);
                 final boolean up = (Boolean) this.data.get(1);
 
                 final Entity entity2 = player.worldObj.getEntityByID(entityID);
 
-                if (entity2 instanceof EntityAutoRocket autoRocket) {
+                if (entity2 instanceof EntityAutoRocket) {
+                    EntityAutoRocket autoRocket = (EntityAutoRocket) entity2;
                     autoRocket.motionY += up ? 0.02F : -0.02F;
                 }
 

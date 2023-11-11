@@ -10,7 +10,6 @@ public class Constants {
     public static final String COREMOD_NAME_SIMPLE = MOD_NAME_SIMPLE + " Core";
 
     public static final String MOD_ID_GALAXYSPACE = "GalaxySpace";
-    public static final String MOD_ID_GREGTECH = "gregtech";
 
     public static final String VERSION = Tags.VERSION;
 

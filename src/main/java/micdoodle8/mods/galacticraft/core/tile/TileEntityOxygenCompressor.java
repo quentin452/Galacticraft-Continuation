@@ -174,24 +174,27 @@ public class TileEntityOxygenCompressor extends TileEntityOxygen implements IInv
     @Override
     public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
         if (this.isItemValidForSlot(slotID, itemstack)) {
-            return switch (slotID) {
-                case 0 -> itemstack.getItemDamage() > 1;
-                case 1 -> ItemElectricBase.isElectricItemCharged(itemstack);
-                case 2 -> itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
-                default -> false;
-            };
+            if (slotID == 0) {
+                return itemstack.getItemDamage() > 1;
+            } else if (slotID == 1) {
+                return ItemElectricBase.isElectricItemCharged(itemstack);
+            } else if (slotID == 2) {
+                return itemstack.getItemDamage() < itemstack.getItem().getMaxDamage();
+            }
         }
         return false;
     }
 
     @Override
     public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
-        return switch (slotID) {
-            case 0 -> itemstack.getItem() instanceof ItemOxygenTank && itemstack.getItemDamage() == 0;
-            case 1 -> ItemElectricBase.isElectricItemEmpty(itemstack);
-            case 2 -> FluidUtil.isEmptyContainer(itemstack);
-            default -> false;
-        };
+        if (slotID == 0) {
+            return itemstack.getItem() instanceof ItemOxygenTank && itemstack.getItemDamage() == 0;
+        } else if (slotID == 1) {
+            return ItemElectricBase.isElectricItemEmpty(itemstack);
+        } else if (slotID == 2) {
+            return FluidUtil.isEmptyContainer(itemstack);
+        }
+        return false;
     }
 
     @Override

@@ -148,30 +148,29 @@ public class PacketSimpleAsteroids implements IPacket {
         switch (this.type) {
             case S_UPDATE_ADVANCED_GUI:
                 TileEntity tile = player.worldObj.getTileEntity(
-                        (Integer) this.data.get(1),
-                        (Integer) this.data.get(2),
-                        (Integer) this.data.get(3));
+                    (Integer) this.data.get(1),
+                    (Integer) this.data.get(2),
+                    (Integer) this.data.get(3));
 
-                switch ((Integer) this.data.get(0)) {
-                    case 0:
-                        if (tile instanceof TileEntityShortRangeTelepad launchController) {
+                if (tile instanceof TileEntityShortRangeTelepad) {
+                    TileEntityShortRangeTelepad launchController = (TileEntityShortRangeTelepad) tile;
+                    switch ((Integer) this.data.get(0)) {
+                        case 0:
                             launchController.setAddress((Integer) this.data.get(4));
-                        }
-                        break;
-                    case 1:
-                        if (tile instanceof TileEntityShortRangeTelepad launchController) {
+                            break;
+                        case 1:
                             launchController.setTargetAddress((Integer) this.data.get(4));
-                        }
-                        break;
-                    default:
-                        break;
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 break;
             case S_REQUEST_MINERBASE_FACING:
                 tile = player.worldObj.getTileEntity(
-                        (Integer) this.data.get(0),
-                        (Integer) this.data.get(1),
-                        (Integer) this.data.get(2));
+                    (Integer) this.data.get(0),
+                    (Integer) this.data.get(1),
+                    (Integer) this.data.get(2));
                 if (tile instanceof TileEntityMinerBase) {
                     ((TileEntityMinerBase) tile).updateClientFlag = true;
                 }

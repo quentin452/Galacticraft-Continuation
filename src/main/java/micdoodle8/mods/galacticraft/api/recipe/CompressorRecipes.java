@@ -89,20 +89,21 @@ public class CompressorRecipes {
         final List<Object> arraylist = new ArrayList<>();
         final int i = par2ArrayOfObj.length;
 
-        for (int j = 0; j < i; ++j) {
-            final Object object1 = par2ArrayOfObj[j];
-
-            if (object1 instanceof ItemStack stack) {
+        for (final Object object1 : par2ArrayOfObj) {
+            if (object1 instanceof ItemStack) {
+                ItemStack stack = (ItemStack) object1;
                 arraylist.add(stack.copy());
-            } else if (object1 instanceof Item item) {
+            } else if (object1 instanceof Item) {
+                Item item = (Item) object1;
                 arraylist.add(new ItemStack(item));
             } else if (object1 instanceof String) {
                 arraylist.add(object1);
             } else {
-                if (!(object1 instanceof Block block)) {
+                if (!(object1 instanceof Block)) {
                     throw new RuntimeException("Invalid shapeless compressor recipe!");
                 }
 
+                Block block = (Block) object1;
                 arraylist.add(new ItemStack(block));
             }
         }

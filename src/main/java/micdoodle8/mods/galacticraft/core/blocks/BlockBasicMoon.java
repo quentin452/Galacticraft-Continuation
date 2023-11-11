@@ -173,17 +173,36 @@ public class BlockBasicMoon extends BlockAdvancedTile
     @Override
     public IIcon getIcon(int side, int meta) {
         if ((meta < 5) || (meta > 13)) {
-            return switch (meta) {
-                case 0 -> this.moonBlockIcons[12];
-                case 1 -> this.moonBlockIcons[13];
-                case 2 -> this.moonBlockIcons[14];
-                case 3 -> this.moonBlockIcons[2];
-                case 4 -> this.moonBlockIcons[15];
-                case 14 -> this.moonBlockIcons[1];
-                case 15 -> this.moonBlockIcons[16];
-                default -> this.moonBlockIcons[16];
-            };
+            IIcon icon;
+            switch (meta) {
+                case 0:
+                    icon = this.moonBlockIcons[12];
+                    break;
+                case 1:
+                    icon = this.moonBlockIcons[13];
+                    break;
+                case 2:
+                    icon = this.moonBlockIcons[14];
+                    break;
+                case 3:
+                    icon = this.moonBlockIcons[2];
+                    break;
+                case 4:
+                    icon = this.moonBlockIcons[15];
+                    break;
+                case 14:
+                    icon = this.moonBlockIcons[1];
+                    break;
+                case 15:
+                    icon = this.moonBlockIcons[16];
+                    break;
+                default:
+                    icon = this.moonBlockIcons[16];
+                    break;
+            }
+            return icon;
         }
+
         if (side == 1) {
             switch (meta - 5) {
                 case 0:
@@ -216,12 +235,21 @@ public class BlockBasicMoon extends BlockAdvancedTile
 
     @Override
     public Item getItemDropped(int meta, Random random, int par3) {
-        return switch (meta) {
-            case 2 -> GCItems.cheeseCurd;
-            case 15 -> Item.getItemFromBlock(Blocks.air);
-            default -> Item.getItemFromBlock(this);
-        };
+        Item droppedItem;
+        switch (meta) {
+            case 2:
+                droppedItem = GCItems.cheeseCurd;
+                break;
+            case 15:
+                droppedItem = Item.getItemFromBlock(Blocks.air);
+                break;
+            default:
+                droppedItem = Item.getItemFromBlock(this);
+                break;
+        }
+        return droppedItem;
     }
+
 
     @Override
     public int damageDropped(int meta) {
@@ -284,12 +312,14 @@ public class BlockBasicMoon extends BlockAdvancedTile
 
     @Override
     public boolean isValueable(int metadata) {
-        return switch (metadata) {
-            case 0 -> true;
-            case 1 -> true;
-            case 2 -> true;
-            default -> false;
-        };
+        switch (metadata) {
+            case 0:
+            case 1:
+            case 2:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

@@ -50,32 +50,30 @@ public class TileEntityCryogenicChamber extends TileEntityMulti implements IMult
 
         final EnumStatus enumstatus = this.sleepInBedAt(entityPlayer, this.xCoord, this.yCoord, this.zCoord);
 
-        return switch (enumstatus) {
-            case OK -> {
+        switch (enumstatus) {
+            case OK:
                 ((EntityPlayerMP) entityPlayer).playerNetServerHandler.setPlayerLocation(
-                        entityPlayer.posX,
-                        entityPlayer.posY,
-                        entityPlayer.posZ,
-                        entityPlayer.rotationYaw,
-                        entityPlayer.rotationPitch);
+                    entityPlayer.posX,
+                    entityPlayer.posY,
+                    entityPlayer.posZ,
+                    entityPlayer.rotationYaw,
+                    entityPlayer.rotationPitch);
                 GalacticraftCore.packetPipeline.sendTo(
-                        new PacketSimpleMars(
-                                EnumSimplePacketMars.C_BEGIN_CRYOGENIC_SLEEP,
-                                new Object[] { this.xCoord, this.yCoord, this.zCoord }),
-                        (EntityPlayerMP) entityPlayer);
-                yield true;
-            }
-            case NOT_POSSIBLE_NOW -> {
+                    new PacketSimpleMars(
+                        EnumSimplePacketMars.C_BEGIN_CRYOGENIC_SLEEP,
+                        new Object[]{this.xCoord, this.yCoord, this.zCoord}),
+                    (EntityPlayerMP) entityPlayer);
+                return true;
+            case NOT_POSSIBLE_NOW:
                 entityPlayer.addChatMessage(
-                        new ChatComponentText(
-                                GCCoreUtil.translateWithFormat(
-                                        "gui.cryogenic.chat.cantUse",
-                                        GCPlayerStats.get((EntityPlayerMP) entityPlayer).cryogenicChamberCooldown
-                                                / 20)));
-                yield false;
-            }
-            default -> false;
-        };
+                    new ChatComponentText(
+                        GCCoreUtil.translateWithFormat(
+                            "gui.cryogenic.chat.cantUse",
+                            GCPlayerStats.get((EntityPlayerMP) entityPlayer).cryogenicChamberCooldown / 20)));
+                return false;
+            default:
+                return false;
+        }
     }
 
     public EnumStatus sleepInBedAt(EntityPlayer entityPlayer, int par1, int par2, int par3) {

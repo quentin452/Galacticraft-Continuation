@@ -26,11 +26,19 @@ public class ItemBlockAluminumWire extends ItemBlockDesc {
 
     @Override
     public String getUnlocalizedName(ItemStack par1ItemStack) {
-        String name = switch (par1ItemStack.getItemDamage()) {
-            case 0 -> BlockAluminumWire.names[0];
-            case 1 -> BlockAluminumWire.names[1];
-            default -> "null";
-        };
+        int damage = par1ItemStack.getItemDamage();
+        String name;
+        switch (damage) {
+            case 0:
+                name = BlockAluminumWire.names[0];
+                break;
+            case 1:
+                name = BlockAluminumWire.names[1];
+                break;
+            default:
+                name = "null";
+                break;
+        }
 
         return "tile." + name;
     }

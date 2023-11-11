@@ -33,14 +33,15 @@ public class OverlayDockingRocket extends Overlay {
         final int height = scaledresolution.getScaledHeight();
         OverlayDockingRocket.minecraft.entityRenderer.setupOverlayRendering();
 
-        if (OverlayDockingRocket.minecraft.thePlayer.ridingEntity instanceof EntityAutoRocket rocket && rocket.landing
-                && rocket.targetVec != null) {
-            final double dX = Math.round((rocket.posX - rocket.targetVec.x) * 100.0D) / 100.0D;
-            final double dY = Math.round((rocket.posY - rocket.targetVec.y) * 100.0D) / 100.0D;
-            final double dZ = Math.round((rocket.posZ - rocket.targetVec.z) * 100.0D) / 100.0D;
-            final String dXStr = String.valueOf(dX);
-            final String dYStr = String.valueOf(dY);
-            final String dZStr = String.valueOf(dZ);
+        if (OverlayDockingRocket.minecraft.thePlayer.ridingEntity instanceof EntityAutoRocket) {
+            EntityAutoRocket rocket = (EntityAutoRocket) OverlayDockingRocket.minecraft.thePlayer.ridingEntity;
+            if (rocket.landing && rocket.targetVec != null) {
+                final double dX = Math.round((rocket.posX - rocket.targetVec.x) * 100.0D) / 100.0D;
+                final double dY = Math.round((rocket.posY - rocket.targetVec.y) * 100.0D) / 100.0D;
+                final double dZ = Math.round((rocket.posZ - rocket.targetVec.z) * 100.0D) / 100.0D;
+                final String dXStr = String.valueOf(dX);
+                final String dYStr = String.valueOf(dY);
+                final String dZStr = String.valueOf(dZ);
 
             final String warning = GCCoreUtil.translateWithFormat(
                     "gui.dockingRocket.warning.name.0",
@@ -104,5 +105,6 @@ public class OverlayDockingRocket extends Overlay {
             OverlayDockingRocket.minecraft.fontRenderer
                     .drawString("Z: " + dZStr, 50, height / 3 + 55, Math.abs(dZ) > 15 ? red : grey);
         }
+    }
     }
 }

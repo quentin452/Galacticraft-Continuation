@@ -65,45 +65,37 @@ public class BlockLandingPadFull extends BlockAdvancedTile implements IPartialSe
 
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
-        return switch (world.getBlockMetadata(x, y, z)) {
-            case 0 -> AxisAlignedBB.getBoundingBox(
-                    x + this.minX,
-                    y + this.minY,
-                    z + this.minZ,
-                    x + this.maxX,
-                    y + this.maxY,
-                    z + this.maxZ);
-            case 2 -> AxisAlignedBB.getBoundingBox(
-                    x + this.minX,
-                    y + this.minY,
-                    z + this.minZ,
-                    x + this.maxX,
-                    y + this.maxY,
-                    z + this.maxZ);
-            default -> AxisAlignedBB.getBoundingBox(x + 0.0D, y + 0.0D, z + 0.0D, x + 1.0D, y + 0.2D, z + 1.0D);
-        };
+        int metadata = world.getBlockMetadata(x, y, z);
+
+        if (metadata == 0 || metadata == 2) {
+            return AxisAlignedBB.getBoundingBox(
+                x + this.minX,
+                y + this.minY,
+                z + this.minZ,
+                x + this.maxX,
+                y + this.maxY,
+                z + this.maxZ);
+        } else {
+            return AxisAlignedBB.getBoundingBox(x + 0.0D, y + 0.0D, z + 0.0D, x + 1.0D, y + 0.2D, z + 1.0D);
+        }
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
-        return switch (world.getBlockMetadata(x, y, z)) {
-            case 0 -> AxisAlignedBB.getBoundingBox(
-                    x + this.minX,
-                    y + this.minY,
-                    z + this.minZ,
-                    x + this.maxX,
-                    y + this.maxY,
-                    z + this.maxZ);
-            case 2 -> AxisAlignedBB.getBoundingBox(
-                    x + this.minX,
-                    y + this.minY,
-                    z + this.minZ,
-                    x + this.maxX,
-                    y + this.maxY,
-                    z + this.maxZ);
-            default -> AxisAlignedBB.getBoundingBox(x + 0.0D, y + 0.0D, z + 0.0D, x + 1.0D, y + 0.2D, z + 1.0D);
-        };
+        int metadata = world.getBlockMetadata(x, y, z);
+
+        if (metadata == 0 || metadata == 2) {
+            return AxisAlignedBB.getBoundingBox(
+                x + this.minX,
+                y + this.minY,
+                z + this.minZ,
+                x + this.maxX,
+                y + this.maxY,
+                z + this.maxZ);
+        } else {
+            return AxisAlignedBB.getBoundingBox(x + 0.0D, y + 0.0D, z + 0.0D, x + 1.0D, y + 0.2D, z + 1.0D);
+        }
     }
 
     @Override
@@ -154,11 +146,20 @@ public class BlockLandingPadFull extends BlockAdvancedTile implements IPartialSe
 
     @Override
     public TileEntity createTileEntity(World world, int metadata) {
-        return switch (metadata) {
-            case 0 -> new TileEntityLandingPad();
-            case 1 -> new TileEntityBuggyFueler();
-            default -> null;
-        };
+        TileEntity tileEntity = null;
+
+        switch (metadata) {
+            case 0:
+                tileEntity = new TileEntityLandingPad();
+                break;
+            case 1:
+                tileEntity = new TileEntityBuggyFueler();
+                break;
+            default:
+                break;
+        }
+
+        return tileEntity;
     }
 
     @Override

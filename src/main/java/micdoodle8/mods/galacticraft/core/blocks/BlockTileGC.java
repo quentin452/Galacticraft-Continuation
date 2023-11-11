@@ -56,7 +56,8 @@ public abstract class BlockTileGC extends BlockAdvanced implements ITileEntityPr
     public void dropEntireInventory(World world, int x, int y, int z, Block block, int par6) {
         final TileEntity tileEntity = world.getTileEntity(x, y, z);
 
-        if (tileEntity != null && tileEntity instanceof IInventory inventory) {
+        if (tileEntity != null && tileEntity instanceof IInventory) {
+            IInventory inventory = (IInventory) tileEntity;
             for (int var6 = 0; var6 < inventory.getSizeInventory(); ++var6) {
                 final ItemStack var7 = inventory.getStackInSlot(var6);
 

@@ -150,11 +150,12 @@ public class TileEntityFuelLoader extends TileBaseElectricBlockWithInventory
     }
 
     public boolean isCorrectFuel(IFuelable fuelable) {
-        if (fuelable instanceof IFuelDock fuelDock) {
+        if (fuelable instanceof IFuelDock) {
+            IFuelDock fuelDock = (IFuelDock) fuelable;
             fuelable = fuelDock.getDockedEntity();
         }
         if (this.attachedFuelable == null || fuelable == null
-                || !RocketFuels.isCorrectFuel(fuelable, this.fuelTank.getFluid())) {
+            || !RocketFuels.isCorrectFuel(fuelable, this.fuelTank.getFluid())) {
             this.correctFuel = false;
             return false;
         }

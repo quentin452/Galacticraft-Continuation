@@ -55,15 +55,16 @@ public class TileEntityBeamReceiver extends TileEntityBeamOutput implements IEne
                     && this.facing != ForgeDirection.UNKNOWN.ordinal()) {
                 final TileEntity tile = this.getAttachedTile();
 
-                if (tile instanceof TileBaseUniversalElectricalSource electricalTile) {
+                if (tile instanceof TileBaseUniversalElectricalSource) {
+                    TileBaseUniversalElectricalSource electricalTile = (TileBaseUniversalElectricalSource) tile;
                     if (electricalTile.storage.getEnergyStoredGC() > 0) {
                         final EnergySourceAdjacent source = new EnergySourceAdjacent(
-                                ForgeDirection.getOrientation(this.facing ^ 1));
+                            ForgeDirection.getOrientation(this.facing ^ 1));
                         final float toSend = Math.min(
-                                electricalTile.storage.getMaxExtract(),
-                                electricalTile.storage.getEnergyStoredGC());
+                            electricalTile.storage.getMaxExtract(),
+                            electricalTile.storage.getEnergyStoredGC());
                         final float transmitted = this.getTarget()
-                                .receiveEnergyGC(new EnergySourceWireless(Lists.newArrayList(this)), toSend, false);
+                            .receiveEnergyGC(new EnergySourceWireless(Lists.newArrayList(this)), toSend, false);
                         electricalTile.extractEnergyGC(source, transmitted, false);
                     }
                 } else if (!(tile instanceof EnergyStorageTile) && !(tile instanceof TileBaseConductor))
@@ -93,13 +94,15 @@ public class TileEntityBeamReceiver extends TileEntityBeamOutput implements IEne
                 } else {
                     final TileEntity tileAdj = this.getAttachedTile();
 
-                    if (tileAdj instanceof TileBaseUniversalElectrical electricalTile) {
+                    if (tileAdj instanceof TileBaseUniversalElectrical) {
+                        TileBaseUniversalElectrical electricalTile = (TileBaseUniversalElectrical) tileAdj;
                         final EnergySourceAdjacent source = new EnergySourceAdjacent(
-                                ForgeDirection.getOrientation(this.facing ^ 1));
+                            ForgeDirection.getOrientation(this.facing ^ 1));
                         this.storage.extractEnergyGCnoMax(
-                                electricalTile.receiveEnergyGC(source, maxTransfer, false),
-                                false);
-                    } else if (!(tileAdj instanceof EnergyStorageTile) && !(tileAdj instanceof TileBaseConductor))
+                            electricalTile.receiveEnergyGC(source, maxTransfer, false),
+                            false);
+                    }
+                    else if (!(tileAdj instanceof EnergyStorageTile) && !(tileAdj instanceof TileBaseConductor))
                     // Dont use other mods methods to connect Beam Receivers to GC's own wires or
                     // machines
                     {

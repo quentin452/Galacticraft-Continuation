@@ -412,8 +412,8 @@ public class TickHandlerClient {
                 TickHandlerClient.spaceRaceGuiScheduled = false;
             }
 
-            if (player != null && player.ridingEntity != null
-                    && player.ridingEntity instanceof EntitySpaceshipBase rocket) {
+            if (player != null && player.ridingEntity != null && player.ridingEntity instanceof EntitySpaceshipBase) {
+                EntitySpaceshipBase rocket = (EntitySpaceshipBase) player.ridingEntity;
                 if (rocket.prevRotationPitch != rocket.rotationPitch || rocket.prevRotationYaw != rocket.rotationYaw) {
                     GalacticraftCore.packetPipeline.sendToServer(new PacketRotateRocket(player.ridingEntity));
                 }
@@ -444,8 +444,8 @@ public class TickHandlerClient {
                 }
             }
 
-            if (player != null && player.ridingEntity != null
-                    && player.ridingEntity instanceof EntitySpaceshipBase ship) {
+            if (player != null && player.ridingEntity != null && player.ridingEntity instanceof EntitySpaceshipBase) {
+                EntitySpaceshipBase ship = (EntitySpaceshipBase) player.ridingEntity;
                 boolean hasChanged = false;
 
                 if (minecraft.gameSettings.keyBindLeft.getIsKeyPressed()) {
@@ -476,9 +476,12 @@ public class TickHandlerClient {
             if (world != null) {
                 final List<Entity> entityList = world.loadedEntityList;
                 for (final Object e : entityList) {
-                    if (e instanceof IEntityNoisy vehicle && vehicle.getSoundUpdater() == null) {
-                        final ISound noise = vehicle.setSoundUpdater(FMLClientHandler.instance().getClient().thePlayer);
-                        FMLClientHandler.instance().getClient().getSoundHandler().playSound(noise);
+                    if (e instanceof IEntityNoisy) {
+                        IEntityNoisy vehicle = (IEntityNoisy) e;
+                        if (vehicle.getSoundUpdater() == null) {
+                            final ISound noise = vehicle.setSoundUpdater(FMLClientHandler.instance().getClient().thePlayer);
+                            FMLClientHandler.instance().getClient().getSoundHandler().playSound(noise);
+                        }
                     }
                 }
             }

@@ -107,7 +107,8 @@ public class TileEntityTelemetry extends TileEntity {
 
                     if (this.linkedEntity instanceof ITelemetry) {
                         ((ITelemetry) this.linkedEntity).transmitData(data);
-                    } else if (this.linkedEntity instanceof EntityLivingBase eLiving) {
+                    } else if (this.linkedEntity instanceof EntityLivingBase) {
+                        EntityLivingBase eLiving = (EntityLivingBase) this.linkedEntity;
                         data[0] = eLiving.hurtTime;
 
                         // Calculate a "pulse rate" based on motion and taking damage

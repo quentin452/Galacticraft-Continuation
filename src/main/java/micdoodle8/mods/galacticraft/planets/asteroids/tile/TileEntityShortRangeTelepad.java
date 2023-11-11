@@ -149,19 +149,21 @@ public class TileEntityShortRangeTelepad extends TileBaseElectricBlock
                                         this.yCoord + 2,
                                         this.zCoord + 1));
 
-                        if (tileAt != null && tileAt instanceof TileEntityShortRangeTelepad destTelepad) {
+                        if (tileAt instanceof TileEntityShortRangeTelepad) {
+                            TileEntityShortRangeTelepad destTelepad = (TileEntityShortRangeTelepad) tileAt;
                             final int teleportResult = destTelepad.canTeleportHere();
                             if (teleportResult == 0) {
                                 for (final EntityLivingBase e : containedEntities) {
                                     e.setPosition(finalPos.x + 0.5F, finalPos.y + 1.0F, finalPos.z + 0.5F);
                                     this.worldObj.updateEntityWithOptionalForce(e, true);
                                     if (e instanceof EntityPlayerMP) {
-                                        ((EntityPlayerMP) e).playerNetServerHandler.setPlayerLocation(
-                                                finalPos.x,
-                                                finalPos.y,
-                                                finalPos.z,
-                                                e.rotationYaw,
-                                                e.rotationPitch);
+                                        EntityPlayerMP player = (EntityPlayerMP) e;
+                                        player.playerNetServerHandler.setPlayerLocation(
+                                            finalPos.x,
+                                            finalPos.y,
+                                            finalPos.z,
+                                            e.rotationYaw,
+                                            e.rotationPitch);
                                     }
                                     GalacticraftCore.packetPipeline.sendToDimension(
                                             new PacketSimpleAsteroids(

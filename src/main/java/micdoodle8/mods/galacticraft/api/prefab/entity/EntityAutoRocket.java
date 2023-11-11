@@ -442,7 +442,9 @@ public abstract class EntityAutoRocket extends EntitySpaceshipBase implements IL
     public void landEntity(int x, int y, int z) {
         final TileEntity tile = this.worldObj.getTileEntity(x, y, z);
 
-        if (tile instanceof IFuelDock dock && this.isDockValid(dock)) {
+        if (tile instanceof IFuelDock && this.isDockValid((IFuelDock) tile)) {
+            IFuelDock dock = (IFuelDock) tile;
+
             if (!this.worldObj.isRemote) {
                 // Drop any existing rocket on the landing pad
                 if (dock.getDockedEntity() instanceof EntitySpaceshipBase && dock.getDockedEntity() != this) {

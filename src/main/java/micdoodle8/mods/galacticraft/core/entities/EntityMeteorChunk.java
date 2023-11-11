@@ -256,11 +256,14 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
                 movingobjectposition = new MovingObjectPosition(entity);
             }
 
-            if (movingobjectposition != null && movingobjectposition.entityHit != null
-                    && movingobjectposition.entityHit instanceof EntityPlayer entityplayer) {
-                if (entityplayer.capabilities.disableDamage || this.shootingEntity instanceof EntityPlayer
-                        && !((EntityPlayer) this.shootingEntity).canAttackPlayer(entityplayer)) {
-                    movingobjectposition = null;
+            if (movingobjectposition != null && movingobjectposition.entityHit != null) {
+                Entity entityHit = movingobjectposition.entityHit;
+                if (entityHit instanceof EntityPlayer) {
+                    EntityPlayer entityplayer = (EntityPlayer) entityHit;
+                    if (entityplayer.capabilities.disableDamage || (this.shootingEntity instanceof EntityPlayer
+                        && !((EntityPlayer) this.shootingEntity).canAttackPlayer(entityplayer))) {
+                        movingobjectposition = null;
+                    }
                 }
             }
 
@@ -288,7 +291,8 @@ public class EntityMeteorChunk extends Entity implements IProjectile {
                     }
 
                     if (movingobjectposition.entityHit.attackEntityFrom(damagesource, i1)) {
-                        if (movingobjectposition.entityHit instanceof EntityLivingBase entitylivingbase) {
+                        if (movingobjectposition.entityHit instanceof EntityLivingBase) {
+                            EntityLivingBase entitylivingbase = (EntityLivingBase) movingobjectposition.entityHit;
                             if (!this.worldObj.isRemote) {
                                 entitylivingbase.setArrowCountInEntity(entitylivingbase.getArrowCountInEntity() + 1);
                             }

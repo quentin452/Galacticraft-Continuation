@@ -248,7 +248,8 @@ public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBl
     public void randomDisplayTick(World par1World, int par2, int par3, int par4, Random rand) {
         final TileEntity te = par1World.getTileEntity(par2, par3, par4);
 
-        if (te instanceof TileEntityGasLiquefier tileEntity && tileEntity.processTicks > 0) {
+        if (te != null && te instanceof TileEntityGasLiquefier && ((TileEntityGasLiquefier) te).processTicks > 0) {
+            TileEntityGasLiquefier tileEntity = (TileEntityGasLiquefier) te;
             final float x = par2 + 0.5F;
             final float y = par3 + 0.8F + 0.05F * rand.nextInt(3);
             final float z = par4 + 0.5F;
@@ -256,31 +257,31 @@ public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBl
             for (float i = -0.41F + 0.16F * rand.nextFloat(); i < 0.5F; i += 0.167F) {
                 if (rand.nextInt(3) == 0) {
                     GalacticraftCore.proxy.spawnParticle(
-                            "whiteSmokeTiny",
-                            new Vector3(x + i, y, z - 0.41F),
-                            new Vector3(0.0D, -0.015D, -0.0015D),
-                            new Object[] {});
+                        "whiteSmokeTiny",
+                        new Vector3(x + i, y, z - 0.41F),
+                        new Vector3(0.0D, -0.015D, -0.0015D),
+                        new Object[]{});
                 }
                 if (rand.nextInt(3) == 0) {
                     GalacticraftCore.proxy.spawnParticle(
-                            "whiteSmokeTiny",
-                            new Vector3(x + i, y, z + 0.537F),
-                            new Vector3(0.0D, -0.015D, 0.0015D),
-                            new Object[] {});
+                        "whiteSmokeTiny",
+                        new Vector3(x + i, y, z + 0.537F),
+                        new Vector3(0.0D, -0.015D, 0.0015D),
+                        new Object[]{});
                 }
                 if (rand.nextInt(3) == 0) {
                     GalacticraftCore.proxy.spawnParticle(
-                            "whiteSmokeTiny",
-                            new Vector3(x - 0.41F, y, z + i),
-                            new Vector3(-0.0015D, -0.015D, 0.0D),
-                            new Object[] {});
+                        "whiteSmokeTiny",
+                        new Vector3(x - 0.41F, y, z + i),
+                        new Vector3(-0.0015D, -0.015D, 0.0D),
+                        new Object[]{});
                 }
                 if (rand.nextInt(3) == 0) {
                     GalacticraftCore.proxy.spawnParticle(
-                            "whiteSmokeTiny",
-                            new Vector3(x + 0.537F, y, z + i),
-                            new Vector3(0.0015D, -0.015D, 0.0D),
-                            new Object[] {});
+                        "whiteSmokeTiny",
+                        new Vector3(x + 0.537F, y, z + i),
+                        new Vector3(0.0015D, -0.015D, 0.0D),
+                        new Object[]{});
                 }
             }
         }

@@ -141,9 +141,10 @@ public class BlockNasaWorkbench extends BlockContainer
         if (!validSpot) {
             world.setBlockToAir(x0, y0, z0);
 
-            if (!world.isRemote && entity instanceof EntityPlayerMP player) {
-                player.addChatMessage(
-                        new ChatComponentText(EnumColor.RED + GCCoreUtil.translate("gui.warning.noroom")));
+            if (!world.isRemote && entity instanceof EntityPlayerMP) {
+                EntityPlayerMP player = (EntityPlayerMP) entity;
+                player.addChatMessage(new ChatComponentText(EnumColor.RED + GCCoreUtil.translate("gui.warning.noroom")));
+
                 if (!player.capabilities.isCreativeMode) {
                     final ItemStack nasaWorkbench = new ItemStack(this, 1, 0);
                     final EntityItem entityitem = player.dropPlayerItemWithRandomChoice(nasaWorkbench, false);

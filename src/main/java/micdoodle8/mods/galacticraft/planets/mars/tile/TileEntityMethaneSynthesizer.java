@@ -275,12 +275,16 @@ public class TileEntityMethaneSynthesizer extends TileBaseElectricBlockWithInven
     @Override
     public boolean canInsertItem(int slotID, ItemStack itemstack, int side) {
         if (this.isItemValidForSlot(slotID, itemstack)) {
-            return switch (slotID) {
-                case 0 -> ItemElectricBase.isElectricItemCharged(itemstack);
-                case 3 -> itemstack.getItem() == MarsItems.carbonFragments;
-                case 4 -> FluidUtil.isEmptyContainer(itemstack, AsteroidsItems.methaneCanister);
-                default -> false;
-            };
+            switch (slotID) {
+                case 0:
+                    return ItemElectricBase.isElectricItemCharged(itemstack);
+                case 3:
+                    return itemstack.getItem() == MarsItems.carbonFragments;
+                case 4:
+                    return FluidUtil.isEmptyContainer(itemstack, AsteroidsItems.methaneCanister);
+                default:
+                    return false;
+            }
         }
         return false;
     }
@@ -288,11 +292,14 @@ public class TileEntityMethaneSynthesizer extends TileBaseElectricBlockWithInven
     @Override
     public boolean canExtractItem(int slotID, ItemStack itemstack, int side) {
         if (this.isItemValidForSlot(slotID, itemstack)) {
-            return switch (slotID) {
-                case 0 -> ItemElectricBase.isElectricItemEmpty(itemstack) || !this.shouldPullEnergy();
-                case 4 -> FluidUtil.isFullContainer(itemstack);
-                default -> false;
-            };
+            switch (slotID) {
+                case 0:
+                    return ItemElectricBase.isElectricItemEmpty(itemstack) || !this.shouldPullEnergy();
+                case 4:
+                    return FluidUtil.isFullContainer(itemstack);
+                default:
+                    return false;
+            }
         }
         return false;
     }

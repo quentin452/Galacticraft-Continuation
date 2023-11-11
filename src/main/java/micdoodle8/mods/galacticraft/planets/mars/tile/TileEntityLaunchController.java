@@ -362,10 +362,12 @@ public class TileEntityLaunchController extends TileBaseElectricBlockWithInvento
                             continue;
                         }
 
-                        if (tile2 instanceof TileEntityLaunchController launchController2
-                                && launchController2.frequency == this.frequency) {
-                            this.frequencyValid = false;
-                            break worldLoop;
+                        if (tile2 instanceof TileEntityLaunchController) {
+                            TileEntityLaunchController launchController2 = (TileEntityLaunchController) tile2;
+                            if (launchController2.frequency == this.frequency) {
+                                this.frequencyValid = false;
+                                break worldLoop;
+                            }
                         }
                     }
                 }
@@ -396,10 +398,12 @@ public class TileEntityLaunchController extends TileBaseElectricBlockWithInvento
                                 continue;
                             }
 
-                            if (tile2 instanceof TileEntityLaunchController launchController2
-                                    && launchController2.frequency == this.destFrequency) {
-                                this.destFrequencyValid = true;
-                                return;
+                            if (tile2 instanceof TileEntityLaunchController) {
+                                TileEntityLaunchController launchController2 = (TileEntityLaunchController) tile2;
+                                if (launchController2.frequency == this.destFrequency) {
+                                    this.destFrequencyValid = true;
+                                    return;
+                                }
                             }
                         }
                     }
@@ -430,7 +434,8 @@ public class TileEntityLaunchController extends TileBaseElectricBlockWithInvento
     }
 
     public void updateRocketOnDockSettings() {
-        if (this.attachedDock instanceof TileEntityLandingPad pad) {
+        if (this.attachedDock instanceof TileEntityLandingPad) {
+            TileEntityLandingPad pad = (TileEntityLandingPad) this.attachedDock;
             final IDockable rocket = pad.getDockedEntity();
             if (rocket instanceof EntityAutoRocket) {
                 ((EntityAutoRocket) rocket).updateControllerSettings(pad);

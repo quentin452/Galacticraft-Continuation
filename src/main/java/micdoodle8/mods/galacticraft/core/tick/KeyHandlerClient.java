@@ -131,20 +131,23 @@ public class KeyHandlerClient extends KeyHandler {
 
             final Entity entityTest = mc.thePlayer.ridingEntity;
 
-            if (entityTest instanceof IControllableEntity entity && keyNum != -1) {
-
-                if (kb.getKeyCode() == mc.gameSettings.keyBindInventory.getKeyCode()) {
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindInventory.getKeyCode(), false);
+            if (entityTest instanceof IControllableEntity) {
+                IControllableEntity entity = (IControllableEntity) entityTest;
+                if (keyNum != -1) {
+                    if (kb.getKeyCode() == mc.gameSettings.keyBindInventory.getKeyCode()) {
+                        KeyBinding.setKeyBindState(mc.gameSettings.keyBindInventory.getKeyCode(), false);
+                    }
+                    entity.pressKey(keyNum);
                 }
-                entity.pressKey(keyNum);
-
-            } else if (entityTest instanceof EntityAutoRocket autoRocket && autoRocket.landing) {
-                if (kb == leftShiftKey) {
-                    autoRocket.motionY -= 0.02D;
-                    GalacticraftCore.packetPipeline.sendToServer(
+        } else if (entityTest instanceof EntityAutoRocket) {
+                EntityAutoRocket autoRocket = (EntityAutoRocket) entityTest;
+                if (autoRocket.landing && (kb == leftShiftKey)) {
+                        autoRocket.motionY -= 0.02D;
+                        GalacticraftCore.packetPipeline.sendToServer(
                             new PacketSimple(
-                                    EnumSimplePacket.S_UPDATE_SHIP_MOTION_Y,
-                                    new Object[] { autoRocket.getEntityId(), false }));
+                                EnumSimplePacket.S_UPDATE_SHIP_MOTION_Y,
+                                new Object[]{autoRocket.getEntityId(), false}));
+
                 }
                 if (kb == spaceKey) {
                     autoRocket.motionY += 0.02D;

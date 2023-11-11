@@ -129,18 +129,21 @@ public class EntityParachest extends Entity {
         this.worldObj.setBlock(x, y, z, GCBlocks.parachest, 0, 3);
         final TileEntity te = this.worldObj.getTileEntity(x, y, z);
 
-        if (te instanceof TileEntityParaChest chest && this.cargo != null) {
-            chest.chestContents = new ItemStack[this.cargo.length + 1];
+        if (te instanceof TileEntityParaChest) {
+            TileEntityParaChest chest = (TileEntityParaChest) te;
+            if (this.cargo != null) {
+                chest.chestContents = new ItemStack[this.cargo.length + 1];
 
-            for (int i = 0; i < this.cargo.length; i++) {
-                chest.chestContents[i] = this.cargo[i];
-            }
+                for (int i = 0; i < this.cargo.length; i++) {
+                    chest.chestContents[i] = this.cargo[i];
+                }
 
-            chest.fuelTank.fill(
+                chest.fuelTank.fill(
                     FluidRegistry.getFluidStack(GalacticraftCore.fluidFuel.getName().toLowerCase(), this.fuelLevel),
                     true);
 
-            return true;
+                return true;
+            }
         }
 
         this.placedChest = true;

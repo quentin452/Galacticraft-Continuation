@@ -43,24 +43,27 @@ public class HydrogenNetwork implements IHydrogenNetwork {
             if (totalHydrogenRequest > 0) {
                 final List<TileEntity> ignoreTilesList = Arrays.asList(ignoreTiles);
                 for (final TileEntity tileEntity : new HashSet<>(this.hydrogenTiles.keySet())) {
-                    if ((!ignoreTilesList.contains(tileEntity)
-                            && tileEntity instanceof TileEntityMethaneSynthesizer hydrogenTile)
-                            && hydrogenTile.shouldPullHydrogen()) {
-                        for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
-                            final TileEntity tile = new BlockVec3(tileEntity).modifyPositionFromSide(direction, 1)
+                    if (!ignoreTilesList.contains(tileEntity) && tileEntity instanceof TileEntityMethaneSynthesizer) {
+                        TileEntityMethaneSynthesizer hydrogenTile = (TileEntityMethaneSynthesizer) tileEntity;
+
+                        if (hydrogenTile.shouldPullHydrogen()) {
+                            for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+                                final TileEntity tile = new BlockVec3(tileEntity).modifyPositionFromSide(direction, 1)
                                     .getTileEntity(tileEntity.getWorldObj());
 
-                            if (hydrogenTile.canConnect(direction, NetworkType.HYDROGEN)
-                                    && tile instanceof ITransmitter transmitter
-                                    && this.pipes.contains(transmitter)) {
-                                final float hydrogenToSend = Math.max(
-                                        totalHydrogen,
-                                        totalHydrogen
-                                                * (hydrogenTile.getHydrogenRequest(direction) / totalHydrogenRequest));
+                                if (hydrogenTile.canConnect(direction, NetworkType.HYDROGEN)
+                                    && tile instanceof ITransmitter) {
+                                    ITransmitter transmitter = (ITransmitter) tile;
 
-                                if (hydrogenToSend > 0) {
-                                    remainingUsableHydrogen -= hydrogenTile
-                                            .receiveHydrogen(direction, hydrogenToSend, true);
+                                    if (this.pipes.contains(transmitter)) {
+                                        final float hydrogenToSend = Math.max(
+                                            totalHydrogen,
+                                            totalHydrogen * (hydrogenTile.getHydrogenRequest(direction) / totalHydrogenRequest));
+
+                                        if (hydrogenToSend > 0) {
+                                            remainingUsableHydrogen -= hydrogenTile.receiveHydrogen(direction, hydrogenToSend, true);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -99,10 +102,12 @@ public class HydrogenNetwork implements IHydrogenNetwork {
                     final TileEntity tile = tileVec.modifyPositionFromSide(direction, 1)
                             .getTileEntity(tileEntity.getWorldObj());
 
-                    if (((TileEntityMethaneSynthesizer) tileEntity).canConnect(direction, NetworkType.HYDROGEN)
-                            && tile instanceof ITransmitter transmitter
-                            && this.pipes.contains(transmitter)) {
-                        requests.add(((TileEntityMethaneSynthesizer) tileEntity).getHydrogenRequest(direction));
+                    if (((TileEntityMethaneSynthesizer) tileEntity).canConnect(direction, NetworkType.HYDROGEN) && tile instanceof ITransmitter) {
+                        ITransmitter transmitter = (ITransmitter) tile;
+
+                        if (this.pipes.contains(transmitter)) {
+                            requests.add(((TileEntityMethaneSynthesizer) tileEntity).getHydrogenRequest(direction));
+                        }
                     }
                 }
             }

@@ -204,11 +204,13 @@ public class EventHandlerGC {
 
     @SubscribeEvent
     public void onEntityFall(LivingFallEvent event) {
-        if (event.entityLiving instanceof EntityPlayer player && (player.ridingEntity instanceof EntityAutoRocket
-                || player.ridingEntity instanceof EntityLanderBase)) {
-            event.distance = 0.0F;
-            event.setCanceled(true);
-            return;
+        if (event.entityLiving instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) event.entityLiving;
+            if (player.ridingEntity instanceof EntityAutoRocket || player.ridingEntity instanceof EntityLanderBase) {
+                event.distance = 0.0F;
+                event.setCanceled(true);
+                return;
+            }
         }
 
         if (event.entityLiving.worldObj.provider instanceof IGalacticraftWorldProvider) {
@@ -909,15 +911,15 @@ public class EventHandlerGC {
         if (fluidStack == null) {
             return;
         }
-        switch (fluidStack.getFluid().getName()) {
-            case "fluid.rocketfuelmixb", "nitrofuel" -> event.toolTip
-                    .add(StatCollector.translateToLocalFormatted("tooltip.rocket_fuel_tier", 2));
-            case "fluid.rocketfuelmixd" -> event.toolTip
-                    .add(StatCollector.translateToLocalFormatted("tooltip.rocket_fuel_tier", 4));
-            case "fluid.rocketfuelmixc" -> event.toolTip
-                    .add(StatCollector.translateToLocalFormatted("tooltip.rocket_fuel_tier", 6));
-            case "fluid.rocketfuelmixa", "rocket_fuel" -> event.toolTip
-                    .add(StatCollector.translateToLocal("tooltip.rocket_fuel_tier_max"));
+        String fluidName = fluidStack.getFluid().getName();
+        if ("fluid.rocketfuelmixb".equals(fluidName) || "nitrofuel".equals(fluidName)) {
+            event.toolTip.add(StatCollector.translateToLocalFormatted("tooltip.rocket_fuel_tier", 2));
+        } else if ("fluid.rocketfuelmixd".equals(fluidName)) {
+            event.toolTip.add(StatCollector.translateToLocalFormatted("tooltip.rocket_fuel_tier", 4));
+        } else if ("fluid.rocketfuelmixc".equals(fluidName)) {
+            event.toolTip.add(StatCollector.translateToLocalFormatted("tooltip.rocket_fuel_tier", 6));
+        } else if ("fluid.rocketfuelmixa".equals(fluidName) || "rocket_fuel".equals(fluidName)) {
+            event.toolTip.add(StatCollector.translateToLocal("tooltip.rocket_fuel_tier_max"));
         }
     }
 

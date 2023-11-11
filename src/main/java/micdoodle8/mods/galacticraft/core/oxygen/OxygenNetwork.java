@@ -47,29 +47,33 @@ public class OxygenNetwork implements IOxygenNetwork {
             if (totalOxygenRequest > 0) {
                 final List<TileEntity> ignoreTilesList = Arrays.asList(ignoreTiles);
                 for (final TileEntity tileEntity : new HashSet<>(this.oxygenTiles.keySet())) {
-                    if ((!ignoreTilesList.contains(tileEntity) && tileEntity instanceof IOxygenReceiver oxygenTile)
-                            && oxygenTile.shouldPullOxygen()) {
-                        for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
-                            if (oxygenTile.canConnect(direction, NetworkType.OXYGEN)) {
-                                final TileEntity tile = new BlockVec3(tileEntity)
+                    if ((!ignoreTilesList.contains(tileEntity) && tileEntity instanceof IOxygenReceiver)) {
+                        IOxygenReceiver oxygenTile = (IOxygenReceiver) tileEntity;
+                        if (oxygenTile.shouldPullOxygen()) {
+                            for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+                                if (oxygenTile.canConnect(direction, NetworkType.OXYGEN)) {
+                                    final TileEntity tile = new BlockVec3(tileEntity)
                                         .getTileEntityOnSide(tileEntity.getWorldObj(), direction);
 
-                                if (tile instanceof ITransmitter transmitter && this.pipes.contains(transmitter)) {
-                                    final float oxygenToSend = Math.min(
-                                            remainingUsableOxygen,
-                                            totalOxygen
+                                    if (tile instanceof ITransmitter) {
+                                        ITransmitter transmitter = (ITransmitter) tile;
+                                        if (this.pipes.contains(transmitter)) {
+                                            final float oxygenToSend = Math.min(
+                                                remainingUsableOxygen,
+                                                totalOxygen
                                                     * (oxygenTile.getOxygenRequest(direction) / totalOxygenRequest));
 
-                                    if (oxygenToSend > 0) {
-                                        remainingUsableOxygen -= oxygenTile
-                                                .receiveOxygen(direction, oxygenToSend, true);
+                                            if (oxygenToSend > 0) {
+                                                remainingUsableOxygen -= oxygenTile.receiveOxygen(direction, oxygenToSend, true);
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
+        }
         }
 
         return remainingUsableOxygen;
@@ -92,17 +96,22 @@ public class OxygenNetwork implements IOxygenNetwork {
                 continue;
             }
 
-            if ((tileEntity instanceof IOxygenReceiver oxygenTile && !tileEntity.isInvalid()
-                    && oxygenTile.shouldPullOxygen())
-                    && (tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord)
-                            == tileEntity)) {
-                for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
-                    if (oxygenTile.canConnect(direction, NetworkType.OXYGEN)) {
-                        final TileEntity tile = new BlockVec3(tileEntity)
+            if ((tileEntity instanceof IOxygenReceiver) && !tileEntity.isInvalid()) {
+                IOxygenReceiver oxygenTile = (IOxygenReceiver) tileEntity;
+
+                if (oxygenTile.shouldPullOxygen()
+                    && (tileEntity.getWorldObj().getTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord) == tileEntity)) {
+                    for (final ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+                        if (oxygenTile.canConnect(direction, NetworkType.OXYGEN)) {
+                            final TileEntity connectedTile = new BlockVec3(tileEntity)
                                 .getTileEntityOnSide(tileEntity.getWorldObj(), direction);
 
-                        if (tile instanceof ITransmitter transmitter && this.pipes.contains(transmitter)) {
-                            requests.add(((IOxygenReceiver) tileEntity).getOxygenRequest(direction));
+                            if (connectedTile instanceof ITransmitter) {
+                                ITransmitter transmitter = (ITransmitter) connectedTile;
+                                if (this.pipes.contains(transmitter)) {
+                                    requests.add(oxygenTile.getOxygenRequest(direction));
+                                }
+                            }
                         }
                     }
                 }

@@ -11,7 +11,6 @@ import net.minecraft.item.ItemStack;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
-import gregtech.api.util.GT_ModHandler;
 import micdoodle8.mods.galacticraft.core.Constants;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.items.GCItems;
@@ -169,29 +168,6 @@ public class NEIGalacticraftMarsConfig implements IConfigureNEI {
         final int x = CargoRocketRecipeHandler.tX - CargoRocketRecipeHandler.x;
         final int y = CargoRocketRecipeHandler.tY - CargoRocketRecipeHandler.y;
         input.add(new PositionedStack(new ItemStack(GCItems.basicItem, 1, 14), 134 - x, 10 - y));
-        if (GalacticraftCore.isGalaxySpaceLoaded) {
-            input.add(
-                    new PositionedStack(
-                            GT_ModHandler
-                                    .getModItem(Constants.MOD_ID_GALAXYSPACE, "item.RocketControlComputer", 1, 101),
-                            134 - x,
-                            28 - y));
-            input.add(
-                    new PositionedStack(
-                            GT_ModHandler.getModItem(Constants.MOD_ID_GALAXYSPACE, "item.ModuleSmallFuelCanister", 1),
-                            116 - x,
-                            19 - y));
-            input.add(
-                    new PositionedStack(
-                            GT_ModHandler.getModItem(Constants.MOD_ID_GALAXYSPACE, "item.ModuleSmallFuelCanister", 1),
-                            152 - x,
-                            19 - y));
-            input.add(
-                    new PositionedStack(
-                            GT_ModHandler.getModItem(Constants.MOD_ID_GALAXYSPACE, "item.ModuleSmallFuelCanister", 1),
-                            116 - x,
-                            37 - y));
-        }
         input.add(new PositionedStack(new ItemStack(GCItems.partNoseCone), 53 - x, 19 - y));
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 2; j++) {

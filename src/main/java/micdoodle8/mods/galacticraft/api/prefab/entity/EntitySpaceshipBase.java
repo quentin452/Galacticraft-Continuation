@@ -182,10 +182,13 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
             this.addToTelemetry = false;
             for (final BlockVec3Dim vec : new ArrayList<>(this.telemetryList)) {
                 final TileEntity t1 = vec.getTileEntityNoLoad();
-                if (t1 instanceof TileEntityTelemetry tileTelemetry && !t1.isInvalid()
-                        && tileTelemetry.linkedEntity == this) {
-                    tileTelemetry.addTrackedEntity(this);
+                if (t1 instanceof TileEntityTelemetry && !t1.isInvalid()) {
+                    TileEntityTelemetry tileTelemetry = (TileEntityTelemetry) t1;
+                    if (tileTelemetry.linkedEntity == this) {
+                        tileTelemetry.addTrackedEntity(this);
+                    }
                 }
+
             }
         }
 
@@ -193,9 +196,7 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
             this.riddenByEntity.fallDistance = 0.0F;
         }
 
-        if (this.posY
-                > (this.worldObj.provider instanceof IExitHeight exitHeight ? exitHeight.getYCoordinateToTeleport()
-                        : 1200)) {
+        if (this.posY > getExitHeightCoordinateToTeleport()) {
             this.onReachAtmosphere();
             // if (this.worldObj.isRemote)
             // this.posY = 1 + (this.worldObj.provider instanceof IExitHeight ?
@@ -214,18 +215,17 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
         if (!this.worldObj.isRemote) {
             if (this.posY < 0.0D) {
                 this.kill();
-            } else if (this.posY
-                    > (this.worldObj.provider instanceof IExitHeight exitHeight ? exitHeight.getYCoordinateToTeleport()
-                            : 1200) + 100) {
-                                if (this.riddenByEntity instanceof EntityPlayerMP playerMP) {
-                                    final GCPlayerStats stats = GCPlayerStats.get(playerMP);
-                                    if (stats.usingPlanetSelectionGui) {
-                                        this.kill();
-                                    }
-                                } else {
-                                    this.kill();
-                                }
-                            }
+            } else if (this.posY > getTeleportYCoordinate()) {
+                if (this.riddenByEntity instanceof EntityPlayerMP) {
+                    EntityPlayerMP playerMP = (EntityPlayerMP) this.riddenByEntity;
+                    final GCPlayerStats stats = GCPlayerStats.get(playerMP);
+                    if (stats.usingPlanetSelectionGui) {
+                        this.kill();
+                    }
+                } else {
+                    this.kill();
+                }
+            }
 
             if (this.timeSinceLaunch > 50 && this.onGround) {
                 this.failRocket();
@@ -306,7 +306,22 @@ public abstract class EntitySpaceshipBase extends Entity implements IPacketRecei
             // this.worldObj.provider.dimensionId);
         }
     }
-
+    private double getExitHeightCoordinateToTeleport() {
+        if (this.worldObj.provider instanceof IExitHeight) {
+            IExitHeight exitHeight = (IExitHeight) this.worldObj.provider;
+            return exitHeight.getYCoordinateToTeleport();
+        } else {
+            return 1200;
+        }
+    }
+    private int getTeleportYCoordinate() {
+        if (this.worldObj.provider instanceof IExitHeight) {
+            IExitHeight exitHeight = (IExitHeight) this.worldObj.provider;
+            return (int) exitHeight.getYCoordinateToTeleport();
+        } else {
+            return 1200;
+        }
+    }
     protected boolean shouldMoveClientSide() {
         return true;
     }

@@ -45,13 +45,15 @@ public class ItemRendererThruster implements IItemRenderer {
      */
     @Override
     public boolean handleRenderType(ItemStack item, ItemRenderType type) {
-        return switch (type) {
-            case ENTITY -> true;
-            case EQUIPPED -> true;
-            case EQUIPPED_FIRST_PERSON -> true;
-            case INVENTORY -> true;
-            default -> false;
-        };
+        switch (type) {
+            case ENTITY:
+            case EQUIPPED:
+            case EQUIPPED_FIRST_PERSON:
+            case INVENTORY:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

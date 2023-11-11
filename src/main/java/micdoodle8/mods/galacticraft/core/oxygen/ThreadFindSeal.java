@@ -882,7 +882,9 @@ public class ThreadFindSeal {
      * @return
      */
     private boolean canBlockPassAirCheck(Block block, BlockVec3 vec, int side) {
-        if (block instanceof IPartialSealableBlock blockPartial) {
+        if (block instanceof IPartialSealableBlock) {
+            IPartialSealableBlock blockPartial = (IPartialSealableBlock) block;
+
             if (blockPartial.isSealed(this.world, vec.x, vec.y, vec.z, ForgeDirection.getOrientation(side))) {
                 // If a partial block checks as solid, no checkedAdd() so allowing
                 // it to be tested again from other directions
@@ -892,8 +894,7 @@ public class ThreadFindSeal {
                 return false;
             }
 
-            // Find the solid sides so they don't get iterated into, when doing the next
-            // layer
+            // Find the solid sides so they don't get iterated into when doing the next layer
             for (int i = 0; i < 6; i++) {
                 if (i == side) {
                     continue;
@@ -905,6 +906,7 @@ public class ThreadFindSeal {
             this.checkedAdd(vec);
             return true;
         }
+
 
         // Check leaves first, because their isOpaqueCube() test depends on graphics
         // settings

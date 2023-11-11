@@ -32,7 +32,8 @@ public class ChunkPowerHandler {
                 tileList.addAll(event.getChunk().chunkTileEntityMap.values());
 
                 for (final Object o : tileList) {
-                    if (o instanceof TileEntity tile && tile instanceof INetworkConnection) {
+                    if (o instanceof TileEntity && o instanceof INetworkConnection) {
+                        TileEntity tile = (TileEntity) o;
                         ((INetworkConnection) tile).refresh();
                     }
                 }
