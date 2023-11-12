@@ -304,6 +304,7 @@ public class MapUtil {
     public static void BiomeMapNextTick() {
         MapGen map;
         boolean doingSlow = false;
+
         if (currentMap != null) {
             map = currentMap;
         } else if (slowMap != null) {
@@ -313,31 +314,33 @@ public class MapUtil {
             return;
         }
 
-        // Allow GC background mapping around 9% of the server tick time if server
-        // running at full speed
-        // (on a slow server, it will be proportionately lower %)
-        final long end = System.nanoTime() + 4500000L;
-        while (System.nanoTime() < end) {
+        final long expirationTime = System.currentTimeMillis() + 4500L;
+
+        do {
             if (map.BiomeMapOneTick()) {
-                // Finished
+
                 map.writeOutputFile(true);
+
                 if ("Overworld192.bin".equals(map.biomeMapFile.getName())) {
                     doneOverworldTexture = true;
                 }
+
                 if (doingSlow) {
                     slowMap = null;
                 } else {
                     currentMap = null;
-                    if (queuedMaps.size() > 0) {
+                    if (!queuedMaps.isEmpty()) {
                         currentMap = queuedMaps.removeFirst();
                     }
                 }
+
                 if (currentMap == null && slowMap == null) {
                     calculatingMap.set(false);
                 }
+
                 return;
             }
-        }
+        } while (System.currentTimeMillis() < expirationTime);
     }
 
     /**

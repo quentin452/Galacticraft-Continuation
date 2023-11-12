@@ -230,11 +230,11 @@ public class TickHandlerServer {
                                 if (footprints != null) {
                                     final List<Footprint> toRemove = new ArrayList<>();
 
-                                    for (int j = 0; j < footprints.size(); j++) {
-                                        footprints.get(j).age += 100;
+                                    for (Footprint footprint : footprints) {
+                                        footprint.age += 100;
 
-                                        if (footprints.get(j).age >= Footprint.MAX_AGE) {
-                                            toRemove.add(footprints.get(j));
+                                        if (footprint.age >= Footprint.MAX_AGE) {
+                                            toRemove.add(footprint);
                                         }
                                     }
 
@@ -249,7 +249,7 @@ public class TickHandlerServer {
                                         new PacketSimple(
                                             EnumSimplePacket.C_UPDATE_FOOTPRINT_LIST,
                                             new Object[] { chunkKey,
-                                                footprints.toArray(new Footprint[footprints.size()]) }),
+                                                footprints.toArray(new Footprint[0]) }),
                                         world.provider.dimensionId);
                                 }
                             }
