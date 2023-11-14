@@ -106,11 +106,6 @@ public class BlockOxygenCompressor extends BlockAdvancedTile implements ItemBloc
             meta += BlockOxygenCompressor.OXYGEN_COMPRESSOR_METADATA;
         }
 
-        final TileEntity te = par1World.getTileEntity(x, y, z);
-        if (te instanceof TileBaseUniversalElectrical) {
-            ((TileBaseUniversalElectrical) te).updateFacing();
-        }
-
         par1World.setBlockMetadataWithNotify(x, y, z, meta, 3);
         return true;
     }

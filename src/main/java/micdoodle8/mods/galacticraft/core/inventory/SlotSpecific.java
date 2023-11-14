@@ -44,18 +44,6 @@ public class SlotSpecific extends Slot {
                     e.printStackTrace();
                 }
             }
-            if (EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-                try {
-                    final Class<?> itemElectricIC2a = Class.forName("ic2.api.item.IElectricItem");
-                    final Class<?> itemElectricIC2b = Class.forName("ic2.api.item.ISpecialElectricItem");
-                    final ArrayList<Class<?>> existing = new ArrayList<>(Arrays.asList(validClasses));
-                    existing.add(itemElectricIC2a);
-                    existing.add(itemElectricIC2b);
-                    validClasses = existing.toArray(new Class[existing.size()]);
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
-            }
             if (EnergyConfigHandler.isMekanismLoaded()) {
                 try {
                     final Class<?> itemElectricMek = Class.forName("mekanism.api.energy.IEnergizedItem");

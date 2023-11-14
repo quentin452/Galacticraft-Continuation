@@ -3,7 +3,6 @@ package micdoodle8.mods.galacticraft.core.energy.tile;
 import cofh.api.energy.IEnergyContainerItem;
 import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.common.Optional.InterfaceList;
-import ic2.api.energy.tile.IEnergySource;
 import mekanism.api.energy.ICableOutputter;
 import micdoodle8.mods.galacticraft.api.item.ElectricItemHelper;
 import micdoodle8.mods.galacticraft.api.item.IItemElectric;
@@ -26,7 +25,7 @@ import java.util.EnumSet;
 @InterfaceList({ @Interface(modid = "IC2API", iface = "ic2.api.energy.tile.IEnergySource"),
     @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.ICableOutputter"), })
 public class TileBaseUniversalElectricalSource extends TileBaseUniversalElectrical
-    implements IEnergySource, ICableOutputter {
+    implements ICableOutputter {
 
     /*
      * The main function to output energy each tick from a source. The source will attempt to produce into its
@@ -110,96 +109,6 @@ public class TileBaseUniversalElectricalSource extends TileBaseUniversalElectric
                         .receiveEnergy(itemStack, (int) (energyToCharge * EnergyConfigHandler.TO_RF_RATIO), false)
                         / EnergyConfigHandler.TO_RF_RATIO,
                     false);
-            } else if (EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-                try {
-                    final Class<?> itemElectricIC2 = Class.forName("ic2.api.item.ISpecialElectricItem");
-                    final Class<?> itemElectricIC2B = Class.forName("ic2.api.item.IElectricItem");
-                    final Class<?> itemManagerIC2 = Class.forName("ic2.api.item.IElectricItemManager");
-                    if (itemElectricIC2.isInstance(item)) {
-                        // Implement by reflection:
-                        // float energy = (float)
-                        // ((ISpecialElectricItem)item).getManager(itemStack).charge(itemStack,
-                        // energyToCharge * EnergyConfigHandler.TO_IC2_RATIO, 4, false, false) *
-                        // EnergyConfigHandler.IC2_RATIO;
-                        final Object IC2item = itemElectricIC2.cast(item);
-                        final Method getMan = itemElectricIC2.getMethod("getManager", ItemStack.class);
-                        final Object IC2manager = getMan.invoke(IC2item, itemStack);
-                        double result;
-                        if (VersionUtil.mcVersion1_7_2) {
-                            final Method methodCharge = itemManagerIC2.getMethod(
-                                "charge",
-                                ItemStack.class,
-                                int.class,
-                                int.class,
-                                boolean.class,
-                                boolean.class);
-                            result = (Integer) methodCharge.invoke(
-                                IC2manager,
-                                itemStack,
-                                (int) (energyToCharge * EnergyConfigHandler.TO_IC2_RATIO),
-                                this.tierGC + 1,
-                                false,
-                                false);
-                        } else {
-                            final Method methodCharge = itemManagerIC2.getMethod(
-                                "charge",
-                                ItemStack.class,
-                                double.class,
-                                int.class,
-                                boolean.class,
-                                boolean.class);
-                            result = (Double) methodCharge.invoke(
-                                IC2manager,
-                                itemStack,
-                                (double) (energyToCharge * EnergyConfigHandler.TO_IC2_RATIO),
-                                this.tierGC + 1,
-                                false,
-                                false);
-                        }
-                        final float energy = (float) result / EnergyConfigHandler.TO_IC2_RATIO;
-                        this.storage.extractEnergyGC(energy, false);
-                    } else if (itemElectricIC2B.isInstance(item)) {
-                        final Class<?> electricItemIC2 = Class.forName("ic2.api.item.ElectricItem");
-                        final Object IC2manager = electricItemIC2.getField("manager")
-                            .get(null);
-                        double result;
-                        if (VersionUtil.mcVersion1_7_2) {
-                            final Method methodCharge = itemManagerIC2.getMethod(
-                                "charge",
-                                ItemStack.class,
-                                int.class,
-                                int.class,
-                                boolean.class,
-                                boolean.class);
-                            result = (Integer) methodCharge.invoke(
-                                IC2manager,
-                                itemStack,
-                                (int) (energyToCharge * EnergyConfigHandler.TO_IC2_RATIO),
-                                this.tierGC + 1,
-                                false,
-                                false);
-                        } else {
-                            final Method methodCharge = itemManagerIC2.getMethod(
-                                "charge",
-                                ItemStack.class,
-                                double.class,
-                                int.class,
-                                boolean.class,
-                                boolean.class);
-                            result = (Double) methodCharge.invoke(
-                                IC2manager,
-                                itemStack,
-                                (double) (energyToCharge * EnergyConfigHandler.TO_IC2_RATIO),
-                                this.tierGC + 1,
-                                false,
-                                false);
-                        }
-                        final float energy = (float) result / EnergyConfigHandler.TO_IC2_RATIO;
-                        this.storage.extractEnergyGC(energy, false);
-                    }
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
             }
             // else if (GCCoreCompatibilityManager.isTELoaded() && itemStack.getItem()
             // instanceof
@@ -219,48 +128,6 @@ public class TileBaseUniversalElectricalSource extends TileBaseUniversalElectric
     }
 
     @Override
-    public boolean emitsEnergyTo(TileEntity receiver, ForgeDirection direction) {
-        // Don't add connection to IC2 grid if it's a Galacticraft tile
-        if (receiver instanceof IElectrical || receiver instanceof IConductor) {
-            return false;
-        }
-
-        try {
-            final Class<?> energyTile = Class.forName("ic2.api.energy.tile.IEnergyTile");
-            if (!energyTile.isInstance(receiver)) {
-                return false;
-            }
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return this.getElectricalOutputDirections()
-            .contains(direction);
-    }
-
-    @Override
-    public double getOfferedEnergy() {
-        if (EnergyConfigHandler.disableIC2Output) {
-            return 0.0;
-        }
-
-        return this.getProvide(ForgeDirection.UNKNOWN) * EnergyConfigHandler.TO_IC2_RATIO;
-    }
-
-    @Override
-    public void drawEnergy(double amount) {
-        if (EnergyConfigHandler.disableIC2Output) {
-            return;
-        }
-
-        this.storage.extractEnergyGC((float) amount / EnergyConfigHandler.TO_IC2_RATIO, false);
-    }
-
-    @Override
-    public int getSourceTier() {
-        return this.tierGC + 1;
-    }
-
-    @Override
     public boolean canOutputTo(ForgeDirection side) {
         return this.getElectricalOutputDirections()
             .contains(side);
@@ -268,16 +135,6 @@ public class TileBaseUniversalElectricalSource extends TileBaseUniversalElectric
 
     @Override
     public float getProvide(ForgeDirection direction) {
-        if (direction == ForgeDirection.UNKNOWN && EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-            final TileEntity tile = new BlockVec3(this)
-                .getTileEntityOnSide(this.worldObj, this.getElectricalOutputDirectionMain());
-            if (tile instanceof IConductor) {
-                // No power provide to IC2 mod if it's a Galacticraft wire on the output.
-                // Galacticraft network will
-                // provide the power.
-                return 0.0F;
-            }
-        }
 
         if (this.getElectricalOutputDirections()
             .contains(direction)) {

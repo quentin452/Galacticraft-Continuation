@@ -5,8 +5,6 @@ import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.common.Optional.InterfaceList;
 import cpw.mods.fml.common.eventhandler.Event;
-import ic2.api.energy.tile.IEnergySink;
-import ic2.api.item.IElectricItem;
 import mekanism.api.energy.ICableOutputter;
 import mekanism.api.energy.IStrictEnergyAcceptor;
 import micdoodle8.mods.galacticraft.api.item.ElectricItemHelper;
@@ -31,7 +29,7 @@ import java.util.EnumSet;
     @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.IStrictEnergyAcceptor"),
     @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.ICableOutputter"), })
 public abstract class TileBaseUniversalElectrical extends EnergyStorageTile
-    implements IEnergySink, IEnergyHandler, IStrictEnergyAcceptor, ICableOutputter {
+    implements IEnergyHandler, IStrictEnergyAcceptor, ICableOutputter {
 
     protected boolean isAddedToEnergyNet;
     protected Object powerHandlerBC;
@@ -185,16 +183,6 @@ public abstract class TileBaseUniversalElectrical extends EnergyStorageTile
                     ((IEnergyContainerItem) item)
                         .extractEnergy(itemStack, (int) (energyToDischarge / EnergyConfigHandler.RF_RATIO), false)
                         * EnergyConfigHandler.RF_RATIO);
-            } else if (EnergyConfigHandler.isIndustrialCraft2Loaded() && item instanceof IElectricItem) {
-                IElectricItem electricItem = (IElectricItem) item;
-                if (electricItem.canProvideEnergy(itemStack)) {
-                    double result = 0;
-                    final double energyDischargeIC2 = energyToDischarge / EnergyConfigHandler.IC2_RATIO;
-                    result = ic2.api.item.ElectricItem.manager
-                        .discharge(itemStack, energyDischargeIC2, 4, false, false, false);
-                    final float energyDischarged = (float) result * EnergyConfigHandler.IC2_RATIO;
-                    this.storage.receiveEnergyGC(energyDischarged);
-                }
             }
         }
     }
@@ -211,14 +199,6 @@ public abstract class TileBaseUniversalElectrical extends EnergyStorageTile
         if (!this.worldObj.isRemote) {
             if (!this.isAddedToEnergyNet) {
                 // Register to the IC2 Network
-                this.initIC();
-            }
-
-            if (EnergyConfigHandler.isIndustrialCraft2Loaded() && this.IC2surplusInGJ >= 0.001F) {
-                this.IC2surplusInGJ -= this.storage.receiveEnergyGC(this.IC2surplusInGJ);
-                if (this.IC2surplusInGJ < 0.001F) {
-                    this.IC2surplusInGJ = 0;
-                }
             }
         }
     }
@@ -228,126 +208,15 @@ public abstract class TileBaseUniversalElectrical extends EnergyStorageTile
      */
     @Override
     public void invalidate() {
-        this.unloadTileIC2();
         super.invalidate();
     }
 
     @Override
     public void onChunkUnload() {
-        this.unloadTileIC2();
         super.onChunkUnload();
     }
 
-    protected void initIC() {
-        if (EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-            try {
-                final Class<?> tileLoadEvent = Class.forName("ic2.api.energy.event.EnergyTileLoadEvent");
-                final Class<?> energyTile = Class.forName("ic2.api.energy.tile.IEnergyTile");
-                final Constructor<?> constr = tileLoadEvent.getConstructor(energyTile);
-                final Object o = constr.newInstance(this);
 
-                if (o instanceof Event) {
-                    MinecraftForge.EVENT_BUS.post((Event) o);
-                }
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        this.isAddedToEnergyNet = true;
-    }
-
-    private void unloadTileIC2() {
-        if (this.isAddedToEnergyNet && this.worldObj != null) {
-            if (EnergyConfigHandler.isIndustrialCraft2Loaded() && !this.worldObj.isRemote) {
-                try {
-                    final Class<?> tileLoadEvent = Class.forName("ic2.api.energy.event.EnergyTileUnloadEvent");
-                    final Class<?> energyTile = Class.forName("ic2.api.energy.tile.IEnergyTile");
-                    final Constructor<?> constr = tileLoadEvent.getConstructor(energyTile);
-                    final Object o = constr.newInstance(this);
-
-                    if (o instanceof Event) {
-                        MinecraftForge.EVENT_BUS.post((Event) o);
-                    }
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            this.isAddedToEnergyNet = false;
-        }
-    }
-
-    @Override
-    public double getDemandedEnergy() {
-        if (EnergyConfigHandler.disableIC2Input) {
-            return 0.0;
-        }
-
-        try {
-            if (this.IC2surplusInGJ < 0.001F) {
-                this.IC2surplusInGJ = 0F;
-                return Math.ceil(this.storage.receiveEnergyGC(Integer.MAX_VALUE, true) / EnergyConfigHandler.IC2_RATIO);
-            }
-
-            final float received = this.storage.receiveEnergyGC(this.IC2surplusInGJ, true);
-            if (received == this.IC2surplusInGJ) {
-                return Math.ceil(
-                    (this.storage.receiveEnergyGC(Integer.MAX_VALUE, true) - this.IC2surplusInGJ)
-                        / EnergyConfigHandler.IC2_RATIO);
-            }
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return 0D;
-    }
-
-    @Override
-    public double injectEnergy(ForgeDirection direction, double amount, double voltage) {
-        if (!EnergyConfigHandler.disableIC2Input
-            && (direction == ForgeDirection.UNKNOWN || this.getElectricalInputDirections()
-                .contains(direction))) {
-            final float convertedEnergy = (float) amount * EnergyConfigHandler.IC2_RATIO;
-            final int tierFromIC2 = (int) voltage > 120 ? 2 : 1;
-            final float receive = this.receiveElectricity(direction, convertedEnergy, tierFromIC2, true);
-
-            if (convertedEnergy > receive) {
-                this.IC2surplusInGJ = convertedEnergy - receive;
-            } else {
-                this.IC2surplusInGJ = 0F;
-            }
-
-            // injectEnergy returns left over energy but all is used or goes into 'surplus'
-            return 0D;
-        }
-
-        return amount;
-    }
-
-    @Override
-    public int getSinkTier() {
-        return 3;
-    }
-
-    @Override
-    public boolean acceptsEnergyFrom(TileEntity emitter, ForgeDirection direction) {
-        // Don't add connection to IC2 grid if it's a Galacticraft tile
-        if (emitter instanceof IElectrical || emitter instanceof IConductor) {
-            return false;
-        }
-
-        try {
-            final Class<?> energyTile = Class.forName("ic2.api.energy.tile.IEnergyTile");
-            if (!energyTile.isInstance(emitter)) {
-                return false;
-            }
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-
-        return this.getElectricalInputDirections()
-            .contains(direction);
-    }
 
     @Override
     public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
@@ -445,17 +314,5 @@ public abstract class TileBaseUniversalElectrical extends EnergyStorageTile
         }
 
         return null;
-    }
-
-    /*
-     * Compatibility: call this if the facing metadata is updated
-     */
-    public void updateFacing() {
-        if (EnergyConfigHandler.isIndustrialCraft2Loaded() && !this.worldObj.isRemote) {
-            // This seems the only method to tell IC2 the connection sides have changed
-            // (Maybe there is an internal refresh() method but it's not in the API)
-            this.unloadTileIC2();
-            // This will do an initIC2 on next tick update.
-        }
     }
 }

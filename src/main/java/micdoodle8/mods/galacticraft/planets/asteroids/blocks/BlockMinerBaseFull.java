@@ -108,10 +108,6 @@ public class BlockMinerBaseFull extends BlockTileGC {
     @Override
     public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
         float hitX, float hitY, float hitZ) {
-        final TileEntity te = par1World.getTileEntity(x, y, z);
-        if (te instanceof TileEntityMinerBase) {
-            ((TileEntityMinerBase) te).updateFacing();
-        }
         return true;
     }
 }

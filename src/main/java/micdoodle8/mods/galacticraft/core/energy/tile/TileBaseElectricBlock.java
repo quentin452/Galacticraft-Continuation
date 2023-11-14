@@ -2,7 +2,6 @@ package micdoodle8.mods.galacticraft.core.energy.tile;
 
 import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.relauncher.Side;
-import ic2.api.tile.IWrenchable;
 import micdoodle8.mods.galacticraft.api.tile.IDisableableMachine;
 import micdoodle8.mods.galacticraft.api.transmission.NetworkType;
 import micdoodle8.mods.galacticraft.api.transmission.tile.IConnector;
@@ -20,7 +19,7 @@ import java.util.EnumSet;
 
 @Interface(modid = "IC2API", iface = "ic2.api.tile.IWrenchable")
 public abstract class TileBaseElectricBlock extends TileBaseUniversalElectrical
-    implements IDisableableMachine, IConnector, IWrenchable {
+    implements IDisableableMachine, IConnector {
     // public int energyPerTick = 200;
     // private final float ueMaxEnergy;
 
@@ -151,38 +150,6 @@ public abstract class TileBaseElectricBlock extends TileBaseUniversalElectrical
     @Override
     public boolean getDisabled(int index) {
         return this.disabled;
-    }
-
-    @Override
-    public boolean wrenchCanSetFacing(EntityPlayer entityPlayer, int side) {
-        return false;
-    }
-
-    @Override
-    public short getFacing() {
-        return (short) this.worldObj.getBlockMetadata(
-            MathHelper.floor_double(this.xCoord),
-            MathHelper.floor_double(this.yCoord),
-            MathHelper.floor_double(this.zCoord));
-    }
-
-    @Override
-    public void setFacing(short facing) {}
-
-    @Override
-    public boolean wrenchCanRemove(EntityPlayer entityPlayer) {
-        return false;
-    }
-
-    @Override
-    public float getWrenchDropRate() {
-        return 1.0F;
-    }
-
-    @Override
-    public ItemStack getWrenchDrop(EntityPlayer entityPlayer) {
-        return this.getBlockType()
-            .getPickBlock(null, this.worldObj, this.xCoord, this.yCoord, this.zCoord, entityPlayer);
     }
 
     @Override

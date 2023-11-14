@@ -201,9 +201,6 @@ public class EnergyConfigHandler {
         if (!EnergyConfigHandler.isBuildcraftLoaded()) {
             EnergyConfigHandler.displayEnergyUnitsBC = false;
         }
-        if (!EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-            EnergyConfigHandler.displayEnergyUnitsIC2 = false;
-        }
         if (!EnergyConfigHandler.isMekanismLoaded()) {
             EnergyConfigHandler.displayEnergyUnitsMek = false;
         }
@@ -225,18 +222,6 @@ public class EnergyConfigHandler {
 
     public static void initGas() {
         // Nothing here
-    }
-
-    /**
-     * Checks using the FML loader too see if IC2 is loaded
-     */
-    public static boolean isIndustrialCraft2Loaded() {
-        if (!cachedIC2Loaded) {
-            cachedIC2Loaded = true;
-            cachedIC2LoadedValue = Loader.isModLoaded("IC2");
-        }
-
-        return cachedIC2LoadedValue;
     }
 
     /**

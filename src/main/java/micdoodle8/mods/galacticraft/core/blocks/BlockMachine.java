@@ -190,13 +190,6 @@ public class BlockMachine extends BlockTileGC implements ItemBlockDesc.IBlockShi
                 break;
         }
 
-        if (metadata < BlockMachine.COMPRESSOR_METADATA) {
-            final TileEntity te = par1World.getTileEntity(x, y, z);
-            if (te instanceof TileBaseUniversalElectrical) {
-                ((TileBaseUniversalElectrical) te).updateFacing();
-            }
-        }
-
         par1World.setBlockMetadataWithNotify(x, y, z, (metadata & 12) + change, 3);
         return true;
     }

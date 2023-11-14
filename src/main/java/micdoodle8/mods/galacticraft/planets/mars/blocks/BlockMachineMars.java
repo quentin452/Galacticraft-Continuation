@@ -266,14 +266,6 @@ public class BlockMachineMars extends BlockTileGC implements ItemBlockDesc.IBloc
             change += BlockMachineMars.LAUNCH_CONTROLLER_METADATA;
         }
 
-        if (metadata >= BlockMachineMars.LAUNCH_CONTROLLER_METADATA
-            || metadata < BlockMachineMars.CRYOGENIC_CHAMBER_METADATA) {
-            final TileEntity te = par1World.getTileEntity(x, y, z);
-            if (te instanceof TileBaseUniversalElectrical) {
-                ((TileBaseUniversalElectrical) te).updateFacing();
-            }
-        }
-
         par1World.setBlockMetadataWithNotify(x, y, z, change, 3);
         return true;
     }

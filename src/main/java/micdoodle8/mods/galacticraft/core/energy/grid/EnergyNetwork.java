@@ -3,7 +3,6 @@ package micdoodle8.mods.galacticraft.core.energy.grid;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyReceiver;
 import cpw.mods.fml.common.FMLLog;
-import ic2.api.energy.tile.IEnergySink;
 import micdoodle8.mods.galacticraft.api.transmission.grid.IElectricityNetwork;
 import micdoodle8.mods.galacticraft.api.transmission.tile.IConductor;
 import micdoodle8.mods.galacticraft.api.transmission.tile.IElectrical;
@@ -30,8 +29,6 @@ public class EnergyNetwork implements IElectricityNetwork {
 
     private final boolean isRF1Loaded = EnergyConfigHandler.isRFAPIv1Loaded() && !EnergyConfigHandler.disableRFOutput;
     private final boolean isRF2Loaded = EnergyConfigHandler.isRFAPIv2Loaded() && !EnergyConfigHandler.disableRFOutput;
-    private final boolean isIC2Loaded = EnergyConfigHandler.isIndustrialCraft2Loaded()
-        && !EnergyConfigHandler.disableIC2Output;
 
     /*
      * Re-written by radfast for better performance Imagine a 30 producer, 80 acceptor network... Before: it would have
@@ -228,19 +225,6 @@ public class EnergyNetwork implements IElectricityNetwork {
 
                     if (acceptor instanceof IElectrical) {
                         e = ((IElectrical) acceptor).getRequest(sideFrom);
-                    } else if (this.isIC2Loaded && acceptor instanceof IEnergySink) {
-                        double result = 0;
-                        try {
-                            result = (Double) EnergyUtil.demandedEnergyIC2.invoke(acceptor);
-                        } catch (final Exception ex) {
-                            if (ConfigManagerCore.enableDebug) {
-                                ex.printStackTrace();
-                            }
-                        }
-                        // Cap IC2 power transfer at 128EU/t for standard Alu wire, 256EU/t for heavy
-                        // Alu wire
-                        result = Math.min(result, this.networkTierGC == 2 ? 256D : 128D);
-                        e = (float) result / EnergyConfigHandler.TO_IC2_RATIO;
                     } else if (this.isRF2Loaded && acceptor instanceof IEnergyReceiver) {
                         e = ((IEnergyReceiver) acceptor).receiveEnergy(sideFrom, Integer.MAX_VALUE, true)
                             / EnergyConfigHandler.TO_RF_RATIO;
@@ -333,30 +317,6 @@ public class EnergyNetwork implements IElectricityNetwork {
                     if (tileEntity instanceof IElectrical) {
                         sentToAcceptor = ((IElectrical) tileEntity)
                             .receiveElectricity(sideFrom, currentSending, tierProduced, true);
-                    } else if (this.isIC2Loaded && tileEntity instanceof IEnergySink) {
-                        final double energySendingIC2 = currentSending * EnergyConfigHandler.TO_IC2_RATIO;
-                        if (energySendingIC2 >= 1D) {
-                            double result = 0;
-                            try {
-                                if (EnergyUtil.voltageParameterIC2) {
-                                    result = (Double) EnergyUtil.injectEnergyIC2
-                                        .invoke(tileEntity, sideFrom, energySendingIC2, 120D);
-                                } else {
-                                    result = (Double) EnergyUtil.injectEnergyIC2
-                                        .invoke(tileEntity, sideFrom, energySendingIC2);
-                                }
-                            } catch (final Exception ex) {
-                                if (ConfigManagerCore.enableDebug) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                            sentToAcceptor = currentSending - (float) result / EnergyConfigHandler.TO_IC2_RATIO;
-                            if (sentToAcceptor < 0F) {
-                                sentToAcceptor = 0F;
-                            }
-                        } else {
-                            sentToAcceptor = 0F;
-                        }
                     } else if (this.isRF2Loaded && tileEntity instanceof IEnergyReceiver) {
                         final int currentSendinginRF = currentSending
                             >= Integer.MAX_VALUE / EnergyConfigHandler.TO_RF_RATIO ? Integer.MAX_VALUE

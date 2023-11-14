@@ -106,11 +106,6 @@ public class BlockFuelLoader extends BlockAdvancedTile implements ItemBlockDesc.
 
         par1World.setBlockMetadataWithNotify(x, y, z, change, 3);
 
-        final TileEntity te = par1World.getTileEntity(x, y, z);
-        if (te instanceof TileBaseUniversalElectrical) {
-            ((TileBaseUniversalElectrical) te).updateFacing();
-        }
-
         return true;
     }
 

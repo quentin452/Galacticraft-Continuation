@@ -138,11 +138,6 @@ public class BlockDish extends BlockTileGC implements ItemBlockDesc.IBlockShiftD
                 break;
         }
 
-        final TileEntity te = par1World.getTileEntity(x, y, z);
-        if (te instanceof TileBaseUniversalElectrical) {
-            ((TileBaseUniversalElectrical) te).updateFacing();
-        }
-
         par1World.setBlockMetadataWithNotify(x, y, z, change, 3);
         return true;
     }

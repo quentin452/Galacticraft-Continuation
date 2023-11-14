@@ -4,8 +4,6 @@ import cofh.api.energy.IEnergyContainerItem;
 import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.common.Optional.InterfaceList;
 import cpw.mods.fml.common.Optional.Method;
-import ic2.api.item.IElectricItemManager;
-import ic2.api.item.ISpecialElectricItem;
 import mekanism.api.energy.IEnergizedItem;
 import micdoodle8.mods.galacticraft.api.item.ElectricItemHelper;
 import micdoodle8.mods.galacticraft.api.item.IItemElectricBase;
@@ -25,10 +23,9 @@ import net.minecraft.world.World;
 import java.util.List;
 
 @InterfaceList({ @Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyContainerItem"),
-    @Interface(modid = "IC2API", iface = "ic2.api.item.ISpecialElectricItem"),
     @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.IEnergizedItem"), })
 public abstract class ItemElectricBase extends Item
-    implements IItemElectricBase, IEnergyContainerItem, ISpecialElectricItem, IEnergizedItem {
+    implements IItemElectricBase, IEnergyContainerItem, IEnergizedItem {
 
     private static Object itemManagerIC2;
     public float transferMax;
@@ -38,10 +35,6 @@ public abstract class ItemElectricBase extends Item
         this.setMaxDamage(100);
         this.setNoRepair();
         this.setMaxTransfer();
-
-        if (EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-            itemManagerIC2 = new ElectricItemManagerIC2_1710();
-        }
     }
 
     protected void setMaxTransfer() {
@@ -168,15 +161,7 @@ public abstract class ItemElectricBase extends Item
     }
 
     public static boolean isElectricItem(Item item) {
-        if (item instanceof IItemElectricBase) {
-            return true;
-        }
-
-        if (EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-            return item instanceof ISpecialElectricItem;
-        }
-
-        return false;
+        return item instanceof IItemElectricBase;
     }
 
     public static boolean isElectricItemEmpty(ItemStack itemstack) {
@@ -187,10 +172,6 @@ public abstract class ItemElectricBase extends Item
 
         if (item instanceof IItemElectricBase) {
             return ((IItemElectricBase) item).getElectricityStored(itemstack) <= 0;
-        }
-
-        if (EnergyConfigHandler.isIndustrialCraft2Loaded() && item instanceof ic2.api.item.ISpecialElectricItem) {
-            return !((ic2.api.item.ISpecialElectricItem) item).canProvideEnergy(itemstack);
         }
 
         return false;
@@ -204,10 +185,6 @@ public abstract class ItemElectricBase extends Item
 
         if (item instanceof IItemElectricBase) {
             return ((IItemElectricBase) item).getElectricityStored(itemstack) > 0;
-        }
-
-        if (EnergyConfigHandler.isIndustrialCraft2Loaded() && item instanceof ic2.api.item.ISpecialElectricItem) {
-            return ((ic2.api.item.ISpecialElectricItem) item).canProvideEnergy(itemstack);
         }
 
         return false;
@@ -275,11 +252,13 @@ public abstract class ItemElectricBase extends Item
 
     // All the following methods are for IC2 compatibility
 
-    @Override
+   /* @Override
     @Method(modid = "IC2API")
     public IElectricItemManager getManager(ItemStack itemstack) {
         return (IElectricItemManager) ItemElectricBase.itemManagerIC2;
     }
+
+
 
     @Override
     public boolean canProvideEnergy(ItemStack itemStack) {
@@ -310,4 +289,6 @@ public abstract class ItemElectricBase extends Item
     public double getTransferLimit(ItemStack itemStack) {
         return this.transferMax * EnergyConfigHandler.TO_IC2_RATIO;
     }
+
+    */
 }

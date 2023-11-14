@@ -251,11 +251,6 @@ public class BlockMachine2 extends BlockTileGC implements ItemBlockDesc.IBlockSh
             original -= BlockMachine2.CIRCUIT_FABRICATOR_METADATA;
         } else if (metadata >= BlockMachine2.ELECTRIC_COMPRESSOR_METADATA) {
             original -= BlockMachine2.ELECTRIC_COMPRESSOR_METADATA;
-
-            final TileEntity te = par1World.getTileEntity(x, y, z);
-            if (te instanceof TileBaseUniversalElectrical) {
-                ((TileBaseUniversalElectrical) te).updateFacing();
-            }
         }
 
         // Re-orient the block

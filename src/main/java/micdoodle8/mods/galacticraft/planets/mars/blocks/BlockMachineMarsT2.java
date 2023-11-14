@@ -186,11 +186,6 @@ public class BlockMachineMarsT2 extends BlockTileGC implements ItemBlockDesc.IBl
                 break;
         }
 
-        final TileEntity te = par1World.getTileEntity(x, y, z);
-        if (te instanceof TileBaseUniversalElectrical) {
-            ((TileBaseUniversalElectrical) te).updateFacing();
-        }
-
         par1World.setBlockMetadataWithNotify(x, y, z, (metadata & 12) + change, 3);
         return true;
     }

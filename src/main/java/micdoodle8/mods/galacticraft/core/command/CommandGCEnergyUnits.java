@@ -19,9 +19,6 @@ public class CommandGCEnergyUnits extends CommandBase {
         if (EnergyConfigHandler.isBuildcraftLoaded()) {
             options.append("|MJ");
         }
-        if (EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-            options.append("|EU");
-        }
         if (EnergyConfigHandler.isMekanismLoaded()) {
             options.append("|J");
         }
@@ -62,12 +59,10 @@ public class CommandGCEnergyUnits extends CommandBase {
                     paramvalue = 1;
                 } else if ("mj".equals(param) && EnergyConfigHandler.isBuildcraftLoaded()) {
                     paramvalue = 2;
-                } else if ("eu".equals(param) && EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-                    paramvalue = 3;
                 } else if ("j".equals(param) && EnergyConfigHandler.isMekanismLoaded()) {
-                    paramvalue = 4;
+                    paramvalue = 3;
                 } else if ("rf".equals(param)) {
-                    paramvalue = 5;
+                    paramvalue = 4;
                 }
 
                 if (paramvalue > 0) {
@@ -99,14 +94,6 @@ public class CommandGCEnergyUnits extends CommandBase {
         if (param == 2 && EnergyConfigHandler.isBuildcraftLoaded()) {
             EnergyConfigHandler.displayEnergyUnitsBC = true;
             EnergyConfigHandler.displayEnergyUnitsIC2 = false;
-            EnergyConfigHandler.displayEnergyUnitsMek = false;
-            EnergyConfigHandler.displayEnergyUnitsRF = false;
-            return;
-        }
-
-        if (param == 3 && EnergyConfigHandler.isIndustrialCraft2Loaded()) {
-            EnergyConfigHandler.displayEnergyUnitsBC = false;
-            EnergyConfigHandler.displayEnergyUnitsIC2 = true;
             EnergyConfigHandler.displayEnergyUnitsMek = false;
             EnergyConfigHandler.displayEnergyUnitsRF = false;
             return;

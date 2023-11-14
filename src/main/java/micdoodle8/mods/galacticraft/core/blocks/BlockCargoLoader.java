@@ -174,12 +174,6 @@ public class BlockCargoLoader extends BlockAdvancedTile implements ItemBlockDesc
                 change = 0;
                 break;
         }
-
-        final TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileBaseUniversalElectrical) {
-            ((TileBaseUniversalElectrical) te).updateFacing();
-        }
-
         return world.setBlockMetadataWithNotify(x, y, z, baseMeta + change, 3);
     }
 

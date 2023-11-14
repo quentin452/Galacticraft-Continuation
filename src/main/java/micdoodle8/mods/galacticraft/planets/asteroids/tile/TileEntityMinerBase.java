@@ -404,40 +404,6 @@ public class TileEntityMinerBase extends TileBaseElectricBlockWithInventory impl
             .getBoundingBox(this.xCoord, this.yCoord, this.zCoord, this.xCoord + 2, this.yCoord + 2, this.zCoord + 2);
     }
 
-    @Override
-    public void updateFacing() {
-        if (this.isMaster && this.linkedMinerID == null) {
-            // Re-orient the block
-            switch (this.facing) {
-                case 0:
-                    this.facing = 3;
-                    break;
-                case 3:
-                    this.facing = 1;
-                    break;
-                case 1:
-                    this.facing = 2;
-                    break;
-                case 2:
-                    this.facing = 0;
-                    break;
-            }
-
-            super.updateFacing();
-        } else {
-            final TileEntityMinerBase master = this.getMaster();
-            if (master != null) {
-                master.updateFacing();
-            }
-        }
-
-        if (!this.worldObj.isRemote) {
-            this.updateClient();
-        }
-
-        this.markDirty();
-    }
-
     private void updateClient() {
         int x = this.xCoord;
         int y = this.yCoord;
