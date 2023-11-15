@@ -11,7 +11,7 @@ public class Constants {
 
     public static final String MOD_ID_GALAXYSPACE = "GalaxySpace";
 
-    public static final String VERSION = Tags.VERSION;
+    public static final String VERSION = "4.0.9";
 
     public static final String CONFIG_CATEGORY_DIMENSIONS = "dimensions";
     public static final String CONFIG_CATEGORY_ENTITIES = "entities";

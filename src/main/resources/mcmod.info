@@ -3,8 +3,8 @@
     "modid": "${modId}",
     "name": "${modName}",
     "description": "An advanced space travel mod for Minecraft 1.7; Maintained by the GTNH team",
-    "version": "${modVersion}",
-    "mcversion": "${minecraftVersion}",
+    "version": "4.0.9",
+    "mcversion": "1.7.10",
     "url": "https://github.com/GTNewHorizons/Galacticraft",
     "updateUrl": "https://github.com/GTNewHorizons/Galacticraft",
     "authorList": [
