@@ -436,4 +436,11 @@ public class EnergyConfigHandler {
         EnergyConfigHandler.conversionLossFactor = sLossRatio;
         updateRatios();
     }
+    public static boolean isIndustrialCraft2Loaded() {
+        if (!cachedIC2Loaded) {
+            cachedIC2Loaded = true;
+            cachedIC2LoadedValue = Loader.isModLoaded("IC2");
+        }
+        return cachedIC2LoadedValue;
+    }
 }
