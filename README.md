@@ -16,7 +16,7 @@ Go here : [Wiki](https://github.com/quentin452/Galacticraft-Continuation/wiki)
 
 [Tinker's Construct](https://github.com/GTNewHorizons/TinkersConstruct/releases/tag/1.10.11-GTNH)
 
-[OptimizationsAndTweaks V1.4.8 and newer](https://github.com/quentin452/OptimizationsAndTweaks/releases)
+[OptimizationsAndTweaks](https://github.com/quentin452/OptimizationsAndTweaks/releases)
 
 # Discord
 
