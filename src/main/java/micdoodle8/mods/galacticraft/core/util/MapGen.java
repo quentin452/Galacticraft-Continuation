@@ -1,5 +1,6 @@
 package micdoodle8.mods.galacticraft.core.util;
 
+import fr.iamacat.optimizationsandtweaks.noise.NoiseGeneratorOctavesMultithread;
 import micdoodle8.mods.galacticraft.core.GalacticraftCore;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple;
 import micdoodle8.mods.galacticraft.core.network.PacketSimple.EnumSimplePacket;
@@ -303,17 +304,17 @@ public class MapGen {
     static double[] noiseField1;
     static double[] noiseField2;
     static double[] noiseField4;
-    private NoiseGeneratorOctaves noiseGen1;
-    private NoiseGeneratorOctaves noiseGen2;
-    private NoiseGeneratorOctaves noiseGen3;
-    public NoiseGeneratorOctaves noiseGen4;
+    private NoiseGeneratorOctavesMultithread noiseGen1;
+    private NoiseGeneratorOctavesMultithread noiseGen2;
+    private NoiseGeneratorOctavesMultithread noiseGen3;
+    public NoiseGeneratorOctavesMultithread noiseGen4;
 
     public void initialise(long seed) {
         this.rand = new Random(seed);
-        this.noiseGen1 = new NoiseGeneratorOctaves(this.rand, 16);
-        this.noiseGen2 = new NoiseGeneratorOctaves(this.rand, 16);
-        this.noiseGen3 = new NoiseGeneratorOctaves(this.rand, 8);
-        this.noiseGen4 = new NoiseGeneratorOctaves(this.rand, 16);
+        this.noiseGen1 = new NoiseGeneratorOctavesMultithread(this.rand, 16);
+        this.noiseGen2 = new NoiseGeneratorOctavesMultithread(this.rand, 16);
+        this.noiseGen3 = new NoiseGeneratorOctavesMultithread(this.rand, 8);
+        this.noiseGen4 = new NoiseGeneratorOctavesMultithread(this.rand, 16);
     }
 
     private void func_147423_a(int cx, int cy, int cz) {

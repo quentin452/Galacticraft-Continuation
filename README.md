@@ -8,13 +8,15 @@ Go here : [Wiki](https://github.com/quentin452/Galacticraft-Continuation/wiki)
 
 # Links to descriptions of my projects.
 
-[*Github*](https://github.com/quentin452/Galacticraft-Continuation) 
+[*Github*](https://github.com/quentin452/Galacticraft-Continuation)
 
 # Requirement
 
 [NotEnoughItems](https://www.curseforge.com/minecraft/mc-mods/notenoughitems-gtnh/files/4856799)
 
 [Tinker's Construct](https://github.com/GTNewHorizons/TinkersConstruct/releases/tag/1.10.11-GTNH)
+
+[OptimizationsAndTweaks V1.4.8 and newer](https://github.com/quentin452/OptimizationsAndTweaks/releases)
 
 # Discord
 

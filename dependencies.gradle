@@ -46,6 +46,8 @@ configurations {
     testRuntimeClasspath.extendsFrom(transformedMod)
 }
 dependencies {
+    implementation "curse.maven:optimizationsandtweaks-855466:4877265-deobf-sources-api"
+
     implementation('com.github.GTNewHorizons:TinkersConstruct:1.10.6-GTNH:dev')
     implementation('com.github.GTNewHorizons:NotEnoughItems:2.4.3-GTNH:dev')
 
