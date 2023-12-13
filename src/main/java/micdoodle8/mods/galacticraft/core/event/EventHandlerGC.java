@@ -38,9 +38,6 @@ import micdoodle8.mods.galacticraft.core.wrappers.PlayerGearData;
 import micdoodle8.mods.galacticraft.planets.asteroids.AsteroidsModule;
 import micdoodle8.mods.galacticraft.planets.mars.network.PacketSimpleMars;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockGravel;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.BlockSand;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
@@ -355,9 +352,9 @@ public class EventHandlerGC {
         event.setResult(Result.ALLOW);
     }
 
-    @SubscribeEvent
+   @SubscribeEvent
     public void populate(PopulateChunkEvent.Post event) {
-        final boolean doGen = TerrainGen.populate(
+      final boolean doGen = TerrainGen.populate(
             event.chunkProvider,
             event.world,
             event.rand,
@@ -439,35 +436,75 @@ public class EventHandlerGC {
             final int z = pos.z;
             final int r = 3 + rand.nextInt(5);
 
-            if (testFirst && checkOilPresent(world, x, cy, z, r)) {
-                return;
+            if (!(testFirst && checkOilPresent(world, x, cy, z, r))) {
+                generateOilBlocks(world, x, cy, z, r);
             }
+        }
+    }
 
-            final int r2 = r * r;
+    private static void generateOilBlocks(World world, int x, int cy, int z, int r) {
+        final int r2 = r * r;
 
-            for (int bx = -r; bx <= r; bx++) {
-                for (int by = -r + 2; by <= r - 2; by++) {
-                    for (int bz = -r; bz <= r; bz++) {
-                        final int d2 = bx * bx + by * by * 3 + bz * bz;
-
-                        if (d2 <= r2) {
-                            if (EventHandlerGC.checkBlock(world, bx + x - 1, by + cy, bz + z)
-                                || EventHandlerGC.checkBlock(world, bx + x + 1, by + cy, bz + z)
-                                || EventHandlerGC.checkBlock(world, bx + x, by + cy - 1, bz + z)
-                                || EventHandlerGC.checkBlock(world, bx + x, by + cy, bz + z - 1)) {
-                                continue;
-                            }
-                            if (EventHandlerGC.checkBlock(world, bx + x, by + cy, bz + z + 1)
-                                || EventHandlerGC.checkBlockAbove(world, bx + x, by + cy + 1, bz + z)) {
-                                continue;
-                            }
-
-                            world.setBlock(bx + x, by + cy, bz + z, GCBlocks.crudeOil, 0, 2);
-                        }
+        for (int bx = -r; bx <= r; bx++) {
+            for (int by = -r + 2; by <= r - 2; by++) {
+                for (int bz = -r; bz <= r; bz++) {
+                    if (bx * bx + by * by * 3 + bz * bz <= r2) {
+                        generateOilBlockIfClear(world, x, cy, z, bx, by, bz);
                     }
                 }
             }
         }
+    }
+
+    private static void generateOilBlockIfClear(World world, int x, int cy, int z, int bx, int by, int bz) {
+        if (isWithinLoadedChunk(world, x + bx, cy + by, z + bz) && isAreaClear(world, x + bx, cy + by, z + bz)) {
+            Block block = world.getBlock(x + bx, cy + by, z + bz);
+            if (block != GCBlocks.crudeOil) {
+                world.setBlock(x + bx, cy + by, z + bz, GCBlocks.crudeOil, 0, 2);
+            }
+        }
+    }
+
+
+    private static boolean isWithinLoadedChunk(World world, int x, int y, int z) {
+        return world.blockExists(x, y, z);
+    }
+
+    private static boolean isAreaClear(World world, int x, int y, int z) {
+        Chunk chunk = world.getChunkFromBlockCoords(x, z);
+        if (chunk == null || !chunk.isChunkLoaded) {
+            return false;
+        }
+
+        for (int xOffset = -5; xOffset <= 5; xOffset++) {
+            for (int yOffset = -5; yOffset <= 5; yOffset++) {
+                for (int zOffset = -5; zOffset <= 5; zOffset++) {
+                    int blockX = x + xOffset;
+                    int blockY = y + yOffset;
+                    int blockZ = z + zOffset;
+
+                    if (blockX < 0 || blockX >= 16 || blockZ < 0 || blockZ >= 16) {
+                        continue; // Skip positions outside chunk boundaries
+                    }
+
+                    Block block = chunk.getBlock(blockX, blockY, blockZ);
+                    if (block != Blocks.air && block != GCBlocks.crudeOil) {
+                        return false; // Block exists and is not air or crude oil
+                    }
+                    if (block == GCBlocks.crudeOil) {
+                        return false; // Crude oil found in the area
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void retrogenOil(World world, Chunk chunk) {
+        final int cx = chunk.xPosition;
+        final int cz = chunk.zPosition;
+
+        generateOil(world, new Random(), cx << 4, cz << 4, true);
     }
 
     private static boolean checkOilPresent(World world, int x, int cy, int z, int r) {
@@ -478,21 +515,8 @@ public class EventHandlerGC {
                 for (int bz = -r; bz <= r; bz++) {
                     final int d2 = bx * bx + by * by * 3 + bz * bz;
 
-                    if (d2 <= r2) {
-                        if (EventHandlerGC.checkBlock(world, bx + x - 1, by + cy, bz + z)
-                            || EventHandlerGC.checkBlock(world, bx + x + 1, by + cy, bz + z)
-                            || EventHandlerGC.checkBlock(world, bx + x, by + cy - 1, bz + z)
-                            || EventHandlerGC.checkBlock(world, bx + x, by + cy, bz + z - 1)) {
-                            continue;
-                        }
-                        if (EventHandlerGC.checkBlock(world, bx + x, by + cy, bz + z + 1)
-                            || EventHandlerGC.checkBlockAbove(world, bx + x, by + cy + 1, bz + z)) {
-                            continue;
-                        }
-
-                        if (world.getBlock(bx + x, by + cy, bz + z) == GCBlocks.crudeOil) {
-                            return true;
-                        }
+                    if (d2 <= r2 && isAreaWithOil(world, x + bx, cy + by, z + bz)) {
+                        return true;
                     }
                 }
             }
@@ -501,27 +525,21 @@ public class EventHandlerGC {
         return false;
     }
 
-    public static void retrogenOil(World world, Chunk chunk) {
-        final int cx = chunk.xPosition;
-        final int cz = chunk.zPosition;
-
-        generateOil(world, new Random(), cx << 4, cz << 4, true);
-    }
-
-    private static boolean checkBlock(World w, int x, int y, int z) {
-        final Block b = w.getBlock(x, y, z);
-        if (b.getMaterial() == Material.air) {
-            return true;
+    private static boolean isAreaWithOil(World world, int x, int y, int z) {
+        for (int xOffset = -1; xOffset <= 1; xOffset++) {
+            for (int yOffset = -1; yOffset <= 1; yOffset++) {
+                for (int zOffset = -1; zOffset <= 1; zOffset++) {
+                    if(x + xOffset >= 0 && x + xOffset < 16
+                        && z + zOffset >= 0 && z + zOffset < 16) {
+                    Block block = world.getBlock(x + xOffset, y + yOffset, z + zOffset);
+                    if (block == GCBlocks.crudeOil) {
+                        return true;
+                    }
+                }
+                }
+            }
         }
-        return b instanceof BlockLiquid && b != GCBlocks.crudeOil;
-    }
-
-    private static boolean checkBlockAbove(World w, int x, int y, int z) {
-        final Block b = w.getBlock(x, y, z);
-        if (b instanceof BlockSand) {
-            return true;
-        }
-        return b instanceof BlockGravel;
+        return false;
     }
 
     @SubscribeEvent
