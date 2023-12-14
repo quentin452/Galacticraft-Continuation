@@ -83,7 +83,7 @@ import java.util.HashMap;
     version = Constants.VERSION,
     acceptedMinecraftVersions = "[1.7.10]",
     useMetadata = true,
-    dependencies = "required-after:NotEnoughItems;before:GalaxySpace;after:IC2;after:TConstruct;after:Mantle;after:BuildCraft|Core;after:BuildCraft|Energy;after:PlayerAPI@[1.3,)",
+    dependencies = "required-after:NotEnoughItems;required-after:unimixins;required-after:optimizationsandtweaks;required-after:falsepatternlib;before:GalaxySpace;after:IC2;after:TConstruct;after:Mantle;after:BuildCraft|Core;after:BuildCraft|Energy;after:PlayerAPI@[1.3,)",
     guiFactory = "micdoodle8.mods.galacticraft.core.client.gui.screen.ConfigGuiFactoryCore")
 public class GalacticraftCore {
 

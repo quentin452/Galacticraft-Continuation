@@ -46,7 +46,15 @@ configurations {
     testRuntimeClasspath.extendsFrom(transformedMod)
 }
 dependencies {
+
+    //Dev-only deps
+    compileOnly("org.projectlombok:lombok:[1.18.24,1.19)") {
+        transitive = false
+    }
+    annotationProcessor("org.projectlombok:lombok:[1.18.24,1.19)")
     implementation "curse.maven:optimizationsandtweaks-855466:4877265-deobf-sources-api"
+    implementation "curse.maven:itemphysic-258587:2498124-deobf-sources-api"
+    implementation "curse.maven:fplib-665627:4905393-deobf-sources-api"
 
     implementation('com.github.GTNewHorizons:TinkersConstruct:1.10.6-GTNH:dev')
     implementation('com.github.GTNewHorizons:NotEnoughItems:2.4.3-GTNH:dev')

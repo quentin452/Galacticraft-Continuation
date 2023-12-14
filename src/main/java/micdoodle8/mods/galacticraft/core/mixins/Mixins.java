@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+// todo completly move to MixinsRewrite
 
 public enum Mixins {
 
@@ -22,16 +24,13 @@ public enum Mixins {
         .addMixinClasses("minecraft.EffectRendererMixin")
         .addTargetedMod(TargetedMod.VANILLA)),
     MODIFY_ENTITY_GRAVITY(new Builder("Entities respect changing gravity").setPhase(Phase.EARLY)
-        .addMixinClasses("minecraft.EntityArrowMixin", "minecraft.EntityItemMixin", "minecraft.EntityLivingBaseMixin")
+        .addMixinClasses("minecraft.EntityArrowMixin", "minecraft.EntityLivingBaseMixin")
         .addTargetedMod(TargetedMod.VANILLA)),
+
     ALLOW_GOLEM_BREATHING(new Builder("Golems don't need oxygen to breath").setPhase(Phase.EARLY)
         .addMixinClasses("minecraft.EntityGolemMixin")
         .addTargetedMod(TargetedMod.VANILLA)),
-    PREVENT_FIRE_RENDERING_WITHOUT_O2(
-        new Builder("No 'onFire' animation is rendered if there is no oxygen").setPhase(Phase.EARLY)
-            .setSide(Side.CLIENT)
-            .addMixinClasses("minecraft.EntityMixin")
-            .addTargetedMod(TargetedMod.VANILLA)),
+
     ADAPT_ENTITY_RENDERER(new Builder("Adapt lightmap, fogcolor and cameraorientation").setPhase(Phase.EARLY)
         .setSide(Side.CLIENT)
         .addMixinClasses("minecraft.EntityRendererMixin")
@@ -42,6 +41,8 @@ public enum Mixins {
             .addMixinClasses("minecraft.EntityRendererWithoutOptifineMixin")
             .addTargetedMod(TargetedMod.VANILLA)
             .addExcludedMod(TargetedMod.OPTIFINE)),
+
+
     INJECT_SLEEP_CANCELLED_EVENT(new Builder("Inject SleepCancelledEvent").setPhase(Phase.EARLY)
         .setSide(Side.CLIENT)
         .addMixinClasses("minecraft.GuiSleepMPMxin")

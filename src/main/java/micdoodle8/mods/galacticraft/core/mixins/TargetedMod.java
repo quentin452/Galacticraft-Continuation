@@ -1,8 +1,9 @@
 package micdoodle8.mods.galacticraft.core.mixins;
-
+// todo completly move to TargetedModRewrite
 public enum TargetedMod {
 
     VANILLA("Minecraft", null),
+    ITEMPHYSICFULL("ItemPhysic Full", "com.creativemd.itemphysic.physics.ServerPhysic", "itemphysic"),
     FORGE("Minecraft Forge", "net.minecraftforge.classloading.FMLForgePlugin", "Forge"),
     PLAYERAPI("Player API", "api.player.forge.PlayerAPIPlugin", "PlayerAPI"),
     OPTIFINE("Optifine", "optifine.OptiFineForgeTweaker", "Optifine");
