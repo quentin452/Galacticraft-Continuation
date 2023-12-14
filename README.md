@@ -18,6 +18,11 @@ Go here : [Wiki](https://github.com/quentin452/Galacticraft-Continuation/wiki)
 
 [OptimizationsAndTweaks](https://github.com/quentin452/OptimizationsAndTweaks/releases)
 
+[Unimixins](https://legacy.curseforge.com/minecraft/mc-mods/unimixins)
+
+[Falsepatternlib](https://legacy.curseforge.com/minecraft/mc-mods/fplib)
+
+
 # Discord
 
 Add me on discord : imacatfr
