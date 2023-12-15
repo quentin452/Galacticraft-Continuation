@@ -818,23 +818,19 @@ public class GCPlayerHandler {
         SchematicRegistry.addUnlockedPage(player, SchematicRegistry.getMatchingRecipeForID(0));
         SchematicRegistry.addUnlockedPage(player, SchematicRegistry.getMatchingRecipeForID(Integer.MAX_VALUE));
 
-        Collections.sort(playerStats.unlockedSchematics);
+        // Sort only if necessary, i.e., when the size of the collection changes
+        if (playerStats.unlockedSchematics.size() != playerStats.lastUnlockedSchematics.size()
+            || (player.ticksExisted - 1) % 100 == 0) {
+            playerStats.unlockedSchematics.sort(Comparator.comparingInt(p -> p == null ? -2 : p.getPageID()));
 
-        if (player.playerNetServerHandler != null
-            && (playerStats.unlockedSchematics.size() != playerStats.lastUnlockedSchematics.size()
-                || (player.ticksExisted - 1) % 100 == 0)) {
-            final Integer[] iArray = new Integer[playerStats.unlockedSchematics.size()];
+            if (player.playerNetServerHandler != null) {
+                final Integer[] iArray = playerStats.unlockedSchematics.stream()
+                    .map(p -> p == null ? -2 : p.getPageID())
+                    .toArray(Integer[]::new);
 
-            for (int i = 0; i < iArray.length; i++) {
-                final ISchematicPage page = playerStats.unlockedSchematics.get(i);
-                iArray[i] = page == null ? -2 : page.getPageID();
+                GalacticraftCore.packetPipeline.sendTo(new PacketSimple(EnumSimplePacket.C_UPDATE_SCHEMATIC_LIST,
+                    Collections.singletonList(iArray)), player);
             }
-
-            final List<Object> objList = new ArrayList<>();
-            objList.add(iArray);
-
-            GalacticraftCore.packetPipeline
-                .sendTo(new PacketSimple(EnumSimplePacket.C_UPDATE_SCHEMATIC_LIST, objList), player);
         }
     }
 
