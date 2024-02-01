@@ -52,7 +52,6 @@ dependencies {
         transitive = false
     }
     annotationProcessor("org.projectlombok:lombok:[1.18.24,1.19)")
-    implementation "curse.maven:optimizationsandtweaks-855466:4877265-deobf-sources-api"
     implementation "curse.maven:itemphysic-258587:2498124-deobf-sources-api"
     implementation "curse.maven:fplib-665627:4905393-deobf-sources-api"
 
@@ -69,4 +68,6 @@ dependencies {
     compileOnly('curse.maven:mekanism-268560:2475797')
 
     runtimeOnly('com.github.GTNewHorizons:ironchest:6.0.74:dev')
+
+    implementation files("libs/optimizationsandtweaks-V1.13.7.jar")
 }
