@@ -1,13 +1,14 @@
 package micdoodle8.mods.galacticraft.planets;
 
-import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.relauncher.Side;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
+import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.network.IGuiHandler;
+import cpw.mods.fml.relauncher.Side;
 
 public class PlanetsProxy implements IGuiHandler {
 

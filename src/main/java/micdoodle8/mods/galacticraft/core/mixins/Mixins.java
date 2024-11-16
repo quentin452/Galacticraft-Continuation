@@ -1,13 +1,12 @@
 package micdoodle8.mods.galacticraft.core.mixins;
 
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 // todo completly move to MixinsRewrite
 
 public enum Mixins {
@@ -41,7 +40,6 @@ public enum Mixins {
             .addMixinClasses("minecraft.EntityRendererWithoutOptifineMixin")
             .addTargetedMod(TargetedMod.VANILLA)
             .addExcludedMod(TargetedMod.OPTIFINE)),
-
 
     INJECT_SLEEP_CANCELLED_EVENT(new Builder("Inject SleepCancelledEvent").setPhase(Phase.EARLY)
         .setSide(Side.CLIENT)

@@ -1,8 +1,8 @@
 package micdoodle8.mods.galacticraft.core.asm.config;
 
-import com.falsepattern.lib.config.SimpleGuiFactory;
-import fr.iamacat.optimizationsandtweaks.config.OptimizationsandTweaksGuiConfig;
 import net.minecraft.client.gui.GuiScreen;
+
+import com.falsepattern.lib.config.SimpleGuiFactory;
 
 public class GalacticraftGuiConfigFactory implements SimpleGuiFactory {
 

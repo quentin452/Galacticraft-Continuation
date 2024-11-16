@@ -1,11 +1,11 @@
 package micdoodle8.mods.galacticraft.core.world.gen;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
-
-import java.util.ArrayList;
-import java.util.Random;
 
 public class StructureVillageStartMoon extends StructureStart {
 

@@ -1,6 +1,7 @@
 package micdoodle8.mods.galacticraft.core.asm.config;
 
 import com.falsepattern.lib.config.Config;
+
 import fr.iamacat.optimizationsandtweaks.Tags;
 
 @Config(modid = Tags.MODID)

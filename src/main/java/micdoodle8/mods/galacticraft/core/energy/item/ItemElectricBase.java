@@ -1,15 +1,7 @@
 package micdoodle8.mods.galacticraft.core.energy.item;
 
-import cofh.api.energy.IEnergyContainerItem;
-import cpw.mods.fml.common.Optional.Interface;
-import cpw.mods.fml.common.Optional.InterfaceList;
-import cpw.mods.fml.common.Optional.Method;
-import mekanism.api.energy.IEnergizedItem;
-import micdoodle8.mods.galacticraft.api.item.ElectricItemHelper;
-import micdoodle8.mods.galacticraft.api.item.IItemElectricBase;
-import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
-import micdoodle8.mods.galacticraft.core.energy.EnergyDisplayHelper;
-import micdoodle8.mods.galacticraft.core.items.ItemBatteryInfinite;
+import java.util.List;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -20,12 +12,19 @@ import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.world.World;
 
-import java.util.List;
+import cofh.api.energy.IEnergyContainerItem;
+import cpw.mods.fml.common.Optional.Interface;
+import cpw.mods.fml.common.Optional.InterfaceList;
+import mekanism.api.energy.IEnergizedItem;
+import micdoodle8.mods.galacticraft.api.item.ElectricItemHelper;
+import micdoodle8.mods.galacticraft.api.item.IItemElectricBase;
+import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
+import micdoodle8.mods.galacticraft.core.energy.EnergyDisplayHelper;
+import micdoodle8.mods.galacticraft.core.items.ItemBatteryInfinite;
 
 @InterfaceList({ @Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyContainerItem"),
     @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.IEnergizedItem"), })
-public abstract class ItemElectricBase extends Item
-    implements IItemElectricBase, IEnergyContainerItem, IEnergizedItem {
+public abstract class ItemElectricBase extends Item implements IItemElectricBase, IEnergyContainerItem, IEnergizedItem {
 
     private static Object itemManagerIC2;
     public float transferMax;
@@ -252,43 +251,35 @@ public abstract class ItemElectricBase extends Item
 
     // All the following methods are for IC2 compatibility
 
-   /* @Override
-    @Method(modid = "IC2API")
-    public IElectricItemManager getManager(ItemStack itemstack) {
-        return (IElectricItemManager) ItemElectricBase.itemManagerIC2;
-    }
-
-
-
-    @Override
-    public boolean canProvideEnergy(ItemStack itemStack) {
-        return true;
-    }
-
-    @Override
-    public Item getChargedItem(ItemStack itemStack) {
-        return itemStack.getItem();
-    }
-
-    @Override
-    public Item getEmptyItem(ItemStack itemStack) {
-        return itemStack.getItem();
-    }
-
-    @Override
-    public int getTier(ItemStack itemStack) {
-        return 1;
-    }
-
-    @Override
-    public double getMaxCharge(ItemStack itemStack) {
-        return this.getMaxElectricityStored(itemStack) / EnergyConfigHandler.IC2_RATIO;
-    }
-
-    @Override
-    public double getTransferLimit(ItemStack itemStack) {
-        return this.transferMax * EnergyConfigHandler.TO_IC2_RATIO;
-    }
-
-    */
+    /*
+     * @Override
+     * @Method(modid = "IC2API")
+     * public IElectricItemManager getManager(ItemStack itemstack) {
+     * return (IElectricItemManager) ItemElectricBase.itemManagerIC2;
+     * }
+     * @Override
+     * public boolean canProvideEnergy(ItemStack itemStack) {
+     * return true;
+     * }
+     * @Override
+     * public Item getChargedItem(ItemStack itemStack) {
+     * return itemStack.getItem();
+     * }
+     * @Override
+     * public Item getEmptyItem(ItemStack itemStack) {
+     * return itemStack.getItem();
+     * }
+     * @Override
+     * public int getTier(ItemStack itemStack) {
+     * return 1;
+     * }
+     * @Override
+     * public double getMaxCharge(ItemStack itemStack) {
+     * return this.getMaxElectricityStored(itemStack) / EnergyConfigHandler.IC2_RATIO;
+     * }
+     * @Override
+     * public double getTransferLimit(ItemStack itemStack) {
+     * return this.transferMax * EnergyConfigHandler.TO_IC2_RATIO;
+     * }
+     */
 }

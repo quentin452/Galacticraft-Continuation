@@ -1,4 +1,5 @@
 package micdoodle8.mods.galacticraft.core.mixins;
+
 // todo completly move to TargetedModRewrite
 public enum TargetedMod {
 

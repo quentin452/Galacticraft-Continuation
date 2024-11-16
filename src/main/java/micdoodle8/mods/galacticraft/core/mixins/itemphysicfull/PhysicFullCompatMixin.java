@@ -1,9 +1,10 @@
 package micdoodle8.mods.galacticraft.core.mixins.itemphysicfull;
 
-import com.creativemd.itemphysic.ItemDummyContainer;
-import com.creativemd.itemphysic.physics.ServerPhysic;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.api.world.IOrbitDimension;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -19,18 +20,21 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.oredict.OreDictionary;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import com.creativemd.itemphysic.ItemDummyContainer;
+import com.creativemd.itemphysic.physics.ServerPhysic;
+
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.api.world.IOrbitDimension;
 
 @Mixin(ServerPhysic.class)
 public class PhysicFullCompatMixin {
+
     @Shadow
     public static Random random = new Random();
 
@@ -47,9 +51,12 @@ public class PhysicFullCompatMixin {
      */
     @Overwrite(remap = false)
     public static void update(EntityItem item) {
-        ItemStack stack = item.getDataWatcher().getWatchableObjectItemStack(10);
+        ItemStack stack = item.getDataWatcher()
+            .getWatchableObjectItemStack(10);
 
-        if (stack == null || stack.getItem() == null || !stack.getItem().onEntityItemUpdate(item)) {
+        if (stack == null || stack.getItem() == null
+            || !stack.getItem()
+                .onEntityItemUpdate(item)) {
             if (item.getEntityItem() == null) {
                 item.setDead();
             } else {
@@ -86,15 +93,32 @@ public class PhysicFullCompatMixin {
                     f = (float) (1.0 / density / 1.2);
                 }
 
-                item.noClip = func_145771_j(item, item.posX, (item.boundingBox.minY + item.boundingBox.maxY) / 2.0, item.posZ);
+                item.noClip = func_145771_j(
+                    item,
+                    item.posX,
+                    (item.boundingBox.minY + item.boundingBox.maxY) / 2.0,
+                    item.posZ);
                 item.moveEntity(item.motionX, item.motionY, item.motionZ);
-                boolean flag = (int) item.prevPosX != (int) item.posX || (int) item.prevPosY != (int) item.posY || (int) item.prevPosZ != (int) item.posZ;
+                boolean flag = (int) item.prevPosX != (int) item.posX || (int) item.prevPosY != (int) item.posY
+                    || (int) item.prevPosZ != (int) item.posZ;
                 if (flag || item.ticksExisted % 25 == 0) {
-                    if (item.worldObj.getBlock(MathHelper.floor_double(item.posX), MathHelper.floor_double(item.posY), MathHelper.floor_double(item.posZ)).getMaterial() == Material.lava && canItemBurn(stack)) {
+                    if (item.worldObj
+                        .getBlock(
+                            MathHelper.floor_double(item.posX),
+                            MathHelper.floor_double(item.posY),
+                            MathHelper.floor_double(item.posZ))
+                        .getMaterial() == Material.lava && canItemBurn(stack)) {
                         item.playSound("random.fizz", 0.4F, 2.0F + random.nextFloat() * 0.4F);
 
                         for (int zahl = 0; zahl < 100; ++zahl) {
-                            item.worldObj.spawnParticle("smoke", item.posX, item.posY, item.posZ, (double) random.nextFloat() * 0.1 - 0.05, 0.2 * random.nextDouble(), (double) random.nextFloat() * 0.1 - 0.05);
+                            item.worldObj.spawnParticle(
+                                "smoke",
+                                item.posX,
+                                item.posY,
+                                item.posZ,
+                                (double) random.nextFloat() * 0.1 - 0.05,
+                                0.2 * random.nextDouble(),
+                                (double) random.nextFloat() * 0.1 - 0.05);
                         }
                     }
 
@@ -104,7 +128,10 @@ public class PhysicFullCompatMixin {
                 }
 
                 if (item.onGround) {
-                    f = item.worldObj.getBlock(MathHelper.floor_double(item.posX), MathHelper.floor_double(item.boundingBox.minY) - 1, MathHelper.floor_double(item.posZ)).slipperiness * 0.98F;
+                    f = item.worldObj.getBlock(
+                        MathHelper.floor_double(item.posX),
+                        MathHelper.floor_double(item.boundingBox.minY) - 1,
+                        MathHelper.floor_double(item.posZ)).slipperiness * 0.98F;
                 }
 
                 item.motionX *= (double) f;
@@ -123,7 +150,11 @@ public class PhysicFullCompatMixin {
                 ++item.age;
                 if (!item.worldObj.isRemote && item.age >= item.lifespan) {
                     if (stack != null) {
-                        ItemExpireEvent event = new ItemExpireEvent(item, stack.getItem() == null ? 6000 : stack.getItem().getEntityLifespan(stack, item.worldObj));
+                        ItemExpireEvent event = new ItemExpireEvent(
+                            item,
+                            stack.getItem() == null ? 6000
+                                : stack.getItem()
+                                    .getEntityLifespan(stack, item.worldObj));
                         if (MinecraftForge.EVENT_BUS.post(event)) {
                             item.lifespan += event.extraLife;
                         } else {
@@ -166,12 +197,15 @@ public class PhysicFullCompatMixin {
 
         return 0.03999999910593033D;
     }
+
     @Shadow
     private static void searchForOtherItemsNearby(EntityItem item) {
-        Iterator iterator = item.worldObj.getEntitiesWithinAABB(EntityItem.class, item.boundingBox.expand(0.5, 0.0, 0.5)).iterator();
+        Iterator iterator = item.worldObj
+            .getEntitiesWithinAABB(EntityItem.class, item.boundingBox.expand(0.5, 0.0, 0.5))
+            .iterator();
 
-        while(iterator.hasNext()) {
-            EntityItem entityitem = (EntityItem)iterator.next();
+        while (iterator.hasNext()) {
+            EntityItem entityitem = (EntityItem) iterator.next();
             item.combineItems(entityitem);
         }
 
@@ -182,9 +216,9 @@ public class PhysicFullCompatMixin {
         int i = MathHelper.floor_double(p_145771_1_);
         int j = MathHelper.floor_double(p_145771_3_);
         int k = MathHelper.floor_double(p_145771_5_);
-        double d3 = p_145771_1_ - (double)i;
-        double d4 = p_145771_3_ - (double)j;
-        double d5 = p_145771_5_ - (double)k;
+        double d3 = p_145771_1_ - (double) i;
+        double d4 = p_145771_3_ - (double) j;
+        double d5 = p_145771_5_ - (double) k;
         List list = item.worldObj.func_147461_a(item.boundingBox);
         if (list.isEmpty() && !item.worldObj.func_147469_q(i, j, k)) {
             return false;
@@ -224,41 +258,43 @@ public class PhysicFullCompatMixin {
 
             float f = random.nextFloat() * 0.2F + 0.1F;
             if (b0 == 0) {
-                item.motionX = (double)(-f);
+                item.motionX = (double) (-f);
             }
 
             if (b0 == 1) {
-                item.motionX = (double)f;
+                item.motionX = (double) f;
             }
 
             if (b0 == 2) {
-                item.motionY = (double)(-f);
+                item.motionY = (double) (-f);
             }
 
             if (b0 == 3) {
-                item.motionY = (double)f;
+                item.motionY = (double) f;
             }
 
             if (b0 == 4) {
-                item.motionZ = (double)(-f);
+                item.motionZ = (double) (-f);
             }
 
             if (b0 == 5) {
-                item.motionZ = (double)f;
+                item.motionZ = (double) f;
             }
 
             return true;
         }
     }
+
     @Shadow
     public static Fluid getFluid(EntityItem item) {
         return getFluid(item, false);
     }
+
     @Shadow
     public static Fluid getFluid(EntityItem item, boolean below) {
-        double d0 = item.posY + (double)item.getEyeHeight();
+        double d0 = item.posY + (double) item.getEyeHeight();
         int i = MathHelper.floor_double(item.posX);
-        int j = MathHelper.floor_float((float)MathHelper.floor_double(d0));
+        int j = MathHelper.floor_float((float) MathHelper.floor_double(d0));
         if (below) {
             --j;
         }
@@ -267,7 +303,7 @@ public class PhysicFullCompatMixin {
         Block block = item.worldObj.getBlock(i, j, k);
         Fluid fluid = FluidRegistry.lookupFluidForBlock(block);
         if (fluid == null && block instanceof IFluidBlock) {
-            fluid = ((IFluidBlock)block).getFluid();
+            fluid = ((IFluidBlock) block).getFluid();
         } else if (block instanceof BlockLiquid) {
             fluid = FluidRegistry.WATER;
         }
@@ -277,67 +313,70 @@ public class PhysicFullCompatMixin {
         } else {
             double filled = 1.0;
             if (block instanceof IFluidBlock) {
-                filled = (double)((IFluidBlock)block).getFilledPercentage(item.worldObj, i, j, k);
+                filled = (double) ((IFluidBlock) block).getFilledPercentage(item.worldObj, i, j, k);
             }
 
             if (filled < 0.0) {
                 filled *= -1.0;
-                if (d0 > (double)j + (1.0 - filled)) {
+                if (d0 > (double) j + (1.0 - filled)) {
                     return fluid;
                 }
-            } else if (d0 < (double)j + filled) {
+            } else if (d0 < (double) j + filled) {
                 return fluid;
             }
 
             return null;
         }
     }
+
     @Shadow
     public static boolean canItemSwim(ItemStack stack) {
         return contains(swimItem, stack);
     }
 
-   @Shadow
-   public static boolean contains(ArrayList list, ItemStack stack) {
-       if (stack != null && stack.getItem() != null) {
-           Object object = stack.getItem();
-           Material material = null;
-           if (object instanceof ItemBlock) {
-               object = Block.getBlockFromItem((Item)object);
-               material = ((Block)object).getMaterial();
-           }
+    @Shadow
+    public static boolean contains(ArrayList list, ItemStack stack) {
+        if (stack != null && stack.getItem() != null) {
+            Object object = stack.getItem();
+            Material material = null;
+            if (object instanceof ItemBlock) {
+                object = Block.getBlockFromItem((Item) object);
+                material = ((Block) object).getMaterial();
+            }
 
-           int[] ores = OreDictionary.getOreIDs(stack);
+            int[] ores = OreDictionary.getOreIDs(stack);
 
-           for(int i = 0; i < list.size(); ++i) {
-               if (list.get(i) instanceof ItemStack && ItemStack.areItemStacksEqual(stack, (ItemStack)list.get(i))) {
-                   return true;
-               }
+            for (int i = 0; i < list.size(); ++i) {
+                if (list.get(i) instanceof ItemStack && ItemStack.areItemStacksEqual(stack, (ItemStack) list.get(i))) {
+                    return true;
+                }
 
-               if (list.get(i) == object) {
-                   return true;
-               }
+                if (list.get(i) == object) {
+                    return true;
+                }
 
-               if (list.get(i) == material) {
-                   return true;
-               }
+                if (list.get(i) == material) {
+                    return true;
+                }
 
-               if (list.get(i) instanceof String) {
-                   for(int j = 0; j < ores.length; ++j) {
-                       if (OreDictionary.getOreName(ores[j]).contains((CharSequence)list.get(i))) {
-                           return true;
-                       }
-                   }
-               }
-           }
+                if (list.get(i) instanceof String) {
+                    for (int j = 0; j < ores.length; ++j) {
+                        if (OreDictionary.getOreName(ores[j])
+                            .contains((CharSequence) list.get(i))) {
+                            return true;
+                        }
+                    }
+                }
+            }
 
-           return false;
-       } else {
-           return false;
-       }
-   }
-   @Shadow
-   public static boolean canItemBurn(ItemStack stack) {
-       return TileEntityFurnace.isItemFuel(stack) ? true : contains(burnItem, stack);
-   }
+            return false;
+        } else {
+            return false;
+        }
+    }
+
+    @Shadow
+    public static boolean canItemBurn(ItemStack stack) {
+        return TileEntityFurnace.isItemFuel(stack) ? true : contains(burnItem, stack);
+    }
 }

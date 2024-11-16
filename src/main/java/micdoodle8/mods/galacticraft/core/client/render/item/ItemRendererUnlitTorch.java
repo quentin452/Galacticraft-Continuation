@@ -1,10 +1,11 @@
 package micdoodle8.mods.galacticraft.core.client.render.item;
 
+import java.util.Objects;
+
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.IItemRenderer;
-import org.lwjgl.opengl.GL11;
 
-import java.util.Objects;
+import org.lwjgl.opengl.GL11;
 
 public class ItemRendererUnlitTorch implements IItemRenderer {
 

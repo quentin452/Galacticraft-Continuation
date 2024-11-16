@@ -1,13 +1,15 @@
 package micdoodle8.mods.galacticraft.api.galaxies;
 
-import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
+import java.util.ArrayList;
+import java.util.Locale;
+
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldProvider;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import java.util.ArrayList;
-import java.util.Locale;
+import micdoodle8.mods.galacticraft.api.world.IAtmosphericGas;
 
 public abstract class CelestialBody implements Comparable<CelestialBody> {
 

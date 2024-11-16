@@ -1,25 +1,18 @@
 package micdoodle8.mods.galacticraft.core.energy.tile;
 
-import appeng.api.networking.energy.IEnergySource;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.util.ForgeDirection;
+
 import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.common.Optional.InterfaceList;
-import cpw.mods.fml.common.eventhandler.Event;
 import mekanism.api.energy.IStrictEnergyAcceptor;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IConductor;
-import micdoodle8.mods.galacticraft.api.transmission.tile.IElectrical;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
 import micdoodle8.mods.galacticraft.core.energy.EnergyUtil;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.ForgeDirection;
 
-import java.lang.reflect.Constructor;
-
-@InterfaceList({
-    @Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyHandler"),
+@InterfaceList({ @Interface(modid = "CoFHAPI|energy", iface = "cofh.api.energy.IEnergyHandler"),
     @Interface(modid = "MekanismAPI|energy", iface = "mekanism.api.energy.IStrictEnergyAcceptor"), })
 public abstract class TileBaseUniversalConductor extends TileBaseConductor
     implements IEnergyHandler, IStrictEnergyAcceptor {
@@ -49,8 +42,7 @@ public abstract class TileBaseUniversalConductor extends TileBaseConductor
         super.updateEntity();
 
         if (!this.isAddedToEnergyNet) {
-            if (!this.worldObj.isRemote) {
-            }
+            if (!this.worldObj.isRemote) {}
 
             this.isAddedToEnergyNet = true;
         }

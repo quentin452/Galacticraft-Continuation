@@ -1,6 +1,13 @@
 package micdoodle8.mods.galacticraft.core.energy;
 
-import appeng.api.networking.energy.IEnergySource;
+import java.lang.reflect.Method;
+import java.util.List;
+
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
 import cofh.api.energy.IEnergyConnection;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.energy.IEnergyProvider;
@@ -12,15 +19,6 @@ import micdoodle8.mods.galacticraft.api.transmission.tile.IElectrical;
 import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
 import micdoodle8.mods.galacticraft.core.energy.tile.EnergyStorageTile;
 import micdoodle8.mods.galacticraft.core.energy.tile.TileBaseConductor;
-import micdoodle8.mods.galacticraft.core.util.ConfigManagerCore;
-import micdoodle8.mods.galacticraft.core.util.GCLog;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 public class EnergyUtil {
 
@@ -169,7 +167,7 @@ public class EnergyUtil {
 
     public static float otherModsEnergyExtract(TileEntity tileAdj, ForgeDirection inputAdj, float toPull,
         boolean simulate) {
-            if (isRF2Loaded && !EnergyConfigHandler.disableRFInput && tileAdj instanceof IEnergyProvider) {
+        if (isRF2Loaded && !EnergyConfigHandler.disableRFInput && tileAdj instanceof IEnergyProvider) {
             return ((IEnergyProvider) tileAdj)
                 .extractEnergy(inputAdj, MathHelper.floor_float(toPull * EnergyConfigHandler.TO_RF_RATIO), simulate)
                 / EnergyConfigHandler.TO_RF_RATIO;
@@ -215,7 +213,6 @@ public class EnergyUtil {
         if (tileAdj instanceof TileBaseConductor || tileAdj instanceof EnergyStorageTile) {
             return false; // Do not try using other mods' methods to connect to GC's own tiles
         }
-
 
         if (isRF1Loaded && tileAdj instanceof IEnergyHandler || isRF2Loaded && tileAdj instanceof IEnergyProvider) {
             return ((IEnergyConnection) tileAdj).canConnectEnergy(side);

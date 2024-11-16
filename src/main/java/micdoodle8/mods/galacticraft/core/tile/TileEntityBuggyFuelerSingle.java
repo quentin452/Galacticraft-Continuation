@@ -1,11 +1,12 @@
 package micdoodle8.mods.galacticraft.core.tile;
 
-import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
-import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
+import java.util.ArrayList;
+
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 
-import java.util.ArrayList;
+import micdoodle8.mods.galacticraft.api.vector.BlockVec3;
+import micdoodle8.mods.galacticraft.core.blocks.GCBlocks;
 
 public class TileEntityBuggyFuelerSingle extends TileEntity {
 

@@ -1,13 +1,16 @@
 package micdoodle8.mods.galacticraft.api.recipe;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.SetMultimap;
-import micdoodle8.mods.galacticraft.api.entity.IFuelable;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
+
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
-import javax.annotation.Nonnull;
-import java.util.Set;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
+
+import micdoodle8.mods.galacticraft.api.entity.IFuelable;
 
 /**
  * Handles which fluids can be used to fuel an {@link IFuelable} object. This is used by the Fuel Loader but you can use

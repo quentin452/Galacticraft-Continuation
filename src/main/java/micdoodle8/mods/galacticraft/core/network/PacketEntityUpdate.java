@@ -1,13 +1,14 @@
 package micdoodle8.mods.galacticraft.core.network;
 
+import java.util.UUID;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import micdoodle8.mods.galacticraft.api.vector.Vector2;
 import micdoodle8.mods.galacticraft.api.vector.Vector3;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-
-import java.util.UUID;
 
 public class PacketEntityUpdate implements IPacket {
 

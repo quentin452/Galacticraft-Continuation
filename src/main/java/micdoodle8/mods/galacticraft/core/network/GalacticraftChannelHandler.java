@@ -1,5 +1,9 @@
 package micdoodle8.mods.galacticraft.core.network;
 
+import java.util.EnumMap;
+
+import net.minecraft.entity.player.EntityPlayerMP;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.FMLIndexedMessageToMessageCodec;
@@ -10,9 +14,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import micdoodle8.mods.galacticraft.core.Constants;
 import micdoodle8.mods.galacticraft.core.util.GCLog;
-import net.minecraft.entity.player.EntityPlayerMP;
-
-import java.util.EnumMap;
 
 public class GalacticraftChannelHandler extends FMLIndexedMessageToMessageCodec<IPacket> {
 

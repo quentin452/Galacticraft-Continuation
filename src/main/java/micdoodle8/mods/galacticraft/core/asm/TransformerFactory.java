@@ -1,10 +1,11 @@
 package micdoodle8.mods.galacticraft.core.asm;
 
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
-import cpw.mods.fml.relauncher.Side;
+import java.util.function.BiFunction;
+
 import org.objectweb.asm.ClassVisitor;
 
-import java.util.function.BiFunction;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
+import cpw.mods.fml.relauncher.Side;
 
 class TransformerFactory {
 

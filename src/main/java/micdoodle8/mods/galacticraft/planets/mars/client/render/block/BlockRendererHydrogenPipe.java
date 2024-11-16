@@ -1,15 +1,17 @@
 package micdoodle8.mods.galacticraft.planets.mars.client.render.block;
 
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityHydrogenPipe;
+import java.util.Arrays;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Arrays;
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import micdoodle8.mods.galacticraft.planets.mars.tile.TileEntityHydrogenPipe;
 
 public class BlockRendererHydrogenPipe implements ISimpleBlockRenderingHandler {
 

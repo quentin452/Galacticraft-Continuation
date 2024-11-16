@@ -1,11 +1,11 @@
 package micdoodle8.mods.galacticraft.core.asm;
 
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-
 import static micdoodle8.mods.galacticraft.core.asm.GCLoadingPlugin.dev;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.NEW;
+
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
 
 /**
  * This cannot be a mixin, as it'd otherwise break on thermos server

@@ -1,10 +1,7 @@
 package micdoodle8.mods.galacticraft.core.asm;
 
-import com.google.common.collect.ImmutableMap;
-import net.minecraft.launchwrapper.IClassTransformer;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.util.TraceClassVisitor;
+import static micdoodle8.mods.galacticraft.core.asm.GCLoadingPlugin.debugOutputDir;
+import static org.objectweb.asm.Opcodes.ASM5;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -12,8 +9,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static micdoodle8.mods.galacticraft.core.asm.GCLoadingPlugin.debugOutputDir;
-import static org.objectweb.asm.Opcodes.ASM5;
+import net.minecraft.launchwrapper.IClassTransformer;
+
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.util.TraceClassVisitor;
+
+import com.google.common.collect.ImmutableMap;
 
 public class GCTransformer implements IClassTransformer {
 

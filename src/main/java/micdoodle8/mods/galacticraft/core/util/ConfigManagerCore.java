@@ -1,6 +1,23 @@
 package micdoodle8.mods.galacticraft.core.util;
 
+import static net.minecraftforge.common.config.Configuration.CATEGORY_GENERAL;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+
 import com.google.common.primitives.Ints;
+
 import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.registry.GameData;
@@ -13,21 +30,6 @@ import micdoodle8.mods.galacticraft.core.energy.EnergyConfigHandler;
 import micdoodle8.mods.galacticraft.core.recipe.RecipeManagerGC;
 import micdoodle8.mods.galacticraft.core.tick.TickHandlerClient;
 import micdoodle8.mods.galacticraft.planets.asteroids.world.gen.BiomeGenBaseAsteroids;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static net.minecraftforge.common.config.Configuration.CATEGORY_GENERAL;
 
 public class ConfigManagerCore {
 
@@ -125,7 +127,7 @@ public class ConfigManagerCore {
     // KEYBOARD AND MOUSE
     public static float mapMouseScrollSensitivity;
     public static boolean invertMapMouseScroll;
-    //Kept to ensure backwards-compatibility with certain Galacticraft addons
+    // Kept to ensure backwards-compatibility with certain Galacticraft addons
     public static int keyOverrideFuelLevelI = 0;
     public static ArrayList<Object> clientSave = null;
 

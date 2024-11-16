@@ -1,8 +1,9 @@
 package micdoodle8.mods.galacticraft.core.network;
 
+import net.minecraft.entity.player.EntityPlayer;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import net.minecraft.entity.player.EntityPlayer;
 
 public interface IPacket {
 

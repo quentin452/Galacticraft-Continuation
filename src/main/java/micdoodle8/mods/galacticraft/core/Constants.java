@@ -1,7 +1,5 @@
 package micdoodle8.mods.galacticraft.core;
 
-import micdoodle8.mods.galacticraft.api.Tags;
-
 public class Constants {
 
     public static final String MOD_ID_CORE = "GalacticraftCore";

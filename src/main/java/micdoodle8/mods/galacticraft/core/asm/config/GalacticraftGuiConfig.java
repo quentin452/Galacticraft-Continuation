@@ -1,11 +1,11 @@
 package micdoodle8.mods.galacticraft.core.asm.config;
 
+import net.minecraft.client.gui.GuiScreen;
+
 import com.falsepattern.lib.config.ConfigException;
 import com.falsepattern.lib.config.SimpleGuiConfig;
-import fr.iamacat.optimizationsandtweaks.Tags;
-import fr.iamacat.optimizationsandtweaks.config.OptimizationsandTweaksConfig;
+
 import micdoodle8.mods.galacticraft.core.Constants;
-import net.minecraft.client.gui.GuiScreen;
 
 public class GalacticraftGuiConfig extends SimpleGuiConfig {
 

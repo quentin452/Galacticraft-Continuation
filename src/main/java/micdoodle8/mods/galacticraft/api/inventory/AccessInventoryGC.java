@@ -1,9 +1,9 @@
 package micdoodle8.mods.galacticraft.api.inventory;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import net.minecraft.entity.player.EntityPlayerMP;
 
 /**
  * A static method for other mods to access the Galacticraft extended inventory.

@@ -1,9 +1,10 @@
 package micdoodle8.mods.galacticraft.api.event;
 
-import cpw.mods.fml.common.eventhandler.Cancelable;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.event.entity.living.LivingEvent;
+
+import cpw.mods.fml.common.eventhandler.Cancelable;
 
 /**
  * Entity Living zero gravity events.

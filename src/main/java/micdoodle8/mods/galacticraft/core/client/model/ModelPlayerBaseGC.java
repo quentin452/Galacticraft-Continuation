@@ -1,17 +1,8 @@
 package micdoodle8.mods.galacticraft.core.client.model;
 
-import api.player.model.ModelPlayer;
-import api.player.model.ModelPlayerAPI;
-import api.player.model.ModelPlayerBase;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.Loader;
-import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
-import micdoodle8.mods.galacticraft.api.prefab.entity.EntityTieredRocket;
-import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
-import micdoodle8.mods.galacticraft.core.GalacticraftCore;
-import micdoodle8.mods.galacticraft.core.network.PacketSimple;
-import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
-import micdoodle8.mods.galacticraft.core.wrappers.PlayerGearData;
+import java.lang.reflect.Constructor;
+import java.util.List;
+
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.model.ModelBase;
@@ -28,10 +19,21 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModelCustom;
 import net.smart.render.playerapi.SmartRender;
+
 import org.lwjgl.opengl.GL11;
 
-import java.lang.reflect.Constructor;
-import java.util.List;
+import api.player.model.ModelPlayer;
+import api.player.model.ModelPlayerAPI;
+import api.player.model.ModelPlayerBase;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.Loader;
+import micdoodle8.mods.galacticraft.api.item.IHoldableItem;
+import micdoodle8.mods.galacticraft.api.prefab.entity.EntityTieredRocket;
+import micdoodle8.mods.galacticraft.api.world.IGalacticraftWorldProvider;
+import micdoodle8.mods.galacticraft.core.GalacticraftCore;
+import micdoodle8.mods.galacticraft.core.network.PacketSimple;
+import micdoodle8.mods.galacticraft.core.proxy.ClientProxyCore;
+import micdoodle8.mods.galacticraft.core.wrappers.PlayerGearData;
 
 @SuppressWarnings("unchecked")
 public class ModelPlayerBaseGC extends ModelPlayerBase {

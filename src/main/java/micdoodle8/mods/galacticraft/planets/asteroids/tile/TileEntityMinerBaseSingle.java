@@ -1,9 +1,10 @@
 package micdoodle8.mods.galacticraft.planets.asteroids.tile;
 
-import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
+import java.util.ArrayList;
+
 import net.minecraft.tileentity.TileEntity;
 
-import java.util.ArrayList;
+import micdoodle8.mods.galacticraft.planets.asteroids.blocks.AsteroidBlocks;
 
 public class TileEntityMinerBaseSingle extends TileEntity {
 

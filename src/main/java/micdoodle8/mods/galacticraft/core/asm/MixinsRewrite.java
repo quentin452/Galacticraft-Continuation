@@ -1,13 +1,14 @@
 package micdoodle8.mods.galacticraft.core.asm;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 import com.falsepattern.lib.mixin.IMixin;
 import com.falsepattern.lib.mixin.ITargetedMod;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import micdoodle8.mods.galacticraft.core.asm.config.GalacticraftConfig;
-
-import java.util.List;
-import java.util.function.Predicate;
 
 @RequiredArgsConstructor
 public enum MixinsRewrite implements IMixin {
@@ -15,12 +16,9 @@ public enum MixinsRewrite implements IMixin {
     // TWEAKING MIXINS
 
     PREVENT_FIRE_RENDERING_WITHOUT_O2(Side.COMMON,
-        avoid(TargetedModRewrite.ITEMPHYSICFULL).and(m -> GalacticraftConfig.enableEntityItemMixin),
-        "core.MixinWorld"),
+        avoid(TargetedModRewrite.ITEMPHYSICFULL).and(m -> GalacticraftConfig.enableEntityItemMixin), "core.MixinWorld"),
 
-    PHYSIC_FULL_COMPAT(Side.COMMON,
-        m -> GalacticraftConfig.enablePhysicFullCompatMixin,
-        "lotrimprovements.MixinMain"),
+    PHYSIC_FULL_COMPAT(Side.COMMON, m -> GalacticraftConfig.enablePhysicFullCompatMixin, "lotrimprovements.MixinMain"),
 
     // MOD-FILTERED MIXINS
 

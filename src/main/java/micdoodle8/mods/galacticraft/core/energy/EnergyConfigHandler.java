@@ -1,13 +1,14 @@
 package micdoodle8.mods.galacticraft.core.energy;
 
-import cpw.mods.fml.common.Loader;
-import micdoodle8.mods.galacticraft.core.util.GCLog;
-import net.minecraftforge.common.config.Configuration;
-
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.minecraftforge.common.config.Configuration;
+
+import cpw.mods.fml.common.Loader;
+import micdoodle8.mods.galacticraft.core.util.GCLog;
 
 /**
  * The universal energy compatibility module allows Galacticraft to be compatible with most other major power systems in
@@ -436,6 +437,7 @@ public class EnergyConfigHandler {
         EnergyConfigHandler.conversionLossFactor = sLossRatio;
         updateRatios();
     }
+
     public static boolean isIndustrialCraft2Loaded() {
         if (!cachedIC2Loaded) {
             cachedIC2Loaded = true;

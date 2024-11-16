@@ -1,12 +1,13 @@
 package micdoodle8.mods.galacticraft.core.asm;
 
-import com.falsepattern.lib.mixin.ITargetedMod;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.*;
 
 import java.util.function.Predicate;
 
-import static com.falsepattern.lib.mixin.ITargetedMod.PredicateHelpers.*;
+import com.falsepattern.lib.mixin.ITargetedMod;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum TargetedModRewrite implements ITargetedMod {

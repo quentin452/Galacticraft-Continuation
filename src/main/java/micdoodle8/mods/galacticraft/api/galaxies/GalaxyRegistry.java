@@ -1,10 +1,12 @@
 package micdoodle8.mods.galacticraft.api.galaxies;
 
-import com.google.common.collect.*;
-import cpw.mods.fml.common.eventhandler.Event;
+import java.util.*;
+
 import net.minecraftforge.common.MinecraftForge;
 
-import java.util.*;
+import com.google.common.collect.*;
+
+import cpw.mods.fml.common.eventhandler.Event;
 
 /**
  * Credits to KingLemming and CovertJaguar, since this is based on the Liquid/Fluid API
