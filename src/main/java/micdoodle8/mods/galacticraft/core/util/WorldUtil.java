@@ -273,9 +273,13 @@ public class WorldUtil {
     public static Vec3 getSkyColorHook(World world) {
         final EntityClientPlayerMP player = FMLClientHandler.instance()
             .getClient().thePlayer;
+
+        if (player == null || world == null || world.provider == null) {
+            return Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
+        }
+
         if (world.provider.getSkyRenderer() instanceof SkyProviderOverworld
-            || player != null && player.posY > Constants.OVERWORLD_CLOUD_HEIGHT
-                && player.ridingEntity instanceof EntitySpaceshipBase) {
+            || player.posY > Constants.OVERWORLD_CLOUD_HEIGHT && player.ridingEntity instanceof EntitySpaceshipBase) {
             final float f1 = world.getCelestialAngle(1.0F);
             float f2 = MathHelper.cos(f1 * (float) Math.PI * 2.0F) * 2.0F + 0.5F;
 
@@ -303,6 +307,11 @@ public class WorldUtil {
                     FMLClientHandler.instance()
                         .getClient().renderViewEntity,
                     1.0F);
+
+                if (vec == null) {
+                    return Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
+                }
+
                 final double blend = (player.posY - Constants.OVERWORLD_CLOUD_HEIGHT)
                     / (Constants.OVERWORLD_SKYPROVIDER_STARTHEIGHT - Constants.OVERWORLD_CLOUD_HEIGHT);
                 final double ablend = 1 - blend;
@@ -325,10 +334,13 @@ public class WorldUtil {
                 f6 * ablend + blend * 99.0D);
         }
 
-        return world.getSkyColor(
-            FMLClientHandler.instance()
-                .getClient().renderViewEntity,
-            1.0F);
+        Entity renderViewEntity = FMLClientHandler.instance()
+            .getClient().renderViewEntity;
+        if (renderViewEntity == null) {
+            return Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
+        }
+
+        return world.getSkyColor(renderViewEntity, 1.0F);
     }
 
     public static WorldProvider getProviderForNameServer(String par1String) {
